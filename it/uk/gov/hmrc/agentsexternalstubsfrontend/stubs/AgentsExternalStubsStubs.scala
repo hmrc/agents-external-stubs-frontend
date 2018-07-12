@@ -14,7 +14,7 @@ trait AgentsExternalStubsStubs {
     val sessionId = UUID.randomUUID().toString
 
     stubFor(
-      post(urlEqualTo(s"/agents-external-stubs/login"))
+      post(urlEqualTo(s"/agents-external-stubs/sign-in"))
         .withRequestBody(equalToJson(s"""{"userId":"$username","plainTextPassword":"$password"}"""))
         .willReturn(aResponse()
           .withStatus(Status.CREATED)

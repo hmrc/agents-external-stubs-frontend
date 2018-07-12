@@ -5,7 +5,7 @@ import java.net.URL
 import javax.inject.{Inject, Named, Singleton}
 import play.api.libs.json.{Json, Reads}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.LoginController.Credentials
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.Credentials
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -23,7 +23,7 @@ class AgentsExternalStubsConnector @Inject()(
 
   def login(credentials: Credentials)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] =
     http
-      .POST[Credentials, HttpResponse](new URL(baseUrl, "/agents-external-stubs/login").toExternalForm, credentials)
+      .POST[Credentials, HttpResponse](new URL(baseUrl, "/agents-external-stubs/sign-in").toExternalForm, credentials)
       .map(
         response =>
           response

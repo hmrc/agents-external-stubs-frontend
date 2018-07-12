@@ -5,7 +5,7 @@ import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.{Json, OWrites, Writes}
+import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
@@ -16,20 +16,23 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import scala.concurrent.Future
 
 @Singleton
-class LoginController @Inject()(
+class SignInController @Inject()(
   override val messagesApi: MessagesApi,
   agentsExternalStubsConnector: AgentsExternalStubsConnector
 )(implicit val configuration: Configuration)
     extends FrontendController with I18nSupport {
 
-  import LoginController._
+  import SignInController._
 
-  def showLogin(continueUrlOpt: Option[ContinueUrl], origin: String, accountType: Option[String]): Action[AnyContent] =
+  def showSignInPage(
+    continueUrlOpt: Option[ContinueUrl],
+    origin: String,
+    accountType: Option[String]): Action[AnyContent] =
     Action { implicit request =>
-      Ok(html.login_form(LoginForm, routes.LoginController.login(continueUrlOpt, origin, accountType)))
+      Ok(html.sign_in(LoginForm, routes.SignInController.signIn(continueUrlOpt, origin, accountType)))
     }
 
-  def login(
+  def signIn(
     continueUrlOpt: Option[ContinueUrl],
     origin: String,
     accountType: Option[String] = None): Action[AnyContent] =
@@ -39,7 +42,7 @@ class LoginController @Inject()(
         .fold(
           formWithErrors =>
             Future.successful(
-              Ok(html.login_form(formWithErrors, routes.LoginController.login(continueUrlOpt, origin, accountType)))),
+              Ok(html.sign_in(formWithErrors, routes.SignInController.signIn(continueUrlOpt, origin, accountType)))),
           credentials =>
             for {
               session <- agentsExternalStubsConnector.login(credentials)
@@ -58,7 +61,7 @@ class LoginController @Inject()(
 
 }
 
-object LoginController {
+object SignInController {
 
   case class Credentials(userId: String, plainTextPassword: String)
   object Credentials {

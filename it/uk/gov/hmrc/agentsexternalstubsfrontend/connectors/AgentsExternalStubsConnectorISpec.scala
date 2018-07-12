@@ -4,7 +4,7 @@ import java.net.URL
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.LoginController.Credentials
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.Credentials
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.http._
@@ -20,7 +20,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
 
   "AgentsExternalStubsConnector" when {
 
-    "login" should {
+    "signIn" should {
 
       "return authenticated session" in {
         val sessionId = givenUserCanSignIn("foo", "bar")
@@ -39,7 +39,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
 
       "throw an exception if the response is 400" in {
         stubFor(
-          post(urlEqualTo(s"/agents-external-stubs/login"))
+          post(urlEqualTo(s"/agents-external-stubs/sign-in"))
             .willReturn(aResponse()
               .withStatus(Status.BAD_REQUEST)))
 

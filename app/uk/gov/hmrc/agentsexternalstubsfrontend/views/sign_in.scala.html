@@ -1,7 +1,7 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.play.views.html.helpers.form
 
-@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.LoginController.Credentials], postUrl: Call)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.Credentials], postUrl: Call)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("login.title"), bodyClasses = None) {
 

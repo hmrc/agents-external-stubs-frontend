@@ -5,26 +5,26 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.Html
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{LoginController, routes}
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.LoginController.Credentials
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{SignInController, routes}
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.Credentials
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.error_template_Scope0.error_template_Scope1.error_template
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.govuk_wrapper_Scope0.govuk_wrapper_Scope1.govuk_wrapper
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.login_form_Scope0.login_form_Scope1.login_form
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.sign_in_Scope0.sign_in_Scope1.sign_in
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template_Scope0.main_template_Scope1.main_template
 import uk.gov.hmrc.play.test.UnitSpec
 
 class ViewsSpec extends UnitSpec with OneAppPerSuite {
 
-  private val filledForm = LoginController.LoginForm.fill(
+  private val filledForm = SignInController.LoginForm.fill(
     Credentials(userId = "My contact name", plainTextPassword = "AA1 1AA")
   )
 
-  "login view" should {
+  "signIn view" should {
     "render title and messages" in new App {
-      val html = new login_form()
+      val html = new sign_in()
         .render(
           loginForm = filledForm,
-          postUrl = routes.LoginController.login(None, "", None),
+          postUrl = routes.SignInController.signIn(None, "", None),
           request = FakeRequest(),
           messages = Messages.Implicits.applicationMessages,
           config = app.configuration
@@ -42,7 +42,7 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
       content should include(Messages("login.username"))
       content should include(Messages("login.password"))
 
-      val html2 = new login_form().f(filledForm, routes.LoginController.login(None, "", None))(
+      val html2 = new sign_in().f(filledForm, routes.SignInController.signIn(None, "", None))(
         FakeRequest(),
         Messages.Implicits.applicationMessages,
         app.configuration)

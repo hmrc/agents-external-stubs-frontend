@@ -7,15 +7,15 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
 
-class LoginControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
+class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
-  private lazy val controller: LoginController = app.injector.instanceOf[LoginController]
+  private lazy val controller: SignInController = app.injector.instanceOf[SignInController]
 
-  "LoginController" when {
+  "SignInController" when {
 
     "GET /gg/sign-in" should {
-      "display login page" in {
-        val result = controller.showLogin(Some(ContinueUrl("/there")), "here", None)(FakeRequest())
+      "display signIn page" in {
+        val result = controller.showSignInPage(Some(ContinueUrl("/there")), "here", None)(FakeRequest())
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
       }
@@ -24,7 +24,7 @@ class LoginControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "POST /gg/sign-in" should {
       "redirect to continue URL if provided" in {
         val sessionId = givenUserCanSignIn("foo", "bar")
-        val result = controller.login(Some(ContinueUrl("/there")), "here", None)(FakeRequest()
+        val result = controller.signIn(Some(ContinueUrl("/there")), "here", None)(FakeRequest()
           .withFormUrlEncodedBody("userId" -> "foo", "password" -> "bar"))
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/there")

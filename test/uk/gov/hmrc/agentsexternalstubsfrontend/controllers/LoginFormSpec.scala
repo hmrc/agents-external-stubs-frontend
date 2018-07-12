@@ -1,6 +1,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.LoginController.Credentials
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.Credentials
 import uk.gov.hmrc.play.test.UnitSpec
 
 class LoginFormSpec extends UnitSpec {
@@ -8,7 +8,7 @@ class LoginFormSpec extends UnitSpec {
   "LoginForm" should {
 
     "bind some input fields and return Credentials and fill it back" in {
-      val form = LoginController.LoginForm
+      val form = SignInController.LoginForm
 
       val value = Credentials(userId = "bar", plainTextPassword = "foo")
 
@@ -19,7 +19,7 @@ class LoginFormSpec extends UnitSpec {
     }
 
     "bind all input fields and return Credentials and fill it back" in {
-      val form = LoginController.LoginForm
+      val form = SignInController.LoginForm
 
       val value = Credentials(userId = "foo", plainTextPassword = "bar")
 
