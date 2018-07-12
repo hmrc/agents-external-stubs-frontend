@@ -1,0 +1,32 @@
+# Validation errors
+error.prefix=Error:
+error.summary.heading=There is a problem
+error.postcode.invalid=You can only enter these characters: A-Z 0-9
+error.telephone.invalid=You can only enter these characters: 0-9 ( ) space
+error.string.invalid=You can only enter these characters: a-z A-Z 0-9 ,.() - ! @ space
+error.maxLength=You can only enter up to {0} characters
+error.email=Enter a valid email address
+
+# Service specific messages
+app.name=Agents External Stubs
+servicename.titleSuffix=Agents External Stubs - GOV.UK
+
+# Start page
+start.title=Agents External Stubs
+start.label=Agents External Stubs
+start.intro=Describe purpose of your service / journey
+start.helpdesklink.text1=Contact the online services helpdesk
+start.helpdesklink.text2=if you need help.
+
+# Login page
+login.continue = Continue
+login.title=Sign in
+login.error.invalid.username=Invalid Username:
+login.error.invalid.password=Invalid Password:
+login.username=User ID
+login.password=Password
+login.submit=Sign in
+
+login.sa.header=Sign in
+login.sa.problems.header=Problems signing in
+login.sa.description=Enter your Government Gateway credentials to sign in. You received these when you created your HMRC online account.

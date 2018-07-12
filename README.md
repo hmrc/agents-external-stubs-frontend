@@ -2,6 +2,12 @@
 
 [ ![Download](https://api.bintray.com/packages/hmrc/releases/agents-external-stubs-frontend/images/download.svg) ](https://bintray.com/hmrc/releases/agents-external-stubs-frontend/_latestVersion)
 
+This microservice is part of Agent Services local testing framework, 
+providing dynamic stubs for some UI journeys.
+
+
+This app SHOULD NOT be run on QA and Production environment.
+
 ## Running the tests
 
     sbt test it:test
@@ -12,13 +18,15 @@
 
 ## Running the app locally
 
-    sm --start AGENT_MTD -f
-    sm --stop AGENTS_EXTERNAL_STUBS_FRONTEND
+    sm --start AGENTS_EXTERNAL_STUBS_FRONTEND -f
+    
+or
+    
     sbt run
 
 It should then be listening on port 9099
 
-    browse http://localhost:9099/agents-external-stubs
+    browse http://localhost:9099/
 
 ### License
 

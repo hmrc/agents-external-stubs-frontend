@@ -1,0 +1,61 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.play.views.html.helpers.form
+
+@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.LoginController.Credentials], postUrl: Call)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("login.title"), bodyClasses = None) {
+
+    <header>
+        <h1>@Messages("login.sa.header")</h1>
+    </header>
+
+    <p>
+    @Html(Messages("login.sa.description"))
+    </p>
+
+    <div>
+
+        @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
+            <fieldset>
+                <div class="form-field-group @if(loginForm.hasErrors) {form-field-group--error}">
+                    @loginForm.errors("userId").map { error =>
+                        <span class="error-notification username">Invalid Username: @Messages(error.message)</span>
+                    }
+                    @loginForm.errors("password").map { error =>
+                        <span class="error-notification password">Invalid Password: @Messages(error.message)</span>
+                    }
+                    @loginForm.globalErrors.map { error =>
+                        <span class="error-notification password">@Messages(error.message)</span>
+                    }
+                    <div class="form-field">
+                        <label class="label--inline" for="userId">@Html(Messages("login.username"))</label>
+                        <input type="text" id="userId" name="userId" required />
+                    </div>
+
+                    <div class="form-field">
+                        <label class="label--inline" for="password">@Messages("login.password")</label>
+                        <input type="password" id="password" name="password" required />
+                    </div>
+
+                    <div class="form-field">
+                        <button class="button" type="submit" id="signin">@Messages("login.submit")</button>
+                    </div>
+                </div>
+            </fieldset>
+        }
+
+        <h2>@Messages("login.sa.problems.header")</h2>
+        <ul>
+            <li><a id="verify-user" href="/ida/sa/login" target="_self" data-sso="false">Trying to file Self Assessment using GOV.UK Verify?</a></li>
+            <li><a id="registration" href="/government-gateway-registration-frontend/route?continue=https%3A%2F%2Fwww.qa.tax.service.gov.uk%2Finvitations%2Fagents%2Fselect-service&amp;origin=agent-invitations-frontend" target="_self" data-sso="false" data-journey-click="sos_gg_login:gg_login_end:exit_create_new_gg_account">Don’t have a Government Gateway account</a></li>
+            <li><a id="forgotten-user-id" href="/government-gateway-lost-credentials-frontend/choose-your-account?continue=https%3A%2F%2Fwww.qa.tax.service.gov.uk%2Finvitations%2Fagents%2Fselect-service&amp;origin=agent-invitations-frontend&amp;forgottenOption=userId" target="_self" data-sso="false" data-journey-click="sos_gg_login:gg_login_end:forgotten_user_id">Forgotten user ID</a></li>
+            <li><a id="forgotten-password" href="/government-gateway-lost-credentials-frontend/choose-your-account?continue=https%3A%2F%2Fwww.qa.tax.service.gov.uk%2Finvitations%2Fagents%2Fselect-service&amp;origin=agent-invitations-frontend&amp;forgottenOption=password" target="_self" data-sso="false" data-journey-click="sos_gg_login:gg_login_end:forgotten_password">Forgotten password</a></li>
+            <li><a id="forgotten-user-id-and-password" href="/government-gateway-lost-credentials-frontend/choose-password-saved?continue=https%3A%2F%2Fwww.qa.tax.service.gov.uk%2Finvitations%2Fagents%2Fselect-service&amp;origin=agent-invitations-frontend&amp;forgottenOption=userIdAndPassword" target="_self" data-sso="false" data-journey-click="sos_gg_login:gg_login_end:forgotten_user_id_and_password">Forgotten user ID and password</a></li>
+        </ul>
+    </div>
+
+    <p id="c2c">
+        <a href="https://online.hmrc.gov.uk/webchat/assistant/bot/Ruth" id="webchatlink" target="_blank" rel="external">Get help from HMRC’s automated assistant <span class="visuallyhidden">These links will open in a new window.</span></a>
+    </p>
+
+}
