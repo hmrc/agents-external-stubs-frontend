@@ -1,5 +1,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
+import java.util.UUID
+
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
@@ -7,7 +9,7 @@ import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
-import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
+import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
@@ -24,40 +26,38 @@ class SignInController @Inject()(
 
   import SignInController._
 
-  def showSignInPage(
-    continueUrlOpt: Option[ContinueUrl],
-    origin: String,
-    accountType: Option[String]): Action[AnyContent] =
+  def showSignInPage(continue: Option[ContinueUrl], origin: String, accountType: Option[String]): Action[AnyContent] =
     Action { implicit request =>
-      Ok(html.sign_in(LoginForm, routes.SignInController.signIn(continueUrlOpt, origin, accountType)))
+      Ok(html.sign_in(LoginForm, routes.SignInController.signIn(continue, origin, accountType)))
     }
 
-  def signIn(
-    continueUrlOpt: Option[ContinueUrl],
-    origin: String,
-    accountType: Option[String] = None): Action[AnyContent] =
+  def signIn(continue: Option[ContinueUrl], origin: String, accountType: Option[String] = None): Action[AnyContent] =
     Action.async { implicit request =>
       LoginForm
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              Ok(html.sign_in(formWithErrors, routes.SignInController.signIn(continueUrlOpt, origin, accountType)))),
+              Ok(html.sign_in(formWithErrors, routes.SignInController.signIn(continue, origin, accountType)))),
           credentials =>
             for {
-              session <- agentsExternalStubsConnector.login(credentials)
+              authenticatedSession <- agentsExternalStubsConnector.signIn(credentials)
               result <- Future.successful(
-                         continueUrlOpt.fold(
-                           Ok("Authenticated.").withSession(
-                             request.session + (SessionKeys.sessionId -> session.sessionId)
-                           )
+                         continue.fold(
+                           withNewSession(Ok("Authenticated."), authenticatedSession)
                          )(continueUrl =>
-                           Redirect(continueUrl.url, Map.empty, 303).withSession(
-                             request.session + (SessionKeys.sessionId -> session.sessionId)
-                         )))
+                           withNewSession(Redirect(continueUrl.url, Map.empty, 303), authenticatedSession)))
             } yield result
         )
     }
+
+  private def withNewSession(result: Result, session: AuthenticatedSession)(
+    implicit request: Request[AnyContent]): Result =
+    result.withSession(
+      request.session +
+        (SessionKeys.sessionId -> UUID.randomUUID().toString) +
+        (SessionKeys.authToken -> session.authToken) +
+        (SessionKeys.userId    -> session.userId))
 
 }
 

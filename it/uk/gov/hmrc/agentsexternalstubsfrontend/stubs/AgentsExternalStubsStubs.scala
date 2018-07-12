@@ -10,23 +10,23 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 trait AgentsExternalStubsStubs {
   me: WireMockSupport =>
 
-  def givenUserCanSignIn(username: String, password: String): String = {
-    val sessionId = UUID.randomUUID().toString
+  def givenUserCanSignIn(userId: String, password: String): String = {
+    val authToken = UUID.randomUUID().toString
 
     stubFor(
       post(urlEqualTo(s"/agents-external-stubs/sign-in"))
-        .withRequestBody(equalToJson(s"""{"userId":"$username","plainTextPassword":"$password"}"""))
+        .withRequestBody(equalToJson(s"""{"userId":"$userId","plainTextPassword":"$password"}"""))
         .willReturn(aResponse()
           .withStatus(Status.CREATED)
-          .withHeader("Location", s"/agents-external-stubs/session/$sessionId")))
+          .withHeader("Location", s"/agents-external-stubs/authenticated/$authToken")))
     stubFor(
-      get(urlEqualTo(s"/agents-external-stubs/session/$sessionId"))
+      get(urlEqualTo(s"/agents-external-stubs/authenticated/$authToken"))
         .willReturn(
           aResponse()
             .withStatus(Status.CREATED)
-            .withBody(Json.obj("sessionId" -> sessionId).toString())))
+            .withBody(Json.obj("userId" -> userId, "authToken" -> authToken).toString())))
 
-    sessionId
+    authToken
   }
 
 }

@@ -24,15 +24,15 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
 
       "return authenticated session" in {
         val sessionId = givenUserCanSignIn("foo", "bar")
-        val response: AuthenticatedSession = await(connector.login(Credentials("foo", "bar")))
-        response.sessionId shouldBe sessionId
+        val response: AuthenticatedSession = await(connector.signIn(Credentials("foo", "bar")))
+        response.authToken shouldBe sessionId
 
       }
 
       "throw an exception if no connection was possible" in {
         stopWireMockServer()
         intercept[BadGatewayException] {
-          await(connector.login(Credentials("foo", "bar")))
+          await(connector.signIn(Credentials("foo", "bar")))
         }
         startWireMockServer()
       }
@@ -44,7 +44,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
               .withStatus(Status.BAD_REQUEST)))
 
         intercept[BadRequestException] {
-          await(connector.login(Credentials("foo", "bar")))
+          await(connector.signIn(Credentials("foo", "bar")))
         }
       }
     }

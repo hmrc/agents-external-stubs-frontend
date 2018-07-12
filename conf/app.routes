@@ -1,4 +1,4 @@
 # microservice specific routes
 
-GET         /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continueUrlOpt: Option[ContinueUrl], origin: String, accountType: Option[String])
-POST        /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continueUrlOpt: Option[ContinueUrl], origin: String, accountType: Option[String])
+GET         /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[ContinueUrl], origin: String, accountType: Option[String])
+POST        /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continue: Option[ContinueUrl], origin: String, accountType: Option[String])

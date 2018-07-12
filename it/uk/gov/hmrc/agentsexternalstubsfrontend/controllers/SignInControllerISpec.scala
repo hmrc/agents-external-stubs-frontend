@@ -23,12 +23,14 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "POST /gg/sign-in" should {
       "redirect to continue URL if provided" in {
-        val sessionId = givenUserCanSignIn("foo", "bar")
+        val authToken = givenUserCanSignIn("foo", "bar")
         val result = controller.signIn(Some(ContinueUrl("/there")), "here", None)(FakeRequest()
           .withFormUrlEncodedBody("userId" -> "foo", "password" -> "bar"))
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/there")
-        session(result).get(SessionKeys.sessionId) shouldBe Some(sessionId)
+        session(result).get(SessionKeys.authToken) shouldBe Some(authToken)
+        session(result).get(SessionKeys.userId) shouldBe Some("foo")
+        session(result).get(SessionKeys.sessionId) should not be empty
       }
     }
 

@@ -10,7 +10,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class AuthenticatedSession(sessionId: String)
+case class AuthenticatedSession(userId: String, authToken: String)
 
 object AuthenticatedSession {
   implicit val reads: Reads[AuthenticatedSession] = Json.reads[AuthenticatedSession]
@@ -21,7 +21,7 @@ class AgentsExternalStubsConnector @Inject()(
   @Named("agents-external-stubs-baseUrl") baseUrl: URL,
   http: HttpGet with HttpPost) {
 
-  def login(credentials: Credentials)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] =
+  def signIn(credentials: Credentials)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] =
     http
       .POST[Credentials, HttpResponse](new URL(baseUrl, "/agents-external-stubs/sign-in").toExternalForm, credentials)
       .map(
