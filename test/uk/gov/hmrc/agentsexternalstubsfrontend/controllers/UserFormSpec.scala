@@ -25,10 +25,12 @@ class UserFormSpec extends UnitSpec {
       val value =
         User(
           userId = "foo",
+          groupId = Some("ABA-712-878-NHG"),
           confidenceLevel = 100,
           nino = Some(Nino("HW827856C")),
           credentialStrength = Some("strong"),
           affinityGroup = Some("Agent"),
+          credentialRole = Some("Admin"),
           principalEnrolments = Seq(Enrolment("FOO"), Enrolment("BAR", Some(Seq(Identifier("ABC", "123"))))),
           delegatedEnrolments = Seq(Enrolment("TAR", Some(Seq(Identifier("XYZ", "987")))), Enrolment("ZOO"))
         )
@@ -46,7 +48,9 @@ class UserFormSpec extends UnitSpec {
         "principalEnrolments[0].key"                  -> "FOO",
         "delegatedEnrolments[1].key"                  -> "ZOO",
         "delegatedEnrolments[0].identifiers[0].value" -> "987",
-        "userId"                                      -> "foo"
+        "userId"                                      -> "foo",
+        "groupId"                                     -> "ABA-712-878-NHG",
+        "credentialRole"                              -> "Admin"
       )
 
       form.fill(value).data shouldBe fieldValues
