@@ -10,7 +10,11 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 trait AgentsExternalStubsStubs {
   me: WireMockSupport =>
 
-  def givenUserCanSignIn(userId: String, password: String, providerType: String = "GovernmentGateway"): String = {
+  def givenUserCanSignIn(
+    userId: String,
+    password: String,
+    providerType: String = "GovernmentGateway",
+    newUser: Boolean = true): String = {
     val authToken = UUID.randomUUID().toString
 
     stubFor(
@@ -18,7 +22,7 @@ trait AgentsExternalStubsStubs {
         .withRequestBody(
           equalToJson(s"""{"userId":"$userId", "plainTextPassword":"$password", "providerType":"$providerType"}"""))
         .willReturn(aResponse()
-          .withStatus(Status.CREATED)
+          .withStatus(if (newUser) Status.CREATED else Status.ACCEPTED)
           .withHeader("Location", s"/agents-external-stubs/authenticated/$authToken")))
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/authenticated/$authToken"))

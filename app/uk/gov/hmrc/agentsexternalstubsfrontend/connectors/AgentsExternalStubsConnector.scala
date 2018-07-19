@@ -10,7 +10,11 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class AuthenticatedSession(userId: String, authToken: String)
+case class AuthenticatedSession(
+  userId: String,
+  authToken: String,
+  providerType: String,
+  newUserCreated: Option[Boolean] = None)
 
 object AuthenticatedSession {
   implicit val reads: Reads[AuthenticatedSession] = Json.reads[AuthenticatedSession]
@@ -27,9 +31,16 @@ class AgentsExternalStubsConnector @Inject()(
       .POST[SignInRequest, HttpResponse](new URL(baseUrl, "/agents-external-stubs/sign-in").toExternalForm, credentials)
       .map(
         response =>
-          response
-            .header(HeaderNames.LOCATION)
-            .getOrElse(throw new IllegalStateException()))
-      .flatMap(location => http.GET[AuthenticatedSession](new URL(baseUrl, location).toExternalForm))
+          (
+            response
+              .header(HeaderNames.LOCATION)
+              .getOrElse(throw new IllegalStateException()),
+            response.status))
+      .flatMap {
+        case (location, status) =>
+          http
+            .GET[AuthenticatedSession](new URL(baseUrl, location).toExternalForm)
+            .map(_.copy(newUserCreated = Some(status == 201)))
+      }
 
 }

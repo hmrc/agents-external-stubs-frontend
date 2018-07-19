@@ -22,11 +22,22 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
 
     "signIn" should {
 
-      "return authenticated session" in {
+      "return authenticated session with new user flag on" in {
         val sessionId = givenUserCanSignIn("foo", "bar")
         val response: AuthenticatedSession = await(connector.signIn(SignInRequest("foo", "bar")))
         response.authToken shouldBe sessionId
+        response.userId shouldBe "foo"
+        response.providerType shouldBe "GovernmentGateway"
+        response.newUserCreated shouldBe Some(true)
+      }
 
+      "return authenticated session with new user flag off" in {
+        val sessionId = givenUserCanSignIn("foo", "bar", newUser = false)
+        val response: AuthenticatedSession = await(connector.signIn(SignInRequest("foo", "bar")))
+        response.authToken shouldBe sessionId
+        response.userId shouldBe "foo"
+        response.providerType shouldBe "GovernmentGateway"
+        response.newUserCreated shouldBe Some(false)
       }
 
       "throw an exception if no connection was possible" in {
