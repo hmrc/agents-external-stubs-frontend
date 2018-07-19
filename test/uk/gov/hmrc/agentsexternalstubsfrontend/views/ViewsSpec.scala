@@ -6,7 +6,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{SignInController, routes}
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.Credentials
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.error_template_Scope0.error_template_Scope1.error_template
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.govuk_wrapper_Scope0.govuk_wrapper_Scope1.govuk_wrapper
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.sign_in_Scope0.sign_in_Scope1.sign_in
@@ -16,7 +16,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 class ViewsSpec extends UnitSpec with OneAppPerSuite {
 
   private val filledForm = SignInController.LoginForm.fill(
-    Credentials(userId = "My contact name", plainTextPassword = "AA1 1AA")
+    SignInRequest(userId = "My contact name", plainTextPassword = "AA1 1AA")
   )
 
   "signIn view" should {

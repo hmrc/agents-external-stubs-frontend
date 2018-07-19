@@ -63,14 +63,15 @@ class SignInController @Inject()(
 
 object SignInController {
 
-  case class Credentials(userId: String, plainTextPassword: String)
-  object Credentials {
-    implicit val writes: Writes[Credentials] = Json.writes[Credentials]
+  case class SignInRequest(userId: String, plainTextPassword: String, providerType: String = "GovernmentGateway")
+  object SignInRequest {
+    implicit val writes: Writes[SignInRequest] = Json.writes[SignInRequest]
   }
 
-  val LoginForm: Form[Credentials] = Form[Credentials](
+  val LoginForm: Form[SignInRequest] = Form[SignInRequest](
     mapping(
-      "userId"   -> nonEmptyText,
-      "password" -> nonEmptyText
-    )(Credentials.apply)(Credentials.unapply))
+      "userId"       -> nonEmptyText,
+      "password"     -> nonEmptyText,
+      "providerType" -> optional(nonEmptyText).transform[String](_.getOrElse("GovernmentGateway"), Some(_))
+    )(SignInRequest.apply)(SignInRequest.unapply))
 }

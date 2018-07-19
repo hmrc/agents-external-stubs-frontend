@@ -1,29 +1,29 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.Credentials
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.play.test.UnitSpec
 
 class LoginFormSpec extends UnitSpec {
 
   "LoginForm" should {
 
-    "bind some input fields and return Credentials and fill it back" in {
+    "bind some input fields and return SignInRequest and fill it back" in {
       val form = SignInController.LoginForm
 
-      val value = Credentials(userId = "bar", plainTextPassword = "foo")
+      val value = SignInRequest(userId = "bar", plainTextPassword = "foo")
 
-      val fieldValues = Map("userId" -> "bar", "password" -> "foo")
+      val fieldValues = Map("userId" -> "bar", "password" -> "foo", "providerType" -> "GovernmentGateway")
 
       form.bind(fieldValues).value shouldBe Some(value)
       form.fill(value).data shouldBe fieldValues
     }
 
-    "bind all input fields and return Credentials and fill it back" in {
+    "bind all input fields and return SignInRequest and fill it back" in {
       val form = SignInController.LoginForm
 
-      val value = Credentials(userId = "foo", plainTextPassword = "bar")
+      val value = SignInRequest(userId = "foo", plainTextPassword = "bar")
 
-      val fieldValues = Map("userId" -> "foo", "password" -> "bar")
+      val fieldValues = Map("userId" -> "foo", "password" -> "bar", "providerType" -> "GovernmentGateway")
 
       form.bind(fieldValues).value shouldBe Some(value)
       form.fill(value).data shouldBe fieldValues
