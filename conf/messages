@@ -48,3 +48,26 @@ global.error.404.message=Please check that you have entered the correct web addr
 global.error.500.title=Sorry, we are experiencing technical difficulties - 500
 global.error.500.heading=Sorry, we''re experiencing technical difficulties
 global.error.500.message=Please try again in a few minutes.
+
+user.edit.header=
+user.edit.description=
+
+form.nino=NINO
+form.error.ninoRequired=You must provide a valid NINO
+form.sa=SAUTR
+form.vat=VAT
+form.ct=CT
+form.taxsagent=TaxsAgent
+form.ated=ATED
+form.awrs=AWRS
+form.gmp=GMP
+form.org=ORG
+form.groupIdentifier=Group Identifier
+form.redirect.url=Redirect URL
+form.error.redirect.url=You must provide a Redirect URL
+form.confidenceLevel=Confidence Level
+form.credStrength=Credential Strength
+form.affinityGroup=Affinity Group
+form.usersName=User's name
+form.credentialRole=Credential Role
+form.enrolmentPresets=Presets

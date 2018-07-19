@@ -6,7 +6,8 @@ import javax.inject.{Inject, Named, Singleton}
 import play.api.libs.json.{Json, Reads}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
+import uk.gov.hmrc.http._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,7 +24,7 @@ object AuthenticatedSession {
 @Singleton
 class AgentsExternalStubsConnector @Inject()(
   @Named("agents-external-stubs-baseUrl") baseUrl: URL,
-  http: HttpGet with HttpPost) {
+  http: HttpGet with HttpPost with HttpPut) {
 
   def signIn(
     credentials: SignInRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] =
@@ -42,5 +43,13 @@ class AgentsExternalStubsConnector @Inject()(
             .GET[AuthenticatedSession](new URL(baseUrl, location).toExternalForm)
             .map(_.copy(newUserCreated = Some(status == 201)))
       }
+
+  def getUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[User] =
+    http.GET[User](new URL(baseUrl, s"/agents-external-stubs/users/$userId").toExternalForm)
+
+  def updateUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .PUT[User, HttpResponse](new URL(baseUrl, s"/agents-external-stubs/users/${user.userId}").toExternalForm, user)
+      .map(_ => ())
 
 }

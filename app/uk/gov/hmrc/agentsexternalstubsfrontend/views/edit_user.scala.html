@@ -1,0 +1,91 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.play.views.html.helpers.form
+
+@(userForm:Form[User], postUrl: Call)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("login.title"), bodyClasses = None) {
+
+    <header>
+        <h1>@Messages("user.edit.header")</h1>
+    </header>
+
+    <p>
+    @Html(Messages("user.edit.description"))
+    </p>
+
+    <div>
+        @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
+            <fieldset>
+                <div class="form-field-group @if(userForm.hasErrors || userForm.hasGlobalErrors) {error}">
+
+                    @userForm.errors.map { error =>
+                        <span class="error-notification">@error.key @Messages(error.message)</span>
+                    }
+
+                    <div class="form-field">
+                        <label class="label--inline">@Messages("form.credStrength")</label>
+                        <select name="credentialStrength" style="display: inline">
+                        @CredStrength.values.map { item => {
+                            @if(item.toLowerCase == "weak") {
+                                <option value="@item" selected="selected">@item</option>
+                            } else {
+                                <option value="@item">@item</option>
+                            }
+                            }
+                        }
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="label--inline">@Messages("form.confidenceLevel")</label>
+                        <select name="confidenceLevel" style="display: inline">
+                        @ConfidenceLevel.values.filterNot(_ == "500").map { item =>
+                            <option value="@item">@item</option>
+                        }
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="label--inline">@Messages("form.affinityGroup")</label>
+                        <select name="affinityGroup" id="affinityGroupSelect" style="display: inline">
+                        @AffinityGroup.values.map { item =>
+                            <option value="@item">@item</option>
+                        }
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="label--inline">@Messages("form.credentialRole")</label>
+                        <select name="credentialRole" style="display: inline" id="credential-role-select">
+                            <option value="User">User</option>
+                        </select>
+                        <span class="form-hint form-hint-small">
+                            Optional - can be set for 'Organisation' or 'Agent' affinity groups only. Otherwise the value will be 'User' (administrator).</span>
+                    </div>
+
+
+                    <div class="form-field divider--top--thick">
+                        <label class="label--inline">@Messages("form.nino")</label>
+                        <input type="text" name="nino" size="30" maxlength="10"/>
+                        <span class="form-hint form-hint-small">
+                            Optional - any valid formatted Nino</span>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="label--inline">@Messages("form.groupIdentifier")</label>
+                        <input type="text" name="groupIdentifier" size="30" maxlength="100"/>
+                        <span class="form-hint form-hint--small">
+                            Optional - any random value.</span>
+                    </div>
+
+                </div>
+            </fieldset>
+        }
+    </div>
+
+    <p id="c2c">
+        <a href="https://online.hmrc.gov.uk/webchat/assistant/bot/Ruth" id="webchatlink" target="_blank" rel="external">Get help from HMRC’s automated assistant <span class="visuallyhidden">These links will open in a new window.</span></a>
+    </p>
+
+}

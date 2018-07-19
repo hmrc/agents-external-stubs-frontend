@@ -28,12 +28,12 @@ class SignInController @Inject()(
 
   def showSignInPage(continue: Option[ContinueUrl], origin: String, accountType: Option[String]): Action[AnyContent] =
     Action { implicit request =>
-      Ok(html.sign_in(LoginForm, routes.SignInController.signIn(continue, origin, accountType)))
+      Ok(html.sign_in(SignInRequestForm, routes.SignInController.signIn(continue, origin, accountType)))
     }
 
   def signIn(continue: Option[ContinueUrl], origin: String, accountType: Option[String] = None): Action[AnyContent] =
     Action.async { implicit request =>
-      LoginForm
+      SignInRequestForm
         .bindFromRequest()
         .fold(
           formWithErrors =>
@@ -68,7 +68,7 @@ object SignInController {
     implicit val writes: Writes[SignInRequest] = Json.writes[SignInRequest]
   }
 
-  val LoginForm: Form[SignInRequest] = Form[SignInRequest](
+  val SignInRequestForm: Form[SignInRequest] = Form[SignInRequest](
     mapping(
       "userId"       -> nonEmptyText,
       "password"     -> nonEmptyText,

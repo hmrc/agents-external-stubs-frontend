@@ -5,6 +5,7 @@ import java.net.URL
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.http._
@@ -16,7 +17,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
 
   private lazy val connector: AgentsExternalStubsConnector = new AgentsExternalStubsConnector(
     new URL(s"http://localhost:$wireMockPort"),
-    app.injector.instanceOf[HttpGet with HttpPost])
+    app.injector.instanceOf[HttpGet with HttpPost with HttpPut])
 
   "AgentsExternalStubsConnector" when {
 
@@ -57,6 +58,22 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         intercept[BadRequestException] {
           await(connector.signIn(SignInRequest("foo", "bar")))
         }
+      }
+    }
+
+    "getUser" should {
+      "return an user for a valid userId" in {
+        givenUser(User("foo"))
+        val user: User = await(connector.getUser("foo"))
+        user.userId shouldBe "foo"
+      }
+    }
+
+    "updateUser" should {
+      "update an user" in {
+        val user = User("foo")
+        givenUser(user)
+        await(connector.updateUser(user))
       }
     }
   }

@@ -5,6 +5,7 @@ import java.util.UUID
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 import play.api.libs.json.Json
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 
 trait AgentsExternalStubsStubs {
@@ -31,6 +32,21 @@ trait AgentsExternalStubsStubs {
           .withBody(Json.obj("userId" -> userId, "authToken" -> authToken, "providerType" -> providerType).toString())))
 
     authToken
+  }
+
+  def givenUser(user: User): Unit = {
+    stubFor(
+      get(urlEqualTo(s"/agents-external-stubs/users/${user.userId}"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withBody(Json.toJson(user).toString())))
+    stubFor(
+      put(urlEqualTo(s"/agents-external-stubs/users/${user.userId}"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.ACCEPTED)
+            .withHeader("Location", s"/agents-external-stubs/users/${user.userId}")))
   }
 
 }
