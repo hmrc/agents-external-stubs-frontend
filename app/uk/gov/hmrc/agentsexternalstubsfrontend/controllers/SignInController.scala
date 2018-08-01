@@ -75,7 +75,7 @@ object SignInController {
   val SignInRequestForm: Form[SignInRequest] = Form[SignInRequest](
     mapping(
       "userId"       -> nonEmptyText,
-      "password"     -> nonEmptyText,
+      "password"     -> default(text, "p@ssw0rd"),
       "providerType" -> optional(nonEmptyText).transform[String](_.getOrElse("GovernmentGateway"), Some(_))
     )(SignInRequest.apply)(SignInRequest.unapply))
 }

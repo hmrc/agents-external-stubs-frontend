@@ -52,12 +52,12 @@ global.error.500.message=Please try again in a few minutes.
 user.title=Current user
 
 user.show.header=Welcome user {0}
-user.show.description=Review your current user configuration.
+user.show.description=Review your current user configuration:
 user.show.edit=Edit
 user.show.continue=Continue
 
-user.edit.header=Configure the user {0}
-user.edit.description=Here you can change the configuration of the current user.
+user.edit.header=Configure user {0}
+user.edit.description=Here you can change a configuration of the current user:
 user.edit.update_and_continue=Update and continue
 user.edit.update=Update
 user.edit.cancel=Cancel

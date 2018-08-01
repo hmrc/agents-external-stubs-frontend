@@ -6,12 +6,10 @@
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = None) {
 
-    <header>
-        <h1>@Messages("user.edit.header", userId)</h1>
-    </header>
+    <h1 class="heading-xlarge">@Messages("user.edit.header", userId)</h1>
 
     <p>
-    @Html(Messages("user.edit.description"))
+    @Messages("user.edit.description")
     </p>
 
     @if(userForm.hasErrors) {
