@@ -13,10 +13,15 @@ class UserFormSpec extends UnitSpec {
 
       val value = User(userId = "bar")
 
-      val fieldValues = Map("userId" -> "bar", "confidenceLevel" -> "50")
+      val fieldValues = Map(
+        "userId"             -> "bar",
+        "confidenceLevel"    -> "50",
+        "affinityGroup"      -> "none",
+        "credentialStrength" -> "none",
+        "credentialRole"     -> "none")
 
-      form.bind(fieldValues).value shouldBe Some(value)
-      form.fill(value).data shouldBe fieldValues
+      form.bind(fieldValues).value shouldBe Some(value.copy(userId = "ignored"))
+      form.fill(value).data shouldBe fieldValues.-("userId")
     }
 
     "bind all input fields and return User and fill it back" in {
@@ -53,8 +58,8 @@ class UserFormSpec extends UnitSpec {
         "credentialRole"                              -> "Admin"
       )
 
-      form.fill(value).data shouldBe fieldValues
-      form.bind(fieldValues).value shouldBe Some(value)
+      form.fill(value).data shouldBe fieldValues.-("userId")
+      form.bind(fieldValues).value shouldBe Some(value.copy(userId = "ignored"))
     }
   }
 }

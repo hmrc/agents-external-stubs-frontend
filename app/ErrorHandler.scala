@@ -1,5 +1,4 @@
 import javax.inject.{Inject, Singleton}
-
 import com.google.inject.name.Named
 import play.api.http.HeaderNames.CACHE_CONTROL
 import play.api.http.HttpErrorHandler
@@ -7,11 +6,13 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.Results._
 import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.{Configuration, Environment, Mode}
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 import uk.gov.hmrc.auth.core.{InsufficientEnrolments, NoActiveSession}
 import uk.gov.hmrc.http.{JsValidationException, NotFoundException}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.error_template
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
 import uk.gov.hmrc.play.bootstrap.config.{AuthRedirects, HttpAuditEvent}
 
@@ -37,7 +38,13 @@ class ErrorHandler @Inject()(
     auditServerError(request, exception)
     implicit val r = Request(request, "")
     exception match {
-      case _: NoActiveSession        => toGGLogin(if (isDevEnv) s"http://${request.host}${request.uri}" else s"${request.uri}")
+      case _: NoActiveSession =>
+        Redirect(
+          routes.SignInController.showSignInPage(
+            Some(ContinueUrl(if (isDevEnv) s"http://${request.host}${request.uri}" else s"${request.uri}")),
+            "agents-external-stubs",
+            None
+          ))
       case _: InsufficientEnrolments => Forbidden
       case _ =>
         Ok(

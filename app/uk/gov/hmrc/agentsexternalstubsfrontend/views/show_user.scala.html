@@ -1,0 +1,154 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
+
+@import uk.gov.hmrc.play.binders.ContinueUrl
+@(user:User, editUrl: Call, continue: Option[ContinueUrl], userId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = None) {
+
+    <header>
+        <h1>@Messages("user.show.header", userId)</h1>
+    </header>
+
+    <p>
+    @Html(Messages("user.show.description"))
+    </p>
+
+    <dl class="govuk-check-your-answers cya-questions-long margin-bottom-40">
+        <div>
+            <dt class="cya-question">
+                @Messages("user.form.affinityGroup")
+            </dt>
+            <dd class="cya-answer" id="affinityGroup">
+                @{user.affinityGroup.getOrElse("none")}
+            </dd>
+        </div>
+        <div>
+            <dt class="cya-question">
+            @Messages("user.form.credentialRole")
+            </dt>
+            <dd class="cya-answer" id="credentialRole">
+            @{user.credentialRole.getOrElse("none")}
+            </dd>
+        </div>
+        <div>
+            <dt class="cya-question">
+            @Messages("user.form.credentialStrength")
+            </dt>
+            <dd class="cya-answer" id="credentialStrength">
+            @{user.credentialStrength.getOrElse("none")}
+            </dd>
+        </div>
+        <div>
+            <dt class="cya-question">
+            @Messages("user.form.confidenceLevel")
+            </dt>
+            <dd class="cya-answer" id="confidenceLevel">
+            @{user.confidenceLevel}
+            </dd>
+        </div>
+        <div>
+            <dt class="cya-question">
+            @Messages("user.form.nino")
+            </dt>
+            <dd class="cya-answer" id="nino">
+            @{user.nino.getOrElse("none")}
+            </dd>
+        </div>
+        <div>
+            <dt class="cya-question">
+            @Messages("user.form.groupIdentifier")
+            </dt>
+            <dd class="cya-answer" id="groupIdentifier">
+            @{user.groupId.getOrElse("none")}
+            </dd>
+        </div>
+
+    </dl>
+
+    <h3>Principal enrolments</h3>
+
+    @if(user.principalEnrolments.nonEmpty){
+        <table style="width:100%">
+            <tr>
+                <th>Service key</th>
+                <th>Identifier Name</th>
+                <th>Identifier Value</th>
+            </tr>
+            @for(e <- user.principalEnrolments){
+              <tr>
+                <td>
+                  @{e.key}
+                </td>
+                  @if(e.identifiers.nonEmpty){
+                    @for(i <- e.identifiers.get) {
+                        <td>
+                        @{i.key}
+                        </td>
+                        <td>
+                        @{i.value}
+                        </td>
+                    }
+                  } else {
+                    <td colspan="2"></td>
+                  }
+              </tr>
+            }
+        </table>
+      } else {
+        <span class="form-hint">This user has not been enrolled yet.</span>
+    }
+
+    @if(user.affinityGroup.contains("Agent")) {
+
+        <h3>Delegated enrolments</h3>
+
+        @if(user.delegatedEnrolments.nonEmpty) {
+            <table style="width:100%">
+                <tr>
+                    <th>Service key</th>
+                    <th>Identifier Name</th>
+                    <th>Identifier Value</th>
+                </tr>
+                @for(e <- user.delegatedEnrolments){
+                    <tr>
+                        <td>
+                        @{e.key}
+                        </td>
+                        @if(e.identifiers.nonEmpty){
+                            @for(i <- e.identifiers.get) {
+                                <td>
+                                @{i.key}
+                                </td>
+                                <td>
+                                @{i.value}
+                                </td>
+                            }
+                        } else {
+                            <td colspan="2"></td>
+                        }
+                    </tr>
+                }
+            </table>
+        } else {
+            <span class="form-hint">This Agent has no delegated enrolments.</span>
+        }
+    }
+
+    <div style="margin-top: 40px;">
+
+        <a role="button" href="@editUrl.url">
+            <button class="button button--spaced button--padded" id="update">
+            @Messages("user.show.edit")
+            </button>
+        </a>
+
+        @if(continue.isDefined) {
+            <a href="@{continue.get.url}">
+                @Messages("user.show.continue")
+            </a>
+        }
+    </div>
+
+}

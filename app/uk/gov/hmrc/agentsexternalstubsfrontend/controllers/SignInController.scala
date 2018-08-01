@@ -42,11 +42,15 @@ class SignInController @Inject()(
           credentials =>
             for {
               authenticatedSession <- agentsExternalStubsConnector.signIn(credentials)
-              result <- Future.successful(
-                         continue.fold(
-                           withNewSession(Ok("Authenticated."), authenticatedSession)
-                         )(continueUrl =>
-                           withNewSession(Redirect(continueUrl.url, Map.empty, 303), authenticatedSession)))
+              result <- Future(
+                         if (authenticatedSession.newUserCreated.getOrElse(false))
+                           withNewSession(
+                             Redirect(routes.UserController.showEditUserPage(continue)),
+                             authenticatedSession)
+                         else
+                           continue.fold(
+                             withNewSession(Redirect(routes.UserController.showUserPage(None)), authenticatedSession)
+                           )(continueUrl => withNewSession(Redirect(continueUrl.url), authenticatedSession)))
             } yield result
         )
     }
@@ -56,7 +60,7 @@ class SignInController @Inject()(
     result.withSession(
       request.session +
         (SessionKeys.sessionId -> UUID.randomUUID().toString) +
-        (SessionKeys.authToken -> session.authToken) +
+        (SessionKeys.authToken -> s"Bearer ${session.authToken}") +
         (SessionKeys.userId    -> session.userId))
 
 }

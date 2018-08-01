@@ -36,13 +36,13 @@ object ConfidenceLevel {
 }
 
 object CredStrength {
-  val values = Seq("strong", "weak", "none")
+  val values = Seq("none", "strong", "weak")
 }
 
 object AffinityGroup {
-  val values = Seq("Individual", "Organisation", "Agent")
+  val values = Seq("none", "Individual", "Organisation", "Agent")
 }
 
 object CredentialRole {
-  val values = Seq("User", "Assistant")
+  val values = Seq("none", "User", "Assistant")
 }
