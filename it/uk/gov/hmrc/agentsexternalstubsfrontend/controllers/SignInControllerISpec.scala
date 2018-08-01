@@ -2,7 +2,6 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{redirectLocation, session}
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.http.SessionKeys

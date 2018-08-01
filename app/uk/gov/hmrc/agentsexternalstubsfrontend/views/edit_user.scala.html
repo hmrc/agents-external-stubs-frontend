@@ -1,6 +1,6 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary}
 
 @(userForm:Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean)(implicit request: Request[_], messages: Messages, config: Configuration)
 
@@ -14,14 +14,14 @@
     @Html(Messages("user.edit.description"))
     </p>
 
+    @if(userForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), userForm, Seq.empty, None)
+    }
+
     <div>
         @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
             <fieldset>
                 <div class="form-field-group">
-
-                    @userForm.errors.map { error =>
-                        <span class="error-notification">@error.key @Messages(error.message)</span>
-                    }
 
                     <div class="form-group soft--ends">
                     @dropdown(
@@ -56,7 +56,7 @@
                     <div class="form-group soft--ends">
                     @dropdown(
                         userForm("confidenceLevel"),
-                        ConfidenceLevel.values.map(i => (i,i)),
+                        ConfidenceLevel.values,
                         false,
                         '_label -> Html("""<span class="h2-heading soft--ends">"""+ Messages("user.form.confidenceLevel") + """</span>"""),
                         '_selectClass -> Html("""input--medium input--cleared""")
@@ -90,7 +90,7 @@
 
                 <h2>Principal enrolments</h2>
 
-                <div class="form-group" style="text-align: right">
+                <div id="principalEnrolments" class="form-group" style="text-align: right">
                     <table style="width:100%">
                         <tr>
                             <th>Service key</th>
@@ -126,7 +126,7 @@
 
                 <span class="form-hint">Only Agents can have delegated enrolments.</span>
 
-                <div class="form-group" style="text-align: right">
+                <div id="delegatedEnrolments" class="form-group" style="text-align: right">
                     <table style="width:100%">
                         <tr>
                             <th>Service key</th>

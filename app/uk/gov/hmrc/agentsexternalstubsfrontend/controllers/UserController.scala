@@ -3,6 +3,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Forms.{default, ignored, mapping, nonEmptyText, number, optional, seq, text}
+import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
@@ -113,14 +114,35 @@ object UserController {
       "identifiers" -> optional(seq(identifierMapping))
     )(Enrolment.apply)(Enrolment.unapply))
 
+  def onlyAgentCanHaveDelegatedEnrolments: Constraint[User] =
+    Constraint(
+      user =>
+        if (user.delegatedEnrolments.nonEmpty && !user.affinityGroup.contains("Agent"))
+          Invalid("user.form.error.onlyAgentCanHaveDelegatedEnrolments")
+        else Valid)
+
+  def onlyIndividualsCanHaveNino: Constraint[User] =
+    Constraint(
+      user =>
+        if (user.nino.nonEmpty && !user.affinityGroup.contains("Individual"))
+          Invalid("user.form.error.onlyIndividualsCanHaveNino")
+        else Valid)
+
+  def confidenceLevelMustBeDefinedWithNino: Constraint[User] =
+    Constraint(
+      user =>
+        if (user.nino.nonEmpty != user.confidenceLevel.nonEmpty)
+          Invalid("user.form.error.confidenceLevelMustBeDefinedForNino")
+        else Valid)
+
   val UserForm: Form[User] = Form[User](
     mapping(
       "userId"             -> ignored("ignored"),
       "groupId"            -> optional(text),
-      "affinityGroup"      -> optional(text).transform(fromNone, toNone),
-      "confidenceLevel"    -> optional(number).transform[Int](_.getOrElse(50), n => Some(n)),
-      "credentialStrength" -> optional(text).transform(fromNone, toNone),
-      "credentialRole"     -> optional(text).transform(fromNone, toNone),
+      "affinityGroup"      -> optional(text).transform(fromNone(none), toNone(none)),
+      "confidenceLevel"    -> optional(number).transform(fromNone(0), toNone(0)),
+      "credentialStrength" -> optional(text).transform(fromNone(none), toNone(none)),
+      "credentialRole"     -> optional(text).transform(fromNone(none), toNone(none)),
       "nino" -> optional(text)
         .verifying("user.form.nino.error", _.forall(Nino.isValid))
         .transform[Option[Nino]](_.map(Nino.apply), _.map(_.toString)),
@@ -128,14 +150,15 @@ object UserController {
         .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply)),
       "delegatedEnrolments" -> seq(enrolmentMapping)
         .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply))
-    )(User.apply)(User.unapply))
+    )(User.apply)(User.unapply)
+      .verifying(onlyAgentCanHaveDelegatedEnrolments, onlyIndividualsCanHaveNino, confidenceLevelMustBeDefinedWithNino))
 
-  def fromNone: Option[String] => Option[String] = {
+  def fromNone[T](none: T): Option[T] => Option[T] = {
     case Some(`none`) => None
     case s            => s
   }
 
-  def toNone: Option[String] => Option[String] = {
+  def toNone[T](none: T): Option[T] => Option[T] = {
     case None => Some(none)
     case s    => s
   }

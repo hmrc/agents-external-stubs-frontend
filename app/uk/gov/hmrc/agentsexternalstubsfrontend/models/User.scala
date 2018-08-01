@@ -7,7 +7,7 @@ case class User(
   userId: String,
   groupId: Option[String] = None,
   affinityGroup: Option[String] = None,
-  confidenceLevel: Int = 50,
+  confidenceLevel: Option[Int] = None,
   credentialStrength: Option[String] = None,
   credentialRole: Option[String] = None,
   nino: Option[Nino] = None,
@@ -32,7 +32,7 @@ object Identifier {
 }
 
 object ConfidenceLevel {
-  val values: Seq[String] = Seq("50", "100", "200", "300")
+  val values: Seq[(String, String)] = Seq("none" -> "0", "50" -> "50", "100" -> "100", "200" -> "200", "300" -> "300")
 }
 
 object CredStrength {
