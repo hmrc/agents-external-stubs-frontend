@@ -2,7 +2,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import play.api.data.Forms.{default, ignored, mapping, nonEmptyText, number, optional, seq, text}
+import play.api.data.Forms.{ignored, mapping, nonEmptyText, number, optional, seq, text}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -10,7 +10,7 @@ import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, Identifier, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
-import uk.gov.hmrc.auth.core.{AuthConnector, NoActiveSession}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.binders.ContinueUrl
@@ -37,10 +37,6 @@ class UserController @Inject()(
             .map(user =>
               Ok(html.show_user(user, routes.UserController.showEditUserPage(continue), continue, user.userId)))
         }
-        .recover {
-          case _: NoActiveSession =>
-            Redirect(routes.SignInController.showSignInPage(continue, "agents-external-stubs", None))
-        }
     }
 
   def showEditUserPage(continue: Option[ContinueUrl]): Action[AnyContent] =
@@ -58,10 +54,6 @@ class UserController @Inject()(
                     routes.UserController.showUserPage(continue),
                     user.userId,
                     continue.isDefined)))
-        }
-        .recover {
-          case _: NoActiveSession =>
-            Redirect(routes.SignInController.showSignInPage(continue, "agents-external-stubs", None))
         }
     }
 
@@ -88,10 +80,6 @@ class UserController @Inject()(
                     continue.fold(Redirect(routes.UserController.showUserPage(continue)))(continueUrl =>
                       Redirect(continueUrl.url)))
             )
-        }
-        .recover {
-          case _: NoActiveSession =>
-            Redirect(routes.SignInController.showSignInPage(continue, "agents-external-stubs", None))
         }
     }
 

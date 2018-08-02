@@ -1,10 +1,11 @@
 import java.net.URL
-import javax.inject.{Inject, Provider, Singleton}
 
+import javax.inject.{Inject, Provider, Singleton}
 import com.google.inject.AbstractModule
 import com.google.inject.name.{Named, Names}
 import org.slf4j.MDC
 import play.api.{Configuration, Environment, Logger}
+import uk.gov.hmrc.agentsexternalstubsfrontend.TcpProxies
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.FrontendAuthConnector
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http._
@@ -35,12 +36,16 @@ class FrontendModule(val environment: Environment, val configuration: Configurat
     bind(classOf[AuthConnector]).to(classOf[FrontendAuthConnector])
 
     //example of service property bindings
-    bindServiceConfigProperty[Int]("agents-external-stubs.someInt")
-    bindServiceConfigProperty[String]("agents-external-stubs.someString")
-    bindServiceConfigProperty[Boolean]("agents-external-stubs.someBoolean")
+    bindServiceConfigProperty[Int]("agents-external-stubs.port")
+    bindServiceConfigProperty[Int]("company-auth-frontend.port")
+
+    bindProperty("http.port")
+    bindProperty("proxies.start")
 
     bindBaseUrl("auth")
     bindBaseUrl("agents-external-stubs")
+
+    bind(classOf[TcpProxies]).asEagerSingleton()
   }
 
   private def bindBaseUrl(serviceName: String) =

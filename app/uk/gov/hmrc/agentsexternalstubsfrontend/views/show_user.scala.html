@@ -43,7 +43,7 @@
             @Messages("user.form.confidenceLevel")
             </dt>
             <dd class="cya-answer" id="confidenceLevel">
-            @{user.confidenceLevel}
+            @{user.confidenceLevel.map(_.toString).getOrElse("none")}
             </dd>
         </div>
         <div>

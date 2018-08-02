@@ -12,6 +12,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AuthStubs, DataStreamStubs}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.it.Port
 
 class BaseISpec
     extends UnitSpec with OneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs
@@ -27,7 +28,8 @@ class BaseISpec
         "metrics.enabled"                                  -> true,
         "auditing.enabled"                                 -> true,
         "auditing.consumer.baseUri.host"                   -> wireMockHost,
-        "auditing.consumer.baseUri.port"                   -> wireMockPort
+        "auditing.consumer.baseUri.port"                   -> wireMockPort,
+        "http.port"                                        -> Port.randomAvailable
       )
 
   override def commonStubs(): Unit = {
