@@ -69,7 +69,9 @@ class SignInController @Inject()(
     Action.async { implicit request =>
       agentsExternalStubsConnector
         .signOut()
-        .map(_ => continue.fold(throw SessionRecordNotFound())(c => Redirect(c.url).withNewSession))
+        .map(_ =>
+          continue.fold(Redirect(routes.SignInController.showSignInPage(None, None, None).url).withNewSession)(c =>
+            Redirect(c.url).withNewSession))
     }
 
   private def withNewSession(result: Result, session: AuthenticatedSession)(

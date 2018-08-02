@@ -49,10 +49,12 @@ global.error.500.title=Sorry, we are experiencing technical difficulties - 500
 global.error.500.heading=Sorry, we''re experiencing technical difficulties
 global.error.500.message=Please try again in a few minutes.
 
+common.sign-out=Sign out
+
 user.title=Current user
 
 user.show.header=Welcome {0}
-user.show.description=Review your current configuration:
+user.show.description=Review your current setup:
 user.show.edit=Edit
 user.show.continue=Continue
 

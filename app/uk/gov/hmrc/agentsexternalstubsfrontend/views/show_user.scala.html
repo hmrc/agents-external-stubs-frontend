@@ -5,7 +5,13 @@
 @import uk.gov.hmrc.play.binders.ContinueUrl
 @(user:User, authToken: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
 
-@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = None) {
+@sidebarLinks = {
+    <nav id="secondary-nav" role="navigation">
+        <a href="/gg/sign-out">@Messages("common.sign-out")</a>
+    </nav>
+}
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = None, sidebarLinks = Some(sidebarLinks)) {
 
     <h1 class="heading-xlarge">@Messages("user.show.header", userId)</h1>
 
