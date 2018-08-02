@@ -51,7 +51,7 @@ or
     
     sbt run
 
-It should then be listening on port 9099
+It should then be listening on ports 9099 and 9025
 
     browse http://localhost:9099/
 
