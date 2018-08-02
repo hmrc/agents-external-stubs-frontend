@@ -51,8 +51,8 @@ global.error.500.message=Please try again in a few minutes.
 
 user.title=Current user
 
-user.show.header=Welcome user {0}
-user.show.description=Review your current user configuration:
+user.show.header=Welcome {0}
+user.show.description=Review your current configuration:
 user.show.edit=Edit
 user.show.continue=Continue
 
