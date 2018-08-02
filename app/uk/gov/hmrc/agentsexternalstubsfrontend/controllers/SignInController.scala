@@ -52,14 +52,15 @@ class SignInController @Inject()(
             for {
               authenticatedSession <- agentsExternalStubsConnector.signIn(credentials)
               result <- Future(
-                         if (authenticatedSession.newUserCreated.getOrElse(false))
-                           withNewSession(
-                             Redirect(routes.UserController.showEditUserPage(continue)),
-                             authenticatedSession)
-                         else
-                           continue.fold(
-                             withNewSession(Redirect(routes.UserController.showUserPage(None)), authenticatedSession)
-                           )(continueUrl => withNewSession(Redirect(continueUrl.url), authenticatedSession)))
+                         withNewSession(
+                           if (authenticatedSession.newUserCreated.getOrElse(false))
+                             Redirect(routes.UserController.showEditUserPage(continue))
+                           else
+                             continue.fold(
+                               Redirect(routes.UserController.showUserPage(None))
+                             )(continueUrl => Redirect(continueUrl.url)),
+                           authenticatedSession
+                         ))
             } yield result
         )
     }
