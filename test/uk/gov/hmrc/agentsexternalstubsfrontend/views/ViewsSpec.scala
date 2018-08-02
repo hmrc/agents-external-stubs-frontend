@@ -24,7 +24,7 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
       val html = new sign_in()
         .render(
           loginForm = filledForm,
-          postUrl = routes.SignInController.signIn(None, "", None),
+          postUrl = routes.SignInController.signIn(None, Some("foo"), None),
           request = FakeRequest(),
           messages = Messages.Implicits.applicationMessages,
           config = app.configuration
@@ -42,7 +42,7 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
       content should include(Messages("login.username"))
       content should include(Messages("login.password"))
 
-      val html2 = new sign_in().f(filledForm, routes.SignInController.signIn(None, "", None))(
+      val html2 = new sign_in().f(filledForm, routes.SignInController.signIn(None, None, None))(
         FakeRequest(),
         Messages.Implicits.applicationMessages,
         app.configuration)

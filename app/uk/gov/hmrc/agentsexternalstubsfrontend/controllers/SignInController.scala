@@ -11,7 +11,7 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
-import uk.gov.hmrc.auth.core.{NoActiveSession, SessionRecordNotFound}
+import uk.gov.hmrc.auth.core.SessionRecordNotFound
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -27,12 +27,20 @@ class SignInController @Inject()(
 
   import SignInController._
 
-  def showSignInPage(continue: Option[ContinueUrl], origin: String, accountType: Option[String]): Action[AnyContent] =
+  def showSignInPage(
+    continue: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String]): Action[AnyContent] =
     Action { implicit request =>
-      Ok(html.sign_in(SignInRequestForm, routes.SignInController.signIn(continue, origin, accountType)))
+      Ok(
+        html
+          .sign_in(SignInRequestForm, routes.SignInController.signIn(continue, origin, accountType)))
     }
 
-  def signIn(continue: Option[ContinueUrl], origin: String, accountType: Option[String] = None): Action[AnyContent] =
+  def signIn(
+    continue: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String] = None): Action[AnyContent] =
     Action.async { implicit request =>
       SignInRequestForm
         .bindFromRequest()

@@ -75,6 +75,7 @@ user.form.affinityGroup=Affinity Group
 user.form.affinityGroup.hint=
 user.form.credentialRole=Credential Role
 user.form.credentialRole.hint=Optional - can be set for 'Organisation' or 'Agent' affinity groups only. Otherwise the value will be 'User' (administrator).
+user.form.authToken=Bearer token
 
 user.form.error.onlyAgentCanHaveDelegatedEnrolments=Only Agents can have delegated enrolments.
 user.form.error.onlyIndividualsCanHaveNino=Only Individual can have NINO.

@@ -3,7 +3,7 @@
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
 
 @import uk.gov.hmrc.play.binders.ContinueUrl
-@(user:User, editUrl: Call, continue: Option[ContinueUrl], userId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(user:User, authToken: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = None) {
 
@@ -60,6 +60,14 @@
             </dt>
             <dd class="cya-answer" id="groupIdentifier">
             @{user.groupId.getOrElse("none")}
+            </dd>
+        </div>
+        <div>
+            <dt class="cya-question">
+            @Messages("user.form.authToken")
+            </dt>
+            <dd class="cya-answer" id="authToken">
+            @{authToken.getOrElse("none")}
             </dd>
         </div>
 

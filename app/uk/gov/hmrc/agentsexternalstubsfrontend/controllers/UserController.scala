@@ -13,6 +13,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
@@ -34,8 +35,15 @@ class UserController @Inject()(
         .retrieve(Retrievals.credentials) { credentials =>
           agentsExternalStubsConnector
             .getUser(credentials.providerId)
-            .map(user =>
-              Ok(html.show_user(user, routes.UserController.showEditUserPage(continue), continue, user.userId)))
+            .map(
+              user =>
+                Ok(
+                  html.show_user(
+                    user,
+                    request.headers.get(SessionKeys.authToken),
+                    routes.UserController.showEditUserPage(continue),
+                    continue,
+                    user.userId)))
         }
     }
 
