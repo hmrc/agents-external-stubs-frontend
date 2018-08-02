@@ -44,6 +44,11 @@ class AgentsExternalStubsConnector @Inject()(
             .map(_.copy(newUserCreated = Some(status == 201)))
       }
 
+  def signOut()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .GET[HttpResponse](new URL(baseUrl, "/agents-external-stubs/sign-out").toExternalForm)
+      .map(_ => ())
+
   def getUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[User] =
     http.GET[User](new URL(baseUrl, s"/agents-external-stubs/users/$userId").toExternalForm)
 

@@ -11,6 +11,7 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
+import uk.gov.hmrc.auth.core.{NoActiveSession, SessionRecordNotFound}
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -53,6 +54,13 @@ class SignInController @Inject()(
                            )(continueUrl => withNewSession(Redirect(continueUrl.url), authenticatedSession)))
             } yield result
         )
+    }
+
+  def signOut(continue: Option[ContinueUrl]): Action[AnyContent] =
+    Action.async { implicit request =>
+      agentsExternalStubsConnector
+        .signOut()
+        .map(_ => continue.fold(throw SessionRecordNotFound())(c => Redirect(c.url).withNewSession))
     }
 
   private def withNewSession(result: Result, session: AuthenticatedSession)(

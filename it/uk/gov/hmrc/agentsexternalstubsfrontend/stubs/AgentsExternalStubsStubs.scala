@@ -34,6 +34,12 @@ trait AgentsExternalStubsStubs {
     authToken
   }
 
+  def givenUserCanSignOut =
+    stubFor(
+      get(urlEqualTo(s"/agents-external-stubs/sign-out"))
+        .willReturn(aResponse()
+          .withStatus(Status.NO_CONTENT)))
+
   def givenUser(user: User): Unit = {
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/users/${user.userId}"))

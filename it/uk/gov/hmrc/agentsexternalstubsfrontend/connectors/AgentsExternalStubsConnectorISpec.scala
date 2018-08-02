@@ -76,6 +76,13 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         await(connector.updateUser(user))
       }
     }
+
+    "signOut" should {
+      "remove authenticated session" in {
+        givenUserCanSignOut
+        await(connector.signOut())
+      }
+    }
   }
 
 }

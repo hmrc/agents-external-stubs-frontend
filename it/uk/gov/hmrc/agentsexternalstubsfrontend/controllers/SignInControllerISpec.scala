@@ -45,6 +45,14 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       }
     }
 
+    "GET /gg/sign-out" should {
+      "remove current session and redirect to the provided continue url" in {
+        givenUserCanSignOut
+        val result = controller.signOut(Some(ContinueUrl("/there")))(FakeRequest())
+        status(result) shouldBe 303
+      }
+    }
+
   }
 
 }
