@@ -13,18 +13,18 @@ trait AgentsExternalStubsStubs {
 
   def givenUserCanSignIn(
     userId: String,
-    password: String,
+    planetId: String,
+    plainTextPassword: String = "p@ssw0rd",
     providerType: String = "GovernmentGateway",
     newUser: Boolean = true): String = {
     val authToken = UUID.randomUUID().toString
 
-    stubFor(
-      post(urlEqualTo(s"/agents-external-stubs/sign-in"))
-        .withRequestBody(
-          equalToJson(s"""{"userId":"$userId", "plainTextPassword":"$password", "providerType":"$providerType"}"""))
-        .willReturn(aResponse()
-          .withStatus(if (newUser) Status.CREATED else Status.ACCEPTED)
-          .withHeader("Location", s"/agents-external-stubs/authenticated/$authToken")))
+    stubFor(post(urlEqualTo(s"/agents-external-stubs/sign-in"))
+      .withRequestBody(equalToJson(
+        s"""{"userId":"$userId", "plainTextPassword":"$plainTextPassword", "providerType":"$providerType", "planetId": "$planetId"}"""))
+      .willReturn(aResponse()
+        .withStatus(if (newUser) Status.CREATED else Status.ACCEPTED)
+        .withHeader("Location", s"/agents-external-stubs/authenticated/$authToken")))
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/authenticated/$authToken"))
         .willReturn(aResponse()

@@ -19,24 +19,31 @@
                     @loginForm.errors("userId").map { error =>
                         <span class="error-notification username">Invalid Username: @Messages(error.message)</span>
                     }
-                    @loginForm.errors("password").map { error =>
-                        <span class="error-notification password">Invalid Password: @Messages(error.message)</span>
+                    @loginForm.errors("planetId").map { error =>
+                        <span class="error-notification password">Invalid Planet: @Messages(error.message)</span>
                     }
                     @loginForm.globalErrors.map { error =>
                         <span class="error-notification password">@Messages(error.message)</span>
                     }
                     <div class="form-field">
                         <label class="label--inline" for="userId">@Html(Messages("login.username"))</label>
-                        <input type="text" id="userId" name="userId" required />
+                        <input type="text" id="userId" name="userId" required placeholder="@Messages("login.username.placeholder")" />
                     </div>
 
                     <div class="form-field">
                         <label class="label--inline" for="password">@Messages("login.password")</label>
-                        <input type="password" id="password" name="password" required />
+                        <input type="password" id="password" name="password" placeholder="Not required"/>
+                    </div>
+
+                    <p class="form-hint">@Messages("login.planetId.hint")</p>
+
+                    <div class="form-field">
+                        <label class="label--inline" for="planetId">@Messages("login.planetId")</label>
+                        <input type="text" id="planetId" name="planetId" required placeholder="@Messages("login.planetId.placeholder")" />
                     </div>
 
                     <div class="form-field">
-                        <button class="button" type="submit" id="signin">@Messages("login.submit")</button>
+                        <button class="button" type="submit" id="signIn">@Messages("login.submit")</button>
                     </div>
                 </div>
             </fieldset>

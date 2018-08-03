@@ -16,7 +16,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 class ViewsSpec extends UnitSpec with OneAppPerSuite {
 
   private val filledForm = SignInController.SignInRequestForm.fill(
-    SignInRequest(userId = "My contact name", plainTextPassword = "AA1 1AA")
+    SignInRequest(userId = "My contact name", plainTextPassword = "AA1 1AA", planetId = "juniper")
   )
 
   "signIn view" should {

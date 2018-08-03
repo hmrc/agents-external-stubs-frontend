@@ -11,7 +11,6 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
-import uk.gov.hmrc.auth.core.SessionRecordNotFound
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -86,7 +85,11 @@ class SignInController @Inject()(
 
 object SignInController {
 
-  case class SignInRequest(userId: String, plainTextPassword: String, providerType: String = "GovernmentGateway")
+  case class SignInRequest(
+    userId: String,
+    planetId: String,
+    plainTextPassword: String = "p@ssw0rd",
+    providerType: String = "GovernmentGateway")
   object SignInRequest {
     implicit val writes: Writes[SignInRequest] = Json.writes[SignInRequest]
   }
@@ -94,6 +97,7 @@ object SignInController {
   val SignInRequestForm: Form[SignInRequest] = Form[SignInRequest](
     mapping(
       "userId"       -> nonEmptyText,
+      "planetId"     -> nonEmptyText,
       "password"     -> default(text, "p@ssw0rd"),
       "providerType" -> optional(nonEmptyText).transform[String](_.getOrElse("GovernmentGateway"), Some(_))
     )(SignInRequest.apply)(SignInRequest.unapply))

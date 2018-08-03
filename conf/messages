@@ -24,7 +24,11 @@ login.title=Sign in
 login.error.invalid.username=Invalid Username:
 login.error.invalid.password=Invalid Password:
 login.username=User ID
+login.username.placeholder=Can be existing or a new one
 login.password=Password
+login.planetId=Planet
+login.planetId.placeholder=What is your user planet? E.g. X123-789Y
+login.planetId.hint=Every test user lives on some planet and can only see data and other users available there. Provide an existing planet ID or invent your own to prevent foot-stepping on other's test data sets.
 login.submit=Sign in
 
 login.sa.header=Sign in

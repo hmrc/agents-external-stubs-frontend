@@ -23,9 +23,9 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "POST /gg/sign-in" should {
       "redirect to continue URL if provided" in {
-        val authToken = givenUserCanSignIn("foo", "bar", newUser = false)
+        val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
         val result = controller.signIn(Some(ContinueUrl("/there")), None, None)(FakeRequest()
-          .withFormUrlEncodedBody("userId" -> "foo", "password" -> "bar"))
+          .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper"))
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/there")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
@@ -34,9 +34,9 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       }
 
       "redirect to edit user with if new one created" in {
-        val authToken = givenUserCanSignIn("foo", "bar", newUser = true)
+        val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
         val result = controller.signIn(Some(ContinueUrl("/there")), None, None)(FakeRequest()
-          .withFormUrlEncodedBody("userId" -> "foo", "password" -> "bar"))
+          .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn"))
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/agents-external-stubs/user/edit?continue=%2Fthere")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
