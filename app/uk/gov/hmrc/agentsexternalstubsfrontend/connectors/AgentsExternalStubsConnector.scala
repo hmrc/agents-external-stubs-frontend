@@ -7,7 +7,7 @@ import play.api.libs.json.{Json, Reads}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.{BadRequestException, _}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -15,6 +15,7 @@ case class AuthenticatedSession(
   userId: String,
   authToken: String,
   providerType: String,
+  planetId: String,
   newUserCreated: Option[Boolean] = None)
 
 object AuthenticatedSession {
@@ -56,5 +57,13 @@ class AgentsExternalStubsConnector @Inject()(
     http
       .PUT[User, HttpResponse](new URL(baseUrl, s"/agents-external-stubs/users/${user.userId}").toExternalForm, user)
       .map(_ => ())
+      .recover {
+        case e: BadRequestException =>
+          val m = e.getMessage
+          val p = ",\"message\":\""
+          val s = m.indexOf(p) + p.length
+          val b = if (s > 0) m.substring(s, m.length - 3) else m
+          throw new BadRequestException(b)
+      }
 
 }

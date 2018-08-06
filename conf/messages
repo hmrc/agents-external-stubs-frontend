@@ -24,10 +24,10 @@ login.title=Sign in
 login.error.invalid.username=Invalid Username:
 login.error.invalid.password=Invalid Password:
 login.username=User ID
-login.username.placeholder=Can be existing or a new one
+login.username.placeholder=An existing or a new one
 login.password=Password
 login.planetId=Planet
-login.planetId.placeholder=What is your user planet? E.g. X123-789Y
+login.planetId.placeholder=Which is your test planet? E.g. X123-789Y
 login.planetId.hint=Every test user lives on some planet and can only see data and other users available there. Provide an existing planet ID or invent your own to prevent foot-stepping on other's test data sets.
 login.submit=Sign in
 
@@ -68,6 +68,14 @@ user.edit.update_and_continue=Update and continue
 user.edit.update=Update
 user.edit.cancel=Cancel
 
+user.show.planetId=Your test planet
+user.show.authToken=Your bearer token
+
+user.form.userId=User ID
+user.form.name=Name
+user.form.name.placeholder=Leave it blank to auto-generate
+user.form.dateOfBirth=Date of birth
+user.form.dateOfBirth.hint=Optional - only for Individuals
 user.form.nino=NINO
 user.form.nino.hint=Optional - any valid formatted Nino
 user.form.nino.error=You must provide a valid NINO or leave it empty
@@ -81,7 +89,6 @@ user.form.affinityGroup=Affinity Group
 user.form.affinityGroup.hint=
 user.form.credentialRole=Credential Role
 user.form.credentialRole.hint=Optional - can be set for 'Organisation' or 'Agent' affinity groups only. Otherwise the value will be 'User' (administrator).
-user.form.authToken=Bearer token
 
 user.form.error.onlyAgentCanHaveDelegatedEnrolments=Only Agents can have delegated enrolments.
 user.form.error.onlyIndividualsCanHaveNino=Only Individual can have NINO.

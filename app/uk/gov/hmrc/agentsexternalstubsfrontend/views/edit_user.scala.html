@@ -1,6 +1,6 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary}
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend}
 
 @(userForm:Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean)(implicit request: Request[_], messages: Messages, config: Configuration)
 
@@ -8,13 +8,13 @@
 
     <h1 class="heading-xlarge">@Messages("user.edit.header", userId)</h1>
 
-    <p>
-    @Messages("user.edit.description")
-    </p>
-
     @if(userForm.hasErrors) {
         @errorSummary(Messages("error.summary.heading"), userForm, Seq.empty, None)
     }
+
+    <p>
+    @Messages("user.edit.description")
+    </p>
 
     <div>
         @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
@@ -28,6 +28,17 @@
                         false,
                         '_label -> Html("""<span class="h2-heading">"""+ Messages("user.form.affinityGroup") + """</span>"""),
                         '_selectClass -> Html("""input--medium input--cleared""")
+                    )
+                    </div>
+
+                    <div class="form-group">
+                    @input(
+                        userForm("name"),
+                        '_label -> Messages("user.form.name"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_labelTextClass -> "h2-heading",
+                        '_labelClass -> "soft--ends",
+                        '_inputPlaceholder ->  Messages("user.form.name.placeholder")
                     )
                     </div>
 
@@ -67,7 +78,6 @@
                             '_label -> Messages("user.form.nino"),
                             '_inputClass -> "input--medium input--cleared",
                             '_labelTextClass -> "h2-heading",
-                            '_inputHint -> Messages("user.form.nino.hint"),
                             '_labelClass -> "soft--ends"
                         )
                     </div>
@@ -78,7 +88,13 @@
                             '_label -> Messages("user.form.groupIdentifier"),
                             '_inputClass -> "input--medium input--cleared",
                             '_labelTextClass -> "h2-heading",
-                            '_inputHint -> Messages("user.form.groupIdentifier.hint"),
+                            '_labelClass -> "soft--ends"
+                        )
+                    </div>
+
+                    <div class="form-group">
+                        @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
+                            '_legend -> Html("""<span class="h2-heading soft--ends">"""+ Messages("user.form.dateOfBirth")+ """</span>"""),
                             '_labelClass -> "soft--ends"
                         )
                     </div>

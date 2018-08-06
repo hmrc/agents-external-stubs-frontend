@@ -27,9 +27,12 @@ trait AgentsExternalStubsStubs {
         .withHeader("Location", s"/agents-external-stubs/authenticated/$authToken")))
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/authenticated/$authToken"))
-        .willReturn(aResponse()
-          .withStatus(Status.CREATED)
-          .withBody(Json.obj("userId" -> userId, "authToken" -> authToken, "providerType" -> providerType).toString())))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.CREATED)
+            .withBody(Json
+              .obj("userId" -> userId, "authToken" -> authToken, "providerType" -> providerType, "planetId" -> planetId)
+              .toString())))
 
     authToken
   }

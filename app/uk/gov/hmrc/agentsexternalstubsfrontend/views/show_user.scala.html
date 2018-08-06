@@ -3,12 +3,43 @@
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
 
 @import uk.gov.hmrc.play.binders.ContinueUrl
-@(user:User, authToken: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(user:User, authToken: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String, planetId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @sidebarLinks = {
+  <div>
     <nav id="secondary-nav" role="navigation">
         <a href="/gg/sign-out">@Messages("common.sign-out")</a>
     </nav>
+      <div>
+          <h3 class="cya-question">
+          @Messages("user.show.planetId")
+          </h3>
+          <div class="cya-answer" id="planetId">
+          @planetId
+          </div>
+      </div>
+    <div>
+        <h3 class="cya-question">
+        @Messages("user.show.authToken")
+        </h3>
+        <div class="cya-answer" id="authToken">
+        @{authToken.getOrElse("none")}
+        </div>
+    </div>
+  </div>
+}
+
+@showField[T](value: Option[T], name: String, id: String) = {
+    @if(value.isDefined) {
+        <div>
+            <dt class="cya-question">
+            @Messages(name)
+            </dt>
+            <dd class="cya-answer" id="@id">
+            @{value.get.toString}
+            </dd>
+        </div>
+    }
 }
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = None, sidebarLinks = Some(sidebarLinks)) {
@@ -22,6 +53,14 @@
     <dl class="govuk-check-your-answers cya-questions-long margin-bottom-40">
         <div>
             <dt class="cya-question">
+            @Messages("user.form.userId")
+            </dt>
+            <dd class="cya-answer" id="userId">
+            @{user.userId}
+            </dd>
+        </div>
+        <div>
+            <dt class="cya-question">
                 @Messages("user.form.affinityGroup")
             </dt>
             <dd class="cya-answer" id="affinityGroup">
@@ -30,34 +69,10 @@
         </div>
         <div>
             <dt class="cya-question">
-            @Messages("user.form.credentialRole")
+            @Messages("user.form.name")
             </dt>
-            <dd class="cya-answer" id="credentialRole">
-            @{user.credentialRole.getOrElse("none")}
-            </dd>
-        </div>
-        <div>
-            <dt class="cya-question">
-            @Messages("user.form.credentialStrength")
-            </dt>
-            <dd class="cya-answer" id="credentialStrength">
-            @{user.credentialStrength.getOrElse("none")}
-            </dd>
-        </div>
-        <div>
-            <dt class="cya-question">
-            @Messages("user.form.confidenceLevel")
-            </dt>
-            <dd class="cya-answer" id="confidenceLevel">
-            @{user.confidenceLevel.map(_.toString).getOrElse("none")}
-            </dd>
-        </div>
-        <div>
-            <dt class="cya-question">
-            @Messages("user.form.nino")
-            </dt>
-            <dd class="cya-answer" id="nino">
-            @{user.nino.getOrElse("none")}
+            <dd class="cya-answer" id="name">
+            @{user.name.getOrElse("none")}
             </dd>
         </div>
         <div>
@@ -68,14 +83,16 @@
             @{user.groupId.getOrElse("none")}
             </dd>
         </div>
-        <div>
-            <dt class="cya-question">
-            @Messages("user.form.authToken")
-            </dt>
-            <dd class="cya-answer" id="authToken">
-            @{authToken.getOrElse("none")}
-            </dd>
-        </div>
+
+        @showField(user.credentialRole,"user.form.credentialRole","credentialRole")
+
+        @showField(user.credentialStrength,"user.form.credentialStrength","credentialStrength")
+
+        @showField(user.confidenceLevel,"user.form.confidenceLevel","confidenceLevel")
+
+        @showField(user.nino,"user.form.nino","nino")
+
+        @showField(user.dateOfBirth,"user.form.dateOfBirth","dateOfBirth")
 
     </dl>
 
@@ -109,7 +126,7 @@
             }
         </table>
       } else {
-        <span class="form-hint">This user has not been enrolled yet.</span>
+        <span class="form-hint">This @{user.affinityGroup.map(_.toLowerCase).getOrElse("user")} has not been enrolled yet.</span>
     }
 
     @if(user.affinityGroup.contains("Agent")) {

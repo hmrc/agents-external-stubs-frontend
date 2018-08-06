@@ -1,9 +1,11 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
+import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormat
 import play.api.Configuration
 import play.api.data.Forms.{ignored, mapping, nonEmptyText, number, optional, seq, text}
-import play.api.data.validation.{Constraint, Invalid, Valid}
+import play.api.data.validation.Constraint
 import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
@@ -13,11 +15,12 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.http.{BadRequestException, SessionKeys}
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 @Singleton
 class UserController @Inject()(
@@ -35,15 +38,15 @@ class UserController @Inject()(
         .retrieve(Retrievals.credentials) { credentials =>
           agentsExternalStubsConnector
             .getUser(credentials.providerId)
-            .map(
-              user =>
-                Ok(
-                  html.show_user(
-                    user,
-                    request.session.get(SessionKeys.authToken),
-                    routes.UserController.showEditUserPage(continue),
-                    continue,
-                    user.userId)))
+            .map(user =>
+              Ok(html.show_user(
+                user,
+                request.session.get(SessionKeys.authToken),
+                routes.UserController.showEditUserPage(continue),
+                continue,
+                user.userId,
+                request.session.get("planetId").getOrElse("")
+              )))
         }
     }
 
@@ -87,6 +90,16 @@ class UserController @Inject()(
                   .map(_ =>
                     continue.fold(Redirect(routes.UserController.showUserPage(continue)))(continueUrl =>
                       Redirect(continueUrl.url)))
+                  .recover {
+                    case e: BadRequestException =>
+                      Ok(html.edit_user(
+                        UserForm.fill(user).withGlobalError(e.message),
+                        routes.UserController.updateUser(continue),
+                        routes.UserController.showUserPage(continue),
+                        credentials.providerId,
+                        continue.isDefined
+                      ))
+                }
             )
         }
     }
@@ -110,27 +123,6 @@ object UserController {
       "identifiers" -> optional(seq(identifierMapping))
     )(Enrolment.apply)(Enrolment.unapply))
 
-  def onlyAgentCanHaveDelegatedEnrolments: Constraint[User] =
-    Constraint(
-      user =>
-        if (user.delegatedEnrolments.nonEmpty && !user.affinityGroup.contains("Agent"))
-          Invalid("user.form.error.onlyAgentCanHaveDelegatedEnrolments")
-        else Valid)
-
-  def onlyIndividualsCanHaveNino: Constraint[User] =
-    Constraint(
-      user =>
-        if (user.nino.nonEmpty && !user.affinityGroup.contains("Individual"))
-          Invalid("user.form.error.onlyIndividualsCanHaveNino")
-        else Valid)
-
-  def confidenceLevelMustBeDefinedWithNino: Constraint[User] =
-    Constraint(
-      user =>
-        if (user.nino.nonEmpty != user.confidenceLevel.nonEmpty)
-          Invalid("user.form.error.confidenceLevelMustBeDefinedForNino")
-        else Valid)
-
   val UserForm: Form[User] = Form[User](
     mapping(
       "userId"             -> ignored("ignored"),
@@ -145,9 +137,10 @@ object UserController {
       "principalEnrolments" -> seq(enrolmentMapping)
         .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply)),
       "delegatedEnrolments" -> seq(enrolmentMapping)
-        .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply))
-    )(User.apply)(User.unapply)
-      .verifying(onlyAgentCanHaveDelegatedEnrolments, onlyIndividualsCanHaveNino, confidenceLevelMustBeDefinedWithNino))
+        .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply)),
+      "name"        -> optional(nonEmptyText),
+      "dateOfBirth" -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat))
+    )(User.apply)(User.unapply))
 
   def fromNone[T](none: T): Option[T] => Option[T] = {
     case Some(`none`) => None
@@ -158,4 +151,50 @@ object UserController {
     case None => Some(none)
     case s    => s
   }
+}
+
+object DateFieldHelper {
+
+  def validateDate(value: String): Boolean = if (parseDate(value)) true else false
+
+  val dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd")
+
+  def parseDate(date: String): Boolean =
+    try {
+      dateTimeFormat.parseDateTime(date)
+      true
+    } catch {
+      case _: Throwable => false
+    }
+
+  def parseDateIntoFields(date: String): Option[(String, String, String)] =
+    try {
+      val l = dateTimeFormat.parseLocalDate(date)
+      Some((l.getYear.toString, l.getMonthOfYear.toString, l.getDayOfMonth.toString))
+    } catch {
+      case NonFatal(_) => None
+    }
+
+  val formatDateFromFields: (String, String, String) => String = {
+    case (y, m, d) =>
+      if (y.isEmpty || m.isEmpty || d.isEmpty) ""
+      else {
+        val month = if (m.length == 1) "0" + m else m
+        val day = if (d.length == 1) "0" + d else d
+        s"$y-$month-$day"
+      }
+  }
+
+  def dateFieldsMapping(constraintDate: Constraint[String]): Mapping[LocalDate] =
+    mapping(
+      "year"  -> text.verifying("error.year.invalid-format", y => y.isEmpty || y.matches("^[0-9]{1,4}$")),
+      "month" -> text.verifying("error.month.invalid-format", m => m.isEmpty || m.matches("^[0-9]{1,2}$")),
+      "day"   -> text.verifying("error.day.invalid-format", d => d.isEmpty || d.matches("^[0-9]{1,2}$"))
+    )(formatDateFromFields)(parseDateIntoFields)
+      .verifying(constraintDate)
+      .transform(LocalDate.parse, _.toString("yyyy-MM-dd"))
+
+  val validDobDateFormat: Constraint[String] =
+    ValidateHelper.validateField("error.date-of-birth.required", "enter.date-of-birth.invalid-format")(date =>
+      validateDate(date))
 }

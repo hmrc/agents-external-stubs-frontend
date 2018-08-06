@@ -49,7 +49,7 @@
 
     <logger name="play" level="INFO"/>
 
-    <logger name="uk.gov.hmrc.audit" level="ERROR"/>
+    <logger name="uk.gov.hmrc.play.bootstrap.audit" level="ERROR"/>
 
     <logger name="uk.gov.hmrc.agentsexternalstubsfrontend" level="INFO"/>
 

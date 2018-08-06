@@ -79,7 +79,9 @@ class SignInController @Inject()(
       request.session +
         (SessionKeys.sessionId -> UUID.randomUUID().toString) +
         (SessionKeys.authToken -> s"Bearer ${session.authToken}") +
-        (SessionKeys.userId    -> session.userId))
+        (SessionKeys.userId    -> session.userId) +
+        ("planetId"            -> session.planetId)
+    )
 
 }
 

@@ -1,5 +1,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.models
 
+import org.joda.time.LocalDate
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.domain.Nino
 
@@ -12,7 +13,9 @@ case class User(
   credentialRole: Option[String] = None,
   nino: Option[Nino] = None,
   principalEnrolments: Seq[Enrolment] = Seq.empty,
-  delegatedEnrolments: Seq[Enrolment] = Seq.empty
+  delegatedEnrolments: Seq[Enrolment] = Seq.empty,
+  name: Option[String] = None,
+  dateOfBirth: Option[LocalDate] = None
 )
 
 object User {
