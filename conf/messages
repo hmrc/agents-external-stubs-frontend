@@ -61,9 +61,10 @@ user.show.header=Welcome {0}
 user.show.description=Review your current setup:
 user.show.edit=Edit
 user.show.continue=Continue
+user.show.isNonStandardUser=WARNING: This is non-standard user setup.
 
 user.edit.header=Configure user {0}
-user.edit.description=Here you can change a configuration of the current user:
+user.edit.description=Here you can change a configuration of the user. All fields are optional except an Affinity Group. If you omit any other field, then the sensible default will be given.
 user.edit.update_and_continue=Update and continue
 user.edit.update=Update
 user.edit.cancel=Cancel
@@ -89,6 +90,11 @@ user.form.affinityGroup=Affinity Group
 user.form.affinityGroup.hint=
 user.form.credentialRole=Credential Role
 user.form.credentialRole.hint=Optional - can be set for 'Organisation' or 'Agent' affinity groups only. Otherwise the value will be 'User' (administrator).
+user.form.agentCode=Agent Code
+user.form.agentFriendlyName=Agent Friendly Name
+user.form.isNonStandardUser=Skip validation and sanitation, this is non-standard user.
+user.form.isNonStandardUser.hint=WARNING: Check this only if you have reason and understand implications.
+
 
 user.form.error.onlyAgentCanHaveDelegatedEnrolments=Only Agents can have delegated enrolments.
 user.form.error.onlyIndividualsCanHaveNino=Only Individual can have NINO.

@@ -1,6 +1,6 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend}
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
 
 @(userForm:Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean)(implicit request: Request[_], messages: Messages, config: Configuration)
 
@@ -12,7 +12,7 @@
         @errorSummary(Messages("error.summary.heading"), userForm, Seq.empty, None)
     }
 
-    <p>
+    <p class="form-hint">
     @Messages("user.edit.description")
     </p>
 
@@ -37,8 +37,7 @@
                         '_label -> Messages("user.form.name"),
                         '_inputClass -> "input--medium input--cleared",
                         '_labelTextClass -> "h2-heading",
-                        '_labelClass -> "soft--ends",
-                        '_inputPlaceholder ->  Messages("user.form.name.placeholder")
+                        '_labelClass -> "soft--ends"
                     )
                     </div>
 
@@ -97,6 +96,26 @@
                             '_legend -> Html("""<span class="h2-heading soft--ends">"""+ Messages("user.form.dateOfBirth")+ """</span>"""),
                             '_labelClass -> "soft--ends"
                         )
+                    </div>
+
+                    <div class="form-group">
+                    @input(
+                        userForm("agentCode"),
+                        '_label -> Messages("user.form.agentCode"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_labelTextClass -> "h2-heading",
+                        '_labelClass -> "soft--ends"
+                    )
+                    </div>
+
+                    <div class="form-group">
+                    @input(
+                        userForm("agentFriendlyName"),
+                        '_label -> Messages("user.form.agentFriendlyName"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_labelTextClass -> "h2-heading",
+                        '_labelClass -> "soft--ends"
+                    )
                     </div>
 
                 </div>
@@ -171,17 +190,30 @@
                     </table>
 
                 </div>
-            </fieldset>
 
-            <div class="form-group">
+                <span class="form-hint">@Messages("user.form.isNonStandardUser.hint")</span>
 
-                <button class="button button--spaced button--padded" type="submit" id="update">
+                <div class="form-group">
+                @singleCheckbox(userForm("isNonStandardUser"),
+                    '_label -> Messages("user.form.isNonStandardUser"),
+                    '_inputClass -> "input--medium input--cleared",
+                    '_labelTextClass -> "h2-heading",
+                    '_labelClass -> "soft--ends"
+                )
+                </div>
+
+                <div class="form-group">
+
+                    <button class="button button--spaced button--padded" type="submit" id="update">
                     @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
-                </button>
+                    </button>
 
-                <a class="button button--link" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
+                    <a class="button button--link" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
 
-            </div>
+                </div>
+
+
+            </fieldset>
 
         }
     </div>

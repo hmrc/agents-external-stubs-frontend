@@ -15,7 +15,10 @@ case class User(
   principalEnrolments: Seq[Enrolment] = Seq.empty,
   delegatedEnrolments: Seq[Enrolment] = Seq.empty,
   name: Option[String] = None,
-  dateOfBirth: Option[LocalDate] = None
+  dateOfBirth: Option[LocalDate] = None,
+  agentCode: Option[String] = None,
+  agentFriendlyName: Option[String] = None,
+  isNonStandardUser: Option[Boolean] = None
 )
 
 object User {

@@ -50,6 +50,10 @@
     @Messages("user.show.description")
     </p>
 
+    @if(user.isNonStandardUser.contains(true)){
+        <p class="form-hint">@Messages("user.show.isNonStandardUser")</p>
+    }
+
     <dl class="govuk-check-your-answers cya-questions-long margin-bottom-40">
         <div>
             <dt class="cya-question">
@@ -93,6 +97,10 @@
         @showField(user.nino,"user.form.nino","nino")
 
         @showField(user.dateOfBirth,"user.form.dateOfBirth","dateOfBirth")
+
+        @showField(user.agentCode,"user.form.agentCode","agentCode")
+
+        @showField(user.agentFriendlyName,"user.form.agentFriendlyName","agentFriendlyName")
 
     </dl>
 

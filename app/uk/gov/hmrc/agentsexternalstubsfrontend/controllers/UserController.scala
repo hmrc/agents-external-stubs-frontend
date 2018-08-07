@@ -4,7 +4,7 @@ import javax.inject.{Inject, Singleton}
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import play.api.Configuration
-import play.api.data.Forms.{ignored, mapping, nonEmptyText, number, optional, seq, text}
+import play.api.data.Forms.{boolean, ignored, mapping, nonEmptyText, number, optional, seq, text}
 import play.api.data.validation.Constraint
 import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -138,8 +138,11 @@ object UserController {
         .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply)),
       "delegatedEnrolments" -> seq(enrolmentMapping)
         .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply)),
-      "name"        -> optional(nonEmptyText),
-      "dateOfBirth" -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat))
+      "name"              -> optional(nonEmptyText),
+      "dateOfBirth"       -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat)),
+      "agentCode"         -> optional(nonEmptyText),
+      "agentFriendlyName" -> optional(nonEmptyText),
+      "isNonStandardUser" -> optional(boolean)
     )(User.apply)(User.unapply))
 
   def fromNone[T](none: T): Option[T] => Option[T] = {
