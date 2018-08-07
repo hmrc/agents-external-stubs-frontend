@@ -92,7 +92,7 @@ user.form.credentialRole=Credential Role
 user.form.credentialRole.hint=Optional - can be set for 'Organisation' or 'Agent' affinity groups only. Otherwise the value will be 'User' (administrator).
 user.form.agentCode=Agent Code
 user.form.agentFriendlyName=Agent Friendly Name
-user.form.isNonStandardUser=Skip validation and sanitation, this is non-standard user.
+user.form.isNonStandardUser=Skip validation and sanitation, this will be non-standard user.
 user.form.isNonStandardUser.hint=WARNING: Check this only if you have reason and understand implications.
 
 
