@@ -18,7 +18,8 @@ case class User(
   dateOfBirth: Option[LocalDate] = None,
   agentCode: Option[String] = None,
   agentFriendlyName: Option[String] = None,
-  isNonStandardUser: Option[Boolean] = None
+  isNonStandardUser: Option[Boolean] = None,
+  isPermanent: Option[Boolean] = None
 )
 
 object User {

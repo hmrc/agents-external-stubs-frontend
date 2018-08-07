@@ -57,20 +57,21 @@ common.sign-out=Sign out
 
 user.title=Current user
 
+
 user.show.header=Welcome {0}
 user.show.description=Review your current setup:
 user.show.edit=Edit
 user.show.continue=Continue
-user.show.isNonStandardUser=WARNING: This is non-standard user setup.
+user.show.isNonStandardUser=WARNING: Non-standard user setup.
+user.show.isPermanent=This is permanent user.
+user.show.planetId=Your test planet
+user.show.authToken=Your bearer token
 
 user.edit.header=Configure user {0}
 user.edit.description=Here you can change a configuration of the user. All fields are optional except an Affinity Group. If you omit any other field, then the sensible default will be given.
 user.edit.update_and_continue=Update and continue
 user.edit.update=Update
 user.edit.cancel=Cancel
-
-user.show.planetId=Your test planet
-user.show.authToken=Your bearer token
 
 user.form.userId=User ID
 user.form.name=Name
@@ -93,7 +94,9 @@ user.form.credentialRole.hint=Optional - can be set for 'Organisation' or 'Agent
 user.form.agentCode=Agent Code
 user.form.agentFriendlyName=Agent Friendly Name
 user.form.isNonStandardUser=Skip validation and sanitation, this will be non-standard user.
-user.form.isNonStandardUser.hint=WARNING: Check this only if you have reason and understand implications.
+user.form.isNonStandardUser.hint=WARNING: Check this box only if you have valid reason and understand implications.
+user.form.isPermanent=Keep this user until manually removed.
+user.form.isPermanent.hint=Check this box if you want to keep this user (and planet) more than 12h.
 
 
 user.form.error.onlyAgentCanHaveDelegatedEnrolments=Only Agents can have delegated enrolments.

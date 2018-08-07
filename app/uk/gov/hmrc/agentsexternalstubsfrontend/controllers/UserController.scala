@@ -142,7 +142,8 @@ object UserController {
       "dateOfBirth"       -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat)),
       "agentCode"         -> optional(nonEmptyText),
       "agentFriendlyName" -> optional(nonEmptyText),
-      "isNonStandardUser" -> optional(boolean)
+      "isNonStandardUser" -> optional(boolean),
+      "isPermanent"       -> optional(boolean)
     )(User.apply)(User.unapply))
 
   def fromNone[T](none: T): Option[T] => Option[T] = {
