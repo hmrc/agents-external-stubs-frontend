@@ -142,7 +142,7 @@ object UserController {
       "dateOfBirth"       -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat)),
       "agentCode"         -> optional(nonEmptyText),
       "agentFriendlyName" -> optional(nonEmptyText),
-      "isNonStandardUser" -> optional(boolean),
+      "isNonCompliant"    -> optional(boolean),
       "isPermanent"       -> optional(boolean)
     )(User.apply)(User.unapply))
 
