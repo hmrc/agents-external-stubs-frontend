@@ -16,9 +16,12 @@ To handle requests aimed at stubbed frontend microservices we provide necessary 
 You can switch this behaviour off by setting `proxies.start` config property to `false`.
 
 ## Data Model
-Every stubbed user and other data live on some test planet. 
+Every stubbed user and other data live is some test sandbox (planet). 
 You have to declare existing or a new planet whenever you sign-in. Each authenticated session have planetId information. 
 Stubbed and custom UIs will consider only users and data assigned to the current planet.
+
+User authentication expires after 15 minutes and so does the bearer token.
+All users and other data on each planet are removed after 12h unless marked as permanent.
 
 ## Stubbed UIs
 

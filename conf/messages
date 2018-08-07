@@ -28,7 +28,7 @@ login.username.placeholder=An existing or a new one
 login.password=Password
 login.planetId=Planet
 login.planetId.placeholder=Which is your test planet? E.g. X123-789Y
-login.planetId.hint=Every test user lives on some planet and can only see data and other users available there. Provide an existing planet ID or invent your own to prevent foot-stepping on other's test data sets.
+login.planetId.hint=Each user belongs to some test data sandbox (planet).
 login.submit=Sign in
 
 login.sa.header=Sign in
@@ -59,11 +59,11 @@ user.title=Current user
 
 
 user.show.header=Welcome {0}
-user.show.description=Review your current setup:
+user.show.description=Here you can review your current user setup.
 user.show.edit=Edit
 user.show.continue=Continue
-user.show.isNonStandardUser=WARNING: Non-standard user setup.
-user.show.isPermanent=This is permanent user.
+user.show.isNonStandardUser=WARNING: This user may have non-compliant setup..
+user.show.isPermanent=This user is permanent, will stay until manually removed.
 user.show.planetId=Your test planet
 user.show.authToken=Your bearer token
 
@@ -93,10 +93,10 @@ user.form.credentialRole=Credential Role
 user.form.credentialRole.hint=Optional - can be set for 'Organisation' or 'Agent' affinity groups only. Otherwise the value will be 'User' (administrator).
 user.form.agentCode=Agent Code
 user.form.agentFriendlyName=Agent Friendly Name
-user.form.isNonStandardUser=Skip validation and sanitation, this will be non-standard user.
-user.form.isNonStandardUser.hint=WARNING: Check this box only if you have valid reason and understand implications.
-user.form.isPermanent=Keep this user until manually removed.
-user.form.isPermanent.hint=Check this box if you want to keep this user (and planet) more than 12h.
+user.form.isNonStandardUser=Skip validation and sanitation
+user.form.isNonStandardUser.hint=WARNING: Check this box only if you have valid reason and understand implications, this user might become non-compliant.
+user.form.isPermanent=Permanent
+user.form.isPermanent.hint=Check this box if you want to keep this user (and planet) for more than 12h, until manually removed.
 
 
 user.form.error.onlyAgentCanHaveDelegatedEnrolments=Only Agents can have delegated enrolments.

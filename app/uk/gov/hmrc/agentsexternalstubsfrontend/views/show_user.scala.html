@@ -48,14 +48,18 @@
 
     <p>
     @Messages("user.show.description")
-    <div class="form-hint">
+
         @if(user.isPermanent.contains(true)){
+            <div class="form-hint">
             @Messages("user.show.isPermanent")
+            </div>
         }
         @if(user.isNonStandardUser.contains(true)){
+            <div class="form-hint">
             @Messages("user.show.isNonStandardUser")
+            </div>
         }
-    </div>
+
     </p>
 
     <dl class="govuk-check-your-answers cya-questions-long margin-bottom-40">
