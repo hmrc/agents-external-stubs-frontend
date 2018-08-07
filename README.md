@@ -15,6 +15,11 @@ To handle requests aimed at stubbed frontend microservices we provide necessary 
 
 You can switch this behaviour off by setting `proxies.start` config property to `false`.
 
+## Data Model
+Every stubbed user and other data live on some test planet. 
+You have to declare existing or a new planet whenever you sign-in. Each authenticated session have planetId information. 
+Stubbed and custom UIs will consider only users and data assigned to the current planet.
+
 ## Stubbed UIs
 
 ### [Company Auth Frontend](https://github.com/hmrc/company-auth-frontend/blob/master/README.md)
