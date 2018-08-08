@@ -32,12 +32,11 @@
 
                     <div class="form-field">
                         <label class="label--inline" for="password">@Messages("login.password")</label>
-                        <input type="password" id="password" name="password" placeholder="Not required"/>
+                        <input type="password" id="password" name="password" placeholder="Not required for tests"/>
                     </div>
 
-                    <p class="form-hint">@Messages("login.planetId.hint")</p>
-
                     <div class="form-field">
+                        <div class="form-hint">@Messages("login.planetId.hint")</div>
                         <label class="label--inline" for="planetId">@Messages("login.planetId")</label>
                         <input type="text" id="planetId" name="planetId" required placeholder="@Messages("login.planetId.placeholder")" />
                     </div>

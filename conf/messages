@@ -19,13 +19,13 @@ start.helpdesklink.text2=if you need help.
 
 # Login page
 login.continue = Continue
-login.title=Sign in
+login.title=Sign in 
 login.username=User ID
 login.username.placeholder=An existing or a new one
 login.password=Password
 login.planetId=Planet
-login.planetId.placeholder=Which is your test planet? E.g. X123-789Y
-login.planetId.hint=Each user belongs to some test data sandbox (planet).
+login.planetId.placeholder=Which planet is the user from? E.g. Melmac
+login.planetId.hint=Test data are grouped into planets, separated from each other.
 login.submit=Sign in
 
 login.sa.header=Sign in
