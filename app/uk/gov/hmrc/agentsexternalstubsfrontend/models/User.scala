@@ -19,6 +19,7 @@ case class User(
   agentCode: Option[String] = None,
   agentFriendlyName: Option[String] = None,
   isNonCompliant: Option[Boolean] = None,
+  complianceIssues: Option[Seq[String]] = None,
   isPermanent: Option[Boolean] = None
 )
 

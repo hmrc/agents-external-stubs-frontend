@@ -143,6 +143,7 @@ object UserController {
       "agentCode"         -> optional(nonEmptyText),
       "agentFriendlyName" -> optional(nonEmptyText),
       "isNonCompliant"    -> optional(boolean),
+      "complianceIssues"  -> ignored[Option[Seq[String]]](None),
       "isPermanent"       -> optional(boolean)
     )(User.apply)(User.unapply))
 

@@ -62,7 +62,7 @@ user.show.header=Welcome {0}
 user.show.description=Here you can review your current user setup.
 user.show.edit=Edit
 user.show.continue=Continue
-user.show.isNonCompliant=WARNING: This user may have non-compliant setup..
+user.show.isNonCompliant=WARNING: This user has non-compliant setup, see details
 user.show.isPermanent=This user is permanent, will stay until manually removed.
 user.show.planetId=Your test planet
 user.show.authToken=Your bearer token
@@ -94,9 +94,9 @@ user.form.credentialRole.hint=Optional - can be set for 'Organisation' or 'Agent
 user.form.agentCode=Agent Code
 user.form.agentFriendlyName=Agent Friendly Name
 user.form.isNonCompliant=Skip validation and sanitation
-user.form.isNonCompliant.hint=WARNING: Check this box only if you have valid reason and understand implications, this user might become non-compliant.
+user.form.isNonCompliant.hint=WARNING: Check this box only if you have valid reason and understand implications, this user may become non-compliant.
 user.form.isPermanent=Permanent
-user.form.isPermanent.hint=Check this box if you want to keep this user (and planet) for more than 12h, until manually removed.
+user.form.isPermanent.hint=Check this box if you want to keep this user in the sandbox for more than 12h, until manually removed.
 
 
 user.form.error.onlyAgentCanHaveDelegatedEnrolments=Only Agents can have delegated enrolments.

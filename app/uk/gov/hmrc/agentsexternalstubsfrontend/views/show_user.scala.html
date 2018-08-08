@@ -47,20 +47,28 @@
     <h1 class="heading-xlarge">@Messages("user.show.header", userId)</h1>
 
     <p>
-    @Messages("user.show.description")
-
-        @if(user.isPermanent.contains(true)){
-            <div class="form-hint">
-            @Messages("user.show.isPermanent")
-            </div>
-        }
-        @if(user.isNonCompliant.contains(true)){
-            <div class="form-hint">
-            @Messages("user.show.isNonCompliant")
-            </div>
-        }
-
+        @Messages("user.show.description")
     </p>
+
+    @if(user.isPermanent.contains(true)){
+        <p class="form-hint">
+        @Messages("user.show.isPermanent")
+        </p>
+    }
+    @if(user.isNonCompliant.contains(true)){
+        <div class="form-group">
+            <details role="group">
+                <summary role="button" aria-controls="details-content-0" aria-expanded="false">
+                    <span class="summary">@Messages("user.show.isNonCompliant")</span>
+                </summary>
+                <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="true">
+                    @for(issue <- user.complianceIssues){
+                        <li>@issue</li>
+                    }
+                </div>
+            </details>
+        </div>
+    }
 
     <dl class="govuk-check-your-answers cya-questions-long margin-bottom-40">
         <div>
@@ -184,7 +192,7 @@
     <div style="margin-top: 40px;">
 
         <a role="button" href="@editUrl.url">
-            <button class="button button--spaced button--padded" id="update">
+            <button class="button" id="update">
             @Messages("user.show.edit")
             </button>
         </a>

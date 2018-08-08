@@ -41,6 +41,16 @@
                     )
                     </div>
 
+                    <div class="form-group">
+
+                        <button class="button" type="submit" id="update">
+                        @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
+                        </button>
+
+                        <a class="button button--link" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
+
+                    </div>
+
                     <div class="form-group soft--ends">
                     @dropdown(
                         userForm("credentialRole"),
@@ -120,6 +130,16 @@
 
                 </div>
 
+                <div class="form-group">
+
+                    <button class="button" type="submit" id="update">
+                    @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
+                    </button>
+
+                    <a class="button button--link" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
+
+                </div>
+
 
                 <h2>Principal enrolments</h2>
 
@@ -191,6 +211,8 @@
 
                 </div>
 
+                <h2>Specials</h2>
+
                 <span class="form-hint">@Messages("user.form.isNonCompliant.hint")</span>
 
                 <div class="form-group">
@@ -215,7 +237,7 @@
 
                 <div class="form-group">
 
-                    <button class="button button--spaced button--padded" type="submit" id="update">
+                    <button class="button" type="submit" id="update">
                     @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
                     </button>
 
