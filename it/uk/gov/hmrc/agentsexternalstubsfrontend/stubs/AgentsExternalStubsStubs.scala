@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{JsArray, JsString, Json}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 
@@ -57,5 +57,14 @@ trait AgentsExternalStubsStubs {
             .withStatus(Status.ACCEPTED)
             .withHeader("Location", s"/agents-external-stubs/users/${user.userId}")))
   }
+
+  def givenUsers(users: User*) =
+    stubFor(
+      get(urlEqualTo(s"/agents-external-stubs/users"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withBody(
+              JsArray(users.map(u => Json.obj("userId" -> u.userId, "affinityGroup" -> u.affinityGroup))).toString())))
 
 }

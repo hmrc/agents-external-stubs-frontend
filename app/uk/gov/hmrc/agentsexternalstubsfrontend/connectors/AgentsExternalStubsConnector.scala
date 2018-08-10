@@ -6,7 +6,7 @@ import javax.inject.{Inject, Named, Singleton}
 import play.api.libs.json.{Json, Reads}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{User, Users}
 import uk.gov.hmrc.http.{BadRequestException, _}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -65,5 +65,8 @@ class AgentsExternalStubsConnector @Inject()(
           val b = if (s > 0) m.substring(s, m.length - 3) else m
           throw new BadRequestException(b)
       }
+
+  def getUsers(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] =
+    http.GET[Users](new URL(baseUrl, s"/agents-external-stubs/users").toExternalForm)
 
 }

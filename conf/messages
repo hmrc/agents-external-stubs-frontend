@@ -52,8 +52,10 @@ global.error.500.message=Please try again in a few minutes.
 
 common.sign-out=Sign out
 
-user.title=Current user
+users.title=Your test users
+users.show.header=Your test users on {0}
 
+user.title=Current user
 user.show.header=Welcome {0}
 user.show.description=Here you can review user setup.
 user.show.edit=Edit

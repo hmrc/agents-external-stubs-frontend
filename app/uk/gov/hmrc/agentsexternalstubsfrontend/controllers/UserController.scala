@@ -86,7 +86,7 @@ class UserController @Inject()(
                       continue.isDefined))),
               user =>
                 agentsExternalStubsConnector
-                  .updateUser(withTidyEnrolments(user.copy(userId = credentials.providerId)))
+                  .updateUser(user.copy(userId = credentials.providerId))
                   .map(_ =>
                     continue.fold(Redirect(routes.UserController.showUserPage(continue)))(continueUrl =>
                       Redirect(continueUrl.url)))
@@ -104,8 +104,22 @@ class UserController @Inject()(
         }
     }
 
-  private def withTidyEnrolments(user: User): User = user
-
+  val showAllUsersPage: Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentials) { credentials =>
+          agentsExternalStubsConnector.getUsers
+            .map(
+              users =>
+                Ok(html.show_all_users(
+                  users,
+                  credentials.providerId,
+                  request.session.get(SessionKeys.authToken),
+                  routes.UserController.showUserPage(None),
+                  request.session.get("planetId").getOrElse("")
+                )))
+        }
+    }
 }
 
 object UserController {

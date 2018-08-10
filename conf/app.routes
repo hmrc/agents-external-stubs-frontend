@@ -8,3 +8,4 @@ GET         /gg/sign-out                          @uk.gov.hmrc.agentsexternalstu
 GET         /agents-external-stubs/user           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showUserPage(continue: Option[ContinueUrl])
 GET         /agents-external-stubs/user/edit      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showEditUserPage(continue: Option[ContinueUrl])
 POST        /agents-external-stubs/user/edit      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.updateUser(continue: Option[ContinueUrl])
+GET         /agents-external-stubs/users           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
