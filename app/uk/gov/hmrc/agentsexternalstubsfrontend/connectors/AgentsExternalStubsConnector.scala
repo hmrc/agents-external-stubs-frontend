@@ -12,6 +12,7 @@ import uk.gov.hmrc.http.{BadRequestException, _}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class AuthenticatedSession(
+  sessionId: String,
   userId: String,
   authToken: String,
   providerType: String,

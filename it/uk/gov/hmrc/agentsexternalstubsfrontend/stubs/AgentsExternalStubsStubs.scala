@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
-import play.api.libs.json.{JsArray, JsString, Json}
+import play.api.libs.json.{JsArray, Json}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 
@@ -30,9 +30,15 @@ trait AgentsExternalStubsStubs {
         .willReturn(
           aResponse()
             .withStatus(Status.CREATED)
-            .withBody(Json
-              .obj("userId" -> userId, "authToken" -> authToken, "providerType" -> providerType, "planetId" -> planetId)
-              .toString())))
+            .withBody(
+              Json
+                .obj(
+                  "sessionId"    -> UUID.randomUUID().toString,
+                  "userId"       -> userId,
+                  "authToken"    -> authToken,
+                  "providerType" -> providerType,
+                  "planetId"     -> planetId)
+                .toString())))
 
     authToken
   }
