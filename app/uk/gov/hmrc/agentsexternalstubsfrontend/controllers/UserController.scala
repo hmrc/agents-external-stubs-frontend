@@ -91,9 +91,9 @@ class UserController @Inject()(
                     continue.fold(Redirect(routes.UserController.showUserPage(continue)))(continueUrl =>
                       Redirect(continueUrl.url)))
                   .recover {
-                    case e: BadRequestException =>
+                    case e: Exception =>
                       Ok(html.edit_user(
-                        UserForm.fill(user).withGlobalError(e.message),
+                        UserForm.fill(user).withGlobalError(e.getMessage),
                         routes.UserController.updateUser(continue),
                         routes.UserController.showUserPage(continue),
                         credentials.providerId,
