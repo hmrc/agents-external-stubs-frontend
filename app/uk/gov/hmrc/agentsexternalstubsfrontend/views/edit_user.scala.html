@@ -52,13 +52,17 @@
                     </div>
 
                     <div class="form-group soft--ends">
-                    @dropdown(
-                        userForm("credentialRole"),
-                        CredentialRole.values.map(i => (i,i)),
-                        false,
-                        '_label -> Html("""<span class="h2-heading soft--ends">"""+ Messages("user.form.credentialRole") + """</span>"""),
-                        '_selectClass -> Html("""input--medium input--cleared""")
-                    )
+                        <span class="form-hint">
+                            If the user is an Admin of its group, then you might not be able to change this without changing groupId as well.
+                        </span>
+                        @dropdown(
+                            userForm("credentialRole"),
+                            CredentialRole.values.map(i => (i, i)),
+                            false,
+                            '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.credentialRole") + """</span>"""),
+                            '_selectClass -> Html("""input--medium input--cleared""")
+                        )
+
                     </div>
 
                     <div class="form-group soft--ends">
@@ -93,7 +97,7 @@
 
                     <div class="form-group">
                         @input(
-                            userForm("groupIdentifier"),
+                            userForm("groupId"),
                             '_label -> Messages("user.form.groupIdentifier"),
                             '_inputClass -> "input--medium input--cleared",
                             '_labelTextClass -> "h2-heading",

@@ -52,5 +52,5 @@ object AffinityGroup {
 }
 
 object CredentialRole {
-  val values = Seq("none", "User", "Assistant")
+  val values = Seq("none", "Admin", "User", "Assistant")
 }
