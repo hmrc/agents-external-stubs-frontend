@@ -37,4 +37,39 @@
         @Messages("users.show.description")
     </p>
 
+    <table id="users" class="margin-bottom-30">
+        <caption id="tableSubHeader" class="normal-text">Manage your test users</caption>
+        <col style="width: 40%">
+        <col style="width: 30%">
+        <col style="width: 30%">
+        <thead>
+            <tr>
+                <th scope="col">UserID</th>
+                <th scope="col">Affinity Group</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        @users.users.sortBy(_.userId).map { user =>
+                <tr>
+                    <td>@user.userId</td>
+                    <td>@user.affinityGroup.getOrElse("none")</td>
+                    <td>@if(user.userId==currentUserId){
+                        <span class="form-hint">This is current user</span>
+                        <div>
+                            <a href="/agents-external-stubs/user?userId=@user.userId">View</a> |
+                            <a href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a>
+                        </div>
+                    }else{
+                        <div>
+                            <a href="/agents-external-stubs/user?userId=@user.userId">View</a> |
+                            <a href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a> |
+                            <a href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a>
+                        </div>
+                    }</td>
+                </tr>
+        }
+        </tbody>
+    </table>
+
 }

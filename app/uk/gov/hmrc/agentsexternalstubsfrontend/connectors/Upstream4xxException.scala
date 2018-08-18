@@ -1,5 +1,5 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
-import uk.gov.hmrc.http.{HttpException, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HttpException, Upstream4xxResponse}
 
 class Upstream4xxException(msg: String, code: Int) extends HttpException(msg, code)
 

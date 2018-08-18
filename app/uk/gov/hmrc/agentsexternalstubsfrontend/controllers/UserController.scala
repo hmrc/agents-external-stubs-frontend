@@ -15,7 +15,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{BadRequestException, SessionKeys}
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
@@ -32,43 +32,44 @@ class UserController @Inject()(
 
   import UserController._
 
-  def showUserPage(continue: Option[ContinueUrl]): Action[AnyContent] =
+  def showUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentials) { credentials =>
           agentsExternalStubsConnector
-            .getUser(credentials.providerId)
+            .getUser(userId.getOrElse(credentials.providerId))
             .map(user =>
               Ok(html.show_user(
                 user,
                 request.session.get(SessionKeys.authToken),
-                routes.UserController.showEditUserPage(continue),
+                routes.UserController.showEditUserPage(continue, userId),
                 continue,
                 user.userId,
+                credentials.providerId,
                 request.session.get("planetId").getOrElse("")
               )))
         }
     }
 
-  def showEditUserPage(continue: Option[ContinueUrl]): Action[AnyContent] =
+  def showEditUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentials) { credentials =>
           agentsExternalStubsConnector
-            .getUser(credentials.providerId)
-            .map(
-              user =>
-                Ok(
-                  html.edit_user(
-                    UserForm.fill(user),
-                    routes.UserController.updateUser(continue),
-                    routes.UserController.showUserPage(continue),
-                    user.userId,
-                    continue.isDefined)))
+            .getUser(userId.getOrElse(credentials.providerId))
+            .map(user =>
+              Ok(html.edit_user(
+                UserForm.fill(user),
+                routes.UserController.updateUser(continue, userId),
+                routes.UserController.showUserPage(continue, userId),
+                user.userId,
+                credentials.providerId,
+                continue.isDefined
+              )))
         }
     }
 
-  def updateUser(continue: Option[ContinueUrl]): Action[AnyContent] =
+  def updateUser(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentials) { credentials =>
@@ -76,17 +77,17 @@ class UserController @Inject()(
             .bindFromRequest()
             .fold(
               formWithErrors =>
-                Future.successful(
-                  Ok(
-                    html.edit_user(
-                      formWithErrors,
-                      routes.UserController.updateUser(continue),
-                      routes.UserController.showUserPage(continue),
-                      credentials.providerId,
-                      continue.isDefined))),
+                Future.successful(Ok(html.edit_user(
+                  formWithErrors,
+                  routes.UserController.updateUser(continue, userId),
+                  routes.UserController.showUserPage(continue, userId),
+                  userId = userId.getOrElse(credentials.providerId),
+                  credentials.providerId,
+                  continue.isDefined
+                ))),
               user =>
                 agentsExternalStubsConnector
-                  .updateUser(user.copy(userId = credentials.providerId))
+                  .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId)))
                   .map(_ =>
                     continue.fold(Redirect(routes.UserController.showUserPage(continue)))(continueUrl =>
                       Redirect(continueUrl.url)))
@@ -94,8 +95,9 @@ class UserController @Inject()(
                     case e: Exception =>
                       Ok(html.edit_user(
                         UserForm.fill(user).withGlobalError(e.getMessage),
-                        routes.UserController.updateUser(continue),
-                        routes.UserController.showUserPage(continue),
+                        routes.UserController.updateUser(continue, userId),
+                        routes.UserController.showUserPage(continue, userId),
+                        userId = userId.getOrElse(credentials.providerId),
                         credentials.providerId,
                         continue.isDefined
                       ))

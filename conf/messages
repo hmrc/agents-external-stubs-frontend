@@ -54,10 +54,13 @@ common.sign-out=Sign out
 
 users.title=Your test users
 users.show.header=Your test users on {0}
+users.show.description=
 
 user.title=Current user
-user.show.header=Welcome {0}
+user.show.header=This is {0}
 user.show.description=Here you can review user setup.
+user.current.show.header=Welcome {0}, you are signed in
+user.current.show.description=Here you can review your setup.
 user.show.edit=Edit
 user.show.continue=Continue
 user.show.isNonCompliant=WARNING: This user has non-compliant setup, see details

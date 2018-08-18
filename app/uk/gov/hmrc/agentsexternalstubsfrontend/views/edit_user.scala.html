@@ -2,7 +2,7 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
 
-@(userForm:Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(userForm:Form[User], postUrl: Call, cancelCall: Call, userId: String, currentUserId: String, hasContinue: Boolean)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = None) {
 
