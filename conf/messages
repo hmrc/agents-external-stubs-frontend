@@ -50,17 +50,22 @@ global.error.500.title=Sorry, we are experiencing technical difficulties - 500
 global.error.500.heading=Sorry, we''re experiencing technical difficulties
 global.error.500.message=Please try again in a few minutes.
 
+error.title=Your recent request failed
+
 common.sign-out=Sign out
 
 users.title=Your test users
 users.show.header=Your test users on {0}
 users.show.description=
 
-user.title=Current user
+user.title=Test user
 user.show.header=This is {0}
 user.show.description=Here you can review user setup.
+
+user.current.title=Current test user
 user.current.show.header=Welcome {0}, you are signed in
 user.current.show.description=Here you can review your setup.
+
 user.show.edit=Edit
 user.show.continue=Continue
 user.show.isNonCompliant=WARNING: This user has non-compliant setup, see details

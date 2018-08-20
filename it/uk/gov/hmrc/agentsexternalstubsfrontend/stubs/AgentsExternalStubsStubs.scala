@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
-import play.api.libs.json.{JsArray, Json}
+import play.api.libs.json.{JsArray, JsNull, JsString, Json}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 
@@ -62,6 +62,10 @@ trait AgentsExternalStubsStubs {
           aResponse()
             .withStatus(Status.ACCEPTED)
             .withHeader("Location", s"/agents-external-stubs/users/${user.userId}")))
+    stubFor(
+      delete(urlEqualTo(s"/agents-external-stubs/users/${user.userId}"))
+        .willReturn(aResponse()
+          .withStatus(Status.NO_CONTENT)))
   }
 
   def givenUsers(users: User*) =
@@ -70,7 +74,14 @@ trait AgentsExternalStubsStubs {
         .willReturn(
           aResponse()
             .withStatus(Status.OK)
-            .withBody(
-              JsArray(users.map(u => Json.obj("userId" -> u.userId, "affinityGroup" -> u.affinityGroup))).toString())))
+            .withBody(Json
+              .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(u =>
+                Json.obj(
+                  "userId"         -> Json.toJsFieldJsValueWrapper(JsString(u.userId)),
+                  "affinityGroup"  -> Json.toJsFieldJsValueWrapper(u.affinityGroup.map(JsString).getOrElse(JsNull)),
+                  "groupId"        -> Json.toJsFieldJsValueWrapper(u.groupId.map(JsString).getOrElse(JsNull)),
+                  "credentialRole" -> Json.toJsFieldJsValueWrapper(u.credentialRole.map(JsString).getOrElse(JsNull))
+              )))))
+              .toString())))
 
 }

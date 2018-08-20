@@ -5,7 +5,7 @@ import java.net.URL
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{User, Users}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.http._
@@ -17,7 +17,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
 
   private lazy val connector: AgentsExternalStubsConnector = new AgentsExternalStubsConnector(
     new URL(s"http://localhost:$wireMockPort"),
-    app.injector.instanceOf[HttpGet with HttpPost with HttpPut])
+    app.injector.instanceOf[HttpGet with HttpPost with HttpPut with HttpDelete])
 
   "AgentsExternalStubsConnector" when {
 
@@ -69,11 +69,27 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       }
     }
 
+    "getUsers" should {
+      "return an user for a valid userId" in {
+        givenUsers(User("foo"), User("bar"))
+        val users: Users = await(connector.getUsers)
+        users.users.map(_.userId) should contain.only("foo", "bar")
+      }
+    }
+
     "updateUser" should {
       "update an user" in {
         val user = User("foo")
         givenUser(user)
         await(connector.updateUser(user))
+      }
+    }
+
+    "removeUser" should {
+      "remove an user" in {
+        val user = User("foo")
+        givenUser(user)
+        await(connector.removeUser(user.userId))
       }
     }
 

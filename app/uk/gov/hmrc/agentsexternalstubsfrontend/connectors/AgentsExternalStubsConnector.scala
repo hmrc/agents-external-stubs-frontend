@@ -26,7 +26,7 @@ object AuthenticatedSession {
 @Singleton
 class AgentsExternalStubsConnector @Inject()(
   @Named("agents-external-stubs-baseUrl") baseUrl: URL,
-  http: HttpGet with HttpPost with HttpPut) {
+  http: HttpGet with HttpPost with HttpPut with HttpDelete) {
 
   def signIn(
     credentials: SignInRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] =
@@ -64,5 +64,13 @@ class AgentsExternalStubsConnector @Inject()(
 
   def getUsers(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] =
     http.GET[Users](new URL(baseUrl, s"/agents-external-stubs/users").toExternalForm)
+
+  def removeUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .DELETE[HttpResponse](new URL(baseUrl, s"/agents-external-stubs/users/$userId").toExternalForm)
+      .map(_ => ())
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
 
 }

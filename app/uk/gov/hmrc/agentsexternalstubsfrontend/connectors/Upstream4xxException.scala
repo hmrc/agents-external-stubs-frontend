@@ -4,6 +4,7 @@ import uk.gov.hmrc.http.{HttpException, Upstream4xxResponse}
 class Upstream4xxException(msg: String, code: Int) extends HttpException(msg, code)
 
 object Upstream4xxException {
+
   def unapply(e: Exception): Option[Upstream4xxException] = {
     val (code, msg) = e match {
       case e: HttpException =>

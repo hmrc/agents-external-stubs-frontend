@@ -106,6 +106,21 @@ class UserController @Inject()(
         }
     }
 
+  def removeUser(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentials) { credentials =>
+          val id = userId.getOrElse(credentials.providerId)
+          (if (id == credentials.providerId) Future.successful(())
+           else agentsExternalStubsConnector.removeUser(id))
+            .map(_ => Redirect(routes.UserController.showAllUsersPage()))
+            .recover {
+              case NonFatal(e) =>
+                Ok(html.error_template(messagesApi("error.title"), s"Error while removing $id", e.getMessage))
+            }
+        }
+    }
+
   val showAllUsersPage: Action[AnyContent] =
     Action.async { implicit request =>
       authorised()

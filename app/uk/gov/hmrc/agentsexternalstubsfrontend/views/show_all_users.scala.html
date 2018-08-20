@@ -52,7 +52,10 @@
         <tbody>
         @users.users.sortBy(_.userId).map { user =>
                 <tr>
-                    <td>@user.userId</td>
+                    <td>
+                        <div>@user.userId</div>
+                        <div style="font-size:70%;">group: @{user.groupId.getOrElse("none")}</div>
+                    </td>
                     <td>@user.affinityGroup.getOrElse("none")</td>
                     <td>@if(user.userId==currentUserId){
                         <span class="form-hint">This is current user</span>
