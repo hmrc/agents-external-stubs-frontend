@@ -144,8 +144,8 @@ object UserController {
   val none = "none"
 
   val identifierMapping: Mapping[Identifier] = mapping(
-    "key"   -> nonEmptyText,
-    "value" -> nonEmptyText
+    "key"   -> text,
+    "value" -> text
   )(Identifier.apply)(Identifier.unapply)
 
   val enrolmentMapping: Mapping[Option[Enrolment]] = optional(
