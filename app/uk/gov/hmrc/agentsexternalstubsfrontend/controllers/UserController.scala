@@ -42,6 +42,7 @@ class UserController @Inject()(
               Ok(html.show_user(
                 user,
                 request.session.get(SessionKeys.authToken),
+                request.session.get(SessionKeys.sessionId),
                 routes.UserController.showEditUserPage(continue, userId),
                 continue,
                 user.userId,

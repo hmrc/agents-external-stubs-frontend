@@ -3,7 +3,7 @@
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
 
 @import uk.gov.hmrc.play.binders.ContinueUrl
-@(user:User, authToken: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String, currentUserId: String, planetId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String, currentUserId: String, planetId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @sidebarLinks = {
   <div>
@@ -31,6 +31,14 @@
         @{authToken.getOrElse("none")}
         </div>
     </div>
+      <div>
+          <h3 class="cya-question">
+          @Messages("user.show.sessionId")
+          </h3>
+          <div class="cya-answer" id="authToken">
+          @{sessionId.getOrElse("none")}
+          </div>
+      </div>
       <div>
       @if(userId!=currentUserId){
           <h3 class="cya-question">

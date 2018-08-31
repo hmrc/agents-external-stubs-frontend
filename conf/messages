@@ -72,6 +72,7 @@ user.show.isNonCompliant=WARNING: This user has non-compliant setup, see details
 user.show.isPermanent=This user is permanent, will stay until manually removed.
 user.show.planetId=Your test planet
 user.show.authToken=Your bearer token
+user.show.sessionId=Session ID
 
 user.edit.header=Configure user {0}
 user.edit.description=Here you can change a configuration of the user. All fields are optional except an Affinity Group. If you omit any other field, then the sensible default will be given.
