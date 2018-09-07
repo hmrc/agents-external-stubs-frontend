@@ -4,6 +4,7 @@ import java.net.URL
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
+import play.api.libs.json.JsObject
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{User, Users}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
@@ -97,6 +98,15 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "remove authenticated session" in {
         givenUserCanSignOut
         await(connector.signOut())
+      }
+    }
+
+    "getRecords" should {
+      "get a map of all master records" in {
+        givenAllRecords
+        val result = await(connector.getRecords)
+        (result \ "VatCustomerInformationRecord").as[Seq[JsObject]] should not be empty
+        (result \ "BusinessPartnerRecord").as[Seq[JsObject]] should not be empty
       }
     }
   }

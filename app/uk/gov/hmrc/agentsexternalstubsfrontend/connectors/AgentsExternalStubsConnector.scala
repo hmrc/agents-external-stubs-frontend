@@ -3,7 +3,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 import java.net.URL
 
 import javax.inject.{Inject, Named, Singleton}
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{JsObject, Json, Reads}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{User, Users}
@@ -72,5 +72,8 @@ class AgentsExternalStubsConnector @Inject()(
       .recover {
         case Upstream4xxException(e) => throw e
       }
+
+  def getRecords(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+    http.GET[JsObject](new URL(baseUrl, s"/agents-external-stubs/records").toExternalForm)
 
 }
