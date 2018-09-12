@@ -10,3 +10,4 @@ GET         /agents-external-stubs/user/edit      @uk.gov.hmrc.agentsexternalstu
 POST        /agents-external-stubs/user/edit      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.updateUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/user/remove    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.removeUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/users          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
+GET         /agents-external-stubs/records        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAllRecordsPage

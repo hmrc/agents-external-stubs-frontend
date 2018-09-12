@@ -1,0 +1,84 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
+
+@import uk.gov.hmrc.play.binders.ContinueUrl
+@import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+@import play.api.libs.json.{Json,JsObject,JsValue,JsString,JsArray}
+@(records: Records, currentUserId: String, authToken: Option[String], showCurrentUserUrl: Call, planetId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("records.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+
+    <h1 class="heading-xlarge">@Messages("records.show.header", planetId)</h1>
+
+    <p>
+        @Messages("records.show.description")
+    </p>
+
+    <table id="users" style="margin:1em 0;">
+        <caption id="tableSubHeader" class="normal-text">Business Partner Records</caption>
+        <col style="width: 100%">
+        <tbody>
+        @recordRows(records.BusinessPartnerRecord)
+        </tbody>
+    </table>
+
+    <table id="users" style="margin:1em 0;">
+        <caption id="tableSubHeader" class="normal-text">Business Details Records</caption>
+        <col style="width: 100%">
+        <tbody>
+        @recordRows(records.BusinessDetailsRecord)
+        </tbody>
+    </table>
+
+    <table id="users" style="margin:1em 0;">
+        <caption id="tableSubHeader" class="normal-text">VAT Customer Information Records</caption>
+        <col style="width: 100%">
+        <tbody>
+        @recordRows(records.VatCustomerInformationRecord)
+        </tbody>
+    </table>
+
+    <table id="users" style="margin:1em 0;">
+        <caption id="tableSubHeader" class="normal-text">Legacy Relationship Records</caption>
+        <col style="width: 100%">
+        <tbody>
+        @recordRows(records.LegacyRelationshipRecord)
+        </tbody>
+    </table>
+
+    <table id="users" style="margin:1em 0;">
+        <caption id="tableSubHeader" class="normal-text">Legacy Agents Records</caption>
+        <col style="width: 100%">
+        <tbody>
+        @recordRows(records.LegacyAgentRecord)
+        </tbody>
+    </table>
+
+}
+
+@recordRows(records: Option[Seq[JsObject]]) = {
+  @if(records.isEmpty){ <tr>
+                          <td>
+                              <div style="font-size:0.8em;">No records found.</div>
+                          </td>
+                      </tr>
+  } else {
+    @records.get.map{json => @recordRow(json)}
+  }
+}
+
+@recordRow(json: JsObject) = {
+    <tr>
+        <td>
+            <div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(json)</div>
+        </td>
+    </tr>
+}
+
+@prettyPrint(json:JsValue) = {@if(json.isInstanceOf[JsObject]){
+<span style="color:blue; font-weight: bold;">{</span>@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintField(f)),{<span style="color:blue;">, </span>})<span style="color:blue; font-weight: bold">}</span>} else {@if(json.isInstanceOf[JsArray]){
+<span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrint(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {<span style="color:orange">@json</span>}}}}
+
+@prettyPrintField(field:(String,JsValue)) = {"<span style="color:gray">@field._1</span>": @prettyPrint(field._2)}
