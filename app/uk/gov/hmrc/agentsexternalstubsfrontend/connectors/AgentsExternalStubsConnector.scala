@@ -76,4 +76,12 @@ class AgentsExternalStubsConnector @Inject()(
   def getRecords(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Records] =
     http.GET[Records](new URL(baseUrl, s"/agents-external-stubs/records").toExternalForm)
 
+  def deleteRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .DELETE[HttpResponse](new URL(baseUrl, s"/agents-external-stubs/records/$id").toExternalForm)
+      .map(_ => ())
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
+
 }

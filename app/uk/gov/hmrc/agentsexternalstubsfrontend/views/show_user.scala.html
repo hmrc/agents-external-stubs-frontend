@@ -17,10 +17,6 @@
 
               <div class="cya-answer" id="planetId">
               <div>@planetId</div>
-
-              <div style="padding-top: 1em;">
-                  <a href="/agents-external-stubs/users">Show all test users</a>
-              </div>
           </div>
       </div>
     <div>
@@ -39,6 +35,9 @@
           @{sessionId.getOrElse("none")}
           </div>
       </div>
+      <div style="font-size: 0.75em; font-family: monospace; overflow-wrap: normal; padding: 1em 0; color: gray;">
+          curl -H 'Content-Type: application/json' -H 'Authorization: Bearer 226520c6-df80-4886-bb17-bb764ccb36a3' -H 'X-Session-ID: 7ab3a46b-73db-436f-8bc7-4413633cd00a'
+      </div>
       <div>
       @if(userId!=currentUserId){
           <h3 class="cya-question">
@@ -52,11 +51,23 @@
           </div>
       }
       </div>
-      <div style="font-size: 0.75em; font-family: monospace; overflow-wrap: normal; padding: 1em 0; color: gray;">
-          curl -H 'Content-Type: application/json' -H 'Authorization: Bearer 226520c6-df80-4886-bb17-bb764ccb36a3' -H 'X-Session-ID: 7ab3a46b-73db-436f-8bc7-4413633cd00a'
+      <div style="padding-top: 1em;">
+          <a href="/agents-external-stubs/users">Show all test users</a>
       </div>
       <div style="padding-top: 1em;">
           <a href="/agents-external-stubs/records">Show master records</a>
+      </div>
+      <h3 class="cya-question">
+          Create a new user
+      </h3>
+      <div class="cya-answer">
+          <form action="/agents-external-stubs/sign-in">
+              <input type="text" name="userId">
+              <div>
+                  <button class="button" style="margin-top:0.5em;background-color: lightgray; color: black;">Create</button>
+              </div>
+
+          </form>
       </div>
   </div>
 }

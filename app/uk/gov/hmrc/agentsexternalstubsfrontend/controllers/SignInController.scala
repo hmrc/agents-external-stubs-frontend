@@ -64,6 +64,26 @@ class SignInController @Inject()(
         )
     }
 
+  def signInUser(userId: String): Action[AnyContent] =
+    Action.async { implicit request =>
+      request.session.get("planetId") match {
+        case None => Future.successful(Ok(html.error_template(messagesApi("error.title"), s"Missing planetId", "")))
+        case Some(planetId) =>
+          for {
+            _                    <- agentsExternalStubsConnector.signOut()
+            authenticatedSession <- agentsExternalStubsConnector.signIn(SignInRequest(userId, planetId))
+            result <- Future(
+                       withNewSession(
+                         if (authenticatedSession.newUserCreated.getOrElse(false))
+                           Redirect(routes.UserController.showEditUserPage(None))
+                         else
+                           Redirect(routes.UserController.showUserPage(None)),
+                         authenticatedSession
+                       ))
+          } yield result
+      }
+    }
+
   def signOut(continue: Option[ContinueUrl]): Action[AnyContent] =
     Action.async { implicit request =>
       agentsExternalStubsConnector

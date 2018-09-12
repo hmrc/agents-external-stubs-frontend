@@ -19,22 +19,30 @@ class RecordsController @Inject()(
 )(implicit val configuration: Configuration)
     extends FrontendController with AuthActions with I18nSupport {
 
-  val showAllRecordsPage: Action[AnyContent] =
-    Action.async { implicit request =>
-      authorised()
-        .retrieve(Retrievals.credentials) { credentials =>
-          agentsExternalStubsConnector.getRecords
-            .map(
-              records =>
-                Ok(html.show_all_records(
-                  records,
-                  credentials.providerId,
-                  request.session.get(SessionKeys.authToken),
-                  routes.UserController.showUserPage(None),
-                  request.session.get("planetId").getOrElse("")
-                )))
-        }
-    }
+  val showAllRecordsPage: Action[AnyContent] = Action.async { implicit request =>
+    authorised()
+      .retrieve(Retrievals.credentials) { credentials =>
+        agentsExternalStubsConnector.getRecords
+          .map(
+            records =>
+              Ok(html.show_all_records(
+                records,
+                credentials.providerId,
+                request.session.get(SessionKeys.authToken),
+                routes.UserController.showUserPage(None),
+                request.session.get("planetId").getOrElse("")
+              )))
+      }
+  }
+
+  def deleteRecord(id: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised()
+      .retrieve(Retrievals.credentials) { _ =>
+        agentsExternalStubsConnector
+          .deleteRecord(id)
+          .map(_ => Redirect(routes.RecordsController.showAllRecordsPage()))
+      }
+  }
 
 }
 

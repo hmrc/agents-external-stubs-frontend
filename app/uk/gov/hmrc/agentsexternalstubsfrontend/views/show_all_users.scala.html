@@ -18,16 +18,28 @@
           @planetId
           </div>
       </div>
-    <div>
+      <div>
         <h3 class="cya-question">
         @Messages("user.show.authToken")
         </h3>
         <div class="cya-answer" id="authToken">
         @{authToken.getOrElse("none")}
         </div>
-    </div>
+      </div>
       <div style="padding-top: 1em;">
           <a href="/agents-external-stubs/records">Show master records</a>
+      </div>
+      <h3 class="cya-question">
+          Create a new user
+      </h3>
+      <div class="cya-answer">
+          <form action="/agents-external-stubs/sign-in">
+              <input type="text" name="userId">
+              <div>
+                  <button class="button" style="margin-top:0.5em;">Create</button>
+              </div>
+
+          </form>
       </div>
   </div>
 }
@@ -71,6 +83,7 @@
                             <a href="/agents-external-stubs/user?userId=@user.userId">View</a> |
                             <a href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a> |
                             <a href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a>
+                            <a href="/agents-external-stubs/sign-in?userId=@user.userId">Sign-in</a>
                         </div>
                     }</td>
                 </tr>

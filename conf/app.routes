@@ -11,3 +11,5 @@ POST        /agents-external-stubs/user/edit      @uk.gov.hmrc.agentsexternalstu
 GET         /agents-external-stubs/user/remove    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.removeUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/users          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
 GET         /agents-external-stubs/records        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAllRecordsPage
+GET         /agents-external-stubs/records/delete        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.deleteRecord(id: String)
+GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(userId: String)

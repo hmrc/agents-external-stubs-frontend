@@ -16,9 +16,14 @@
         @Messages("records.show.description")
     </p>
 
+    <div style="padding-top: 1em; text-align: right;">
+        <a href="/agents-external-stubs/user">Show current user</a> | <a href="/agents-external-stubs/users">Show all users</a>
+    </div>
+
     <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Business Partner Records</caption>
-        <col style="width: 100%">
+        <col style="width: 95%">
+        <col style="width: 5%">
         <tbody>
         @recordRows(records.BusinessPartnerRecord)
         </tbody>
@@ -26,7 +31,8 @@
 
     <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Business Details Records</caption>
-        <col style="width: 100%">
+        <col style="width: 95%">
+        <col style="width: 5%">
         <tbody>
         @recordRows(records.BusinessDetailsRecord)
         </tbody>
@@ -34,7 +40,8 @@
 
     <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">VAT Customer Information Records</caption>
-        <col style="width: 100%">
+        <col style="width: 95%">
+        <col style="width: 5%">
         <tbody>
         @recordRows(records.VatCustomerInformationRecord)
         </tbody>
@@ -42,7 +49,8 @@
 
     <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Legacy Relationship Records</caption>
-        <col style="width: 100%">
+        <col style="width: 95%">
+        <col style="width: 5%">
         <tbody>
         @recordRows(records.LegacyRelationshipRecord)
         </tbody>
@@ -73,6 +81,9 @@
     <tr>
         <td>
             <div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(json)</div>
+        </td>
+        <td style="font-size:0.8em;">
+            <a role="button" href="/agents-external-stubs/records/delete?id=@{(json \ "id").as[String]}">Remove</a>
         </td>
     </tr>
 }
