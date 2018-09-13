@@ -110,6 +110,12 @@ records.show.header=Your master records on {0}
 records.show.description=Here you can manage all your master records on that planet.
 
 records.edit.header=Amend the master record
-records.edit.description=Here you can edit the master record content
-records.edit.update=Update
+records.edit.description=Here you can edit the master record content.
+records.edit.submit=Update
 records.edit.cancel=Cancel
+
+records.create.header=Create new master record
+records.create.description=Here you can create a new master record starting from an example generated content.
+records.create.submit=Create
+records.create.cancel=Cancel
+records.create.shake=Shake the bowl

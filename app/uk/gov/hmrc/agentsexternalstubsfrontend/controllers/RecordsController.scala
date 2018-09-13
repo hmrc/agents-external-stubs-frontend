@@ -6,7 +6,7 @@ import play.api.data.Form
 import play.api.data.Forms.{mapping, text}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
@@ -80,6 +80,56 @@ class RecordsController @Inject()(
             }
         )
     }
+  }
+
+  def showAddRecordPage(`type`: String, seed: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+      agentsExternalStubsConnector
+        .generateRecord(`type`, seed)
+        .map(record =>
+          Ok(html.create_record(
+            RecordForm.fill(record.-("id").-("_links")),
+            routes.RecordsController.createRecord(`type`, seed),
+            routes.RecordsController.showAllRecordsPage(None),
+            routes.RecordsController.showAddRecordPage(`type`, shake(seed))
+          )))
+    }
+  }
+
+  def createRecord(`type`: String, seed: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+      RecordForm
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(Ok(html.create_record(
+              formWithErrors,
+              routes.RecordsController.createRecord(`type`, seed),
+              routes.RecordsController.showAllRecordsPage(None),
+              routes.RecordsController.showAddRecordPage(`type`, shake(seed))
+            ))),
+          record =>
+            agentsExternalStubsConnector
+              .createRecord(`type`, record)
+              .map(_ => Redirect(routes.RecordsController.showAllRecordsPage(None)))
+              .recover {
+                case e =>
+                  Ok(html.create_record(
+                    RecordForm.fill(record).withError("json", e.getMessage),
+                    routes.RecordsController.createRecord(`type`, seed),
+                    routes.RecordsController.showAllRecordsPage(None),
+                    routes.RecordsController.showAddRecordPage(`type`, shake(seed))
+                  ))
+            }
+        )
+    }
+  }
+
+  private def shake(seed: String): String = {
+    val p = seed.charAt(0).toInt % seed.length
+    val s = seed.drop(1) + seed.head
+    s.take(p).reverse + s.drop(p)
+
   }
 
 }

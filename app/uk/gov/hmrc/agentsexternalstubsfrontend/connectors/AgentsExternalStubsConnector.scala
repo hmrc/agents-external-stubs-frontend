@@ -79,6 +79,12 @@ class AgentsExternalStubsConnector @Inject()(
   def getRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     http.GET[JsObject](new URL(baseUrl, s"/agents-external-stubs/records/$id").toExternalForm)
 
+  def generateRecord(recordType: String, seed: String)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext): Future[JsObject] =
+    http.GET[JsObject](
+      new URL(baseUrl, s"/agents-external-stubs/records/$recordType/generate?seed=$seed&minimal=false").toExternalForm)
+
   def updateRecord(id: String, record: JsObject)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .PUT[JsValue, HttpResponse](
@@ -93,6 +99,19 @@ class AgentsExternalStubsConnector @Inject()(
   def deleteRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .DELETE[HttpResponse](new URL(baseUrl, s"/agents-external-stubs/records/$id").toExternalForm)
+      .map(_ => ())
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
+
+  def createRecord(recordType: String, record: JsObject)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext): Future[Unit] =
+    http
+      .POST[JsValue, HttpResponse](
+        new URL(baseUrl, s"/agents-external-stubs/records/$recordType").toExternalForm,
+        record
+      )
       .map(_ => ())
       .recover {
         case Upstream4xxException(e) => throw e

@@ -5,7 +5,7 @@
 
 @import uk.gov.hmrc.play.binders.ContinueUrl
 @import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
-@import play.api.libs.json.{Json,JsObject,JsValue,JsString,JsArray}
+@import play.api.libs.json.{Json,JsObject,JsValue,JsString,JsArray,JsBoolean}
 @(records: Records, planetId: String, showId: Option[String])(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("records.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
@@ -21,34 +21,54 @@
     </p>
 
     <table id="users" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Business Partner Records</caption>
+        <caption id="tableSubHeader" class="normal-text">Business Partner Records
+            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            href="/agents-external-stubs/records/add?type=business-partner-record&seed=@{records.BusinessPartnerRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">Create new business partner</a></caption>
         <col style="width: 90%">
         <col style="width: 10%">
         <tbody>
-        @recordRows(records.BusinessPartnerRecord, ViewHelper.excerpt(_, "agentReferenceNumber", "utr", "nino", "eori", "addressDetails"))
+        @recordRows(records.BusinessPartnerRecord,
+            ViewHelper.excerpt(_, "agentReferenceNumber", "utr", "nino", "eori", "addressDetails","isAnASAgent"))
         </tbody>
     </table>
 
     <table id="users" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Business Details Records</caption>
+        <caption id="tableSubHeader" class="normal-text">Business Details Records
+            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            href="/agents-external-stubs/records/add?type=business-details&seed=@{records.BusinessDetailsRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">
+                Create new business details
+            </a>
+        </caption>
         <col style="width: 90%">
         <col style="width: 10%">
         <tbody>
-        @recordRows(records.BusinessDetailsRecord, ViewHelper.excerpt(_,"nino","mtdbsa","businessData.0.tradingName", "businessData.0.businessAddressDetails", "businessData.0.cessationDate"))
+        @recordRows(records.BusinessDetailsRecord,
+            ViewHelper.excerpt(_,"nino","mtdbsa","businessData.0.tradingName", "businessData.0.businessAddressDetails", "businessData.0.cessationDate"))
         </tbody>
     </table>
 
     <table id="users" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">VAT Customer Information Records</caption>
+        <caption id="tableSubHeader" class="normal-text">VAT Customer Information Records
+            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            href="/agents-external-stubs/records/add?type=vat-customer-information&seed=@{records.VatCustomerInformationRecord.map(o => (o.last \ "vrn").as[String]).getOrElse("1234567890")}">
+                Create new VAT customer information
+            </a>
+        </caption>
         <col style="width: 90%">
         <col style="width: 10%">
         <tbody>
-        @recordRows(records.VatCustomerInformationRecord, ViewHelper.excerpt(_,"vrn","approvedInformation.customerDetails.organisationName","approvedInformation.customerDetails.individual", "approvedInformation.customerDetails.effectiveRegistrationDate"))
+        @recordRows(records.VatCustomerInformationRecord,
+            ViewHelper.excerpt(_,"vrn","approvedInformation.customerDetails.organisationName","approvedInformation.customerDetails.individual", "approvedInformation.customerDetails.effectiveRegistrationDate"))
         </tbody>
     </table>
 
     <table id="users" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Legacy Relationship Records</caption>
+        <caption id="tableSubHeader" class="normal-text">Legacy Relationship Records
+            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            href="/agents-external-stubs/records/add?type=legacy-relationship&seed=@{records.LegacyRelationshipRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
+                Create new legacy relationship
+            </a>
+        </caption>
         <col style="width: 90%">
         <col style="width: 10%">
         <tbody>
@@ -57,7 +77,12 @@
     </table>
 
     <table id="users" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Legacy Agents Records</caption>
+        <caption id="tableSubHeader" class="normal-text">Legacy Agents Records
+            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            href="/agents-external-stubs/records/add?type=legacy-agent&seed=@{records.LegacyAgentRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
+                Create new legacy agent
+            </a>
+        </caption>
         <col style="width: 90%">
         <col style="width: 10%">
         <tbody>
@@ -105,6 +130,6 @@
 
 @prettyPrint(json:JsValue) = {@if(json.isInstanceOf[JsObject]){
 <span style="color:blue; font-weight: bold;">{</span>@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintField(f)),{<span style="color:blue;">, </span>})<span style="color:blue; font-weight: bold">}</span>} else {@if(json.isInstanceOf[JsArray]){
-<span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrint(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {<span style="color:orange">@json</span>}}}}
+<span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrint(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {@if(json.isInstanceOf[JsBoolean]){<span style="color:@if(json.as[Boolean]){green}else{red}">@json</span>} else {<span style="color:blue">@json</span>}}}}}
 
 @prettyPrintField(field:(String,JsValue)) = {"<span style="color:gray">@field._1</span>": @prettyPrint(field._2)}

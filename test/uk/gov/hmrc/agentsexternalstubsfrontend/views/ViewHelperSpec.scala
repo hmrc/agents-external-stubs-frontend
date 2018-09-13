@@ -31,6 +31,12 @@ class ViewHelperSpec extends UnitSpec {
         .obj("a" -> Json.arr(Json.obj("b" -> "c")))
       ViewHelper.excerpt(Json.obj("a" -> JsArray(Seq(Json.obj("b" -> "c", "d" -> "e")))), "a.0.b") shouldBe Json
         .obj("a" -> Json.arr(Json.obj("b" -> "c")))
+      ViewHelper
+        .excerpt(Json.obj("a" -> JsArray(Seq(Json.obj("b" -> "c", "d" -> "e")))), "a.0.b", "a.0.d") shouldBe Json
+        .obj("a" -> Json.arr(Json.obj("b" -> "c", "d" -> "e")))
+      ViewHelper
+        .excerpt(Json.obj("a" -> JsArray(Seq(Json.obj("b" -> "c", "d" -> "e", "f" -> "g")))), "a.0.b", "a.0.f") shouldBe Json
+        .obj("a" -> Json.arr(Json.obj("b" -> "c", "f" -> "g")))
     }
   }
 

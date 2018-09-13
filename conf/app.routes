@@ -14,5 +14,7 @@ GET         /agents-external-stubs/records        @uk.gov.hmrc.agentsexternalstu
 GET         /agents-external-stubs/records/edit   @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showEditRecordPage(id: String)
 POST        /agents-external-stubs/records/update @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.updateRecord(id: String)
 GET         /agents-external-stubs/records/delete @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.deleteRecord(id: String)
+GET         /agents-external-stubs/records/add    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAddRecordPage(`type`: String, seed: String)
+POST        /agents-external-stubs/records/create @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.createRecord(`type`: String, seed: String)
 
 GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(userId: String)
