@@ -4,12 +4,15 @@ GET         /gg/sign-in                           @uk.gov.hmrc.agentsexternalstu
 POST        /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
 GET         /gg/sign-out                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[ContinueUrl])
 
-
 GET         /agents-external-stubs/user           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/user/edit      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showEditUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 POST        /agents-external-stubs/user/edit      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.updateUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/user/remove    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.removeUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/users          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
-GET         /agents-external-stubs/records        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAllRecordsPage
-GET         /agents-external-stubs/records/delete        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.deleteRecord(id: String)
+
+GET         /agents-external-stubs/records        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAllRecordsPage(showId: Option[String] ?= None)
+GET         /agents-external-stubs/records/edit   @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showEditRecordPage(id: String)
+POST        /agents-external-stubs/records/update @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.updateRecord(id: String)
+GET         /agents-external-stubs/records/delete @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.deleteRecord(id: String)
+
 GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(userId: String)

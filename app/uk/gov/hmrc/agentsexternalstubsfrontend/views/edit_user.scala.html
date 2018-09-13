@@ -4,7 +4,11 @@
 
 @(userForm:Form[User], postUrl: Call, cancelCall: Call, userId: String, currentUserId: String, hasContinue: Boolean)(implicit request: Request[_], messages: Messages, config: Configuration)
 
-@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = None) {
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = Some("full-width")) {
+
+    <nav style="margin-bottom: 1em; text-align: right;">
+        <a href="/agents-external-stubs/records">@Messages("records.link.all")</a> | <a href="/agents-external-stubs/user">@Messages("users.link.current")</a> | <a href="/agents-external-stubs/users">@Messages("users.link.all")</a> | <a href="/gg/sign-out">@Messages("common.sign-out")</a>
+    </nav>
 
     <h1 class="heading-xlarge">@Messages("user.edit.header", userId)</h1>
 
@@ -17,7 +21,7 @@
     </p>
 
     <div>
-        @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
+        @form(action = postUrl, 'id -> "userForm", 'novalidate -> "novalidate") {
             <fieldset>
                 <div class="form-field-group">
 
@@ -47,7 +51,7 @@
                         @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
                         </button>
 
-                        <a class="button button--link" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
+                        <a class="button-secondary" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
 
                     </div>
 
@@ -140,7 +144,7 @@
                     @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
                     </button>
 
-                    <a class="button button--link" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
+                    <a class="button-secondary" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
 
                 </div>
 
@@ -245,7 +249,7 @@
                     @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
                     </button>
 
-                    <a class="button button--link" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
+                    <a class="button-secondary" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
 
                 </div>
 

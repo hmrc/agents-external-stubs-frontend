@@ -21,7 +21,7 @@ start.helpdesklink.text2=if you need help.
 login.continue = Continue
 login.title=Sign in 
 login.username=User ID
-login.username.placeholder=An existing or a new one
+login.username.placeholder=Existing or a new one
 login.password=Password
 login.planetId=Planet
 login.planetId.placeholder=Which planet is the user from? E.g. Melmac
@@ -56,7 +56,7 @@ common.sign-out=Sign out
 
 users.title=Your test users
 users.show.header=Your test users on {0}
-users.show.description=
+users.show.description=Here you can manage all your test users on that planet.
 
 user.title=Test user
 user.show.header=This is {0}
@@ -97,6 +97,19 @@ user.form.isNonCompliant.hint=WARNING: Check this box only if you have valid rea
 user.form.isPermanent=Permanent
 user.form.isPermanent.hint=Check this box if you want to keep this user on the planet for more than 12h, until manually removed.
 
+user.show.create=Create
+
+users.link.all=Manage test users
+users.link.current=Show current user
+users.link.create=Create a new user
+
+records.link.all=Manage master records
+
 records.title=Your master records
 records.show.header=Your master records on {0}
-records.show.description=
+records.show.description=Here you can manage all your master records on that planet.
+
+records.edit.header=Amend the master record
+records.edit.description=Here you can edit the master record content
+records.edit.update=Update
+records.edit.cancel=Cancel

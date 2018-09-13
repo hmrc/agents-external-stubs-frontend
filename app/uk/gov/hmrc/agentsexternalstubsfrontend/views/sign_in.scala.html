@@ -27,7 +27,7 @@
                     }
                     <div class="form-field">
                         <label class="label--inline" for="userId">@Html(Messages("login.username"))</label>
-                        <input type="text" id="userId" name="userId" required placeholder="@Messages("login.username.placeholder")" />
+                        <input type="text" id="userId" name="userId" required placeholder="@Messages("login.username.placeholder") [A-Za-z0-9-_]{6,64}" pattern="[A-Za-z0-9-_]{6,64}" />
                     </div>
 
                     <div class="form-field">

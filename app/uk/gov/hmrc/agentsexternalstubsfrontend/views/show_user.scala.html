@@ -46,27 +46,27 @@
           <div class="cya-answer" id="planetId">
               <div>@currentUserId</div>
               <div style="padding-top: 1em;">
-                  <a href="/agents-external-stubs/user">Show current user</a>
+                  <a href="/agents-external-stubs/user">@Messages("users.link.current")</a>
               </div>
           </div>
       }
       </div>
       <div style="padding-top: 1em;">
-          <a href="/agents-external-stubs/users">Show all test users</a>
+          <a href="/agents-external-stubs/users">@Messages("users.link.all")</a>
       </div>
       <div style="padding-top: 1em;">
-          <a href="/agents-external-stubs/records">Show master records</a>
+          <a href="/agents-external-stubs/records">@Messages("records.link.all")</a>
       </div>
       <h3 class="cya-question">
-          Create a new user
+          @Messages("users.link.create")
       </h3>
       <div class="cya-answer">
           <form action="/agents-external-stubs/sign-in">
-              <input type="text" name="userId">
-              <div>
-                  <button class="button" style="margin-top:0.5em;background-color: lightgray; color: black;">Create</button>
+              <div style="vertical-align: middle;">
+              <label for="userId" style="font-size: 0.7em; color: gray;">Expected pattern [A-Za-z0-9-_]{6,64}</label>
+              <input type="text" name="userId" pattern="[A-Za-z0-9-_]{6,64}" required>
+              <button class="button">@Messages("user.show.create")</button>
               </div>
-
           </form>
       </div>
   </div>

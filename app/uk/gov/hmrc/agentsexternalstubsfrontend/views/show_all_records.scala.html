@@ -6,9 +6,13 @@
 @import uk.gov.hmrc.play.binders.ContinueUrl
 @import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 @import play.api.libs.json.{Json,JsObject,JsValue,JsString,JsArray}
-@(records: Records, currentUserId: String, authToken: Option[String], showCurrentUserUrl: Call, planetId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(records: Records, planetId: String, showId: Option[String])(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("records.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+
+    <nav style="margin-bottom: 1em; text-align: right;">
+        <a href="/agents-external-stubs/user">@Messages("users.link.current")</a> | <a href="/agents-external-stubs/users">@Messages("users.link.all")</a> | <a href="/gg/sign-out">@Messages("common.sign-out")</a>
+    </nav>
 
     <h1 class="heading-xlarge">@Messages("records.show.header", planetId)</h1>
 
@@ -16,74 +20,85 @@
         @Messages("records.show.description")
     </p>
 
-    <div style="padding-top: 1em; text-align: right;">
-        <a href="/agents-external-stubs/user">Show current user</a> | <a href="/agents-external-stubs/users">Show all users</a>
-    </div>
-
     <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Business Partner Records</caption>
-        <col style="width: 95%">
-        <col style="width: 5%">
+        <col style="width: 90%">
+        <col style="width: 10%">
         <tbody>
-        @recordRows(records.BusinessPartnerRecord)
+        @recordRows(records.BusinessPartnerRecord, ViewHelper.excerpt(_, "agentReferenceNumber", "utr", "nino", "eori", "addressDetails"))
         </tbody>
     </table>
 
     <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Business Details Records</caption>
-        <col style="width: 95%">
-        <col style="width: 5%">
+        <col style="width: 90%">
+        <col style="width: 10%">
         <tbody>
-        @recordRows(records.BusinessDetailsRecord)
+        @recordRows(records.BusinessDetailsRecord, ViewHelper.excerpt(_,"nino","mtdbsa","businessData.0.tradingName", "businessData.0.businessAddressDetails", "businessData.0.cessationDate"))
         </tbody>
     </table>
 
     <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">VAT Customer Information Records</caption>
-        <col style="width: 95%">
-        <col style="width: 5%">
+        <col style="width: 90%">
+        <col style="width: 10%">
         <tbody>
-        @recordRows(records.VatCustomerInformationRecord)
+        @recordRows(records.VatCustomerInformationRecord, ViewHelper.excerpt(_,"vrn","approvedInformation.customerDetails.organisationName","approvedInformation.customerDetails.individual", "approvedInformation.customerDetails.effectiveRegistrationDate"))
         </tbody>
     </table>
 
     <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Legacy Relationship Records</caption>
-        <col style="width: 95%">
-        <col style="width: 5%">
+        <col style="width: 90%">
+        <col style="width: 10%">
         <tbody>
-        @recordRows(records.LegacyRelationshipRecord)
+        @recordRows(records.LegacyRelationshipRecord, identity)
         </tbody>
     </table>
 
     <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Legacy Agents Records</caption>
-        <col style="width: 100%">
+        <col style="width: 90%">
+        <col style="width: 10%">
         <tbody>
-        @recordRows(records.LegacyAgentRecord)
+        @recordRows(records.LegacyAgentRecord, identity)
         </tbody>
     </table>
 
 }
 
-@recordRows(records: Option[Seq[JsObject]]) = {
+@recordRows(records: Option[Seq[JsObject]], excerpt: JsValue => JsValue) = {
   @if(records.isEmpty){ <tr>
                           <td>
                               <div style="font-size:0.8em;">No records found.</div>
                           </td>
                       </tr>
   } else {
-    @records.get.map{json => @recordRow(json)}
+    @records.get.map{json => @recordRow(json, (json \ "id").asOpt[String], excerpt)}
   }
 }
 
-@recordRow(json: JsObject) = {
+@recordRow(json: JsValue, id: Option[String], excerpt: JsValue => JsValue) = {
     <tr>
-        <td>
-            <div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(json)</div>
-        </td>
-        <td style="font-size:0.8em;">
-            <a role="button" href="/agents-external-stubs/records/delete?id=@{(json \ "id").as[String]}">Remove</a>
+        @if(showId.isDefined && id.contains(showId.get)) {
+            <a name="e"></a>
+            <a name="@id"></a>
+            <td><div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(json)</div></td>
+        } else {
+            <td><div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(excerpt(json))</div></td>
+        }
+        <td style="font-size:0.8em;vertical-align: top;">
+            @if(id.isDefined) {
+                @if(excerpt!=(identity _)){
+                    @if(showId.isDefined && id.contains(showId.get)) {
+                        <div><a role="button" href="/agents-external-stubs/records">Fold ...</a></div>
+                    } else {
+                        <div><a role="button" href="/agents-external-stubs/records?showId=@{id.get}#e">Expand ...</a></div>
+                    }
+                }
+                <div><a role="button" href="/agents-external-stubs/records/edit?id=@{id.get}">Edit</a></div>
+                <div style="margin-top:0.3em;"><a role="button" href="/agents-external-stubs/records/delete?id=@{id.get}">Remove</a></div>
+            }
         </td>
     </tr>
 }

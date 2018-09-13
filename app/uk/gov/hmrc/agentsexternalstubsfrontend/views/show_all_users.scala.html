@@ -5,55 +5,32 @@
 @import uk.gov.hmrc.play.binders.ContinueUrl
 @(users: Users, currentUserId: String, authToken: Option[String], showCurrentUserUrl: Call, planetId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
 
-@sidebarLinks = {
-  <div>
-    <nav id="secondary-nav" role="navigation">
-        <a href="/gg/sign-out">@Messages("common.sign-out")</a>
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("users.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+
+    <nav style="margin-bottom: 1em; text-align: right;">
+        <a href="/agents-external-stubs/records">@Messages("records.link.all")</a> | <a href="/agents-external-stubs/user">@Messages("users.link.current")</a> | <a href="/gg/sign-out">@Messages("common.sign-out")</a>
     </nav>
-      <div>
-          <h3 class="cya-question">
-          @Messages("user.show.planetId")
-          </h3>
-          <div class="cya-answer" id="planetId">
-          @planetId
-          </div>
-      </div>
-      <div>
-        <h3 class="cya-question">
-        @Messages("user.show.authToken")
-        </h3>
-        <div class="cya-answer" id="authToken">
-        @{authToken.getOrElse("none")}
-        </div>
-      </div>
-      <div style="padding-top: 1em;">
-          <a href="/agents-external-stubs/records">Show master records</a>
-      </div>
-      <h3 class="cya-question">
-          Create a new user
-      </h3>
-      <div class="cya-answer">
-          <form action="/agents-external-stubs/sign-in">
-              <input type="text" name="userId">
-              <div>
-                  <button class="button" style="margin-top:0.5em;">Create</button>
-              </div>
-
-          </form>
-      </div>
-  </div>
-}
-
-@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("users.title"), bodyClasses = None, sidebarLinks = Some(sidebarLinks)) {
 
     <h1 class="heading-xlarge">@Messages("users.show.header", planetId)</h1>
 
+    <div style="float: right; margin-bottom: 1em;position: relative; top:-3em;right: -3em;">
+        <h3 class="cya-question">
+        @Messages("users.link.create")
+        </h3>
+        <form action="/agents-external-stubs/sign-in">
+            <div style="vertical-align: middle;">
+                <label for="userId" style="font-size: 0.7em; color: gray;">Expected pattern [A-Za-z0-9-_]{6,64}</label>
+                <input type="text" name="userId" pattern="[A-Za-z0-9-_]{6,64}" required>
+                <button class="button">@Messages("user.show.create")</button>
+            </div>
+        </form>
+    </div>
+
     <p>
-        @Messages("users.show.description")
+    @Messages("users.show.description")
     </p>
 
     <table id="users" class="margin-bottom-30">
-        <caption id="tableSubHeader" class="normal-text">Manage your test users</caption>
         <col style="width: 40%">
         <col style="width: 30%">
         <col style="width: 30%">
@@ -82,7 +59,7 @@
                         <div>
                             <a href="/agents-external-stubs/user?userId=@user.userId">View</a> |
                             <a href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a> |
-                            <a href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a>
+                            <a href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a> |
                             <a href="/agents-external-stubs/sign-in?userId=@user.userId">Sign-in</a>
                         </div>
                     }</td>

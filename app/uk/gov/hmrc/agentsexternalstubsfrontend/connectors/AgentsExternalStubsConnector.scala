@@ -3,7 +3,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 import java.net.URL
 
 import javax.inject.{Inject, Named, Singleton}
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Records, User, Users}
@@ -75,6 +75,20 @@ class AgentsExternalStubsConnector @Inject()(
 
   def getRecords(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Records] =
     http.GET[Records](new URL(baseUrl, s"/agents-external-stubs/records").toExternalForm)
+
+  def getRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+    http.GET[JsObject](new URL(baseUrl, s"/agents-external-stubs/records/$id").toExternalForm)
+
+  def updateRecord(id: String, record: JsObject)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .PUT[JsValue, HttpResponse](
+        new URL(baseUrl, s"/agents-external-stubs/records/$id").toExternalForm,
+        record.+("id" -> JsString(id))
+      )
+      .map(_ => ())
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
 
   def deleteRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http

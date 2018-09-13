@@ -1,0 +1,47 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
+
+@import play.api.libs.json.JsObject
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox, textArea}
+
+@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("records.title"), bodyClasses = Some("full-width")) {
+
+    <nav style="margin-bottom: 1em; text-align: right;">
+        <a href="/agents-external-stubs/records">@Messages("records.link.all")</a> | <a href="/agents-external-stubs/user">@Messages("users.link.current")</a> | <a href="/agents-external-stubs/users">@Messages("users.link.all")</a> | <a href="/gg/sign-out">@Messages("common.sign-out")</a>
+    </nav>
+
+    <h1 class="heading-xlarge">@Messages("records.edit.header")</h1>
+
+    <p class="form-hint">
+    @Messages("records.edit.description")
+    </p>
+
+    <div>
+        @form(action = postUrl, 'id -> "recordForm", 'novalidate -> "novalidate") {
+            <fieldset>
+                <div class="form-field-group">
+
+                 @textArea(
+                     recordForm("json"),
+                     '_inputClass -> "textarea-large"
+                 )
+
+                </div>
+                <div class="form-group" style="vertical-align: middle;">
+
+                    <button class="button" type="submit" id="update">
+                        @Messages("records.edit.update")
+                    </button>
+
+                    <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("records.edit.cancel")</a>
+
+                </div>
+            </fieldset>
+
+        }
+    </div>
+
+}
