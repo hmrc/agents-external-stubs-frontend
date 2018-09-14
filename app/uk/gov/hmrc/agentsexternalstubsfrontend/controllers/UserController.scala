@@ -87,7 +87,7 @@ class UserController @Inject()(
                 agentsExternalStubsConnector
                   .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId)))
                   .map(_ =>
-                    continue.fold(Redirect(routes.UserController.showUserPage(continue)))(continueUrl =>
+                    continue.fold(Redirect(routes.UserController.showUserPage(continue, userId)))(continueUrl =>
                       Redirect(continueUrl.url)))
                   .recover {
                     case e: Exception =>
