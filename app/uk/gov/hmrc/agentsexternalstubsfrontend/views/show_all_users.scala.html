@@ -40,17 +40,21 @@
             </tr>
         </thead>
         <tbody>
-        @users.users.sortBy(_.userId).map { user =>
+        @for(user <- users.users.sortBy(_.userId)){
                 <tr>
                     <td>
-                        <div>@user.userId</div>
+                        <div>@if(user.userId==currentUserId){
+                            <span style="font-weight: bold;">@user.userId</span>
+                        }else{
+                            @user.userId
+                        }</div>
                         <div style="font-size:70%;">group: @{user.groupId.getOrElse("none")}</div>
                     </td>
                     <td>
                         <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@user.affinityGroup.getOrElse("none")</span>
                     </td>
                     <td>@if(user.userId==currentUserId){
-                        <span class="form-hint">This is current user</span>
+                        <span class="form-hint" style="font-size: 0.8em;">This is current user</span>
                         <div>
                             <a href="/agents-external-stubs/user?userId=@user.userId">View</a> |
                             <a href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a>

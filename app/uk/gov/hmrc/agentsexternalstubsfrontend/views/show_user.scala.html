@@ -250,6 +250,11 @@
                 @Messages("user.show.continue")
             </a>
         }
+        @if(userId!=currentUserId) {
+            <a class="button-secondary" href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a> |
+            <a class="button-secondary" href="/agents-external-stubs/sign-in?userId=@user.userId">Sign-in</a>
+        }
+
     </div>
 
 }
