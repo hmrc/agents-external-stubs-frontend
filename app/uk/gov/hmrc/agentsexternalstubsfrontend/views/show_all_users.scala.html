@@ -29,13 +29,15 @@
     </p>
 
     <table id="users" class="margin-bottom-30">
-        <col style="width: 40%">
-        <col style="width: 30%">
+        <col style="width: 25%">
+        <col style="width: 10%">
+        <col style="width: 35%">
         <col style="width: 30%">
         <thead>
             <tr>
                 <th scope="col">UserID</th>
-                <th scope="col">Affinity Group</th>
+                <th scope="col" style="text-align: center;">Affinity</th>
+                <th scope="col" style="text-align: center;">Services</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -43,15 +45,23 @@
         @for(user <- users.users.sortBy(_.userId)){
                 <tr>
                     <td>
-                        <div>@if(user.userId==currentUserId){
+                        <div style="overflow-wrap: break-word;">@if(user.userId==currentUserId){
                             <span style="font-weight: bold;">@user.userId</span>
                         }else{
                             @user.userId
                         }</div>
                         <div style="font-size:70%;">group: @{user.groupId.getOrElse("none")}</div>
                     </td>
-                    <td>
+                    <td style="text-align: center;">
                         <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@user.affinityGroup.getOrElse("none")</span>
+                    </td>
+                    <td style="text-align: center; font-size: 0.9em;">
+                      @if(user.principalEnrolments.nonEmpty) {
+                          <span style="display: inline-block;
+                              margin: 0.1em 0;">@{user.principalEnrolments.head.key}</span>@for(e <- user.principalEnrolments.tail) {, <span style="display: inline-block;
+                                  margin: 0.1em 0;">@e.key</span>
+                          }
+                      }
                     </td>
                     <td>@if(user.userId==currentUserId){
                         <span class="form-hint" style="font-size: 0.8em;">This is current user</span>
