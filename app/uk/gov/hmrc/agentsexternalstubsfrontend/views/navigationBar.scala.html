@@ -1,0 +1,12 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
+
+@import play.api.libs.json.JsObject
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox, textArea}
+
+@()(implicit request: Request[_], messages: Messages, config: Configuration)
+
+<nav style="margin-bottom: 1em; text-align: right;">
+    <a href="/agents-external-stubs/records">@Messages("records.link.all")</a> | <a href="/agents-external-stubs/users">@Messages("users.link.all")</a> | <a href="/agents-external-stubs/user">@Messages("users.link.current")</a> | <a href="/agents-external-stubs/services">@Messages("services.link.short")</a> | <a href="/gg/sign-out">@Messages("common.sign-out")</a>
+</nav>

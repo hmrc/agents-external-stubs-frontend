@@ -69,6 +69,9 @@
               </div>
           </form>
       </div>
+      <div style="padding-top: 1.5em;">
+          <a href="/agents-external-stubs/services">@Messages("services.link.guide")</a>
+      </div>
   </div>
 }
 
@@ -129,7 +132,7 @@
                 @Messages("user.form.affinityGroup")
             </dt>
             <dd class="cya-answer" id="affinityGroup">
-                @{user.affinityGroup.getOrElse("none")}
+                <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@{user.affinityGroup.getOrElse("none")}</span>
             </dd>
         </div>
         <div>
@@ -170,14 +173,14 @@
     @if(user.principalEnrolments.nonEmpty){
         <table style="width:100%">
             <tr>
-                <th>Service key</th>
-                <th>Identifier Name</th>
-                <th>Identifier Value</th>
+                <th style="color:gray;">Service key</th>
+                <th style="color:gray;">Identifier Name</th>
+                <th style="color:gray;">Identifier Value</th>
             </tr>
             @for(e <- user.principalEnrolments){
               <tr>
                 <td>
-                  @{e.key}
+                    <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
                 </td>
                   @if(e.identifiers.nonEmpty){
                     @for(i <- e.identifiers.get) {
@@ -185,7 +188,7 @@
                         @{i.key}
                         </td>
                         <td>
-                        @{i.value}
+                        <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey="+ek.tag).getOrElse("")}">@{i.value}</a>
                         </td>
                     }
                   } else {
@@ -205,9 +208,9 @@
         @if(user.delegatedEnrolments.nonEmpty) {
             <table style="width:100%">
                 <tr>
-                    <th>Service key</th>
-                    <th>Identifier Name</th>
-                    <th>Identifier Value</th>
+                    <th style="color:gray;">Service key</th>
+                    <th style="color:gray;">Identifier Name</th>
+                    <th style="color:gray;">Identifier Value</th>
                 </tr>
                 @for(e <- user.delegatedEnrolments){
                     <tr>

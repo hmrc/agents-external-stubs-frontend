@@ -7,9 +7,7 @@
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("users.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
 
-    <nav style="margin-bottom: 1em; text-align: right;">
-        <a href="/agents-external-stubs/records">@Messages("records.link.all")</a> | <a href="/agents-external-stubs/user">@Messages("users.link.current")</a> | <a href="/gg/sign-out">@Messages("common.sign-out")</a>
-    </nav>
+    @navigationBar()
 
     <h1 class="heading-xlarge">@Messages("users.show.header", planetId)</h1>
 
@@ -48,7 +46,9 @@
                         <div>@user.userId</div>
                         <div style="font-size:70%;">group: @{user.groupId.getOrElse("none")}</div>
                     </td>
-                    <td>@user.affinityGroup.getOrElse("none")</td>
+                    <td>
+                        <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@user.affinityGroup.getOrElse("none")</span>
+                    </td>
                     <td>@if(user.userId==currentUserId){
                         <span class="form-hint">This is current user</span>
                         <div>

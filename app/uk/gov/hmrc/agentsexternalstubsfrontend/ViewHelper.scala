@@ -40,7 +40,7 @@ object ViewHelper {
         case (x1, x2)                     => throw new UnsupportedOperationException(s"Could not merge $x1 and $x2")
       }
 
-  private def isArrayIndex(s: String): Boolean = s == "*" || (try { s.toInt; true } catch { case _ => false })
+  private def isArrayIndex(s: String): Boolean = s == "*" || (try { s.toInt; true } catch { case NonFatal(_) => false })
 
   private def deepMerge(o1: JsObject, o2: JsObject): JsObject = {
     val result = o1.value ++ o2.value.map {

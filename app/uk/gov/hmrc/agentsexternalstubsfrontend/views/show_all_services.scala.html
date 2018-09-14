@@ -1,0 +1,98 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
+
+@import uk.gov.hmrc.play.binders.ContinueUrl
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.EnrolmentInfo
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.Service
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.Services
+@(services:Services)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("knownFacts.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+
+    @navigationBar()
+
+    <h1 class="heading-xlarge">@Messages("services.show.header")</h1>
+
+    <p class="form-hint">
+        @Messages("services.show.description")
+    </p>
+
+    <table id="services" class="margin-bottom-30">
+        <col style="width: 3%">
+        <col style="width: 27%">
+        <col style="width: 40%">
+        <col style="width: 30%">
+        <thead>
+            <tr>
+                <th scope="col">Type</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Pattern</th>
+            </tr>
+        </thead>
+        <tbody>
+        @for((service,si) <- services.services.sortBy(_.name).zipWithIndex){
+            <tr>
+                <td colspan="4">
+                    <a name="@service.name"> </a>
+                    <h2>@{si+1}. @service.name</h2>
+                    <p class="form-hint">
+                        <span style="color:black;">@service.description</span>
+
+                    <span>
+                        @for(affinityGroup <- service.affinityGroups){
+                            <span class="badge badge-@{affinityGroup.toLowerCase}">@affinityGroup</span>
+                        }
+                        @if(service.flags.uniqueIdentifiers){<span class="badge badge-gray">UniqueIdentifiers</span>}
+                        @if(service.flags.multipleEnrolment){<span class="badge badge-gray">MultipleEnrolment</span>}
+                        @if(service.flags.autoEnrolment){<span class="badge badge-gray">AutoEnrolment</span>}
+                        @if(service.flags.autoActivation){<span class="badge badge-gray">AutoActivation</span>}
+                        @if(service.flags.agentExclusive){<span class="badge badge-gray">AgentExclusive</span>}
+                        @if(service.flags.agentExcludesPrincipal){<span class="badge badge-gray">AgentExcludesPrincipal</span>}
+                    </span>
+                    </p>
+                </td>
+            <tr>
+            @for((identifier,ii) <- service.identifiers.zipWithIndex){
+                <tr>
+                    @if(ii==0){
+                        <td rowspan="@{service.identifiers.size}">
+                            <div class="form-hint" style="font-size:0.8em;">Identifier@if(service.identifiers.size>1){<span>s</span>}else{}</div>
+                        </td>
+                    }
+                    <td>
+                        <div style="font-weight: bold;">@identifier.name</div>
+                    </td>
+                    <td>
+                        <div>@identifier.description</div>
+                    </td>
+                    <td>
+                        <div style="font-size:0.8em;font-family: monospace;">@identifier.regex</div>
+                    </td>
+                </tr>
+            }
+            @for((verifier,ii) <- service.knownFacts.zipWithIndex){
+                <tr>
+                    @if(ii==0){
+                        <td rowspan="@{service.knownFacts.size}">
+                            <div class="form-hint" style="font-size:0.8em;">Verifier@if(service.knownFacts.size>1){<span>s</span>}else{}</div>
+                        </td>
+                    }
+                    <td>
+                        <div>@verifier.name</div>
+                    </td>
+                    <td>
+                        <div>@verifier.description</div>
+                    </td>
+                    <td>
+                        <div style="font-size:0.8em;font-family: monospace;">@verifier.regex</div>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+
+
+}

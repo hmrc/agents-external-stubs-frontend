@@ -27,16 +27,21 @@ object User {
   implicit val formats: Format[User] = Json.format[User]
 }
 
-case class Enrolment(key: String, identifiers: Option[Seq[Identifier]] = None)
+case class Enrolment(key: String, identifiers: Option[Seq[Identifier]] = None) {
+  lazy val toEnrolmentKey: Option[EnrolmentKey] = identifiers.map(ii => EnrolmentKey(key, ii))
+}
 
 object Enrolment {
   implicit val format: Format[Enrolment] = Json.format[Enrolment]
 }
 
-case class Identifier(key: String, value: String)
+case class Identifier(key: String, value: String) {
+  override def toString: String = s"${key.toUpperCase}~$value"
+}
 
 object Identifier {
   implicit val format: Format[Identifier] = Json.format[Identifier]
+  implicit val ordering: Ordering[Identifier] = Ordering.by(_.key)
 }
 
 object ConfidenceLevel {

@@ -1,0 +1,100 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
+
+@import uk.gov.hmrc.play.binders.ContinueUrl
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.EnrolmentInfo
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.Service
+@(enrolmentInfo:EnrolmentInfo, service: Service)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("knownFacts.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+
+    @navigationBar()
+
+    <h1 class="heading-xlarge">@Messages("knownFacts.show.header", service.description)</h1>
+
+    <p class="form-hint">
+        @Messages("knownFacts.show.description")
+    </p>
+
+    <dl class="govuk-check-your-answers cya-questions-long" style="margin-bottom:2em;">
+        <div>
+            <dt class="cya-question">
+            Service Name
+            </dt>
+            <dd class="cya-answer" id="serviceName">
+            <a href="/agents-external-stubs/services#@{enrolmentInfo.enrolmentKey.service}">@{enrolmentInfo.enrolmentKey.service}</a>
+            </dd>
+        </div>
+
+        @for(identifier <- enrolmentInfo.enrolmentKey.identifiers) {
+            <div>
+                <dt class="cya-question">
+                Identifier Type
+                </dt>
+                <dd class="cya-answer">
+                @{service.getIdentifier(identifier.key).map(_.name).getOrElse(identifier.key)}
+                </dd>
+            </div>
+            <div>
+                <dt class="cya-question">
+                Identifier Value
+                </dt>
+                <dd class="cya-answer">
+                @{identifier.value}
+                </dd>
+            </div>
+        }
+
+    </dl>
+
+    <dl class="govuk-check-your-answers cya-questions-long" style="margin-bottom:2em;">
+        @for(verifier <- enrolmentInfo.verifiers) {
+            <div>
+                <dt class="cya-question">
+                Verifier Type
+                </dt>
+                <dd class="cya-answer">
+                @{service.getKnownFact(verifier.key).map(_.name).getOrElse(verifier.key)}
+                </dd>
+            </div>
+            <div>
+                <dt class="cya-question">
+                Verifier Value
+                </dt>
+                <dd class="cya-answer">
+                @{verifier.value}
+                </dd>
+            </div>
+        }
+    </dl>
+
+
+    @for(user <- enrolmentInfo.user){
+        <dl class="govuk-check-your-answers cya-questions-long" style="margin-bottom:2em;">
+            <div>
+                <dt class="cya-question">
+                Principal User
+                </dt>
+                <dd class="cya-answer">
+                    <a href="/agents-external-stubs/user?userId=@{user.userId}">@{user.userId}</a><span style="display:inline-block;margin-left:0.2em;">(@{user.name})</span> <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@{user.affinityGroup.getOrElse("")}</span>
+                </dd>
+            </div>
+        </dl>
+    }
+
+    @for(agent <- enrolmentInfo.agents){
+        <dl class="govuk-check-your-answers cya-questions-long" style="margin-bottom:2em;">
+            <div>
+                <dt class="cya-question">
+                Delegated User (Agent)
+                </dt>
+                <dd class="cya-answer">
+                    <a href="/agents-external-stubs/user?userId=@{agent.userId}">@{agent.userId}</a><span style="display:inline-block;margin-left:0.2em;">(@{agent.agentFriendlyName})</span>
+                </dd>
+            </div>
+        </dl>
+    }
+
+
+}

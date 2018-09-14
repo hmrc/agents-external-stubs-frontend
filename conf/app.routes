@@ -17,4 +17,7 @@ GET         /agents-external-stubs/records/delete @uk.gov.hmrc.agentsexternalstu
 GET         /agents-external-stubs/records/add    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAddRecordPage(`type`: String, seed: String)
 POST        /agents-external-stubs/records/create @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.createRecord(`type`: String, seed: String)
 
+GET         /agents-external-stubs/known-facts    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.KnownFactsController.showKnownFactsPage(enrolmentKey: String)
+GET         /agents-external-stubs/services       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.KnownFactsController.showGuideToServicesPage
+
 GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(userId: String)

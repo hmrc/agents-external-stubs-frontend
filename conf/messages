@@ -119,3 +119,13 @@ records.create.description=Here you can create a new master record starting from
 records.create.submit=Create
 records.create.cancel=Cancel
 records.create.shake=Shake the bowl
+
+knownFacts.title=Your known facts (enrolment)
+knownFacts.show.header=Enrolment for {0}
+knownFacts.show.description=Here you can review the details of the enrolment.
+
+services.title=Your guide to Enrolments
+services.show.header=Your guide to Enrolments
+services.show.description=Here you will find the definitions of the services available for enrolment.
+services.link.guide=Your guide to Enrolments
+services.link.short=Dictionary

@@ -14,6 +14,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 @Singleton
 class RecordsController @Inject()(
@@ -137,7 +138,7 @@ class RecordsController @Inject()(
 object RecordsController {
 
   val validJson: Constraint[String] = Constraint(
-    json => try { Json.parse(json); Valid } catch { case e => Invalid(e.getMessage) })
+    json => try { Json.parse(json); Valid } catch { case NonFatal(e) => Invalid(e.getMessage) })
 
   val RecordForm: Form[JsObject] =
     Form[JsObject](

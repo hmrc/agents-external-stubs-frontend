@@ -6,7 +6,7 @@ import javax.inject.{Inject, Named, Singleton}
 import play.api.libs.json._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Records, User, Users}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.http._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -116,5 +116,11 @@ class AgentsExternalStubsConnector @Inject()(
       .recover {
         case Upstream4xxException(e) => throw e
       }
+
+  def getKnownFacts(enrolmentKey: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[EnrolmentInfo] =
+    http.GET[EnrolmentInfo](new URL(baseUrl, s"/agents-external-stubs/known-facts/$enrolmentKey").toExternalForm)
+
+  def getServicesInfo()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Services] =
+    http.GET[Services](new URL(baseUrl, s"/agents-external-stubs/config/services").toExternalForm)
 
 }

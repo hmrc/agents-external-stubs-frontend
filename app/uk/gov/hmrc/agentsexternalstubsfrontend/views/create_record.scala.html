@@ -9,9 +9,7 @@
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("records.title"), bodyClasses = Some("full-width")) {
 
-    <nav style="margin-bottom: 1em; text-align: right;">
-        <a href="/agents-external-stubs/records">@Messages("records.link.all")</a> | <a href="/agents-external-stubs/user">@Messages("users.link.current")</a> | <a href="/agents-external-stubs/users">@Messages("users.link.all")</a> | <a href="/gg/sign-out">@Messages("common.sign-out")</a>
-    </nav>
+    @navigationBar()
 
     <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("records.create.header")</h1>
 
