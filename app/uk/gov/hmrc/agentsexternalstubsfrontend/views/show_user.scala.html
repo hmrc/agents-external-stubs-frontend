@@ -215,7 +215,7 @@
                 @for(e <- user.delegatedEnrolments){
                     <tr>
                         <td>
-                        @{e.key}
+                            <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
                         </td>
                         @if(e.identifiers.nonEmpty){
                             @for(i <- e.identifiers.get) {
@@ -223,7 +223,7 @@
                                 @{i.key}
                                 </td>
                                 <td>
-                                @{i.value}
+                                    <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey="+ek.tag).getOrElse("")}">@{i.value}</a>
                                 </td>
                             }
                         } else {
