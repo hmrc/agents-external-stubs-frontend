@@ -103,6 +103,30 @@ class SignInController @Inject()(
         ("planetId"            -> session.planetId)
     )
 
+  def showSignInPageInternal(
+    continue: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String]): Action[AnyContent] =
+    Action { implicit request =>
+      Ok(
+        html
+          .sign_in(SignInRequestForm, routes.SignInController.signInInternal(continue, origin, accountType)))
+    }
+
+  def signInInternal(
+    continue: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String] = None): Action[AnyContent] = signIn(continue, origin, accountType)
+
+  def signOutInternal(continue: Option[ContinueUrl]): Action[AnyContent] =
+    Action.async { implicit request =>
+      agentsExternalStubsConnector
+        .signOut()
+        .map(_ =>
+          continue.fold(Redirect(routes.SignInController.showSignInPageInternal(None, None, None).url).withNewSession)(
+            c => Redirect(c.url).withNewSession))
+    }
+
 }
 
 object SignInController {
