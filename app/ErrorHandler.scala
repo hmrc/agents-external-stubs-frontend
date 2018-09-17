@@ -24,7 +24,8 @@ class ErrorHandler @Inject()(
   @Named("http.port") httpPort: String)(implicit val config: Configuration, ec: ExecutionContext)
     extends FrontendErrorHandler with AuthRedirects with ErrorAuditing {
 
-  private val isDevEnv = env.mode.equals(Mode.Dev) || config.getString("run.mode").exists(Mode.Dev.toString.equals)
+  private val isDevEnv =
+    if (env.mode.equals(Mode.Test)) false else config.getString("run.mode").forall(Mode.Dev.toString.equals)
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
     auditClientError(request, statusCode, message)
