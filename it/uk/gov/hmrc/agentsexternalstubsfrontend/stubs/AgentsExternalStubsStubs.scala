@@ -76,13 +76,7 @@ trait AgentsExternalStubsStubs extends ValidRecordResponses {
           aResponse()
             .withStatus(Status.OK)
             .withBody(Json
-              .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(u =>
-                Json.obj(
-                  "userId"         -> Json.toJsFieldJsValueWrapper(JsString(u.userId)),
-                  "affinityGroup"  -> Json.toJsFieldJsValueWrapper(u.affinityGroup.map(JsString).getOrElse(JsNull)),
-                  "groupId"        -> Json.toJsFieldJsValueWrapper(u.groupId.map(JsString).getOrElse(JsNull)),
-                  "credentialRole" -> Json.toJsFieldJsValueWrapper(u.credentialRole.map(JsString).getOrElse(JsNull))
-              )))))
+              .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
               .toString())))
 
   def givenAllRecords =

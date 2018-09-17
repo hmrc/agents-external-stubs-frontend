@@ -13,7 +13,8 @@ import uk.gov.hmrc.http._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStubsStubs {
-  private implicit val hc = HeaderCarrier()
+
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   private lazy val connector: AgentsExternalStubsConnector = new AgentsExternalStubsConnector(
     new URL(s"http://localhost:$wireMockPort"),
