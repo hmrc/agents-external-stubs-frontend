@@ -36,8 +36,7 @@ class ErrorHandler @Inject()(
     implicit val r = Request(request, "")
     exception match {
       case _: NoActiveSession =>
-        toGGLogin(
-          if (isDevEnv) s"http://${request.host}${request.uri}" else s"http://localhost:$httpPort${request.uri}")
+        toGGLogin(if (isDevEnv) s"http://${request.host}${request.uri}" else request.uri)
       case _: InsufficientEnrolments =>
         Forbidden(
           error_template(
