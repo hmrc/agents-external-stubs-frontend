@@ -1,0 +1,117 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
+
+@import play.api.libs.json.JsObject
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox, textArea}
+
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.RestQuery
+@import play.api.libs.ws.WSResponse
+@import play.mvc.Http.HeaderNames
+@import play.api.libs.json.Json
+@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, response: Option[WSResponse], currentUserId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("rest.query.title"), bodyClasses = Some("full-width")) {
+
+    @navigationBar()
+
+    @if(response.isDefined){
+    @for(r <- response){
+        <h1 class="heading-xlarge">
+            @r.status @r.statusText
+        </h1>
+
+        <div class="form-hint" style="color:black;">
+            @{restQueryForm.data("method")} @{restQueryForm.data("url")}
+        </div>
+
+        <div style="margin-bottom: 2em;">
+            <div style="font-family: monospace; font-size: 0.8em; color: gray">
+            @for((k,vv) <- r.allHeaders){
+                <div>@k: @vv</div>
+            }
+            </div>
+
+            @if(r.header(HeaderNames.CONTENT_TYPE).contains("application/json")){
+                <p style="font-family: monospace; font-size: 0.8em;margin:1em 0;white-space: pre-wrap; overflow: scroll; max-height: 40em; padding: 0.5em; border-style: dotted">@{Json.prettyPrint(r.json)}</p>
+            }
+        </div>
+    }} else {
+        <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("rest.query.header", currentUserId)</h1>
+
+        <p class="form-hint">
+        @Messages("rest.query.description", currentUserId)
+        </p>
+    }
+
+    <div>
+        @form(action = postUrl, 'id -> "restQueryForm", 'novalidate -> "novalidate") {
+            <fieldset>
+
+                @if(response.isDefined) {
+                    <div class="form-group" style="vertical-align: middle;">
+
+                        <button class="button" type="submit" id="update">
+                        @Messages("rest.query.submit")
+                        </button>
+
+                        <a style="display: inline-block;
+                            margin-top: 0.5em;" href="@{
+                            cancelUrl.url
+                        }">@Messages("rest.query.cancel")</a>
+
+                    </div>
+                }
+
+                <div class="form-group soft--ends">
+                @dropdown(
+                    restQueryForm("method"),
+                    Seq("GET"->"GET", "POST"->"POST", "PUT"->"PUT", "DELETE"->"DELETE"),
+                    false,
+                    '_label -> Html("""<span class="h2-heading">"""+ Messages("rest.query.form.method") + """</span>"""),
+                    '_selectClass -> Html("""input--medium input--cleared""")
+                )
+                </div>
+
+                <div class="form-group">
+                @input(
+                    restQueryForm("url"),
+                    '_label -> Messages("rest.query.form.url"),
+                    '_inputClass -> "input--cleared",
+                    '_labelTextClass -> "h2-heading",
+                    '_labelClass -> "soft--ends"
+                )
+                </div>
+
+                <div class="form-group" style="vertical-align: middle;">
+
+                    <button class="button" type="submit" id="update">
+                    @Messages("rest.query.submit")
+                    </button>
+
+                    <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
+
+                </div>
+
+                <div class="form-field-group">
+                @textArea(
+                    restQueryForm("payload"),
+                    '_label -> Html("""<span class="h2-heading">"""+ Messages("rest.query.form.payload") + """</span>"""),
+                    '_inputClass -> "textarea-large"
+                )
+                </div>
+
+                <div class="form-group" style="vertical-align: middle;">
+
+                    <button class="button" type="submit" id="update">
+                        @Messages("rest.query.submit")
+                    </button>
+
+                    <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
+
+                </div>
+            </fieldset>
+        }
+    </div>
+
+}

@@ -137,4 +137,15 @@ services.title=Your guide to Enrolments
 services.show.header=Your guide to Enrolments
 services.show.description=Here you will find the definitions of the services available for enrolment.
 services.link.guide=Your guide to Enrolments
-services.link.short=Dictionary
+services.link.short=Enrolments
+
+rest.query.title=Query REST API
+rest.query.header=Query REST API as {0}
+rest.query.description=Here you can query directly any backend service API having current authorised user {0} in scope.
+rest.query.form.method=HTTP Verb
+rest.query.form.url=Service endpoint URL
+rest.query.form.payload=JSON payload (optional)
+rest.query.submit=Run
+rest.query.cancel=Cancel
+rest.query.link.short=Query
+rest.query.link=Query REST API as a current user
