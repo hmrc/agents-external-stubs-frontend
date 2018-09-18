@@ -9,7 +9,7 @@
 @import play.api.libs.ws.WSResponse
 @import play.mvc.Http.HeaderNames
 @import play.api.libs.json.Json
-@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, response: Option[WSResponse], currentUserId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, response: Option[WSResponse], currentUserId: String, curlCommand: Option[String])(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("rest.query.title"), bodyClasses = Some("full-width")) {
 
@@ -25,6 +25,12 @@
             @{restQueryForm.data("method")} @{restQueryForm.data("url")}
         </div>
 
+        @for(curl <- curlCommand){
+            <div style="font-family: monospace; font-size: 0.8em; color: white; padding:0.5em; margin-bottom: 1em; background: lightgray;">
+            @curl
+            </div>
+        }
+
         <div style="margin-bottom: 2em;">
             <div style="font-family: monospace; font-size: 0.8em; color: gray">
             @for((k,vv) <- r.allHeaders){
@@ -33,7 +39,7 @@
             </div>
 
             @if(r.header(HeaderNames.CONTENT_TYPE).contains("application/json")){
-                <p style="font-family: monospace; font-size: 0.8em;margin:1em 0;white-space: pre-wrap; overflow: scroll; max-height: 40em; padding: 0.5em; border-style: dotted">@{Json.prettyPrint(r.json)}</p>
+                <div style="font-family: monospace; font-size: 0.8em;margin-top:1em;white-space: pre-wrap; overflow: scroll; max-height: 40em; padding: 0.5em; border-style: dotted">@{Json.prettyPrint(r.json)}</div>
             }
         </div>
     }} else {

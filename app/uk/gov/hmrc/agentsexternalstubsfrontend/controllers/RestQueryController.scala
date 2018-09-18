@@ -43,7 +43,8 @@ class RestQueryController @Inject()(
                 routes.RestQueryController.runQuery(),
                 routes.UserController.showUserPage(),
                 None,
-                credentials.providerId
+                credentials.providerId,
+                None
               )))
           case Some(query) =>
             RestQuery
@@ -51,16 +52,15 @@ class RestQueryController @Inject()(
               .fold(
                 errors => Future.successful(BadRequest(errors)),
                 rq =>
-                  runQuery(rq).map(
-                    response =>
-                      Ok(
-                        html.rest_query(
-                          RestQueryForm.fill(rq),
-                          routes.RestQueryController.runQuery(),
-                          routes.UserController.showUserPage(),
-                          Some(response),
-                          credentials.providerId
-                        )))
+                  runQuery(rq).map(response =>
+                    Ok(html.rest_query(
+                      RestQueryForm.fill(rq),
+                      routes.RestQueryController.runQuery(),
+                      routes.UserController.showUserPage(),
+                      Option(response),
+                      credentials.providerId,
+                      Option(rq.toCurlCommand)
+                    )))
               )
 
         }
@@ -81,7 +81,8 @@ class RestQueryController @Inject()(
                     routes.RestQueryController.runQuery(),
                     routes.UserController.showUserPage(),
                     None,
-                    credentials.providerId
+                    credentials.providerId,
+                    None
                   ))),
             query => Future.successful(Redirect(routes.RestQueryController.showRestQueryPage(Some(query.encode))))
           )
@@ -113,6 +114,15 @@ object RestQueryController {
       new String(
         Base64.getUrlEncoder.encode(Json.toJson(this).toString().getBytes(StandardCharsets.UTF_8)),
         StandardCharsets.UTF_8)
+
+    def toCurlCommand(implicit request: Request[AnyContent]): String =
+      s"""curl -v -X $method -H "Authorization: ${request.session
+        .get(SessionKeys.authToken)
+        .get}" -H "X-Session-ID: ${request.session
+        .get(SessionKeys.sessionId)
+        .get}" ${if (method == "POST" || method == "PUT") """-H "Content-Type: application/json"""" else ""} ${payload
+        .map(p => s"""--data '$p'""")
+        .getOrElse("")} $url"""
   }
 
   object RestQuery {
