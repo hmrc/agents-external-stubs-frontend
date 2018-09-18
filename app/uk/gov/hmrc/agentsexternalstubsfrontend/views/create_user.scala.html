@@ -2,50 +2,80 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
 
-@(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, currentUserId: String, hasContinue: Boolean)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, currentUserId: String, hasContinue: Boolean, services: Seq[(String,String)])(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = Some("full-width")) {
 
     @navigationBar()
 
-    <h1 class="heading-xlarge">@Messages("user.create.header", userId)</h1>
+    <h1 class="heading-xlarge" style="margin-bottom: 1em;">@Messages("user.create.header", userId)</h1>
 
     @if(userForm.hasErrors) {
         @errorSummary(Messages("error.summary.heading"), userForm, Seq.empty, None)
     }
 
-    <p class="form-hint">
+    <div class="form-hint">
     @Messages("user.create.description")
-    </p>
+    </div>
+
+  <script>
+      function filterServices(keyword){
+          var selectId = "principalEnrolments[0].key";
+          var select = document.getElementById(selectId);
+          for (var i = 0; i < select.length; i++) {
+              var txt = select.options[i].dataset.affinity;
+              var include = txt==='none' | txt.toLowerCase().indexOf(keyword.toLowerCase())>=0;
+              select.options[i].style.display = include ? 'list-item':'none';
+              select.options[i].checked = false;
+          }
+          select.options[0].checked = true;
+          select.selectedIndex = 0;
+      }
+  </script>
 
     <div style="width: 50%;">
         @form(action = postUrl, 'id -> "userForm", 'novalidate -> "novalidate") {
             <fieldset>
                 <div class="form-field-group">
 
+                    <h2 class="h2-heading" style="display: inline-block;margin: 1em 0;">@Messages("user.form.affinityGroup")</h2>
+
                     <div class="form-group soft--ends">
-                    @dropdown(
-                        userForm("affinityGroup"),
-                        AffinityGroup.values.map(i => (i,i)),
-                        false,
-                        '_label -> Html("""<span class="h2-heading">"""+ Messages("user.form.affinityGroup") + """</span>"""),
-                        '_selectClass -> Html("""input--medium input--cleared""")
-                    )
+                        @for(value <- AffinityGroup.values) {
+                            <div class="multiple-choice">
+                                <input
+                                type="radio"
+                                id="affinityGroup-@value"
+                                name="affinityGroup"
+                                value="@value"
+                                oninput="filterServices('@value')"
+                                @if(userForm("affinityGroup").value.contains(value)){
+                                    checked
+                                } else {""}
+                                />
+                                <label for="affinityGroup-@value">@value</label>
+                            </div>
+                        }
+
                     </div>
 
                     <div class="form-group soft--ends">
-                    @input(
-                        userForm(s"principalEnrolments[0].key"),
-                        '_label -> Html("""<div class="h2-heading">"""+ Messages("user.form.principalEnrolments") + """ (optional)</div> <div style="color: gray; font-size: 0.8em;">Example: HMRC-AS-AGENT, HMRC-MTD-IT, HMRC-MTD-VAT, etc.</div>"""),
-                        '_dataAttributes -> "style=width:100%;"
-                    )
-                    </div>
 
-                    <div class="form-group soft--ends">
-                    @input(
-                        userForm(s"principalEnrolments[1].key"),
-                        '_dataAttributes -> "style=width:100%;"
-                    )
+                        <label for="principalEnrolments[0].key" style="margin-bottom: 1em;" class="@if(userForm(s"principalEnrolments[0].key").hasErrors){ error}">
+                            <span class="label__text">
+                                <span class="h2-heading">@Messages("user.form.principalEnrolment")</span>
+                            </span>
+                        </label>
+
+                        <select id="principalEnrolments[0].key" name="principalEnrolments[0].key" class="">
+                            <option value="" data-affinity="none">none</option>
+                            @for(option <- services) {
+                                <option id="principalEnrolments[0].key-@option._1" value="@option._1" data-affinity="@option._2" style="display: none"
+                                    @if(userForm(s"principalEnrolments[0].key").value.contains(option._1)){selected="selected"}
+                                >@option._1</option>
+                            }
+                        </select>
+
                     </div>
 
                     <div class="form-group">

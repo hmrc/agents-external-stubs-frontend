@@ -8,6 +8,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, Identifier, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.services.ServicesDefinitionsService
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
@@ -23,7 +24,8 @@ import scala.util.control.NonFatal
 class UserController @Inject()(
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
-  agentsExternalStubsConnector: AgentsExternalStubsConnector
+  agentsExternalStubsConnector: AgentsExternalStubsConnector,
+  servicesDefinitionsService: ServicesDefinitionsService
 )(implicit val configuration: Configuration)
     extends FrontendController with AuthActions with I18nSupport {
 
@@ -63,7 +65,8 @@ class UserController @Inject()(
                 routes.UserController.showUserPage(continue, userId),
                 user.userId,
                 credentials.providerId,
-                continue.isDefined
+                continue.isDefined,
+                servicesDefinitionsService.servicesDefinitions.options
               )))
         }
     }

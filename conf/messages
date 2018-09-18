@@ -81,7 +81,7 @@ user.edit.update=Update
 user.edit.cancel=Cancel
 
 user.create.header=Create user {0}
-user.create.description=Here you can define a basic configuration of the user or switch to full edit form.
+user.create.description=Here you can define affinity group of the user and its principal enrolment, or switch to the full form for editing other properties.
 user.create.update_and_continue=Create and continue
 user.create.update=Create
 user.create.edit=Show full edit form
@@ -104,7 +104,7 @@ user.form.isNonCompliant.hint=WARNING: Check this box only if you have valid rea
 user.form.isPermanent=Permanent
 user.form.isPermanent.hint=Check this box if you want to keep this user on the planet for more than 12h, until manually removed.
 
-user.form.principalEnrolments=Principal enrolments
+user.form.principalEnrolment=Principal enrolment
 
 user.show.create=Create
 
