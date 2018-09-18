@@ -70,7 +70,7 @@
           </form>
       </div>
       <div style="padding-top: 1.5em;">
-          <a href="/agents-external-stubs/rest-query">@Messages("rest.query.link")</a>
+          <a href="/agents-external-stubs/rest-query">@Messages("rest.query.link", (if(Set('a','e','o','u','y').contains(currentUserId.head.toLower)) "an " else "a ")+currentUserId)</a>
       </div>
       <div style="padding-top: 1.5em;">
           <a href="/agents-external-stubs/services">@Messages("services.link.guide")</a>

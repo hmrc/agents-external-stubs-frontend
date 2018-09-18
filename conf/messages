@@ -140,7 +140,7 @@ services.link.guide=Your guide to Enrolments
 services.link.short=Enrolments
 
 rest.query.title=Query REST API
-rest.query.header=Query REST API as {0}
+rest.query.header=Query REST APIs like {0}
 rest.query.description=Here you can query directly any backend service API having current authorised user {0} in scope.
 rest.query.form.method=HTTP Verb
 rest.query.form.url=Service endpoint URL
@@ -148,4 +148,4 @@ rest.query.form.payload=JSON payload (optional)
 rest.query.submit=Run
 rest.query.cancel=Cancel
 rest.query.link.short=Query
-rest.query.link=Query REST API as a current user
+rest.query.link=Query REST APIs like {0}

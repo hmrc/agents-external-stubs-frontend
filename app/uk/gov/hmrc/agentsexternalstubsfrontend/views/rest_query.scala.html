@@ -43,7 +43,7 @@
             }
         </div>
     }} else {
-        <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("rest.query.header", currentUserId)</h1>
+        <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("rest.query.header", (if(Set('a','e','o','u','y').contains(currentUserId.head.toLower)) "an " else "a ")+currentUserId)</h1>
 
         <p class="form-hint">
         @Messages("rest.query.description", currentUserId)
