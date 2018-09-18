@@ -1,0 +1,69 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
+
+@(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, currentUserId: String, hasContinue: Boolean)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = Some("full-width")) {
+
+    @navigationBar()
+
+    <h1 class="heading-xlarge">@Messages("user.create.header", userId)</h1>
+
+    @if(userForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), userForm, Seq.empty, None)
+    }
+
+    <p class="form-hint">
+    @Messages("user.create.description")
+    </p>
+
+    <div style="width: 50%;">
+        @form(action = postUrl, 'id -> "userForm", 'novalidate -> "novalidate") {
+            <fieldset>
+                <div class="form-field-group">
+
+                    <div class="form-group soft--ends">
+                    @dropdown(
+                        userForm("affinityGroup"),
+                        AffinityGroup.values.map(i => (i,i)),
+                        false,
+                        '_label -> Html("""<span class="h2-heading">"""+ Messages("user.form.affinityGroup") + """</span>"""),
+                        '_selectClass -> Html("""input--medium input--cleared""")
+                    )
+                    </div>
+
+                    <div class="form-group soft--ends">
+                    @input(
+                        userForm(s"principalEnrolments[0].key"),
+                        '_label -> Html("""<div class="h2-heading">"""+ Messages("user.form.principalEnrolments") + """ (optional)</div> <div style="color: gray; font-size: 0.8em;">Example: HMRC-AS-AGENT, HMRC-MTD-IT, HMRC-MTD-VAT, etc.</div>"""),
+                        '_dataAttributes -> "style=width:100%;"
+                    )
+                    </div>
+
+                    <div class="form-group soft--ends">
+                    @input(
+                        userForm(s"principalEnrolments[1].key"),
+                        '_dataAttributes -> "style=width:100%;"
+                    )
+                    </div>
+
+                    <div class="form-group">
+
+                        <button class="button" type="submit" id="update">
+                        @Messages(if(hasContinue) "user.create.update_and_continue" else "user.create.update")
+                        </button>
+
+                        <a class="button-secondary" href="@{editCall.url}">@Messages("user.create.edit")</a> |
+                        <a class="button-secondary" href="@{cancelCall.url}">@Messages("user.create.cancel")</a>
+
+                    </div>
+                </div>
+
+
+            </fieldset>
+
+        }
+    </div>
+
+}

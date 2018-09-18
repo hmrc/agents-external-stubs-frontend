@@ -49,6 +49,25 @@ class UserController @Inject()(
         }
     }
 
+  def showCreateUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentials) { credentials =>
+          agentsExternalStubsConnector
+            .getUser(userId.getOrElse(credentials.providerId))
+            .map(user =>
+              Ok(html.create_user(
+                UserForm.fill(user),
+                routes.UserController.updateUser(continue, userId),
+                routes.UserController.showEditUserPage(continue, userId),
+                routes.UserController.showUserPage(continue, userId),
+                user.userId,
+                credentials.providerId,
+                continue.isDefined
+              )))
+        }
+    }
+
   def showEditUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
@@ -165,7 +184,8 @@ object UserController {
         .transform[Option[Nino]](_.map(Nino.apply), _.map(_.toString)),
       "principalEnrolments" -> seq(enrolmentMapping)
         .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply)),
-      "delegatedEnrolments" -> seq(enrolmentMapping)
+      "delegatedEnrolments" -> optional(seq(enrolmentMapping))
+        .transform[Seq[Option[Enrolment]]](_.getOrElse(Seq.empty), Option.apply)
         .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply)),
       "name"              -> optional(nonEmptyText),
       "dateOfBirth"       -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat)),

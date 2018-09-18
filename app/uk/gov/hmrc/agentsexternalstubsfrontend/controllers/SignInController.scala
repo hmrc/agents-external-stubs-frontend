@@ -1,7 +1,5 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
-import java.util.UUID
-
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
@@ -53,7 +51,7 @@ class SignInController @Inject()(
               result <- Future(
                          withNewSession(
                            if (authenticatedSession.newUserCreated.getOrElse(false))
-                             Redirect(routes.UserController.showEditUserPage(continue))
+                             Redirect(routes.UserController.showCreateUserPage(continue))
                            else
                              continue.fold(
                                Redirect(routes.UserController.showUserPage(None))
@@ -75,7 +73,7 @@ class SignInController @Inject()(
             result <- Future(
                        withNewSession(
                          if (authenticatedSession.newUserCreated.getOrElse(false))
-                           Redirect(routes.UserController.showEditUserPage(None))
+                           Redirect(routes.UserController.showCreateUserPage(None))
                          else
                            Redirect(routes.UserController.showUserPage(None)),
                          authenticatedSession

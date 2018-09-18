@@ -80,6 +80,13 @@ user.edit.update_and_continue=Update and continue
 user.edit.update=Update
 user.edit.cancel=Cancel
 
+user.create.header=Create user {0}
+user.create.description=Here you can define a basic configuration of the user or switch to full edit form.
+user.create.update_and_continue=Create and continue
+user.create.update=Create
+user.create.edit=Show full edit form
+user.create.cancel=Cancel
+
 user.form.userId=User ID
 user.form.name=Name
 user.form.dateOfBirth=Date of birth
@@ -96,6 +103,8 @@ user.form.isNonCompliant=Skip validation and sanitation
 user.form.isNonCompliant.hint=WARNING: Check this box only if you have valid reason and understand implications, this user may become non-compliant.
 user.form.isPermanent=Permanent
 user.form.isPermanent.hint=Check this box if you want to keep this user on the planet for more than 12h, until manually removed.
+
+user.form.principalEnrolments=Principal enrolments
 
 user.show.create=Create
 
