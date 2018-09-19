@@ -29,7 +29,6 @@ class UserControllerISpec extends BaseISpec with AgentsExternalStubsStubs with A
         val request = FakeRequest(GET, "/agents-external-stubs/user")
         val result = callEndpointWith(request)
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("user.title"))
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
       }
     }

@@ -42,6 +42,7 @@ class RestQueryController @Inject()(
                 RestQueryForm.fill(RestQuery("GET", "https://", None)),
                 routes.RestQueryController.runQuery(),
                 routes.UserController.showUserPage(),
+                routes.RestQueryController.showRestQueryPage(None),
                 None,
                 credentials.providerId,
                 None
@@ -57,6 +58,7 @@ class RestQueryController @Inject()(
                       RestQueryForm.fill(rq),
                       routes.RestQueryController.runQuery(),
                       routes.UserController.showUserPage(),
+                      routes.RestQueryController.showRestQueryPage(None),
                       Option(response),
                       credentials.providerId,
                       Option(rq.toCurlCommand)
@@ -74,16 +76,15 @@ class RestQueryController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              Future.successful(
-                Ok(
-                  html.rest_query(
-                    formWithErrors,
-                    routes.RestQueryController.runQuery(),
-                    routes.UserController.showUserPage(),
-                    None,
-                    credentials.providerId,
-                    None
-                  ))),
+              Future.successful(Ok(html.rest_query(
+                formWithErrors,
+                routes.RestQueryController.runQuery(),
+                routes.UserController.showUserPage(),
+                routes.RestQueryController.showRestQueryPage(None),
+                None,
+                credentials.providerId,
+                None
+              ))),
             query => Future.successful(Redirect(routes.RestQueryController.showRestQueryPage(Some(query.encode))))
           )
       }

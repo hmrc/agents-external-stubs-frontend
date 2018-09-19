@@ -8,6 +8,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsCon
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.ServicesDefinitionsService
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.Future
@@ -22,20 +23,23 @@ class KnownFactsController @Inject()(
     extends FrontendController with AuthActions with I18nSupport {
 
   def showKnownFactsPage(enrolmentKey: String): Action[AnyContent] = Action.async { implicit request =>
-    authorised() {
-      agentsExternalStubsConnector
-        .getKnownFacts(enrolmentKey)
-        .map(
-          enrolmentInfo =>
-            Ok(
-              html.show_known_facts(
-                enrolmentInfo,
-                servicesDefinitionsService.servicesDefinitions
-                  .getService(enrolmentInfo.enrolmentKey.service)
-                  .getOrElse(throw new Exception()))
+    authorised()
+      .retrieve(Retrievals.credentials) { credentials =>
+        agentsExternalStubsConnector
+          .getKnownFacts(enrolmentKey)
+          .map(
+            enrolmentInfo =>
+              Ok(
+                html.show_known_facts(
+                  enrolmentInfo,
+                  servicesDefinitionsService.servicesDefinitions
+                    .getService(enrolmentInfo.enrolmentKey.service)
+                    .getOrElse(throw new Exception()),
+                  credentials.providerId
+                )
+            )
           )
-        )
-    }
+      }
   }
 
   val showGuideToServicesPage: Action[AnyContent] = Action.async { implicit request =>

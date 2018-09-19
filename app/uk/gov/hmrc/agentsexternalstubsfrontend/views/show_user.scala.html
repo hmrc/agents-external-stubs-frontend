@@ -55,7 +55,7 @@
           <a href="/agents-external-stubs/users">@Messages("users.link.all")</a>
       </div>
       <div style="padding-top: 1em;">
-          <a href="/agents-external-stubs/records">@Messages("records.link.all")</a>
+          <a href="/agents-external-stubs/records">@Messages("records.link.all") (DES)</a>
       </div>
       <h3 class="cya-question">
           @Messages("users.link.create")
@@ -63,7 +63,7 @@
       <div class="cya-answer">
           <form action="/agents-external-stubs/sign-in">
               <div style="vertical-align: middle;">
-              <label for="userId" style="font-size: 0.7em; color: gray;">Expected pattern [A-Za-z0-9-_]{6,64}</label>
+              <label for="userId" style="font-size: 0.7em; color: gray;">Expected ID pattern [A-Za-z0-9-_]{6,64}</label>
               <input type="text" name="userId" pattern="[A-Za-z0-9-_]{6,64}" required>
               <button class="button">@Messages("user.show.create")</button>
               </div>
@@ -91,7 +91,7 @@
     }
 }
 
-@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = None, sidebarLinks = Some(sidebarLinks)) {
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title", user.userId), bodyClasses = None, sidebarLinks = Some(sidebarLinks)) {
 
     <h1 class="heading-xlarge">
     @if(userId==currentUserId){ @Messages("user.current.show.header", userId) }else{ @Messages("user.show.header", userId) }
@@ -201,7 +201,7 @@
             }
         </table>
       } else {
-        <span class="form-hint">This @{user.affinityGroup.map(_.toLowerCase).getOrElse("user")} has not been enrolled yet.</span>
+        <span class="form-hint">This @{user.affinityGroup.map(_.toLowerCase).getOrElse("user")} has not been enrolled yet. <span style="display: inline-block; margin-left: 0.5em;"><a href="@editUrl.url#enrolments">Add enrolment</a></span></span>
     }
 
     @if(user.affinityGroup.contains("Agent")) {

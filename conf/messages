@@ -58,13 +58,13 @@ users.title=Your test users
 users.show.header=Your test users on {0}
 users.show.description=Here you can manage all your test users on that planet.
 
-user.title=Test user
+user.title=Test user {0}
 user.show.header=This is {0}
 user.show.description=Here you can review user setup.
 
 user.current.title=Current test user
 user.current.show.header=Welcome {0}, you are signed in
-user.current.show.description=Here you can review your setup.
+user.current.show.description=Here you can review your current setup.
 
 user.show.edit=Edit
 user.show.continue=Continue
@@ -133,10 +133,10 @@ knownFacts.title=Your known facts (enrolment)
 knownFacts.show.header=Enrolment for {0}
 knownFacts.show.description=Here you can review the details of the enrolment.
 
-services.title=Your guide to Enrolments
-services.show.header=Your guide to Enrolments
+services.title=Enrolments dictionary
+services.show.header=Enrolments dictionary
 services.show.description=Here you will find the definitions of the services available for enrolment.
-services.link.guide=Your guide to Enrolments
+services.link.guide=Enrolments dictionary
 services.link.short=Enrolments
 
 rest.query.title=Query REST API
@@ -147,5 +147,6 @@ rest.query.form.url=Service endpoint URL
 rest.query.form.payload=JSON payload (optional)
 rest.query.submit=Run
 rest.query.cancel=Cancel
+rest.query.reset=Reset
 rest.query.link.short=Query
 rest.query.link=Query REST APIs like {0}

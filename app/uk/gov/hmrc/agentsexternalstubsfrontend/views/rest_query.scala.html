@@ -9,7 +9,7 @@
 @import play.api.libs.ws.WSResponse
 @import play.mvc.Http.HeaderNames
 @import play.api.libs.json.Json
-@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, response: Option[WSResponse], currentUserId: String, curlCommand: Option[String])(implicit request: Request[_], messages: Messages, config: Configuration)
+@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, resetUrl: Call, response: Option[WSResponse], currentUserId: String, curlCommand: Option[String])(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("rest.query.title"), bodyClasses = Some("full-width")) {
 
@@ -62,9 +62,9 @@
                         </button>
 
                         <a style="display: inline-block;
-                            margin-top: 0.5em;" href="@{
-                            cancelUrl.url
-                        }">@Messages("rest.query.cancel")</a>
+                            margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("rest.query.reset")</a> |
+                        <a style="display: inline-block;
+                            margin-top: 0.5em;" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
 
                     </div>
                 }
@@ -95,6 +95,8 @@
                     @Messages("rest.query.submit")
                     </button>
 
+                    <a style="display: inline-block;
+                        margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("rest.query.reset")</a> |
                     <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
 
                 </div>
@@ -113,6 +115,8 @@
                         @Messages("rest.query.submit")
                     </button>
 
+                    <a style="display: inline-block;
+                        margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("rest.query.reset")</a> |
                     <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
 
                 </div>
