@@ -93,7 +93,9 @@
                 Delegated User (Agent)
                 </dt>
                 <dd class="cya-answer">
-                    <a href="/agents-external-stubs/user?userId=@{agent.userId}">@{agent.userId}</a><span style="display:inline-block;margin-left:0.2em;">(@{agent.agentFriendlyName})</span>
+                    <a href="/agents-external-stubs/user?userId=@{agent.userId}">@{agent.userId}</a>
+                    <span style="display:inline-block;margin-left:0.2em;">(@{agent.agentFriendlyName})</span>
+                    @if(agent.userId!=currentUserId){<span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{agent.userId}">Sign-in</a></span>}
                 </dd>
             </div>
         </dl>
