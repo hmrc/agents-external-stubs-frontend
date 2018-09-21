@@ -61,6 +61,20 @@
     </table>
 
     <table id="users" style="margin:1em 0;">
+        <caption id="tableSubHeader" class="normal-text">MTD Relationship Records
+            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            href="/agents-external-stubs/records/add?type=relationship&seed=@{records.RelationshipRecord.map(o => (o.last \ "arn").as[String]).getOrElse("1234567890")}">
+                Create new relationship
+            </a>
+        </caption>
+        <col style="width: 90%">
+        <col style="width: 10%">
+        <tbody>
+        @recordRows(records.RelationshipRecord, identity)
+        </tbody>
+    </table>
+
+    <table id="users" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Legacy Relationship Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=legacy-relationship&seed=@{records.LegacyRelationshipRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
