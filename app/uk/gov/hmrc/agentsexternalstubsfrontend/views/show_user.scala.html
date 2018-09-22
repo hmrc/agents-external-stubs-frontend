@@ -180,7 +180,7 @@
                 <th style="color:gray;">Identifier Name</th>
                 <th style="color:gray;">Identifier Value</th>
             </tr>
-            @for(e <- user.principalEnrolments){
+            @for(e <- user.principalEnrolments.get){
               <tr>
                 <td>
                     <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
@@ -215,7 +215,7 @@
                     <th style="color:gray;">Identifier Name</th>
                     <th style="color:gray;">Identifier Value</th>
                 </tr>
-                @for(e <- user.delegatedEnrolments){
+                @for(e <- user.delegatedEnrolments.get){
                     <tr>
                         <td>
                             <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>

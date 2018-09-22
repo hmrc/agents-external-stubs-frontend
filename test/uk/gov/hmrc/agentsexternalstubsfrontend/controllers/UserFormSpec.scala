@@ -58,8 +58,8 @@ class UserFormSpec extends UnitSpec {
           credentialStrength = Some("strong"),
           affinityGroup = Some("Agent"),
           credentialRole = Some("Admin"),
-          principalEnrolments = Seq(Enrolment("FOO"), Enrolment("BAR", Some(Seq(Identifier("ABC", "123"))))),
-          delegatedEnrolments = Seq(Enrolment("TAR", Some(Seq(Identifier("XYZ", "987")))), Enrolment("ZOO"))
+          principalEnrolments = Some(Seq(Enrolment("FOO"), Enrolment("BAR", Some(Seq(Identifier("ABC", "123")))))),
+          delegatedEnrolments = Some(Seq(Enrolment("TAR", Some(Seq(Identifier("XYZ", "987")))), Enrolment("ZOO")))
         )
 
       val fieldValues = Map(
@@ -77,6 +77,33 @@ class UserFormSpec extends UnitSpec {
         "userId"                                      -> "foo",
         "groupId"                                     -> "ABA-712-878-NHG",
         "credentialRole"                              -> "Admin"
+      )
+
+      form.fill(value).data shouldBe fieldValues.-("userId")
+      form.bind(fieldValues).value shouldBe Some(value.copy(userId = "ignored"))
+    }
+
+    "bind all input fields and return User and fill it back when enrolments empty" in {
+      val form = UserController.UserForm
+
+      val value =
+        User(
+          userId = "foo",
+          groupId = Some("ABA-712-878-NHG"),
+          confidenceLevel = None,
+          nino = None,
+          credentialStrength = Some("strong"),
+          affinityGroup = Some("Agent"),
+          credentialRole = Some("Admin")
+        )
+
+      val fieldValues = Map(
+        "affinityGroup"      -> "Agent",
+        "credentialStrength" -> "strong",
+        "confidenceLevel"    -> "0",
+        "userId"             -> "foo",
+        "groupId"            -> "ABA-712-878-NHG",
+        "credentialRole"     -> "Admin"
       )
 
       form.fill(value).data shouldBe fieldValues.-("userId")

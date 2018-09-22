@@ -58,7 +58,7 @@
                     <td style="text-align: center; font-size: 0.9em;">
                       @if(user.principalEnrolments.nonEmpty) {
                           <span style="display: inline-block;
-                              margin: 0.1em 0;">@{user.principalEnrolments.head.key}</span>@for(e <- user.principalEnrolments.tail) {, <span style="display: inline-block;
+                              margin: 0.1em 0;">@{user.principalEnrolments.get.head.key}</span>@for(e <- user.principalEnrolments.get.tail) {, <span style="display: inline-block;
                                   margin: 0.1em 0;">@e.key</span>
                           }
                       }

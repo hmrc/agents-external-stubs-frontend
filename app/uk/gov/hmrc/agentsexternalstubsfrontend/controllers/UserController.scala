@@ -185,11 +185,10 @@ object UserController {
       "nino" -> optional(text)
         .verifying("user.form.nino.error", _.forall(Nino.isValid))
         .transform[Option[Nino]](_.map(Nino.apply), _.map(_.toString)),
-      "principalEnrolments" -> seq(enrolmentMapping)
-        .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply)),
+      "principalEnrolments" -> optional(seq(enrolmentMapping))
+        .transform[Option[Seq[Enrolment]]](_.map(_.collect { case Some(x) => x }), _.map(_.map(Option.apply))),
       "delegatedEnrolments" -> optional(seq(enrolmentMapping))
-        .transform[Seq[Option[Enrolment]]](_.getOrElse(Seq.empty), Option.apply)
-        .transform[Seq[Enrolment]](_.collect { case Some(x) => x }, _.map(Option.apply)),
+        .transform[Option[Seq[Enrolment]]](_.map(_.collect { case Some(x) => x }), _.map(_.map(Option.apply))),
       "name"              -> optional(nonEmptyText),
       "dateOfBirth"       -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat)),
       "agentCode"         -> optional(nonEmptyText),
