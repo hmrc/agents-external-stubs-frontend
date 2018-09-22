@@ -4,6 +4,8 @@ GET         /gg/sign-in                           @uk.gov.hmrc.agentsexternalstu
 POST        /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
 GET         /gg/sign-out                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[ContinueUrl])
 
+GET         /agents-external-stubs                @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start
+
 GET         /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPageInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
 POST        /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
 GET         /agents-external-stubs/gg/sign-out    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutInternal(continue: Option[ContinueUrl])

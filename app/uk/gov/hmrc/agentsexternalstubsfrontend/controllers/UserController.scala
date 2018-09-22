@@ -31,6 +31,8 @@ class UserController @Inject()(
 
   import UserController._
 
+  val start: Action[AnyContent] = showUserPage(None, None)
+
   def showUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
