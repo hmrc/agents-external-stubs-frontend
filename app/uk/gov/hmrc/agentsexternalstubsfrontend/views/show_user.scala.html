@@ -6,19 +6,23 @@
 @(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String, currentUserId: String, planetId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @sidebarLinks = {
-  <div>
     <nav id="secondary-nav" role="navigation">
         <a href="/agents-external-stubs/gg/sign-out">@Messages("common.sign-out")</a>
     </nav>
-      <div>
-          <h3 class="cya-question">
-          @Messages("user.show.planetId")
-          </h3>
-
+    <div>
+          @if(planetId!=null && planetId.nonEmpty){
+              <h3 class="cya-question">
+                @Messages("user.show.planetId")
+              </h3>
               <div class="cya-answer" id="planetId">
-              <div>@planetId</div>
-          </div>
-      </div>
+                  <div>
+                      @planetId
+                  </div>
+              </div>
+          } else {
+              <h3 class="cya-question">Externally Authorized</h3>
+          }
+    </div>
     <div>
         <h3 class="cya-question">
         @Messages("user.show.authToken")
@@ -63,8 +67,8 @@
       <div class="cya-answer">
           <form action="/agents-external-stubs/sign-in">
               <div style="vertical-align: middle;">
-              <label for="userId" style="font-size: 0.7em; color: gray;">Expected ID pattern [A-Za-z0-9-_]{6,64}</label>
-              <input type="text" name="userId" pattern="[A-Za-z0-9-_]{6,64}" required>
+              <label for="userId" style="font-size: 0.7em; color: gray;">Expected ID pattern [A-Za-z0-9-_]{3,64}</label>
+              <input type="text" name="userId" pattern="[A-Za-z0-9-_]{3,64}" required>
               <button class="button">@Messages("user.show.create")</button>
               </div>
           </form>
@@ -76,7 +80,11 @@
           <a href="/agents-external-stubs/services">@Messages("services.link.guide")</a>
       </div>
       <div style="padding-top: 1.5em;">
-          <a href="/agents-external-stubs/planet/destroy">@Messages("planet.link.destroy")</a>
+          <form id="destroyPlanet" name="destroyPlanet" action="/agents-external-stubs/planet/destroy">
+              <a style="text-decoration: underline; cursor: pointer;" onclick="if(confirm('Please confirm you wish to destroy current planet and lost the associated data?')){document.forms.namedItem('destroyPlanet').submit()};">
+                @Messages("planet.link.destroy")
+              </a>
+          </form>
       </div>
   </div>
 }
@@ -176,7 +184,7 @@
 
     <h3>Principal enrolments</h3>
 
-    @if(user.principalEnrolments.nonEmpty){
+    @if(user.principalEnrolments.nonEmpty && user.principalEnrolments.get.nonEmpty){
         <table style="width:100%">
             <tr>
                 <th style="color:gray;">Service key</th>
@@ -211,7 +219,7 @@
 
         <h3>Delegated enrolments</h3>
 
-        @if(user.delegatedEnrolments.nonEmpty) {
+        @if(user.delegatedEnrolments.nonEmpty && user.delegatedEnrolments.get.nonEmpty) {
             <table style="width:100%">
                 <tr>
                     <th style="color:gray;">Service key</th>

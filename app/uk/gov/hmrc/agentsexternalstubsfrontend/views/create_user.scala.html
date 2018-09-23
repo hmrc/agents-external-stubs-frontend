@@ -4,7 +4,7 @@
 
 @(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, currentUserId: String, hasContinue: Boolean, services: Seq[(String,String)])(implicit request: Request[_], messages: Messages, config: Configuration)
 
-@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title"), bodyClasses = Some("full-width")) {
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title", userId), bodyClasses = Some("full-width")) {
 
     @navigationBar()
 

@@ -27,16 +27,12 @@
                     }
                     <div class="form-field">
                         <label class="label--inline" for="userId">@Html(Messages("login.username"))</label>
-                        <input type="text" id="userId" name="userId" required placeholder="@Messages("login.username.placeholder") [A-Za-z0-9-_]{6,64}" pattern="[A-Za-z0-9-_]{6,64}" />
+                        <input type="text" id="userId" name="userId" required placeholder="@Messages("login.username.placeholder")" pattern="[A-Za-z0-9-_]{6,64}" />
                     </div>
 
-                    <div class="form-field">
-                        <label class="label--inline" for="password">@Messages("login.password")</label>
-                        <input type="password" id="password" name="password" placeholder="Not required for tests"/>
-                    </div>
+                    <div class="form-field">@Messages("login.planetId.hint")</div>
 
                     <div class="form-field">
-                        <div class="form-hint">@Messages("login.planetId.hint")</div>
                         <label class="label--inline" for="planetId">@Messages("login.planetId")</label>
                         <input type="text" id="planetId" name="planetId" required placeholder="@Messages("login.planetId.placeholder")" />
                     </div>
@@ -47,19 +43,12 @@
                 </div>
             </fieldset>
         }
-
-        <h2>@Messages("login.sa.problems.header")</h2>
-        <ul>
-            <li><a id="verify-user" href="/booo" target="_self" data-sso="false">Trying to file Self Assessment using GOV.UK Verify?</a></li>
-            <li><a id="registration" href="/booo" target="_self" data-sso="false" data-journey-click="sos_gg_login:gg_login_end:exit_create_new_gg_account">Don’t have a Government Gateway account</a></li>
-            <li><a id="forgotten-user-id" href="/booo" target="_self" data-sso="false" data-journey-click="sos_gg_login:gg_login_end:forgotten_user_id">Forgotten user ID</a></li>
-            <li><a id="forgotten-password" href="/booo" target="_self" data-sso="false" data-journey-click="sos_gg_login:gg_login_end:forgotten_password">Forgotten password</a></li>
-            <li><a id="forgotten-user-id-and-password" href="/booo" target="_self" data-sso="false" data-journey-click="sos_gg_login:gg_login_end:forgotten_user_id_and_password">Forgotten user ID and password</a></li>
-        </ul>
     </div>
 
-    <p id="c2c">
-        <a href="https://online.hmrc.gov.uk/webchat/assistant/bot/Ruth" id="webchatlink" target="_blank" rel="external">Get help from HMRC’s automated assistant <span class="visuallyhidden">These links will open in a new window.</span></a>
+    <p class="form-hint">
+        This page provides fake 'Sign In' form served by Agents Stubs.
+        If you want your application to use this authorisation,
+        configure it first to speak to the 'agents-external-stubs' microservice instead of the 'auth'.
     </p>
 
 }

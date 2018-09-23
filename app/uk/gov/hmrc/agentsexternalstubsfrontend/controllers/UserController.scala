@@ -62,7 +62,8 @@ class UserController @Inject()(
             .map(user =>
               Ok(html.create_user(
                 UserForm.fill(user),
-                routes.UserController.updateUser(continue, userId),
+                routes.UserController
+                  .updateUser(Some(ContinueUrl(routes.UserController.showEditUserPage(continue).url)), userId),
                 routes.UserController.showEditUserPage(continue, userId),
                 routes.UserController.showUserPage(continue, userId),
                 user.userId,
@@ -209,4 +210,5 @@ object UserController {
     case None => Some(none)
     case s    => s
   }
+
 }
