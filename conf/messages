@@ -60,11 +60,11 @@ users.show.description=Here you can see and manage all the test users on the pla
 
 user.title=Test user {0}
 user.show.header=This is {0}
-user.show.description=Here you can review user setup.
+user.show.description=Here you can review user''s setup.
 
 user.current.title=Current test user
 user.current.show.header=Welcome {0}, you are signed in
-user.current.show.description=Here you can review your current setup.
+user.current.show.description=Here you can review current user''s setup.
 
 user.show.edit=Edit
 user.show.continue=Continue

@@ -20,7 +20,8 @@ case class User(
   agentFriendlyName: Option[String] = None,
   isNonCompliant: Option[Boolean] = None,
   complianceIssues: Option[Seq[String]] = None,
-  isPermanent: Option[Boolean] = None
+  isPermanent: Option[Boolean] = None,
+  recordIds: Option[Seq[String]] = None
 )
 
 object User {

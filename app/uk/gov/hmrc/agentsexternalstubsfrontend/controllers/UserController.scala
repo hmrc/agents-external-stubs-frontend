@@ -198,7 +198,8 @@ object UserController {
       "agentFriendlyName" -> optional(nonEmptyText),
       "isNonCompliant"    -> optional(boolean),
       "complianceIssues"  -> ignored[Option[Seq[String]]](None),
-      "isPermanent"       -> optional(boolean)
+      "isPermanent"       -> optional(boolean),
+      "recordIds"         -> ignored[Option[Seq[String]]](None)
     )(User.apply)(User.unapply))
 
   def fromNone[T](none: T): Option[T] => Option[T] = {

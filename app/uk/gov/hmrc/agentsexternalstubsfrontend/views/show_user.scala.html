@@ -251,7 +251,7 @@
         }
     }
 
-    <div style="margin-top: 40px;">
+    <div style="margin:2em 0;">
 
         <a role="button" href="@editUrl.url">
             <button class="button" id="update">
@@ -270,5 +270,14 @@
         }
 
     </div>
+
+    @if(user.recordIds.nonEmpty && user.recordIds.get.nonEmpty) {
+
+        <h3>Associated master records (DES)</h3>
+
+        @for(recordId <-  user.recordIds.get){
+          <li><a class="button-secondary" href="/agents-external-stubs/records?showId=@recordId">@recordId</a></li>
+        }
+    }
 
 }

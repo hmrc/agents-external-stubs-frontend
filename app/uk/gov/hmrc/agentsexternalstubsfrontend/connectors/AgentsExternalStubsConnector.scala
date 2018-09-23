@@ -106,13 +106,13 @@ class AgentsExternalStubsConnector @Inject()(
 
   def createRecord(recordType: String, record: JsObject)(
     implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[Unit] =
+    ec: ExecutionContext): Future[Option[String]] =
     http
       .POST[JsValue, HttpResponse](
         new URL(baseUrl, s"/agents-external-stubs/records/$recordType").toExternalForm,
         record
       )
-      .map(_ => ())
+      .map(r => (r.json \ "_links" \ 0 \ "href").asOpt[String].map(_.split("/").last))
       .recover {
         case Upstream4xxException(e) => throw e
       }

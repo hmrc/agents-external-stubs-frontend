@@ -122,7 +122,7 @@
             <a name="@id"></a>
             <td><div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(json)</div></td>
         } else {
-            <td><div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(excerpt(json))</div></td>
+            <td><div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrintFlat(excerpt(json))</div></td>
         }
         <td style="font-size:0.8em;vertical-align: top;">
             @if(id.isDefined) {
@@ -140,8 +140,14 @@
     </tr>
 }
 
+@prettyPrintFlat(json:JsValue) = {@if(json.isInstanceOf[JsObject]){
+<span style="color:blue; font-weight: bold;">{</span>@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintFieldFlat(f)),{<span style="color:blue;">, </span>})<span style="color:blue; font-weight: bold">}</span>} else {@if(json.isInstanceOf[JsArray]){
+<span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrintFlat(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {@if(json.isInstanceOf[JsBoolean]){<span style="color:@if(json.as[Boolean]){green}else{red}">@json</span>} else {<span style="color:blue">@json</span>}}}}}
+
+@prettyPrintFieldFlat(field:(String,JsValue)) = {"<span style="color:gray">@field._1</span>": @prettyPrintFlat(field._2)}
+
 @prettyPrint(json:JsValue) = {@if(json.isInstanceOf[JsObject]){
-<span style="color:blue; font-weight: bold;">{</span>@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintField(f)),{<span style="color:blue;">, </span>})<span style="color:blue; font-weight: bold">}</span>} else {@if(json.isInstanceOf[JsArray]){
-<span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrint(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {@if(json.isInstanceOf[JsBoolean]){<span style="color:@if(json.as[Boolean]){green}else{red}">@json</span>} else {<span style="color:blue">@json</span>}}}}}
+    <span style="color:blue; font-weight: bold;">{</span><div style="position: relative; left: 2em;">@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintField(f)),{<span style="color:blue;">, <br/></span>})</div><span style="color:blue; font-weight: bold">}</span>} else {@if(json.isInstanceOf[JsArray]){
+    <span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrint(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {@if(json.isInstanceOf[JsBoolean]){<span style="color:@if(json.as[Boolean]){green}else{red}">@json</span>} else {<span style="color:blue">@json</span>}}}}}
 
 @prettyPrintField(field:(String,JsValue)) = {"<span style="color:gray">@field._1</span>": @prettyPrint(field._2)}

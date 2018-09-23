@@ -112,7 +112,7 @@ class RecordsController @Inject()(
           record =>
             agentsExternalStubsConnector
               .createRecord(`type`, record)
-              .map(_ => Redirect(routes.RecordsController.showAllRecordsPage(None)))
+              .map(recordIdOpt => Redirect(routes.RecordsController.showAllRecordsPage(recordIdOpt)))
               .recover {
                 case e =>
                   Ok(html.create_record(
