@@ -123,4 +123,12 @@ class AgentsExternalStubsConnector @Inject()(
   def getServicesInfo()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Services] =
     http.GET[Services](new URL(baseUrl, s"/agents-external-stubs/config/services").toExternalForm)
 
+  def destroyPlanet(planetId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .DELETE[HttpResponse](new URL(baseUrl, s"/agents-external-stubs/planets/$planetId").toExternalForm)
+      .map(_ => ())
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
+
 }

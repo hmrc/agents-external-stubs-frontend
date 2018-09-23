@@ -31,3 +31,5 @@ GET         /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstu
 POST        /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.runQuery
 
 GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(userId: String)
+
+GET         /agents-external-stubs/planet/destroy @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PlanetController.destroyPlanet

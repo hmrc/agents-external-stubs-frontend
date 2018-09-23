@@ -150,3 +150,5 @@ rest.query.cancel=Cancel
 rest.query.reset=Reset
 rest.query.link.short=Query
 rest.query.link=Query REST APIs like {0}
+
+planet.link.destroy=End this planet and destroy the data
