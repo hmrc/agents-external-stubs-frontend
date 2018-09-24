@@ -20,16 +20,18 @@ import scala.util.control.NonFatal
 class RecordsController @Inject()(
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
-  agentsExternalStubsConnector: AgentsExternalStubsConnector
+  val agentsExternalStubsConnector: AgentsExternalStubsConnector
 )(implicit val configuration: Configuration)
-    extends FrontendController with AuthActions with I18nSupport {
+    extends FrontendController with AuthActions with I18nSupport with WithPlanetId {
 
   import RecordsController._
 
   def showAllRecordsPage(showId: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     authorised() {
-      agentsExternalStubsConnector.getRecords
-        .map(records => Ok(html.show_all_records(records, request.session.get("planetId").getOrElse(""), showId)))
+      withPlanetId { planetId =>
+        agentsExternalStubsConnector.getRecords
+          .map(records => Ok(html.show_all_records(records, planetId, showId)))
+      }
     }
   }
 

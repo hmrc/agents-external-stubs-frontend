@@ -13,21 +13,21 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 @Singleton
 class UserController @Inject()(
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
-  agentsExternalStubsConnector: AgentsExternalStubsConnector,
+  val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   servicesDefinitionsService: ServicesDefinitionsService
 )(implicit val configuration: Configuration)
-    extends FrontendController with AuthActions with I18nSupport {
+    extends FrontendController with AuthActions with I18nSupport with WithPlanetId {
 
   import UserController._
 
@@ -37,19 +37,21 @@ class UserController @Inject()(
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentials) { credentials =>
-          agentsExternalStubsConnector
-            .getUser(userId.getOrElse(credentials.providerId))
-            .map(user =>
-              Ok(html.show_user(
-                user,
-                request.session.get(SessionKeys.authToken),
-                request.session.get(SessionKeys.sessionId),
-                routes.UserController.showEditUserPage(continue, userId),
-                continue,
-                user.userId,
-                credentials.providerId,
-                request.session.get("planetId").getOrElse("")
-              )))
+          withPlanetId { planetId =>
+            agentsExternalStubsConnector
+              .getUser(userId.getOrElse(credentials.providerId))
+              .map(user =>
+                Ok(html.show_user(
+                  user,
+                  request.session.get(SessionKeys.authToken),
+                  request.session.get(SessionKeys.sessionId),
+                  routes.UserController.showEditUserPage(continue, userId),
+                  continue,
+                  user.userId,
+                  credentials.providerId,
+                  planetId
+                )))
+          }
         }
     }
 
@@ -148,16 +150,19 @@ class UserController @Inject()(
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentials) { credentials =>
-          agentsExternalStubsConnector.getUsers
-            .map(
-              users =>
-                Ok(html.show_all_users(
-                  users,
-                  credentials.providerId,
-                  request.session.get(SessionKeys.authToken),
-                  routes.UserController.showUserPage(None),
-                  request.session.get("planetId").getOrElse("")
-                )))
+          withPlanetId { planetId =>
+            agentsExternalStubsConnector.getUsers
+              .map(
+                users =>
+                  Ok(
+                    html.show_all_users(
+                      users,
+                      credentials.providerId,
+                      request.session.get(SessionKeys.authToken),
+                      routes.UserController.showUserPage(None),
+                      planetId
+                    )))
+          }
         }
     }
 }

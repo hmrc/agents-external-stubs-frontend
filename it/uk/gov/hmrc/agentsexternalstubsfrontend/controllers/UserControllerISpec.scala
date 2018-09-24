@@ -25,6 +25,7 @@ class UserControllerISpec extends BaseISpec with AgentsExternalStubsStubs with A
              |  }
              |}""".stripMargin
         )
+        givenCurrentSession()
         givenUser(User("Test123"))
         val request = FakeRequest(GET, "/agents-external-stubs/user")
         val result = callEndpointWith(request)

@@ -18,9 +18,9 @@ import scala.concurrent.Future
 @Singleton
 class SignInController @Inject()(
   override val messagesApi: MessagesApi,
-  agentsExternalStubsConnector: AgentsExternalStubsConnector
+  val agentsExternalStubsConnector: AgentsExternalStubsConnector
 )(implicit val configuration: Configuration)
-    extends FrontendController with I18nSupport {
+    extends FrontendController with I18nSupport with WithPlanetId {
 
   import SignInController._
 
@@ -64,21 +64,19 @@ class SignInController @Inject()(
 
   def signInUser(userId: String): Action[AnyContent] =
     Action.async { implicit request =>
-      request.session.get("planetId") match {
-        case None => Future.successful(Ok(html.error_template(messagesApi("error.title"), s"Missing planetId", "")))
-        case Some(planetId) =>
-          for {
-            _                    <- agentsExternalStubsConnector.signOut()
-            authenticatedSession <- agentsExternalStubsConnector.signIn(SignInRequest(userId, planetId))
-            result <- Future(
-                       withNewSession(
-                         if (authenticatedSession.newUserCreated.getOrElse(false))
-                           Redirect(routes.UserController.showCreateUserPage(None))
-                         else
-                           Redirect(routes.UserController.showUserPage(None)),
-                         authenticatedSession
-                       ))
-          } yield result
+      withPlanetId { planetId =>
+        for {
+          _                    <- agentsExternalStubsConnector.signOut()
+          authenticatedSession <- agentsExternalStubsConnector.signIn(SignInRequest(userId, planetId))
+          result <- Future(
+                     withNewSession(
+                       if (authenticatedSession.newUserCreated.getOrElse(false))
+                         Redirect(routes.UserController.showCreateUserPage(None))
+                       else
+                         Redirect(routes.UserController.showUserPage(None)),
+                       authenticatedSession
+                     ))
+        } yield result
       }
     }
 

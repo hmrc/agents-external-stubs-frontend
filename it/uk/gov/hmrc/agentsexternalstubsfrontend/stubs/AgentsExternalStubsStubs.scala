@@ -25,9 +25,9 @@ trait AgentsExternalStubsStubs extends ValidRecordResponses {
         s"""{"userId":"$userId", "plainTextPassword":"$plainTextPassword", "providerType":"$providerType", "planetId": "$planetId"}"""))
       .willReturn(aResponse()
         .withStatus(if (newUser) Status.CREATED else Status.ACCEPTED)
-        .withHeader("Location", s"/agents-external-stubs/authenticated/$authToken")))
+        .withHeader("Location", s"/agents-external-stubs/session/$authToken")))
     stubFor(
-      get(urlEqualTo(s"/agents-external-stubs/authenticated/$authToken"))
+      get(urlEqualTo(s"/agents-external-stubs/session/$authToken"))
         .willReturn(
           aResponse()
             .withStatus(Status.CREATED)
@@ -43,6 +43,23 @@ trait AgentsExternalStubsStubs extends ValidRecordResponses {
 
     authToken
   }
+
+  def givenCurrentSession(): Unit =
+    stubFor(
+      get(urlEqualTo("/agents-external-stubs/session/current"))
+        .willReturn(
+          aResponse()
+            .withStatus(200)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(Json
+              .obj(
+                "sessionId"    -> UUID.randomUUID().toString,
+                "userId"       -> "foo",
+                "authToken"    -> UUID.randomUUID().toString,
+                "providerType" -> "GovernmentGateway",
+                "planetId"     -> UUID.randomUUID().toString
+              )
+              .toString())))
 
   def givenUserCanSignOut =
     stubFor(
