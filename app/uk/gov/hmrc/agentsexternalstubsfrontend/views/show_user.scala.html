@@ -15,7 +15,7 @@
                 @Messages("user.show.planetId")
               </h3>
               <div class="cya-answer" id="planetId">
-                  <div>
+                  <div style="overflow-wrap: break-word;">
                       @planetId
                   </div>
               </div>
@@ -27,7 +27,7 @@
         <h3 class="cya-question">
         @Messages("user.show.authToken")
         </h3>
-        <div class="cya-answer" id="authToken">
+        <div class="cya-answer" id="authToken" style="overflow-wrap: break-word;">
         @{authToken.getOrElse("none")}
         </div>
     </div>
@@ -39,7 +39,7 @@
           @{sessionId.getOrElse("none")}
           </div>
       </div>
-      <div style="font-size: 0.75em; font-family: monospace; overflow-wrap: normal; padding: 1em 0; color: gray;">
+      <div style="font-size: 0.75em; font-family: monospace; overflow-wrap: normal; padding: 1em 0; color: gray;overflow-wrap: break-word;">
           curl -v -H 'Authorization: @{authToken.getOrElse("")}' -H 'X-Session-ID: @{sessionId.getOrElse("")}'
       </div>
       <div>
