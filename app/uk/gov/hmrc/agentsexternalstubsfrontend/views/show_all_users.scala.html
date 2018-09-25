@@ -15,7 +15,7 @@
         <h3 class="cya-question">
         @Messages("users.link.create")
         </h3>
-        <form action="/agents-external-stubs/sign-in">
+        <form action="/agents-external-stubs/user/create">
             <div style="vertical-align: middle;">
                 <label for="userId" style="font-size: 0.7em; color: gray;">Expected ID pattern [A-Za-z0-9-_]{3,64}</label>
                 <input type="text" name="userId" pattern="[A-Za-z0-9-_]{3,64}" required>
@@ -69,17 +69,17 @@
                       }
                     </td>
                     <td>@if(user.userId==currentUserId){
-                        <span class="form-hint" style="font-size: 0.8em;">This is current user</span>
                         <div>
                             <a href="/agents-external-stubs/user?userId=@user.userId">View</a> |
-                            <a href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a>
+                            <a href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a> |
+                            <span style="color: black; font-weight: bold;">Current user </span>
                         </div>
                     }else{
                         <div>
                             <a href="/agents-external-stubs/user?userId=@user.userId">View</a> |
                             <a href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a> |
                             <a href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a> |
-                            <a href="/agents-external-stubs/sign-in?userId=@user.userId">Sign-in</a>
+                            <a href="/agents-external-stubs/sign-in?userId=@user.userId&continue=/agents-external-stubs/users">Sign-in</a>
                         </div>
                     }</td>
                 </tr>

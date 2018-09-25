@@ -58,6 +58,14 @@ class AgentsExternalStubsConnector @Inject()(
   def getUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[User] =
     http.GET[User](new URL(baseUrl, s"/agents-external-stubs/users/$userId").toExternalForm)
 
+  def createUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .POST[User, HttpResponse](new URL(baseUrl, s"/agents-external-stubs/users").toExternalForm, user)
+      .map(_ => ())
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
+
   def updateUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .PUT[User, HttpResponse](new URL(baseUrl, s"/agents-external-stubs/users/${user.userId}").toExternalForm, user)

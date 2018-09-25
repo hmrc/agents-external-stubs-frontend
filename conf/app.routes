@@ -13,7 +13,7 @@ GET         /agents-external-stubs/gg/sign-out    @uk.gov.hmrc.agentsexternalstu
 GET         /agents-external-stubs/user           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/user/create    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showCreateUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/user/edit      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showEditUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
-POST        /agents-external-stubs/user/update    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.updateUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
+POST        /agents-external-stubs/user/update    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.updateUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None, create: Boolean ?= false)
 GET         /agents-external-stubs/user/remove    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.removeUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/users          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
 
@@ -30,6 +30,6 @@ GET         /agents-external-stubs/services       @uk.gov.hmrc.agentsexternalstu
 GET         /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.showRestQueryPage(q: Option[String] ?= None)
 POST        /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.runQuery
 
-GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(userId: String)
+GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(continue: Option[ContinueUrl] ?= None, userId: String)
 
 GET         /agents-external-stubs/planet/destroy @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PlanetController.destroyPlanet

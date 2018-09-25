@@ -62,7 +62,7 @@ class SignInController @Inject()(
         )
     }
 
-  def signInUser(userId: String): Action[AnyContent] =
+  def signInUser(continue: Option[ContinueUrl], userId: String): Action[AnyContent] =
     Action.async { implicit request =>
       withPlanetId { planetId =>
         for {
@@ -71,9 +71,11 @@ class SignInController @Inject()(
           result <- Future(
                      withNewSession(
                        if (authenticatedSession.newUserCreated.getOrElse(false))
-                         Redirect(routes.UserController.showCreateUserPage(None))
+                         Redirect(routes.UserController.showCreateUserPage(continue))
                        else
-                         Redirect(routes.UserController.showUserPage(None)),
+                         continue.fold(
+                           Redirect(routes.UserController.showUserPage(None))
+                         )(continueUrl => Redirect(continueUrl.url)),
                        authenticatedSession
                      ))
         } yield result

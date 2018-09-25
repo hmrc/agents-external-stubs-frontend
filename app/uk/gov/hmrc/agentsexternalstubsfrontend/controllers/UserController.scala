@@ -13,11 +13,11 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.http.{NotFoundException, SessionKeys}
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 @Singleton
@@ -59,20 +59,61 @@ class UserController @Inject()(
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentials) { credentials =>
-          agentsExternalStubsConnector
-            .getUser(userId.getOrElse(credentials.providerId))
-            .map(user =>
-              Ok(html.create_user(
-                UserForm.fill(user),
-                routes.UserController
-                  .updateUser(Some(ContinueUrl(routes.UserController.showEditUserPage(continue).url)), userId),
-                routes.UserController.showEditUserPage(continue, userId),
-                routes.UserController.showUserPage(continue, userId),
-                user.userId,
-                credentials.providerId,
-                continue.isDefined,
-                servicesDefinitionsService.servicesDefinitions.options
-              )))
+          userId match {
+            case Some(uid) =>
+              agentsExternalStubsConnector
+                .getUser(uid)
+                .map(user =>
+                  Ok(html.create_user(
+                    UserForm.fill(user),
+                    routes.UserController
+                      .updateUser(
+                        Some(ContinueUrl(routes.UserController.showEditUserPage(continue, userId).url)),
+                        userId,
+                        create = true),
+                    routes.UserController.showEditUserPage(continue, userId),
+                    routes.UserController.showUserPage(continue, userId),
+                    user.userId,
+                    credentials.providerId,
+                    continue.isDefined,
+                    servicesDefinitionsService.servicesDefinitions.options
+                  )))
+                .recover {
+                  case e: NotFoundException =>
+                    userId match {
+                      case Some(id) =>
+                        Ok(
+                          html.create_user(
+                            UserForm.fill(User(id)),
+                            routes.UserController
+                              .updateUser(
+                                Some(ContinueUrl(routes.UserController.showEditUserPage(continue, userId).url)),
+                                userId,
+                                create = true),
+                            routes.UserController.showEditUserPage(continue, userId),
+                            routes.UserController.showUserPage(continue, userId),
+                            id,
+                            credentials.providerId,
+                            continue.isDefined,
+                            servicesDefinitionsService.servicesDefinitions.options
+                          ))
+                      case None => NotFound(e.getMessage)
+                    }
+                }
+            case None =>
+              Future.successful(
+                Ok(html.create_user(
+                  UserForm.fill(User(credentials.providerId)),
+                  routes.UserController
+                    .updateUser(Some(ContinueUrl(routes.UserController.showEditUserPage(continue).url)), create = true),
+                  routes.UserController.showEditUserPage(continue),
+                  routes.UserController.showUserPage(continue),
+                  credentials.providerId,
+                  credentials.providerId,
+                  continue.isDefined,
+                  servicesDefinitionsService.servicesDefinitions.options
+                )))
+          }
         }
     }
 
@@ -94,7 +135,7 @@ class UserController @Inject()(
         }
     }
 
-  def updateUser(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
+  def updateUser(continue: Option[ContinueUrl], userId: Option[String], create: Boolean): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentials) { credentials =>
@@ -102,17 +143,36 @@ class UserController @Inject()(
             .bindFromRequest()
             .fold(
               formWithErrors =>
-                Future.successful(Ok(html.edit_user(
-                  formWithErrors,
-                  routes.UserController.updateUser(continue, userId),
-                  routes.UserController.showUserPage(continue, userId),
-                  userId = userId.getOrElse(credentials.providerId),
-                  credentials.providerId,
-                  continue.isDefined
-                ))),
+                if (create)
+                  Future.successful(Ok(html.create_user(
+                    UserForm.fill(User(userId.get)),
+                    routes.UserController
+                      .updateUser(
+                        Some(ContinueUrl(routes.UserController.showEditUserPage(continue, userId).url)),
+                        userId,
+                        create = true),
+                    routes.UserController.showEditUserPage(continue, userId),
+                    routes.UserController.showUserPage(continue, userId),
+                    userId.get,
+                    credentials.providerId,
+                    continue.isDefined,
+                    servicesDefinitionsService.servicesDefinitions.options
+                  )))
+                else
+                  Future.successful(Ok(html.edit_user(
+                    formWithErrors,
+                    routes.UserController.updateUser(continue, userId),
+                    routes.UserController.showUserPage(continue, userId),
+                    userId = userId.getOrElse(credentials.providerId),
+                    credentials.providerId,
+                    continue.isDefined
+                  ))),
               user =>
-                agentsExternalStubsConnector
-                  .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId)))
+                (if (create && userId.isDefined)
+                   agentsExternalStubsConnector.createUser(user.copy(userId = userId.get))
+                 else
+                   agentsExternalStubsConnector
+                     .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId))))
                   .map(_ =>
                     continue.fold(Redirect(routes.UserController.showUserPage(continue, userId)))(continueUrl =>
                       Redirect(continueUrl.url)))

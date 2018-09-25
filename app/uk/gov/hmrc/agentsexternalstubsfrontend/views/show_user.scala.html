@@ -65,11 +65,11 @@
           @Messages("users.link.create")
       </h3>
       <div class="cya-answer">
-          <form action="/agents-external-stubs/sign-in">
+          <form action="/agents-external-stubs/user/create">
               <div style="vertical-align: middle;">
-              <label for="userId" style="font-size: 0.7em; color: gray;">Expected ID pattern [A-Za-z0-9-_]{3,64}</label>
-              <input type="text" name="userId" pattern="[A-Za-z0-9-_]{3,64}" required>
-              <button class="button">@Messages("user.show.create")</button>
+                <label for="userId" style="font-size: 0.7em; color: gray;">Expected ID pattern [A-Za-z0-9-_]{3,64}</label>
+                <input type="text" name="userId" pattern="[A-Za-z0-9-_]{3,64}" required>
+                <button class="button">@Messages("user.show.create")</button>
               </div>
           </form>
       </div>
