@@ -63,21 +63,25 @@ class UserController @Inject()(
             case Some(uid) =>
               agentsExternalStubsConnector
                 .getUser(uid)
-                .map(user =>
-                  Ok(html.create_user(
-                    UserForm.fill(user),
-                    routes.UserController
-                      .updateUser(
-                        Some(ContinueUrl(routes.UserController.showEditUserPage(continue, userId).url)),
-                        userId,
-                        create = true),
-                    routes.UserController.showEditUserPage(continue, userId),
-                    routes.UserController.showUserPage(continue, userId),
-                    user.userId,
-                    credentials.providerId,
-                    continue.isDefined,
-                    servicesDefinitionsService.servicesDefinitions.options
-                  )))
+                .map(
+                  user =>
+                    if (user.affinityGroup.isDefined)
+                      Redirect(routes.UserController.showEditUserPage(continue, userId))
+                    else
+                      Ok(html.create_user(
+                        UserForm.fill(user),
+                        routes.UserController
+                          .updateUser(
+                            Some(ContinueUrl(routes.UserController.showEditUserPage(continue, userId).url)),
+                            userId,
+                            create = true),
+                        routes.UserController.showEditUserPage(continue, userId),
+                        routes.UserController.showUserPage(continue, userId),
+                        user.userId,
+                        credentials.providerId,
+                        continue.isDefined,
+                        servicesDefinitionsService.servicesDefinitions.options
+                      )))
                 .recover {
                   case e: NotFoundException =>
                     userId match {

@@ -2,7 +2,16 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
 
+@import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
 @(userForm:Form[User], postUrl: Call, cancelCall: Call, userId: String, currentUserId: String, hasContinue: Boolean)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@principalEnrolments = @{
+    ViewHelper.buildTree("",userForm.data)("principalEnrolments")
+}
+
+@delegatedEnrolments = @{
+    ViewHelper.buildTree("",userForm.data)("delegatedEnrolments")
+}
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title", userId), bodyClasses = Some("full-width")) {
 
@@ -160,27 +169,54 @@
                             <th>Identifier Name</th>
                             <th>Identifier Value</th>
                         </tr>
-                        @List.range(0, 4).map { rowNum =>
-                            <tr>
-                                <td>
-                                @input(
-                                    userForm(s"principalEnrolments[$rowNum].key"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
-                                </td>
-                                <td class="hook-@rowNum">
-                                @input(
-                                    userForm(s"principalEnrolments[$rowNum].identifiers[0].key"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
-                               <td>
-                                @input(
-                                    userForm(s"principalEnrolments[$rowNum].identifiers[0].value"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
-                                </td>
-                            </tr>
+
+                        @for(enrolment <- principalEnrolments){
+                            @for((identifier,i) <- enrolment(".identifier").zipWithIndex){
+                                <tr>
+                                  @if(i==0) {
+                                      <td rowspan="@{enrolment(".identifier").size}" style="vertical-align: top;">
+                                      @input(
+                                          userForm(s"${enrolment.key}.key"),
+                                          '_dataAttributes -> "style=width:100%;"
+                                      )
+                                      </td>
+                                  }
+
+                                    <td>
+                                    @input(
+                                        userForm(s"${identifier.key}.key"),
+                                        '_dataAttributes -> "style=width:100%;"
+                                    )
+                                    <td>
+                                    @input(
+                                        userForm(s"${identifier.key}.value"),
+                                        '_dataAttributes -> "style=width:100%;"
+                                    )
+                                    </td>
+                                </tr>
+                            }
                         }
+
+                        <tr>
+                            <td>
+                            @input(
+                                userForm(s"principalEnrolments[${principalEnrolments.size}].key"),
+                                '_dataAttributes -> "style=width:100%;"
+                            )
+                            </td>
+                            <td>
+                            @input(
+                                userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key"),
+                                '_dataAttributes -> "style=width:100%;"
+                            )
+                            <td>
+                            @input(
+                                userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value"),
+                                '_dataAttributes -> "style=width:100%;"
+                            )
+                            </td>
+                        </tr>
+
                     </table>
 
                 </div>
@@ -197,27 +233,54 @@
                                 <th>Identifier Name</th>
                                 <th>Identifier Value</th>
                             </tr>
-                            @List.range(0, 4).map { rowNum =>
-                                <tr>
+
+                            @for(enrolment <- delegatedEnrolments){
+                                @for((identifier,i) <- enrolment(".identifier").zipWithIndex){
+                                    <tr>
+                                        @if(i==0) {
+                                            <td rowspan="@{enrolment(".identifier").size}" style="vertical-align: top;">
+                                            @input(
+                                                userForm(s"${enrolment.key}.key"),
+                                                '_dataAttributes -> "style=width:100%;"
+                                            )
+                                            </td>
+                                        }
+
                                     <td>
                                         @input(
-                                            userForm(s"delegatedEnrolments[$rowNum].key"),
+                                            userForm(s"${identifier.key}.key"),
                                             '_dataAttributes -> "style=width:100%;"
                                         )
-                                    </td>
-                                    <td class="hook-@rowNum">
-                                    @input(
-                                        userForm(s"delegatedEnrolments[$rowNum].identifiers[0].key"),
-                                        '_dataAttributes -> "style=width:100%;"
-                                    )
                                     <td>
                                     @input(
-                                        userForm(s"delegatedEnrolments[$rowNum].identifiers[0].value"),
+                                        userForm(s"${identifier.key}.value"),
                                         '_dataAttributes -> "style=width:100%;"
                                     )
                                     </td>
-                                </tr>
+                                    </tr>
+                                }
                             }
+
+                            <tr>
+                                <td>
+                                @input(
+                                    userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].key"),
+                                    '_dataAttributes -> "style=width:100%;"
+                                )
+                                </td>
+                                <td>
+                                @input(
+                                    userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].key"),
+                                    '_dataAttributes -> "style=width:100%;"
+                                )
+                                <td>
+                                @input(
+                                    userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].value"),
+                                    '_dataAttributes -> "style=width:100%;"
+                                )
+                                </td>
+                            </tr>
+
                         </table>
 
                     </div>

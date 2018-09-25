@@ -66,4 +66,44 @@ object ViewHelper {
       case (_, i2)                      => i2
     })
 
+  sealed trait Tree extends Iterable[Tree] {
+    def key: String
+    def apply(prefix: String): Seq[Tree]
+    def size: Int
+  }
+  case class Node(key: String, nodes: Seq[Tree]) extends Tree {
+    override def apply(prefix: String): Seq[Tree] = nodes.filter(_.key.startsWith(key + prefix))
+    override def iterator: Iterator[Tree] = nodes.iterator
+    override def size: Int = nodes.size
+    override def toString(): String = s"Node($key,${nodes.mkString("Seq(", ",", ")")})"
+  }
+  case class Leaf(key: String, value: String) extends Tree {
+    override def apply(prefix: String): Seq[Tree] = Seq.empty
+    override def iterator: Iterator[Tree] = Iterator.empty
+    override def size: Int = 0
+    override def toString(): String = s"Leaf($key,$value)"
+  }
+
+  def buildTree(key: String, data: Map[String, String]): Node =
+    Node(
+      key,
+      data
+        .groupBy { case (k, _) => k.takeWhile(_ != ']') }
+        .toSeq
+        .sortBy(_._1)
+        .map {
+          case (k, data1) =>
+            val leafs = data1.collect {
+              case (k1, v1) if k1.dropWhile(_ != ']').drop(1).isEmpty => Leaf(key + k1, v1)
+            }.toSeq
+            if (data1.size == 1 && leafs.size == 1) leafs.head
+            else {
+              val node = buildTree(key + k + ']', data1.collect {
+                case (k1, v1) if k1.dropWhile(_ != ']').drop(1).nonEmpty => (k1.dropWhile(_ != ']').drop(1), v1)
+              })
+              node.copy(nodes = leafs ++ node.nodes)
+            }
+        }
+    )
+
 }

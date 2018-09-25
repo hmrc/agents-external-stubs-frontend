@@ -192,23 +192,27 @@
                 <th style="color:gray;">Identifier Value</th>
             </tr>
             @for(e <- user.principalEnrolments.get){
-              <tr>
-                <td>
-                    <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
-                </td>
-                  @if(e.identifiers.nonEmpty){
-                    @for(i <- e.identifiers.get) {
-                        <td>
-                        @{i.key}
-                        </td>
-                        <td>
-                        <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey="+ek.tag).getOrElse("")}">@{i.value}</a>
-                        </td>
+                @if(e.identifiers.nonEmpty){
+                    @for((i,j) <- e.identifiers.get.zipWithIndex) {
+                        <tr>
+                          @if(j==0) {
+                              <td rowspan="@{e.identifiers.get.size}">
+                                  <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
+                              </td>
+                          }
+                            <td>
+                            @{i.key}
+                            </td>
+                            <td>
+                                <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey="+ek.tag).getOrElse("")}">@{i.value}</a>
+                            </td>
+                        </tr>
                     }
-                  } else {
-                    <td colspan="2"></td>
-                  }
-              </tr>
+                } else {
+                    <tr><td colspan="3">
+                        <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
+                    </td></tr>
+                }
             }
         </table>
       } else {
@@ -227,23 +231,27 @@
                     <th style="color:gray;">Identifier Value</th>
                 </tr>
                 @for(e <- user.delegatedEnrolments.get){
-                    <tr>
-                        <td>
-                            <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
-                        </td>
-                        @if(e.identifiers.nonEmpty){
-                            @for(i <- e.identifiers.get) {
-                                <td>
-                                @{i.key}
-                                </td>
-                                <td>
-                                    <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey="+ek.tag).getOrElse("")}">@{i.value}</a>
-                                </td>
-                            }
-                        } else {
-                            <td colspan="2"></td>
+                    @if(e.identifiers.nonEmpty){
+                        @for((i,j) <- e.identifiers.get.zipWithIndex) {
+                            <tr>
+                                @if(j==0) {
+                                    <td rowspan="@{e.identifiers.get.size}">
+                                        <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
+                                    </td>
+                                }
+                            <td>
+                            @{i.key}
+                            </td>
+                            <td>
+                                <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey="+ek.tag).getOrElse("")}">@{i.value}</a>
+                            </td>
+                            </tr>
                         }
-                    </tr>
+                    } else {
+                        <tr><td colspan="3">
+                            <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
+                        </td></tr>
+                    }
                 }
             </table>
         } else {
