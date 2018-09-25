@@ -77,10 +77,17 @@
                 Principal User
                 </dt>
                 <dd class="cya-answer">
-                    <a href="/agents-external-stubs/user?userId=@{user.userId}">@{user.userId}</a>
-                    <span style="display:inline-block;margin-left:0.2em;">(@{user.name})</span>
-                    <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@{user.affinityGroup.getOrElse("")}</span>
-                    @if(user.userId!=currentUserId){<span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{user.userId}">Sign-in</a></span>}
+
+                    <div>
+                        <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@{user.affinityGroup.getOrElse("")}</span>&nbsp;&nbsp;
+                        <a href="/agents-external-stubs/user?userId=@{user.userId}">@{user.userId}</a>
+                        <span style="display:inline-block;margin-left:0.2em;">(@{user.name})</span>
+                        @if(user.userId!=currentUserId){
+                            <span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{user.userId}&continue=@{request.uri}">Sign-in</a></span>
+                        } else {
+                            <span style="color: black; font-weight: bold;">Current user </span>
+                        }
+                    </div>
                 </dd>
             </div>
         </dl>
@@ -95,7 +102,9 @@
                 <dd class="cya-answer">
                     <a href="/agents-external-stubs/user?userId=@{agent.userId}">@{agent.userId}</a>
                     <span style="display:inline-block;margin-left:0.2em;">(@{agent.agentFriendlyName})</span>
-                    @if(agent.userId!=currentUserId){<span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{agent.userId}">Sign-in</a></span>}
+                    @if(agent.userId!=currentUserId){
+                        <span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{agent.userId}>Sign-in</a></span>
+                    }
                 </dd>
             </div>
         </dl>
