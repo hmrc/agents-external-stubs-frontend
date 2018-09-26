@@ -33,3 +33,5 @@ POST        /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstu
 GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(continue: Option[ContinueUrl] ?= None, userId: String)
 
 GET         /agents-external-stubs/planet/destroy @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PlanetController.destroyPlanet
+
+GET         /assets/*file                         controllers.Assets.at(path="/public", file)

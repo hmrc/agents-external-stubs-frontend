@@ -5,45 +5,43 @@
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("login.title"), bodyClasses = None) {
 
-    <h1 class="heading-xlarge">@Messages("login.sa.header")</h1>
-
-    <p>
-    @Html(Messages("login.sa.description"))
-    </p>
-
-    <div>
-
-        @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
-            <fieldset>
-                <div class="form-field-group @if(loginForm.hasErrors) {form-field-group--error}">
-                    @loginForm.errors("userId").map { error =>
-                        <span class="error-notification username">Invalid Username: @Messages(error.message)</span>
-                    }
-                    @loginForm.errors("planetId").map { error =>
-                        <span class="error-notification password">Invalid Planet: @Messages(error.message)</span>
-                    }
-                    @loginForm.globalErrors.map { error =>
-                        <span class="error-notification password">@Messages(error.message)</span>
-                    }
-                    <div class="form-field">
-                        <label class="label--inline" for="userId">@Html(Messages("login.username"))</label>
-                        <input type="text" id="userId" name="userId" required placeholder="@Messages("login.username.placeholder")" pattern="[A-Za-z0-9-_]{6,64}" />
-                    </div>
-
-                    <div class="form-field">@Messages("login.planetId.hint")</div>
-
-                    <div class="form-field">
-                        <label class="label--inline" for="planetId">@Messages("login.planetId")</label>
-                        <input type="text" id="planetId" name="planetId" required placeholder="@Messages("login.planetId.placeholder")" />
-                    </div>
-
-                    <div class="form-field">
-                        <button class="button" type="submit" id="signIn">@Messages("login.submit")</button>
-                    </div>
+    @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
+        <fieldset>
+            <legend>
+                <h1 class="heading-xlarge">@Messages("login.sa.header")</h1>
+                <p>
+                @Html(Messages("login.sa.description"))
+                </p>
+            </legend>
+            <div class="form-field-group @if(loginForm.hasErrors) {form-field-group--error soft--ends}">
+                @loginForm.errors("userId").map { error =>
+                    <span class="error-notification username">Invalid Username: @Messages(error.message)</span>
+                }
+                @loginForm.errors("planetId").map { error =>
+                    <span class="error-notification password">Invalid Planet: @Messages(error.message)</span>
+                }
+                @loginForm.globalErrors.map { error =>
+                    <span class="error-notification password">@Messages(error.message)</span>
+                }
+                <div class="form-group">
+                    <label class="label--inline" for="userId">@Html(Messages("login.username"))</label>
+                    <input class="form-control" type="text" id="userId" name="userId" required placeholder="@Messages("login.username.placeholder")" pattern="[A-Za-z0-9-_]{6,64}" />
                 </div>
-            </fieldset>
-        }
-    </div>
+
+                <div class="form-group">@Messages("login.planetId.hint")</div>
+
+                <div class="form-group">
+                    <label class="label--inline" for="planetId">@Messages("login.planetId")</label>
+                    <input  class="form-control" type="text" id="planetId" name="planetId" required placeholder="@Messages("login.planetId.placeholder")" />
+                </div>
+
+                <div class="form-group">
+                    <button class="button" type="submit" id="signIn">@Messages("login.submit")</button>
+                </div>
+            </div>
+        </fieldset>
+    }
+
 
     <p class="form-hint">
         This page provides fake 'Sign In' form served by Agents Stubs.
