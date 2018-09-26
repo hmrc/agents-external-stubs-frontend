@@ -79,14 +79,15 @@
                     </div>
 
                     <div class="form-group">
-
                         <button class="button" type="submit" id="update">
                         @Messages(if(hasContinue) "user.create.update_and_continue" else "user.create.update")
                         </button>
-
-                        <a class="button-secondary" href="@{editCall.url}">@Messages("user.create.edit")</a> |
-                        <a class="button-secondary" href="@{cancelCall.url}">@Messages("user.create.cancel")</a>
-
+                    </div>
+                    <div class="form-group">
+                        <ul>
+                            <li><a class="button-secondary" href="@{editCall.url}">@Messages("user.create.edit")</a></li>
+                            <li><a class="button-secondary" href="@{cancelCall.url}">@Messages("user.create.cancel")</a></li>
+                        </ul>
                     </div>
                 </div>
 
