@@ -30,6 +30,8 @@ object User {
 
 case class Enrolment(key: String, identifiers: Option[Seq[Identifier]] = None) {
   lazy val toEnrolmentKey: Option[EnrolmentKey] = identifiers.map(ii => EnrolmentKey(key, ii))
+
+  def identifiersValues: Seq[String] = identifiers.map(_.map(_.value)).getOrElse(Seq.empty)
 }
 
 object Enrolment {

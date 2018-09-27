@@ -9,7 +9,7 @@ import play.api.data.Form
 import play.api.data.Forms.{mapping, optional, text}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.{Format, JsValue, Json, OFormat}
+import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.mvc._
 import play.mvc.Http.HeaderNames
@@ -99,8 +99,8 @@ class RestQueryController @Inject()(
         "X-Session-ID"            -> request.session.get(SessionKeys.sessionId).get)
     query.method match {
       case "GET"    => wsRequest.get()
-      case "POST"   => wsRequest.post(query.payload.get)
-      case "PUT"    => wsRequest.put(query.payload.get)
+      case "POST"   => wsRequest.post(query.payload.getOrElse(JsNull))
+      case "PUT"    => wsRequest.put(query.payload.getOrElse(JsNull))
       case "DELETE" => wsRequest.delete()
       case _        => Future.failed(new Exception(s"Method ${query.method} is not supported, try GET, POST, PUT or DELETE"))
     }

@@ -59,11 +59,10 @@
                       @for(enrolments <- user.principalEnrolments) {
                         @if(enrolments.nonEmpty) {
                             <span style="display: inline-block;
-                                margin: 0.1em 0;">@{
-                                enrolments.head.key
-                            }</span>
-                            @for(e <- enrolments.tail) {, <span style="display: inline-block;
-                                margin: 0.1em 0;">@e.key</span>
+                                margin: 0.1em 0;">@{enrolments.head.key}</span> <span>@{enrolments.head.identifiersValues.mkString("(","/",")")}</span>
+                            @for(e <- enrolments.tail) {
+                                , <span style="display: inline-block;
+                                margin: 0.1em 0;">@e.key</span> <span>@{e.identifiersValues.mkString("(","/",")")}</span>
                             }
                         }
                       }
