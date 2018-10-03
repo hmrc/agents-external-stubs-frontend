@@ -8,24 +8,19 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, AuthStubs}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 
-class PlanetControllerISpec extends BaseISpec with AgentsExternalStubsStubs with AuthStubs {
+class RestQueryControllerISpec extends BaseISpec with AgentsExternalStubsStubs with AuthStubs {
 
   def callEndpointWith[A: Writeable](request: Request[A]): Result = await(play.api.test.Helpers.route(app, request).get)
 
-  "PlanetController" when {
+  "RestQueryController" when {
 
-    "GET /agents-external-stubs/planet/destroy" should {
-      "destroy existing test planet and redirect to the start page" ignore {
-        givenAuthorisedFor(
-          """{"retrieve": []}""",
-          s"""{}""".stripMargin
-        )
+    "GET /agents-external-stubs/rest-query" should {
+      "render rest-query page" in {
+        givenAuthorised()
         givenUser(User("Test123"))
-        val request = FakeRequest(GET, "/agents-external-stubs/planet/destroy")
-          .withSession("planetId" -> "foo")
+        val request = FakeRequest(GET, "/agents-external-stubs/rest-query")
         val result = callEndpointWith(request)
-        status(result) shouldBe 304
-        redirectLocation(result) shouldBe Some("/agents-external-stubs/start")
+        status(result) shouldBe 200
       }
     }
 

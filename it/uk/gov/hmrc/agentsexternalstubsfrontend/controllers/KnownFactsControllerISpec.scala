@@ -1,5 +1,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
+import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Writeable
 import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
@@ -8,21 +9,26 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, AuthStubs}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 
-class UserControllerISpec extends BaseISpec with AgentsExternalStubsStubs with AuthStubs {
+class KnownFactsControllerISpec extends BaseISpec with AgentsExternalStubsStubs with AuthStubs {
 
   def callEndpointWith[A: Writeable](request: Request[A]): Result = await(play.api.test.Helpers.route(app, request).get)
 
-  "UserController" when {
+  "KnownFactsController" when {
 
-    "GET /agents-external-stubs/user" should {
-      "display current user details" in {
-        givenAuthorised("Test123")
-        givenCurrentSession()
+    "GET /agents-external-stubs/services" should {
+      "render enrolments page" in {
+        givenAuthorised()
+        stubFor(
+          get(urlEqualTo("/agents-external-stubs/config/services"))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("""{"services":[]}""".stripMargin)))
         givenUser(User("Test123"))
-        val request = FakeRequest(GET, "/agents-external-stubs/user")
+        val request = FakeRequest(GET, "/agents-external-stubs/services")
         val result = callEndpointWith(request)
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("foo"))
       }
     }
 

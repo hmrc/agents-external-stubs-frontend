@@ -13,6 +13,7 @@ import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.mvc._
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
@@ -26,6 +27,7 @@ import scala.util.control.NonFatal
 class RestQueryController @Inject()(
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
+  features: Features,
   wsClient: WSClient
 )(implicit val configuration: Configuration)
     extends FrontendController with AuthActions with I18nSupport {
@@ -33,61 +35,67 @@ class RestQueryController @Inject()(
   import RestQueryController._
 
   def showRestQueryPage(q: Option[String]): Action[AnyContent] = Action.async { implicit request =>
-    authorised()
-      .retrieve(Retrievals.credentials) { credentials =>
-        q match {
-          case None =>
-            Future.successful(
-              Ok(html.rest_query(
-                RestQueryForm.fill(RestQuery("GET", "https://", None)),
-                routes.RestQueryController.runQuery(),
-                routes.UserController.showUserPage(),
-                routes.RestQueryController.showRestQueryPage(None),
-                None,
-                credentials.providerId,
-                None
-              )))
-          case Some(query) =>
-            RestQuery
-              .decode(query)
-              .fold(
-                errors => Future.successful(BadRequest(errors)),
-                rq =>
-                  runQuery(rq).map(response =>
-                    Ok(html.rest_query(
-                      RestQueryForm.fill(rq),
-                      routes.RestQueryController.runQuery(),
-                      routes.UserController.showUserPage(),
-                      routes.RestQueryController.showRestQueryPage(None),
-                      Option(response),
-                      credentials.providerId,
-                      Option(rq.toCurlCommand)
-                    )))
-              )
+    if (features.showRestQuery)(
+      authorised()
+        .retrieve(Retrievals.credentials) { credentials =>
+          q match {
+            case None =>
+              Future.successful(
+                Ok(html.rest_query(
+                  RestQueryForm.fill(RestQuery("GET", "https://", None)),
+                  routes.RestQueryController.runQuery(),
+                  routes.UserController.showUserPage(),
+                  routes.RestQueryController.showRestQueryPage(None),
+                  None,
+                  credentials.providerId,
+                  None
+                )))
+            case Some(query) =>
+              RestQuery
+                .decode(query)
+                .fold(
+                  errors => Future.successful(BadRequest(errors)),
+                  rq =>
+                    runQuery(rq).map(response =>
+                      Ok(html.rest_query(
+                        RestQueryForm.fill(rq),
+                        routes.RestQueryController.runQuery(),
+                        routes.UserController.showUserPage(),
+                        routes.RestQueryController.showRestQueryPage(None),
+                        Option(response),
+                        credentials.providerId,
+                        Option(rq.toCurlCommand)
+                      )))
+                )
 
+          }
         }
-      }
+    )
+    else Future.successful(Forbidden)
   }
 
   val runQuery: Action[AnyContent] = Action.async { implicit request =>
-    authorised()
-      .retrieve(Retrievals.credentials) { credentials =>
-        RestQueryForm
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              Future.successful(Ok(html.rest_query(
-                formWithErrors,
-                routes.RestQueryController.runQuery(),
-                routes.UserController.showUserPage(),
-                routes.RestQueryController.showRestQueryPage(None),
-                None,
-                credentials.providerId,
-                None
-              ))),
-            query => Future.successful(Redirect(routes.RestQueryController.showRestQueryPage(Some(query.encode))))
-          )
-      }
+    if (features.showRestQuery)(
+      authorised()
+        .retrieve(Retrievals.credentials) { credentials =>
+          RestQueryForm
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(Ok(html.rest_query(
+                  formWithErrors,
+                  routes.RestQueryController.runQuery(),
+                  routes.UserController.showUserPage(),
+                  routes.RestQueryController.showRestQueryPage(None),
+                  None,
+                  credentials.providerId,
+                  None
+                ))),
+              query => Future.successful(Redirect(routes.RestQueryController.showRestQueryPage(Some(query.encode))))
+            )
+        }
+    )
+    else Future.successful(Forbidden)
   }
 
   private def runQuery(

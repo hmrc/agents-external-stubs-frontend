@@ -45,6 +45,22 @@ trait AuthStubs {
             .withStatus(401)
             .withHeader("WWW-Authenticate", s"""MDTP detail="$mdtpDetail"""")))
 
+  def givenAuthorised(userId: String = "foo"): Unit = {
+    givenAuthorisedFor(
+      """{"retrieve": []}""",
+      s"""{}""".stripMargin
+    )
+    givenAuthorisedFor(
+      """{"retrieve": ["credentials"]}""",
+      s"""{
+         |"credentials":{
+         |    "providerId": "$userId",
+         |    "providerType": "bar"
+         |  }
+         |}""".stripMargin
+    )
+  }
+
   def givenAuthorisedFor(payload: String, responseBody: String): Unit = {
     stubFor(
       post(urlEqualTo("/auth/authorise"))

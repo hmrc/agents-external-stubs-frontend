@@ -5,7 +5,7 @@ import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.services.ServicesDefinitionsService
+import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
@@ -18,7 +18,8 @@ class KnownFactsController @Inject()(
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
   agentsExternalStubsConnector: AgentsExternalStubsConnector,
-  servicesDefinitionsService: ServicesDefinitionsService
+  servicesDefinitionsService: ServicesDefinitionsService,
+  features: Features
 )(implicit val configuration: Configuration)
     extends FrontendController with AuthActions with I18nSupport {
 
@@ -42,13 +43,13 @@ class KnownFactsController @Inject()(
       }
   }
 
-  val showGuideToServicesPage: Action[AnyContent] = Action.async { implicit request =>
-    authorised() {
+  val showEnrolmentsPage: Action[AnyContent] = Action.async { implicit request =>
+    if (features.showEnrolments) authorised() {
       Future.successful(
         Ok(
           html.show_all_services(servicesDefinitionsService.servicesDefinitions)
         ))
-    }
+    } else Future.successful(Forbidden)
   }
 
 }
