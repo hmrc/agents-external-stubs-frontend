@@ -1,5 +1,6 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.play.views.html.helpers.form
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers._
 
 @(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest], postUrl: Call)(implicit request: Request[_], messages: Messages, config: Configuration)
 
@@ -49,4 +50,5 @@
         configure it first to speak to the 'agents-external-stubs' microservice instead of the 'auth'.
     </p>
 
+    <a href="@routes.HelpController.showHelpPage("agent-authorisation-api")">API Help</a>
 }

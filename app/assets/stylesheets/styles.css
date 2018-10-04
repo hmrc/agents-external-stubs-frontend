@@ -31,3 +31,7 @@
 .input--fullwidth-important{
     width:98%!important;
 }
+.screens{
+    width: 400px;
+    border: solid 1px #efefef;
+}
