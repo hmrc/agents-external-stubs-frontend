@@ -34,4 +34,6 @@ GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstu
 
 GET         /agents-external-stubs/planet/destroy @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PlanetController.destroyPlanet
 
-GET         /agents-external-stubs/assets/*file                         controllers.Assets.at(path="/public", file)
+GET         /agents-external-stubs/help/*name     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.HelpController.showHelpPage(name: String)
+
+GET         /agents-external-stubs/assets/*file   controllers.Assets.at(path="/public", file)
