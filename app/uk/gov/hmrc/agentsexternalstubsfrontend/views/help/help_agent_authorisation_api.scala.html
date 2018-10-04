@@ -5,6 +5,161 @@
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("help.title"), bodyClasses = None) {
 
-    <div>HELP!</div>
+    <h1 class="heading-xlarge">Create a client on Agents External Stubs</h1>
+
+    <h2 class="heading-medium">Prerequisites</h1>
+        <ol class="list-number">
+            <li>Login to API developer hub and create a sandbox application</li>
+            <li>Make note of your clientID from API developer Hub.</li>
+        </ol>
+        <p><a href="@controllers.routes.Assets.at("images/screen-1.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-1.jpg")" class="screens" ></a></p>
+
+
+    <h2 class="heading-medium">Steps</h2>
+    <ol class="list-number">
+        <li>
+            <p>Navigate to agents external stubs <a href="https://test-www.tax.service.gov.uk/agents-external-stubs/gg/sign-in" target="_blank" rel="noopener noreferrer">https://test-www.tax.service.gov.uk/agents-external-stubs/gg/sign-in</a></p>
+            <p><a href="@controllers.routes.Assets.at("images/screen-2.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-2.jpg")" class="screens" ></a></p>
+        </li>
+        <li>
+            <p>Sign in with <code>userID = &#60;any id&#62; Planet = &#60;clientID&#62;</code> noted in Step 2 of prerequisites.</p>
+            <p><a href="@controllers.routes.Assets.at("images/screen-3.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-3.jpg")" class="screens" ></a></p>
+        </li>
+        <li>Select Affinity group as Individual</li>
+        <li>
+            <p>Principal enrolment as HMRC-MTD-IT</p>
+            <p><a href="@controllers.routes.Assets.at("images/screen-4.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-4.jpg")" class="screens" ></a></p>
+        </li>
+        <li>Create and Continue</li>
+        <li>
+            <p>Change Credential Strength to Strong</p>
+            <p><a href="@controllers.routes.Assets.at("images/screen-5.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-5.jpg")" class="screens" ></a></p>
+        </li>
+        <li>
+            <p>Change confidence level to 200</p>
+            <p><a href="@controllers.routes.Assets.at("images/screen-6.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-6.jpg")" class="screens" ></a></p>
+        </li>
+        <li>Add principal enrolment as HMRC-MTD-VAT if you need MTD-VAT enrolment for the same client</li>
+        <li>Click Update</li>
+        <li>
+            <p>client001 home page is displayed</p>
+            <p><a href="@controllers.routes.Assets.at("images/screen-7.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-7.jpg")" class="screens" ></a></p>
+        </li>
+        <li>
+            <p>Click on Identifier value corresponding to HMRC-MTD-IT</p>
+            <p><a href="@controllers.routes.Assets.at("images/screen-8.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-8.jpg")" class="screens" ></a></p>
+            <ul class="bullets">
+                <li>Verifier value = NINO to be used</li>
+                <li>Verifier value = Postcode to be used</li>
+            </ul>
+        </li>
+        <li>Click on client001 and click on identifier value corresponding to HMRC-MTD-VAT
+            <ul class="bullets">
+                <li>
+                    <p>Identifier value = VRN to be used</p>
+                    <p><a href="@controllers.routes.Assets.at("images/screen-9.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-9.jpg")" class="screens" ></a></p>
+                </li>
+                <li>Identifier value = VATRegistrationDate to be used
+
+                    <ul class="bullets">
+                        <li>Note that you will need to convert date from dd/mm/yy to yyyy/mm/dd</li>
+                        <li>
+                            <p>eg: 20/07/03 becomes 2003-07-03</p>
+                            <p><a href="@controllers.routes.Assets.at("images/screen-10.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-10.jpg")" class="screens" ></a></p>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ol>
+<h2 class="heading-medium">Test data for MTD-IT</h2>
+<pre class="snippet--block">
+    {
+        "service":[ "MTD-IT" ],
+        "clientIdType":"ni", 
+        "clientId":"AB863145B",
+        "knownFact":"OX1 3IK"
+    }
+</pre>
+
+<h2 class="heading-medium">Sample API call</h3>
+
+<pre class="snippet--block" style="display:table-caption;white-space: pre-line;">
+    curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application/json' -H "Authorization: Bearer 5946713224d32eab9615c47966a3b4" --data '{"service": ["MTD-IT"], "clientIdType": "ni", "clientId": "AB863145B", "knownFact": "OX12 3IK"}' https://test-api.service.hmrc.gov.uk/agents/NARN0238758/invitations
+</pre>
+
+
+<h2 class="heading-medium">Test data for MTD-VAT</h2>
+<pre class="snippet--block">
+    { 
+        "service":[ "MTD-VAT" ], 
+        "clientIdType":"vrn", 
+        "clientId":"102569784", 
+        "knownFact":"2003-07-20"
+    }
+</pre>
+<pre class="snippet--block" style="display:table-caption;white-space: pre-line;">
+curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application/json' -H "Authorization: Bearer 5946713224d32eab9615c47966a3b4" --data '{"service": ["MTD-VAT"], "clientIdType": "vrn", "clientId": "102569784",  "knownFact":"2003-07-20"}' https://test-api.service.hmrc.gov.uk/agents/NARN0238758/invitations
+</pre>
+
+<h2 class="heading-medium">Create agent-client relationship in agents-external-stubs Prerequisites</h2>
+
+    <ul class="bullets">
+        <li>
+            <p>Make sure you are signed in with the <code>client (client001) and planetID = &#60;clientID&#62;</code></p>
+            <p><a href="@controllers.routes.Assets.at("images/screen-11.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-11.jpg")" class="screens" ></a></p>
+        </li>
+        <li>
+            <p>If you are already inside the stubs, you can sign-in to the client by clicking sign-in corresponding to client001</p>
+            <p><a href="@controllers.routes.Assets.at("images/screen-12.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-12.jpg")" class="screens" ></a></p>
+        </li>
+    </ul>
+
+
+<h2 class="heading-medium">Steps</h2>
+<ol class="list-number">
+    <li>Navigate to <a href="https://test-www.tax.service.gov.uk/invitations/<invitationID>">https://test-www.tax.service.gov.uk/invitations/&#60;invitationID&#62;</a> in a separate tab.</li>
+    <li>
+        <p>Get the invitationID from the response of create invitation in location header</p>
+        <p><a href="@controllers.routes.Assets.at("images/screen-13.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-13.jpg")" class="screens" ></a></p>
+    </li>
+    <li>
+        <p>Select Yes Radio button and click on Continue. You will be served with consent page</p>
+        <p><a href="@controllers.routes.Assets.at("images/screen-14.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-14.jpg")" class="screens" ></a></p>
+    </li>
+    <li>Select Yes radio button and click Continue</li>
+    <li>
+        <p>Success page should be served</p>
+        <p><a href="@controllers.routes.Assets.at("images/screen-15.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-15.jpg")" class="screens" ></a></p>
+    </li>
+    <li>
+        <p>Go back to agents-external-stubs and click on “view” corresponding to the agent used to create an invitation.</p>
+        <p><a href="@controllers.routes.Assets.at("images/screen-16.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-16.jpg")" class="screens" ></a></p>
+    </li>
+    <li>
+        <p>You should be able to see the relationship successfully created with the client in the Delegated enrolment section.</p>
+        <p><a href="@controllers.routes.Assets.at("images/screen-17.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-17.jpg")" class="screens" ></a></p>
+    </li>
+</ol>
+
+
+<p>Now you use that test data in get Relationship API</p>
+
+<h2 class="heading-medium">Test data for MTD-IT</h2>
+
+<pre class="snippet--block">
+{
+ 	"service":[ "MTD-IT" ],
+ 	"clientIdType":"ni",
+ 	"clientId":"AB863145B",
+     "knownFact":"OX1 3IK"
+}
+</pre>
+
+Sample API call for create invitation (by providing bearer of the corresponding agent)
+
+<pre class="snippet--block" style="display:table-caption;white-space: pre-line;">curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application/json' -H "Authorization: Bearer 5946713224d32eab9615c47966a3b4" --data '{"service": ["MTD-IT"], "clientIdType": "ni", "clientId": "AB863145B", "knownFact": "OX12 3IK"}' https://test-api.service.hmrc.gov.uk/agents/NARN0238758/relationships</pre>
+
+
 
 }

@@ -19,7 +19,7 @@ start.helpdesklink.text2=if you need help.
 
 # Login page
 login.continue = Continue
-login.title=Sign in 
+login.title=Sign in
 login.username=User ID
 login.username.placeholder=Existing or just made up, min. 3 characters
 login.password=Password
@@ -158,3 +158,6 @@ rest.query.link.short=Query
 rest.query.link=Query REST APIs like {0}
 
 planet.link.destroy=End this planet and destroy the data
+
+#Help
+help.title=Create a client on Agents External Stubs
