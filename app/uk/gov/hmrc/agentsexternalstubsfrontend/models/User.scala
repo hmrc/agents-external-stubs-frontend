@@ -1,8 +1,11 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.models
 
 import org.joda.time.LocalDate
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, Json, Reads}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.CountryCodes.values
 import uk.gov.hmrc.domain.Nino
+
+import scala.io.{BufferedSource, Source}
 
 case class User(
   userId: String,
@@ -21,11 +24,28 @@ case class User(
   isNonCompliant: Option[Boolean] = None,
   complianceIssues: Option[Seq[String]] = None,
   isPermanent: Option[Boolean] = None,
-  recordIds: Option[Seq[String]] = None
+  recordIds: Option[Seq[String]] = None,
+  address: Option[Address] = None
 )
 
 object User {
   implicit val formats: Format[User] = Json.format[User]
+}
+
+case class Address(
+  line1: Option[String] = None,
+  line2: Option[String] = None,
+  line3: Option[String] = None,
+  line4: Option[String] = None,
+  postcode: Option[String] = None,
+  countryCode: Option[String] = None) {
+
+  def isUKAddress: Boolean = countryCode.contains("GB")
+
+}
+
+object Address {
+  implicit lazy val formats: Format[Address] = Json.format[Address]
 }
 
 case class Enrolment(key: String, identifiers: Option[Seq[Identifier]] = None) {
@@ -61,4 +81,24 @@ object AffinityGroup {
 
 object CredentialRole {
   val values = Seq("none", "Admin", "User", "Assistant")
+}
+
+case class Country(name: String, code: String, phone_code: String)
+
+object Country {
+
+  implicit val reads: Reads[Country] = Json.reads[Country]
+
+  lazy val countriesSource: BufferedSource =
+    Source.fromInputStream(getClass.getResourceAsStream("/countries.json"), "utf-8")
+
+  lazy val countries: Seq[Country] = Json.parse(countriesSource.mkString).as[Seq[Country]]
+
+  lazy val byCode: Map[String, Country] = countries.map(c => c.code -> c).toMap
+}
+
+object CountryCodes {
+
+  lazy val values: Seq[(String, String)] = Country.countries.map(c => c.code -> c.name)
+
 }

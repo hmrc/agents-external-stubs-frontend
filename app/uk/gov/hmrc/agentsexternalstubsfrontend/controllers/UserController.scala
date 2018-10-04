@@ -7,7 +7,7 @@ import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, Identifier, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Address, Enrolment, Identifier, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.ServicesDefinitionsService
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -246,6 +246,15 @@ object UserController {
       "identifiers" -> optional(seq(identifierMapping))
     )(Enrolment.apply)(Enrolment.unapply))
 
+  val addressMapping: Mapping[Address] = mapping(
+    "line1"       -> optional(nonEmptyText),
+    "line2"       -> optional(nonEmptyText),
+    "line3"       -> optional(nonEmptyText),
+    "line4"       -> optional(nonEmptyText),
+    "postcode"    -> optional(nonEmptyText),
+    "countryCode" -> optional(nonEmptyText)
+  )(Address.apply)(Address.unapply)
+
   val UserForm: Form[User] = Form[User](
     mapping(
       "userId"             -> ignored("ignored"),
@@ -268,7 +277,8 @@ object UserController {
       "isNonCompliant"    -> optional(boolean),
       "complianceIssues"  -> ignored[Option[Seq[String]]](None),
       "isPermanent"       -> optional(boolean),
-      "recordIds"         -> ignored[Option[Seq[String]]](None)
+      "recordIds"         -> ignored[Option[Seq[String]]](None),
+      "address"           -> optional(addressMapping)
     )(User.apply)(User.unapply))
 
   def fromNone[T](none: T): Option[T] => Option[T] = {

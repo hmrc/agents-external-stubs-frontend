@@ -180,6 +180,46 @@
 
         @showField(user.agentFriendlyName,"user.form.agentFriendlyName","agentFriendlyName")
 
+        @if(user.address.isDefined) {
+            <div>
+                <dt class="cya-question">
+                @Messages("user.form.address")
+                </dt>
+                <dd class="cya-answer" id="address">
+                @if(user.address.get.line1.isDefined){
+                    <div id="address.line1">
+                    @{user.address.get.line1.get}
+                    </div>
+                }
+                @if(user.address.get.line2.isDefined){
+                    <div id="address.line2">
+                        @{user.address.get.line2.get}
+                    </div>
+                }
+                @if(user.address.get.line3.isDefined){
+                    <div id="address.line3">
+                    @{user.address.get.line3.get}
+                    </div>
+                }
+                @if(user.address.get.line4.isDefined){
+                    <div id="address.line4">
+                    @{user.address.get.line4.get}
+                    </div>
+                }
+                @if(user.address.get.postcode.isDefined){
+                    <div id="address.postcode">
+                    @{user.address.get.postcode.get}
+                    </div>
+                }
+                @if(user.address.get.countryCode.isDefined && user.address.get.countryCode.get!="GB"){
+                    <div id="address.countryCode">
+                    @{Country.byCode.get(user.address.get.countryCode.get).map(_.name).getOrElse("none")}
+                    </div>
+                }
+                </dd>
+            </div>
+        }
+
     </dl>
 
     <h3>Principal enrolments</h3>

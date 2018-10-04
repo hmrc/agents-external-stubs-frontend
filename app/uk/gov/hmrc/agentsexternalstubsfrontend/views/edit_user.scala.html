@@ -147,6 +147,62 @@
                         </div>
                     }
 
+                    <a name="address"></a>
+
+                    <div class="form-group" style="margin-bottom: 0.5em;">
+                        <span class="h2-heading">@Messages("user.form.address")</span>
+                        @input(
+                            userForm("address.line1"),
+                            '_inputClass -> "input--medium input--cleared",
+                            '_maxlength -> 35
+                        )
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0.5em;">
+                    @input(
+                        userForm("address.line2"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_maxlength -> 35
+                    )
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0.5em;">
+                    @input(
+                        userForm("address.line3"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_maxlength -> 35
+                    )
+                    </div>
+
+                    <div class="form-group">
+                    @input(
+                        userForm("address.line4"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_maxlength -> 35
+                    )
+                    </div>
+
+                    <div class="form-group">
+                    @input(
+                        userForm("address.postcode"),
+                        '_label -> Messages("user.form.address.postcode"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_labelTextClass -> "h2-heading",
+                        '_labelClass -> "soft--ends",
+                        '_maxlength -> 10
+                    )
+                    </div>
+
+                    <div class="form-group">
+                    @dropdown(
+                        userForm("address.countryCode"),
+                        CountryCodes.values,
+                        false,
+                        '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.address.countryCode") + """</span>"""),
+                        '_selectClass -> Html("""input--medium input--cleared""")
+                    )
+                    </div>
+
                 </div>
 
                 <div class="form-group">
