@@ -3,44 +3,49 @@
 
 @()(implicit request: Request[_], messages: Messages, config: Configuration)
 
-@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("help.title"), bodyClasses = None) {
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("help.title"), bodyClasses = Some("full-width")) {
 
-    <h1 class="heading-xlarge">Create a client on Agents External Stubs</h1>
+    <style>
+        em {font-style: normal; font-weight: bold;}
+        .click-button {padding: 5px 10px; line-height: 3em; color: white; background-color: forestgreen}
+    </style>
+  
+    <h1 class="heading-xlarge">How to test Agent Authorisation API?</h1>
 
     <h2 class="heading-medium">Prerequisites</h1>
         <ol class="list-number">
             <li>Login to API developer hub and create a sandbox application</li>
-            <li>Make note of your clientID from API developer Hub.</li>
+            <li>Make note of your <em>clientID</em> from API developer Hub.</li>
         </ol>
         <p><a href="@controllers.routes.Assets.at("images/screen-1.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-1.jpg")" class="screens" ></a></p>
 
 
-    <h2 class="heading-medium">Steps</h2>
+    <h2 class="heading-medium">Create a client on Agent Stubs</h2>
     <ol class="list-number">
         <li>
-            <p>Navigate to agents external stubs <a href="https://test-www.tax.service.gov.uk/agents-external-stubs/gg/sign-in" target="_blank" rel="noopener noreferrer">https://test-www.tax.service.gov.uk/agents-external-stubs/gg/sign-in</a></p>
+            <p>Navigate to agents stubs UI <a href="https://test-www.tax.service.gov.uk/agents-external-stubs/gg/sign-in" target="_blank" rel="noopener noreferrer">https://test-www.tax.service.gov.uk/agents-external-stubs/gg/sign-in</a></p>
             <p><a href="@controllers.routes.Assets.at("images/screen-2.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-2.jpg")" class="screens" ></a></p>
         </li>
         <li>
-            <p>Sign in with <code>userID = &#60;any id&#62; Planet = &#60;clientID&#62;</code> noted in Step 2 of prerequisites.</p>
+            <p>Sign in with any <code>UserID</code> and use your <em>clientID</em> noted in Step 2 as <code>Planet</code></p>
             <p><a href="@controllers.routes.Assets.at("images/screen-3.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-3.jpg")" class="screens" ></a></p>
         </li>
-        <li>Select Affinity group as Individual</li>
+        <li>Select <code>Affinity Group</code> as <em>Individual</em></li>
         <li>
-            <p>Principal enrolment as HMRC-MTD-IT</p>
+            <p>Select <code>Principal enrolment</code> as <em>HMRC-MTD-IT</em></p>
             <p><a href="@controllers.routes.Assets.at("images/screen-4.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-4.jpg")" class="screens" ></a></p>
         </li>
-        <li>Create and Continue</li>
+        <li>Click <span class="click-button">Create and Continue</span></li>
         <li>
-            <p>Change Credential Strength to Strong</p>
+            <p>Change <code>Credential Strength</code> to <em>Strong</em></p>
             <p><a href="@controllers.routes.Assets.at("images/screen-5.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-5.jpg")" class="screens" ></a></p>
         </li>
         <li>
-            <p>Change confidence level to 200</p>
+            <p>Change <code>Confidence Level</code> to <em>200</em></p>
             <p><a href="@controllers.routes.Assets.at("images/screen-6.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-6.jpg")" class="screens" ></a></p>
         </li>
-        <li>Add principal enrolment as HMRC-MTD-VAT if you need MTD-VAT enrolment for the same client</li>
-        <li>Click Update</li>
+        <li>If you need MTD-VAT enrolment for the same client, add new <code>Principal Enrolment</code> as <em>HMRC-MTD-VAT</em></li>
+        <li>Click <span class="click-button">Update</span></li>
         <li>
             <p>client001 home page is displayed</p>
             <p><a href="@controllers.routes.Assets.at("images/screen-7.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-7.jpg")" class="screens" ></a></p>

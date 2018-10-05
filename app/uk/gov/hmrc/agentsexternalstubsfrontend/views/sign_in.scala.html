@@ -43,12 +43,21 @@
         </fieldset>
     }
 
+    <div class="form-group">
+        <details role="group">
+            <summary role="button" aria-controls="details-content-0" aria-expanded="false">
+                <span class="summary">Why do I see this page?</span>
+            </summary>
+            <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="true">
+                This page provides fake 'Sign In' form served by Agents Stubs.
+                After sign-in you will have the opportunity to configure your test user further and continue to the service.
 
-    <p class="form-hint">
-        This page provides fake 'Sign In' form served by Agents Stubs.
-        If you want your application to use this authorisation,
-        configure it first to speak to the 'agents-external-stubs' microservice instead of the 'auth'.
-    </p>
+                <div class="form-hint" style="margin-top: 0.5em;">
+                    Check confluence documentation to see how your microservice can work with Agents Stubs.
+                </div>
+            </div>
+        </details>
+    </div>
 
-    <a href="@routes.HelpController.showHelpPage("agent-authorisation-api")">API Help</a>
+    <a href="@routes.HelpController.showHelpPage("agent-authorisation-api")">Show me how to test Agent Authorisation API in Sandbox</a>
 }
