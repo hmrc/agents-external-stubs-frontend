@@ -57,8 +57,8 @@ class KnownFactsController @Inject()(
                     html
                       .error_template(
                         messagesApi("knownFacts.title"),
-                        "Enrolment not found",
-                        "Enrolment you are looking for does not exist on this test planet."))
+                        "Known facts not found",
+                        "Known facts for the provided enrolment key does not exist on this test planet."))
               }
         }
     )
