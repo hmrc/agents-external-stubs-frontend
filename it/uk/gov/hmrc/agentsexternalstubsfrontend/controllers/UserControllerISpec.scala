@@ -17,12 +17,13 @@ class UserControllerISpec extends BaseISpec with AgentsExternalStubsStubs with A
     "GET /agents-external-stubs/user" should {
       "display current user details" in {
         givenAuthorised("Test123")
-        givenCurrentSession()
         givenUser(User("Test123"))
+
         val request = FakeRequest(GET, "/agents-external-stubs/user")
+
         val result = callEndpointWith(request)
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("foo"))
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
       }
     }
 

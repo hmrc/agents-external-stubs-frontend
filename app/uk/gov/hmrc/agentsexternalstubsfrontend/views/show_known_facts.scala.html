@@ -5,11 +5,12 @@
 @import uk.gov.hmrc.play.binders.ContinueUrl
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.EnrolmentInfo
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.Service
-@(enrolmentInfo:EnrolmentInfo, service: Service, currentUserId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@(enrolmentInfo:EnrolmentInfo, service: Service, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("knownFacts.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
 
-    @navigationBar()
+    @navigationBar(context)
 
     <h1 class="heading-xlarge">@Messages("knownFacts.show.header", service.description)</h1>
 
@@ -23,7 +24,13 @@
             Service Name
             </dt>
             <dd class="cya-answer" id="serviceName">
-            <a href="/agents-external-stubs/services#@{enrolmentInfo.enrolmentKey.service}">@{enrolmentInfo.enrolmentKey.service}</a>
+                @if(context.features.showEnrolments) {
+                    <a href="/agents-external-stubs/services#@enrolmentInfo.enrolmentKey.service">
+                    @enrolmentInfo.enrolmentKey.service
+                    </a>
+                } else {
+                    @enrolmentInfo.enrolmentKey.service
+                }
             </dd>
         </div>
 
@@ -82,7 +89,7 @@
                         <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@{user.affinityGroup.getOrElse("")}</span>&nbsp;&nbsp;
                         <a href="/agents-external-stubs/user?userId=@{user.userId}">@{user.userId}</a>
                         <span style="display:inline-block;margin-left:0.2em;">(@{user.name})</span>
-                        @if(user.userId!=currentUserId){
+                        @if(user.userId!=context.authorisedUserId){
                             <span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{user.userId}&continue=@{request.uri}">Sign-in</a></span>
                         } else {
                             <span style="color: black; font-weight: bold;">Current user </span>
@@ -102,7 +109,7 @@
                 <dd class="cya-answer">
                     <a href="/agents-external-stubs/user?userId=@{agent.userId}">@{agent.userId}</a>
                     <span style="display:inline-block;margin-left:0.2em;">(@{agent.agentFriendlyName})</span>
-                    @if(agent.userId!=currentUserId){
+                    @if(agent.userId!=context.authorisedUserId){
                         <span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{agent.userId}>Sign-in</a></span>
                     }
                 </dd>

@@ -2,7 +2,7 @@
 
 GET         /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
 POST        /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
-GET         /gg/sign-out                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[ContinueUrl])
+GET         /gg/sign-out                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[ContinueUrl] ?= None)
 
 GET         /agents-external-stubs                @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start
 

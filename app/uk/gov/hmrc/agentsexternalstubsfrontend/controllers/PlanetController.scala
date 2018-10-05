@@ -17,16 +17,12 @@ class PlanetController @Inject()(
     extends FrontendController with AuthActions {
 
   val destroyPlanet: Action[AnyContent] = Action.async { implicit request =>
-    authorised() {
-      request.session.get("planetId") match {
-        case Some(planetId) =>
-          agentsExternalStubsConnector
-            .destroyPlanet(planetId)
-            .map(_ => Redirect(routes.UserController.start()).withNewSession)
-        case None =>
-          Future.successful(BadRequest("Unknown planet."))
+    authorised()
+      .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+        agentsExternalStubsConnector
+          .destroyPlanet(credentials.planetId)
+          .map(_ => Redirect(routes.UserController.start()).withNewSession)
       }
-    }
   }
 
 }

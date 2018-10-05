@@ -6,13 +6,14 @@
 @import uk.gov.hmrc.play.binders.ContinueUrl
 @import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 @import play.api.libs.json.{Json,JsObject,JsValue,JsString,JsArray,JsBoolean}
-@(records: Records, planetId: String, showId: Option[String])(implicit request: Request[_], messages: Messages, config: Configuration)
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@(records: Records, showId: Option[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("records.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
 
-    @navigationBar()
+    @navigationBar(context)
 
-    <h1 class="heading-xlarge">@Messages("records.show.header", planetId)</h1>
+    <h1 class="heading-xlarge">@Messages("records.show.header", context.planetId)</h1>
 
     <p>
         @Messages("records.show.description")

@@ -9,6 +9,7 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -18,9 +19,10 @@ import scala.concurrent.Future
 @Singleton
 class SignInController @Inject()(
   override val messagesApi: MessagesApi,
-  val agentsExternalStubsConnector: AgentsExternalStubsConnector
+  val agentsExternalStubsConnector: AgentsExternalStubsConnector,
+  val authConnector: AuthConnector
 )(implicit val configuration: Configuration)
-    extends FrontendController with I18nSupport with WithPlanetId {
+    extends FrontendController with AuthActions with I18nSupport {
 
   import SignInController._
 
@@ -64,22 +66,23 @@ class SignInController @Inject()(
 
   def signInUser(continue: Option[ContinueUrl], userId: String): Action[AnyContent] =
     Action.async { implicit request =>
-      withPlanetId { planetId =>
-        for {
-          _                    <- agentsExternalStubsConnector.signOut()
-          authenticatedSession <- agentsExternalStubsConnector.signIn(SignInRequest(userId, planetId))
-          result <- Future(
-                     withNewSession(
-                       if (authenticatedSession.newUserCreated.getOrElse(false))
-                         Redirect(routes.UserController.showCreateUserPage(continue))
-                       else
-                         continue.fold(
-                           Redirect(routes.UserController.showUserPage(None))
-                         )(continueUrl => Redirect(continueUrl.url)),
-                       authenticatedSession
-                     ))
-        } yield result
-      }
+      authorised()
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          for {
+            _                    <- agentsExternalStubsConnector.signOut()
+            authenticatedSession <- agentsExternalStubsConnector.signIn(SignInRequest(userId, credentials.planetId))
+            result <- Future(
+                       withNewSession(
+                         if (authenticatedSession.newUserCreated.getOrElse(false))
+                           Redirect(routes.UserController.showCreateUserPage(continue))
+                         else
+                           continue.fold(
+                             Redirect(routes.UserController.showUserPage(None))
+                           )(continueUrl => Redirect(continueUrl.url)),
+                         authenticatedSession
+                       ))
+          } yield result
+        }
     }
 
   def signOut(continue: Option[ContinueUrl]): Action[AnyContent] =

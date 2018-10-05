@@ -3,13 +3,14 @@
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
 
 @import uk.gov.hmrc.play.binders.ContinueUrl
-@(users: Users, currentUserId: String, authToken: Option[String], showCurrentUserUrl: Call, planetId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@(users: Users, authToken: Option[String], showCurrentUserUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("users.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
 
-    @navigationBar()
+    @navigationBar(context)
 
-    <h1 class="heading-xlarge">@Messages("users.show.header", planetId)</h1>
+    <h1 class="heading-xlarge">@Messages("users.show.header", context.planetId)</h1>
 
     <div style="float: right; margin-bottom: 1em;position: relative; top:-3em;right: -3em;">
         <h3 class="cya-question">
@@ -45,7 +46,7 @@
         @for(user <- users.users.sortBy(_.userId)){
                 <tr>
                     <td>
-                        <div style="overflow-wrap: break-word;">@if(user.userId==currentUserId){
+                        <div style="overflow-wrap: break-word;">@if(user.userId==context.authorisedUserId){
                             <span style="font-weight: bold;">@user.userId</span>
                         }else{
                             @user.userId
@@ -67,7 +68,7 @@
                         }
                       }
                     </td>
-                    <td>@if(user.userId==currentUserId){
+                    <td>@if(user.userId==context.authorisedUserId){
                         <div>
                             <a href="/agents-external-stubs/user?userId=@user.userId">View</a> |
                             <a href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a> |

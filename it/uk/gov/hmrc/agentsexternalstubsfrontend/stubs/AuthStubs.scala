@@ -1,9 +1,8 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 import play.api.test.FakeRequest
-import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 import uk.gov.hmrc.http.SessionKeys
 
 trait AuthStubs {
@@ -55,7 +54,8 @@ trait AuthStubs {
       s"""{
          |"credentials":{
          |    "providerId": "$userId",
-         |    "providerType": "bar"
+         |    "providerType": "bar",
+         |    "planetId": "foobar"
          |  }
          |}""".stripMargin
     )

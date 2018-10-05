@@ -5,11 +5,12 @@
 @import play.api.libs.json.JsObject
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox, textArea}
 
-@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, shakeUrl: Call)(implicit request: Request[_], messages: Messages, config: Configuration)
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, shakeUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("records.title"), bodyClasses = Some("full-width")) {
 
-    @navigationBar()
+    @navigationBar(context)
 
     <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("records.create.header")</h1>
 

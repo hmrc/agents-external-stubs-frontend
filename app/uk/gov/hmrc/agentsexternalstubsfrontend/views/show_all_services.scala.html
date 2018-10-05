@@ -6,11 +6,12 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.EnrolmentInfo
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.Service
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.Services
-@(services:Services)(implicit request: Request[_], messages: Messages, config: Configuration)
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@(services:Services, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("knownFacts.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
 
-    @navigationBar()
+    @navigationBar(context)
 
     <h1 class="heading-xlarge">@Messages("services.show.header")</h1>
 

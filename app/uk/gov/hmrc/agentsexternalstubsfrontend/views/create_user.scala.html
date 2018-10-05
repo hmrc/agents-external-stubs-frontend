@@ -2,11 +2,12 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
 
-@(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, currentUserId: String, hasContinue: Boolean, services: Seq[(String,String)])(implicit request: Request[_], messages: Messages, config: Configuration)
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, hasContinue: Boolean, services: Seq[(String,String)], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title", userId), bodyClasses = Some("full-width")) {
 
-    @navigationBar()
+    @navigationBar(context)
 
     <h1 class="heading-xlarge" style="margin-bottom: 1em;">@Messages("user.create.header", userId)</h1>
 

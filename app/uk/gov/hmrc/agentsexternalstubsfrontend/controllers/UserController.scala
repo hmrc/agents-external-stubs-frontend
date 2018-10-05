@@ -8,10 +8,9 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Address, Enrolment, Identifier, User}
-import uk.gov.hmrc.agentsexternalstubsfrontend.services.ServicesDefinitionsService
+import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{NotFoundException, SessionKeys}
 import uk.gov.hmrc.play.binders.ContinueUrl
@@ -25,9 +24,10 @@ class UserController @Inject()(
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
-  servicesDefinitionsService: ServicesDefinitionsService
+  val servicesDefinitionsService: ServicesDefinitionsService,
+  val features: Features
 )(implicit val configuration: Configuration)
-    extends FrontendController with AuthActions with I18nSupport with WithPlanetId {
+    extends FrontendController with AuthActions with I18nSupport with WithPageContext {
 
   import UserController._
 
@@ -36,29 +36,26 @@ class UserController @Inject()(
   def showUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
-        .retrieve(Retrievals.credentials) { credentials =>
-          withPlanetId { planetId =>
-            agentsExternalStubsConnector
-              .getUser(userId.getOrElse(credentials.providerId))
-              .map(user =>
-                Ok(html.show_user(
-                  user,
-                  request.session.get(SessionKeys.authToken),
-                  request.session.get(SessionKeys.sessionId),
-                  routes.UserController.showEditUserPage(continue, userId),
-                  continue,
-                  user.userId,
-                  credentials.providerId,
-                  planetId
-                )))
-          }
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          agentsExternalStubsConnector
+            .getUser(userId.getOrElse(credentials.providerId))
+            .map(user =>
+              Ok(html.show_user(
+                user,
+                request.session.get(SessionKeys.authToken),
+                request.session.get(SessionKeys.sessionId),
+                routes.UserController.showEditUserPage(continue, userId),
+                continue,
+                user.userId,
+                pageContext(credentials)
+              )))
         }
     }
 
   def showCreateUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
-        .retrieve(Retrievals.credentials) { credentials =>
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           userId match {
             case Some(uid) =>
               agentsExternalStubsConnector
@@ -78,9 +75,9 @@ class UserController @Inject()(
                         routes.UserController.showEditUserPage(continue, userId),
                         routes.UserController.showUserPage(continue, userId),
                         user.userId,
-                        credentials.providerId,
                         continue.isDefined,
-                        servicesDefinitionsService.servicesDefinitions.options
+                        servicesDefinitionsService.servicesDefinitions.options,
+                        pageContext(credentials)
                       )))
                 .recover {
                   case e: NotFoundException =>
@@ -97,9 +94,9 @@ class UserController @Inject()(
                             routes.UserController.showEditUserPage(continue, userId),
                             routes.UserController.showUserPage(continue, userId),
                             id,
-                            credentials.providerId,
                             continue.isDefined,
-                            servicesDefinitionsService.servicesDefinitions.options
+                            servicesDefinitionsService.servicesDefinitions.options,
+                            pageContext(credentials)
                           ))
                       case None => NotFound(e.getMessage)
                     }
@@ -113,9 +110,9 @@ class UserController @Inject()(
                   routes.UserController.showEditUserPage(continue),
                   routes.UserController.showUserPage(continue),
                   credentials.providerId,
-                  credentials.providerId,
                   continue.isDefined,
-                  servicesDefinitionsService.servicesDefinitions.options
+                  servicesDefinitionsService.servicesDefinitions.options,
+                  pageContext(credentials)
                 )))
           }
         }
@@ -124,7 +121,7 @@ class UserController @Inject()(
   def showEditUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
-        .retrieve(Retrievals.credentials) { credentials =>
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           agentsExternalStubsConnector
             .getUser(userId.getOrElse(credentials.providerId))
             .map(user =>
@@ -133,8 +130,8 @@ class UserController @Inject()(
                 routes.UserController.updateUser(continue, userId),
                 routes.UserController.showUserPage(continue, userId),
                 user.userId,
-                credentials.providerId,
-                continue.isDefined
+                continue.isDefined,
+                pageContext(credentials)
               )))
         }
     }
@@ -142,7 +139,7 @@ class UserController @Inject()(
   def updateUser(continue: Option[ContinueUrl], userId: Option[String], create: Boolean): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
-        .retrieve(Retrievals.credentials) { credentials =>
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           UserForm
             .bindFromRequest()
             .fold(
@@ -158,9 +155,9 @@ class UserController @Inject()(
                     routes.UserController.showEditUserPage(continue, userId),
                     routes.UserController.showUserPage(continue, userId),
                     userId.get,
-                    credentials.providerId,
                     continue.isDefined,
-                    servicesDefinitionsService.servicesDefinitions.options
+                    servicesDefinitionsService.servicesDefinitions.options,
+                    pageContext(credentials)
                   )))
                 else
                   Future.successful(Ok(html.edit_user(
@@ -168,8 +165,8 @@ class UserController @Inject()(
                     routes.UserController.updateUser(continue, userId),
                     routes.UserController.showUserPage(continue, userId),
                     userId = userId.getOrElse(credentials.providerId),
-                    credentials.providerId,
-                    continue.isDefined
+                    continue.isDefined,
+                    pageContext(credentials)
                   ))),
               user =>
                 (if (create && userId.isDefined)
@@ -187,8 +184,8 @@ class UserController @Inject()(
                         routes.UserController.updateUser(continue, userId),
                         routes.UserController.showUserPage(continue, userId),
                         userId = userId.getOrElse(credentials.providerId),
-                        credentials.providerId,
-                        continue.isDefined
+                        continue.isDefined,
+                        pageContext(credentials)
                       ))
                 }
             )
@@ -198,7 +195,7 @@ class UserController @Inject()(
   def removeUser(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
-        .retrieve(Retrievals.credentials) { credentials =>
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           val id = userId.getOrElse(credentials.providerId)
           (if (id == credentials.providerId) Future.successful(())
            else agentsExternalStubsConnector.removeUser(id))
@@ -213,20 +210,17 @@ class UserController @Inject()(
   val showAllUsersPage: Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
-        .retrieve(Retrievals.credentials) { credentials =>
-          withPlanetId { planetId =>
-            agentsExternalStubsConnector.getUsers
-              .map(
-                users =>
-                  Ok(
-                    html.show_all_users(
-                      users,
-                      credentials.providerId,
-                      request.session.get(SessionKeys.authToken),
-                      routes.UserController.showUserPage(None),
-                      planetId
-                    )))
-          }
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          agentsExternalStubsConnector.getUsers
+            .map(
+              users =>
+                Ok(
+                  html.show_all_users(
+                    users,
+                    request.session.get(SessionKeys.authToken),
+                    routes.UserController.showUserPage(None),
+                    pageContext(credentials)
+                  )))
         }
     }
 }

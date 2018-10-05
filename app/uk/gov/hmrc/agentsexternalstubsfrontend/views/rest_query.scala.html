@@ -9,11 +9,12 @@
 @import play.api.libs.ws.WSResponse
 @import play.mvc.Http.HeaderNames
 @import play.api.libs.json.Json
-@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, resetUrl: Call, response: Option[WSResponse], currentUserId: String, curlCommand: Option[String])(implicit request: Request[_], messages: Messages, config: Configuration)
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, resetUrl: Call, response: Option[WSResponse], curlCommand: Option[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("rest.query.title"), bodyClasses = Some("full-width")) {
 
-    @navigationBar()
+    @navigationBar(context)
 
     @if(response.isDefined){
     @for(r <- response){
@@ -43,10 +44,10 @@
             }
         </div>
     }} else {
-        <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("rest.query.header", (if(Set('a','e','o','u','y').contains(currentUserId.head.toLower)) "an " else "a ")+currentUserId)</h1>
+        <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("rest.query.header", (if(Set('a','e','o','u','y').contains(context.authorisedUserId.head.toLower)) "an " else "a ")+context.authorisedUserId)</h1>
 
         <p class="form-hint">
-        @Messages("rest.query.description", currentUserId)
+        @Messages("rest.query.description", context.authorisedUserId)
         </p>
     }
 

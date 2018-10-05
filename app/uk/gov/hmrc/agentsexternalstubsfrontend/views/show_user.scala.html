@@ -3,25 +3,32 @@
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
 
 @import uk.gov.hmrc.play.binders.ContinueUrl
-@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String, currentUserId: String, planetId: String)(implicit request: Request[_], messages: Messages, config: Configuration)
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @sidebarLinks = {
     <nav id="secondary-nav" role="navigation">
         <a href="/agents-external-stubs/gg/sign-out">@Messages("common.sign-out")</a>
     </nav>
     <div>
-          @if(planetId!=null && planetId.nonEmpty){
-              <h3 class="cya-question">
-                @Messages("user.show.planetId")
-              </h3>
-              <div class="cya-answer" id="planetId">
-                  <div style="overflow-wrap: break-word;">
-                      @planetId
-                  </div>
-              </div>
-          } else {
-              <h3 class="cya-question">Externally Authorized</h3>
-          }
+        <h3 class="cya-question">
+        @Messages("user.show.planetId")
+        </h3>
+        <div class="cya-answer" id="planetId">
+            <div style="overflow-wrap: break-word;">
+            @context.planetId
+            </div>
+        </div>
+    </div>
+    <div>
+    @if(userId!=context.authorisedUserId){
+        <h3 class="cya-question">
+            Authenticated user
+        </h3>
+        <div class="cya-answer">
+            <a id="link_users_current" href="/agents-external-stubs/user">@context.authorisedUserId</a>
+        </div>
+    }
     </div>
     <div>
         <h3 class="cya-question">
@@ -42,24 +49,11 @@
       <div style="font-size: 0.75em; font-family: monospace; overflow-wrap: normal; padding: 1em 0; color: gray;overflow-wrap: break-word;">
           curl -v -H 'Authorization: @{authToken.getOrElse("")}' -H 'X-Session-ID: @{sessionId.getOrElse("")}'
       </div>
-      <div>
-      @if(userId!=currentUserId){
-          <h3 class="cya-question">
-            Authenticated user
-          </h3>
-          <div class="cya-answer" id="planetId">
-              <div>@currentUserId</div>
-              <div style="padding-top: 1em;">
-                  <a href="/agents-external-stubs/user">@Messages("users.link.current")</a>
-              </div>
-          </div>
-      }
+      <div style="padding-top: 1em;">
+          <a id="link_users_all" href="/agents-external-stubs/users">@Messages("users.link.all")</a>
       </div>
       <div style="padding-top: 1em;">
-          <a href="/agents-external-stubs/users">@Messages("users.link.all")</a>
-      </div>
-      <div style="padding-top: 1em;">
-          <a href="/agents-external-stubs/records">@Messages("records.link.all") (DES)</a>
+          <a id="link_records_all" href="/agents-external-stubs/records">@Messages("records.link.all") (DES)</a>
       </div>
       <h3 class="cya-question">
           @Messages("users.link.create")
@@ -73,15 +67,19 @@
               </div>
           </form>
       </div>
-      <div style="padding-top: 1.5em;">
-          <a href="/agents-external-stubs/rest-query">@Messages("rest.query.link", (if(Set('a','e','o','u','y').contains(currentUserId.head.toLower)) "an " else "a ")+currentUserId)</a>
-      </div>
-      <div style="padding-top: 1.5em;">
-          <a href="/agents-external-stubs/services">@Messages("services.link.guide")</a>
-      </div>
+      @if(context.features.mayShowRestQuery(context.planetId)) {
+          <div style="padding-top: 1.5em;">
+              <a id="link_rest_query" href="/agents-external-stubs/rest-query">@Messages("rest.query.link", (if(Set('a', 'e', 'o', 'u', 'y').contains(context.authorisedUserId.head.toLower)) "an " else "a ") + context.authorisedUserId)</a>
+          </div>
+      }
+      @if(context.features.showEnrolments) {
+          <div style="padding-top: 1.5em;">
+              <a id="link_help_enrolments" href="/agents-external-stubs/services">@Messages("services.link.guide")</a>
+          </div>
+      }
       <div style="padding-top: 1.5em;">
           <form id="destroyPlanet" name="destroyPlanet" action="/agents-external-stubs/planet/destroy">
-              <a style="text-decoration: underline; cursor: pointer;" onclick="if(confirm('Please confirm you wish to destroy current planet and lost the associated data?')){document.forms.namedItem('destroyPlanet').submit()};">
+              <a id="link_planet_destroy" style="text-decoration: underline; cursor: pointer;" onclick="if(confirm('Please confirm you wish to destroy current planet and lost the associated data?')){document.forms.namedItem('destroyPlanet').submit()};">
                 @Messages("planet.link.destroy")
               </a>
           </form>
@@ -105,11 +103,11 @@
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title", user.userId), bodyClasses = None, sidebarLinks = Some(sidebarLinks)) {
 
     <h1 class="heading-xlarge">
-    @if(userId==currentUserId){ @Messages("user.current.show.header", userId) }else{ @Messages("user.show.header", userId) }
+    @if(userId==context.authorisedUserId){ @Messages("user.current.show.header", userId) }else{ @Messages("user.show.header", userId) }
     </h1>
 
     <p>
-    @if(userId==currentUserId){ @Messages("user.current.show.description") } else { @Messages("user.show.description") }
+    @if(userId==context.authorisedUserId){ @Messages("user.current.show.description") } else { @Messages("user.show.description") }
     </p>
 
     @if(user.isPermanent.contains(true)){
@@ -237,20 +235,34 @@
                         <tr>
                           @if(j==0) {
                               <td rowspan="@{e.identifiers.get.size}">
-                                  <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
+                              @if(context.features.showEnrolments) {
+                                  <a href="/agents-external-stubs/services#@e.key">
+                                    @e.key
+                                  </a>
+                              } else {
+                                  @e.key
+                              }
                               </td>
                           }
                             <td>
-                            @{i.key}
+                                @i.key
                             </td>
                             <td>
-                                <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey="+ek.tag).getOrElse("")}">@{i.value}</a>
+                                <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey=" + ek.tag).getOrElse("")}">
+                                @i.value
+                                </a>
                             </td>
                         </tr>
                     }
                 } else {
                     <tr><td colspan="3">
-                        <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
+                        @if(context.features.showEnrolments) {
+                            <a href="/agents-external-stubs/services#@e.key">
+                                @e.key
+                            </a>
+                        } else {
+                            @e.key
+                        }
                     </td></tr>
                 }
             }
@@ -276,20 +288,34 @@
                             <tr>
                                 @if(j==0) {
                                     <td rowspan="@{e.identifiers.get.size}">
-                                        <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
+                                        @if(context.features.showEnrolments) {
+                                            <a href="/agents-external-stubs/services#@e.key">
+                                            @e.key
+                                            </a>
+                                        } else {
+                                            @e.key
+                                        }
                                     </td>
                                 }
                             <td>
-                            @{i.key}
+                                @i.key
                             </td>
                             <td>
-                                <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey="+ek.tag).getOrElse("")}">@{i.value}</a>
+                                <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey=" + ek.tag).getOrElse("")}">
+                                @i.value
+                                </a>
                             </td>
                             </tr>
                         }
                     } else {
                         <tr><td colspan="3">
-                            <a href="/agents-external-stubs/services#@{e.key}">@{e.key}</a>
+                            @if(context.features.showEnrolments) {
+                                <a href="/agents-external-stubs/services#@e.key">
+                                @e.key
+                                </a>
+                            } else {
+                                @e.key
+                            }
                         </td></tr>
                     }
                 }
@@ -312,7 +338,7 @@
                 @Messages("user.show.continue")
             </a>
         }
-        @if(userId!=currentUserId) {
+        @if(userId!=context.authorisedUserId) {
             <a class="button-secondary" href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a> |
             <a class="button-secondary" href="/agents-external-stubs/sign-in?userId=@user.userId">Sign-in</a>
         }

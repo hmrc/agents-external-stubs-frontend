@@ -5,8 +5,15 @@
 @import play.api.libs.json.JsObject
 @import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox, textArea}
 
-@()(implicit request: Request[_], messages: Messages, config: Configuration)
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@(context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
-<nav style="margin-bottom: 1em; text-align: right;">
-    <a href="/agents-external-stubs/records">@Messages("records.link.all")</a> | <a href="/agents-external-stubs/users">@Messages("users.link.all")</a> | <a href="/agents-external-stubs/user">@Messages("users.link.current")</a> | <a href="/agents-external-stubs/services">@Messages("services.link.short")</a> | <a href="/agents-external-stubs/rest-query">@Messages("rest.query.link.short")</a> | <a href="/agents-external-stubs/gg/sign-out">@Messages("common.sign-out")</a>
-</nav>
+@if(context.menuItems.nonEmpty) {
+    <nav style="margin-bottom: 1em;
+        text-align: right;">
+        <a href="@context.menuItems.head.call.url">@Messages(context.menuItems.head.messageKey)</a>
+        @for(menuItem <- context.menuItems.tail) {
+            | <a id="@menuItem.id" href="@menuItem.call.url">@Messages(menuItem.messageKey)</a>
+        }
+    </nav>
+}
