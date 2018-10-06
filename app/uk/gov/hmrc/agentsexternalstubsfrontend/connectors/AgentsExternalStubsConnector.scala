@@ -133,7 +133,9 @@ class AgentsExternalStubsConnector @Inject()(
     http.GET[EnrolmentInfo](new URL(baseUrl, s"/agents-external-stubs/known-facts/$enrolmentKey").toExternalForm)
 
   def getServicesInfo()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Services] =
-    http.GET[Services](new URL(baseUrl, s"/agents-external-stubs/config/services").toExternalForm)
+    http
+      .GET[Services](new URL(baseUrl, s"/agents-external-stubs/config/services").toExternalForm)
+      .map(s => s.copy(s.services.sortBy(_.name)))
 
   def destroyPlanet(planetId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http

@@ -34,6 +34,10 @@ case class Services(services: Seq[Service]) {
   def getService(name: String): Option[Service] = services.find(_.name == name)
 
   def options: Seq[(String, String)] = services.map(s => (s.name, s.affinityGroups.mkString(" "))).sortBy(_._1)
+
+  def servicesFor(affinityGoup: String): Seq[Service] = services.collect {
+    case s if s.affinityGroups.contains(affinityGoup) => s
+  }
 }
 
 object Services {

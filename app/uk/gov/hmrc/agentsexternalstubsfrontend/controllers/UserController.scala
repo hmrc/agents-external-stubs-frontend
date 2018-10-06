@@ -47,6 +47,15 @@ class UserController @Inject()(
                 routes.UserController.showEditUserPage(continue, userId),
                 continue,
                 user.userId,
+                user.affinityGroup
+                  .map(ag =>
+                    servicesDefinitionsService.servicesDefinitions
+                      .servicesFor(ag)
+                      .collect {
+                        case s if s.flags.multipleEnrolment   => s.name
+                        case s if !user.isEnrolledFor(s.name) => s.name
+                    })
+                  .getOrElse(Seq.empty),
                 pageContext(credentials)
               )))
         }
@@ -204,6 +213,28 @@ class UserController @Inject()(
               case NonFatal(e) =>
                 Ok(html.error_template(messagesApi("error.title"), s"Error while removing $id", e.getMessage))
             }
+        }
+    }
+
+  def amendUser(
+    continue: Option[ContinueUrl],
+    userId: Option[String],
+    principalEnrolment: Option[String]): Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          val id = userId.getOrElse(credentials.providerId)
+          agentsExternalStubsConnector
+            .getUser(id)
+            .flatMap(user => {
+              val maybeUpdate = principalEnrolment.map(newEnrolment =>
+                user.copy(
+                  principalEnrolments = Some(user.principalEnrolments.getOrElse(Seq.empty) :+ Enrolment(newEnrolment))))
+              (maybeUpdate match {
+                case Some(update) => agentsExternalStubsConnector.updateUser(update)
+                case None         => Future.successful(())
+              }).map(_ => Redirect(routes.UserController.showUserPage(continue, userId)))
+            })
         }
     }
 

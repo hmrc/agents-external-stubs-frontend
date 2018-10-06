@@ -4,7 +4,7 @@
 
 @import uk.gov.hmrc.play.binders.ContinueUrl
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
-@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String,services: Seq[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @sidebarLinks = {
     <nav id="secondary-nav" role="navigation">
@@ -267,9 +267,10 @@
                 }
             }
         </table>
-      } else {
-        <span class="form-hint">This @{user.affinityGroup.map(_.toLowerCase).getOrElse("user")} has not been enrolled yet. <span style="display: inline-block; margin-left: 0.5em;"><a href="@editUrl.url#enrolments">Add enrolment</a></span></span>
+    } else {
+        <span class="form-hint">This @{user.affinityGroup.map(_.toLowerCase).getOrElse("user")} has not been enrolled yet.</span>
     }
+    @addEnrolment(services, user)
 
     @if(user.affinityGroup.contains("Agent")) {
 
@@ -321,8 +322,11 @@
                 }
             </table>
         } else {
-            <span class="form-hint">This Agent has no delegated enrolments.</span>
+            <span class="form-hint">This agent has no delegated enrolments.</span>
         }
+      <div style="margin-top: 0.5em;width: 100%;text-align: right;">
+          <a href="/agents-external-stubs/user/edit?userId=@user.userId#delegated">Add delegated enrolment</a>
+      </div>
     }
 
     <div style="margin:2em 0;">
@@ -354,4 +358,20 @@
         }
     }
 
+}
+
+@addEnrolment(services: Seq[String], user: User) = {
+    @if(services.nonEmpty) {
+        <div style="margin-top: 0.5em;width: 100%;text-align: right;">
+            <form id="add_enrolment" action="/agents-external-stubs/user/amend">
+                <select id="principalEnrolment" name="principalEnrolment" class="">
+                @for(service <- services) {
+                    <option id="enrolment-@service" value="@service">@service</option>
+                }
+                </select>
+                <input type="hidden" name="userId" value="@user.userId"/>
+                <a style="text-decoration: underline;margin-left: 0.5em;" onclick="document.getElementById('add_enrolment').submit()">Add enrolment</a>
+            </form>
+        </div>
+    }
 }

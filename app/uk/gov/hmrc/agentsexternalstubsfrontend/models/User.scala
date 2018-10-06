@@ -26,7 +26,11 @@ case class User(
   isPermanent: Option[Boolean] = None,
   recordIds: Option[Seq[String]] = None,
   address: Option[Address] = None
-)
+) {
+
+  def isEnrolledFor(service: String): Boolean =
+    principalEnrolments.exists(_.exists(_.key == service))
+}
 
 object User {
   implicit val formats: Format[User] = Json.format[User]

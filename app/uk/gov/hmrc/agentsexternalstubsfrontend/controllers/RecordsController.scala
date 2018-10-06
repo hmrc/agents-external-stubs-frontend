@@ -142,7 +142,6 @@ class RecordsController @Inject()(
     val p = seed.charAt(0).toInt % seed.length
     val s = seed.drop(1) + seed.head
     s.take(p).reverse + s.drop(p)
-
   }
 
 }
