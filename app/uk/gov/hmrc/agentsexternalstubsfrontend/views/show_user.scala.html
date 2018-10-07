@@ -220,6 +220,26 @@
 
     </dl>
 
+    <div style="margin:2em 0;">
+
+        <a role="button" href="@editUrl.url">
+            <button class="button" id="update">
+            @Messages("user.show.edit")
+            </button>
+        </a>
+
+        @if(continue.isDefined) {
+            <a href="@{continue.get.url}">
+            @Messages("user.show.continue")
+            </a>
+        }
+        @if(userId!=context.authorisedUserId) {
+            <a class="button-secondary" href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a> |
+            <a class="button-secondary" href="/agents-external-stubs/sign-in?userId=@user.userId">Sign-in</a>
+        }
+
+    </div>
+
     <h3>Principal enrolments</h3>
 
     @if(user.principalEnrolments.nonEmpty && user.principalEnrolments.get.nonEmpty){

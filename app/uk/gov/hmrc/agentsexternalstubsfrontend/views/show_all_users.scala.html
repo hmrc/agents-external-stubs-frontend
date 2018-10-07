@@ -56,14 +56,12 @@
                     <td style="text-align: center;">
                         <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@user.affinityGroup.getOrElse("none")</span>
                     </td>
-                    <td style="text-align: center; font-size: 0.9em;">
+                    <td style="text-align: left; font-size: 0.9em;">
                       @for(enrolments <- user.principalEnrolments) {
                         @if(enrolments.nonEmpty) {
-                            <span style="display: inline-block;
-                                margin: 0.1em 0;">@{enrolments.head.key}</span> <span>@{enrolments.head.identifiersValues.mkString("(","/",")")}</span>
-                            @for(e <- enrolments.tail) {
-                                , <span style="display: inline-block;
-                                margin: 0.1em 0;">@e.key</span> <span>@{e.identifiersValues.mkString("(","/",")")}</span>
+                            @for(e <- enrolments) {
+                                <div><span style="display: inline-block;
+                                margin: 0.1em 0;">@e.key</span> <span>@{e.identifiersValues.mkString("(","/",")")}</span></div>
                             }
                         }
                       }
