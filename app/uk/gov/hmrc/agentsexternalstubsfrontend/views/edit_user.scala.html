@@ -221,15 +221,22 @@
 
                 <div id="principalEnrolments" class="form-group" style="text-align: right">
                     <table style="width:100%">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="10%">
+                        </colgroup>
                         <tr>
                             <th>Service key</th>
                             <th>Identifier Name</th>
                             <th>Identifier Value</th>
+                            <th></th>
                         </tr>
 
                         @for(enrolment <- principalEnrolments){
                             @for((identifier,i) <- enrolment(".identifier").zipWithIndex){
-                                <tr>
+                                <tr id="principalEnrolment-@i-row">
                                   @if(i==0) {
                                       <td rowspan="@{enrolment(".identifier").size}" style="vertical-align: top;">
                                       @input(
@@ -249,6 +256,11 @@
                                         userForm(s"${identifier.key}.value"),
                                         '_dataAttributes -> "style=width:100%;"
                                     )
+                                    </td>
+                                    <td>
+                                        <a style="text-decoration: underline;cursor: pointer;" onclick="document.getElementById('principalEnrolment-@i-row').remove()">
+                                            Remove
+                                        </a>
                                     </td>
                                 </tr>
                             }
@@ -272,6 +284,7 @@
                                 '_dataAttributes -> "style=width:100%;"
                             )
                             </td>
+                            <td></td>
                         </tr>
 
                     </table>
@@ -286,15 +299,22 @@
 
                     <div id="delegatedEnrolments" class="form-group" style="text-align: right">
                         <table style="width:100%">
+                            <colgroup>
+                                <col width="30%">
+                                <col width="30%">
+                                <col width="30%">
+                                <col width="10%">
+                            </colgroup>
                             <tr>
                                 <th>Service key</th>
                                 <th>Identifier Name</th>
                                 <th>Identifier Value</th>
+                                <th></th>
                             </tr>
 
                             @for(enrolment <- delegatedEnrolments){
                                 @for((identifier,i) <- enrolment(".identifier").zipWithIndex){
-                                    <tr>
+                                    <tr id="delegatedEnrolment-@i-row">
                                         @if(i==0) {
                                             <td rowspan="@{enrolment(".identifier").size}" style="vertical-align: top;">
                                             @input(
@@ -315,6 +335,11 @@
                                         '_dataAttributes -> "style=width:100%;"
                                     )
                                     </td>
+                                      <td>
+                                        <a style="text-decoration: underline;cursor: pointer;" onclick="document.getElementById('delegatedEnrolment-@i-row').remove()">
+                                            Remove
+                                        </a>
+                                      </td>
                                     </tr>
                                 }
                             }
@@ -336,6 +361,9 @@
                                     userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].value"),
                                     '_dataAttributes -> "style=width:100%;"
                                 )
+                                </td>
+                                <td>
+
                                 </td>
                             </tr>
 
