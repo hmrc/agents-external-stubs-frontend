@@ -182,11 +182,21 @@ class UserController @Inject()(
                    agentsExternalStubsConnector.createUser(user.copy(
                      userId = userId.get,
                      confidenceLevel =
-                       if (user.affinityGroup.contains("Individual")) Some(200) else user.confidenceLevel,
+                       if (user.affinityGroup.contains(User.Individual)) Some(200) else user.confidenceLevel,
                      credentialStrength =
-                       if (user.affinityGroup.contains("Individual")) Some("strong")
+                       if (user.affinityGroup.contains(User.Individual)) Some("strong")
                        else user.credentialStrength
                    ))
+                 else if (create && userId.isEmpty)
+                   agentsExternalStubsConnector
+                     .updateUser(user.copy(
+                       userId = credentials.providerId,
+                       confidenceLevel =
+                         if (user.affinityGroup.contains(User.Individual)) Some(200) else user.confidenceLevel,
+                       credentialStrength =
+                         if (user.affinityGroup.contains(User.Individual)) Some("strong")
+                         else user.credentialStrength
+                     ))
                  else
                    agentsExternalStubsConnector
                      .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId))))

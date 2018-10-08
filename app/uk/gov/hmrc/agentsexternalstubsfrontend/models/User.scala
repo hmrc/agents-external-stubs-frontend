@@ -33,6 +33,9 @@ case class User(
 }
 
 object User {
+
+  val Individual = "Individual"
+
   implicit val formats: Format[User] = Json.format[User]
 }
 

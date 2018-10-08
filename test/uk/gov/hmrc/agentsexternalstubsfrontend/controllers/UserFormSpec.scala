@@ -13,7 +13,7 @@ class UserFormSpec extends UnitSpec {
 
       val value = User(
         userId = "bar",
-        affinityGroup = Some("Individual"),
+        affinityGroup = Some(User.Individual),
         confidenceLevel = Some(50),
         nino = Some(Nino("HW827856C")))
 
