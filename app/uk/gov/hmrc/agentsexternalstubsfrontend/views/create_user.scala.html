@@ -23,14 +23,18 @@
       function filterServices(keyword){
           var selectId = "principalEnrolments[0].key";
           var select = document.getElementById(selectId);
+          var selectedIndex = 0
           for (var i = 0; i < select.length; i++) {
               var txt = select.options[i].dataset.affinity;
               var include = txt==='none' | txt.toLowerCase().indexOf(keyword.toLowerCase())>=0;
               select.options[i].style.display = include ? 'list-item':'none';
-              select.options[i].checked = false;
+              select.options[i].checked = (keyword === "Agent" && select.options[i].value === "HMRC-AS-AGENT") ||
+                      (keyword === "Individual" && select.options[i].value === "HMRC-MTD-IT") ||
+                      (keyword === "Organisation" && select.options[i].value === "HMRC-MTD-VAT") ||
+                      false;
+              if(select.options[i].checked) selectedIndex = i;
           }
-          select.options[0].checked = true;
-          select.selectedIndex = 0;
+          select.selectedIndex = selectedIndex;
       }
   </script>
 
