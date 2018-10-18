@@ -40,7 +40,7 @@
             </div>
 
             @if(r.header(HeaderNames.CONTENT_TYPE).contains("application/json")){
-                <div style="font-family: monospace; font-size: 0.8em;margin-top:1em;white-space: pre-wrap; overflow: scroll; max-height: 40em; padding: 0.5em; border-style: dotted">@{Json.prettyPrint(r.json)}</div>
+                <div style="font-family: monospace; font-size: 0.8em;margin-top:1em;white-space: pre-wrap; overflow: scroll; max-height: 40em; padding: 1em; border-style: dotted">@{Json.prettyPrint(r.json)}</div>
             }
         </div>
     }} else {

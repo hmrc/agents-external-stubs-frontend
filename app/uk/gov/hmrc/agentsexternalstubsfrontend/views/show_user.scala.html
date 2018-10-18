@@ -49,12 +49,15 @@
       <div style="font-size: 0.75em; font-family: monospace; overflow-wrap: normal; padding: 1em 0; color: gray;overflow-wrap: break-word;">
           curl -v -H 'Authorization: @{authToken.getOrElse("")}' -H 'X-Session-ID: @{sessionId.getOrElse("")}'
       </div>
-      <div style="padding-top: 1em;">
+      <div style="padding-top: 0.7em;">
           <a id="link_users_all" href="/agents-external-stubs/users">@Messages("users.link.all")</a>
       </div>
       <div style="padding-top: 1em;">
           <a id="link_records_all" href="/agents-external-stubs/records">@Messages("records.link.all") (DES)</a>
       </div>
+    <div style="padding-top: 1em;">
+        <a id="link_special_cases" href="/agents-external-stubs/special-cases">@Messages("specialCase.link.all")</a>
+    </div>
       <h3 class="cya-question">
           @Messages("users.link.create")
       </h3>
@@ -68,16 +71,16 @@
           </form>
       </div>
       @if(context.features.mayShowRestQuery(context.planetId)) {
-          <div style="padding-top: 1.5em;">
+          <div style="padding-top: 1em;">
               <a id="link_rest_query" href="/agents-external-stubs/rest-query">@Messages("rest.query.link", (if(Set('a', 'e', 'o', 'u', 'y').contains(context.authorisedUserId.head.toLower)) "an " else "a ") + context.authorisedUserId)</a>
           </div>
       }
       @if(context.features.showEnrolments) {
-          <div style="padding-top: 1.5em;">
+          <div style="padding-top: 1em;">
               <a id="link_help_enrolments" href="/agents-external-stubs/services">@Messages("services.link.guide")</a>
           </div>
       }
-      <div style="padding-top: 1.5em;">
+      <div style="padding-top: 1em;">
           <form id="destroyPlanet" name="destroyPlanet" action="/agents-external-stubs/planet/destroy">
               <a id="link_planet_destroy" style="text-decoration: underline; cursor: pointer;" onclick="if(confirm('Please confirm you wish to destroy current planet and lost the associated data?')){document.forms.namedItem('destroyPlanet').submit()};">
                 @Messages("planet.link.destroy")

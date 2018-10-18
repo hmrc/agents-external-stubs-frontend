@@ -1,0 +1,143 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, textArea, errorSummary}
+
+@import uk.gov.hmrc.play.binders.ContinueUrl
+@import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+@import play.api.libs.json.{Json,JsObject,JsValue,JsString,JsArray,JsBoolean}
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase
+@(specialCaseForm: Form[SpecialCase], caseId: Option[String], postUrl: Call, resetUrl: Call, cancelUrl: Call , context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@headers = @{
+    ViewHelper.buildTree("",specialCaseForm.data)("response.headers")
+}
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("specialCase.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+
+    <style>
+        .label--inline {
+            display: inline;
+        }
+    </style>
+
+    @navigationBar(context)
+
+    <h1 class="heading-xlarge">@Messages("specialCase.edit.header", context.planetId)</h1>
+
+    @if(specialCaseForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), specialCaseForm, Seq.empty, None)
+    }
+
+    <p>
+        @Messages("specialCase.edit.description")
+    </p>
+
+    <div>
+    @form(action = postUrl, 'id -> "specialCaseForm", 'novalidate -> "novalidate") {
+        <fieldset>
+
+            <div class="form-group soft--ends">
+            @dropdown(
+                specialCaseForm("requestMatch.method"),
+                Seq("GET"->"GET", "POST"->"POST", "PUT"->"PUT", "DELETE"->"DELETE"),
+                false,
+                '_label -> Html("""<span class="h2-heading">"""+ Messages("specialCase.form.requestMatch.method") + """</span>"""),
+                '_selectClass -> Html("""input--medium input--cleared""")
+            )
+            </div>
+
+            <div class="form-group">
+            @input(
+                specialCaseForm("requestMatch.path"),
+                '_label -> Html("""<span class="h2-heading">"""+ Messages("specialCase.form.requestMatch.path") + """</span><span class="form-hint">""" + Messages("specialCase.form.requestMatch.path.hint") + """</span>"""),
+                '_inputClass -> "input--cleared input--fullwidth-important",
+                '_labelTextClass -> "h2-heading",
+                '_labelClass -> "soft--ends"
+            )
+            </div>
+
+            <h2>@Messages("specialCase.form.response.headers")</h2>
+
+            @for(header <- headers) {
+                <div class="form-group soft--ends">
+                    @input(
+                        specialCaseForm(s"${header.key}.name"),
+                        '_labelClass -> "label--inline",
+                        '_dataAttributes -> "style=width:49%;"
+                    ):
+                    @input(
+                        specialCaseForm(s"${header.key}.value"),
+                        '_labelClass -> "label--inline",
+                        '_dataAttributes -> "style=width:49%;"
+                    )
+                </div>
+            }
+            <div class="form-group soft--ends">
+                @input(
+                    specialCaseForm(s"response.headers[${headers.size}].name"),
+                    '_labelClass -> "label--inline",
+                    '_dataAttributes -> "style=width:49%;"
+                ):
+                @input(
+                    specialCaseForm(s"response.headers[${headers.size}].value"),
+                    '_labelClass -> "label--inline",
+                    '_dataAttributes -> "style=width:49%;"
+                )
+            </div>
+
+            <div class="form-group soft--ends">
+            @dropdown(
+                specialCaseForm("response.status"),
+                SpecialCase.httpStatusCodeOptions,
+                false,
+                '_label -> Html("""<span class="h2-heading">"""+ Messages("specialCase.form.response.status") + """</span>"""),
+                '_selectClass -> Html("""input--medium input--cleared""")
+            )
+            </div>
+
+            <div class="form-group" style="vertical-align: middle;">
+
+                <button class="button" type="submit" id="submit">
+                    @if(caseId.isEmpty){
+                        @Messages("specialCase.form.create")
+                    } else {
+                        @Messages("specialCase.form.update")
+                    }
+                </button>
+
+                <a style="display: inline-block;
+                    margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("specialCase.form.reset")</a> |
+                <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("specialCase.form.cancel")</a>
+
+            </div>
+
+            <div class="form-field-group">
+            @textArea(
+                specialCaseForm("response.body"),
+                '_label -> Html("""<span class="h2-heading">"""+ Messages("specialCase.form.response.body") + """</span>"""),
+                '_inputClass -> "textarea-large"
+            )
+            </div>
+
+            <div class="form-group" style="vertical-align: middle;">
+
+                <button class="button" type="submit" id="submit">
+                    @if(caseId.isEmpty){
+                        @Messages("specialCase.form.create")
+                    } else {
+                        @Messages("specialCase.form.update")
+                    }
+                </button>
+
+                <a style="display: inline-block;
+                    margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("specialCase.form.reset")</a> |
+                <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("specialCase.form.cancel")</a>
+
+            </div>
+        </fieldset>
+    }
+    </div>
+
+}

@@ -4,8 +4,10 @@ import java.net.URL
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
+import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{User, Users}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase.RequestMatch
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{SpecialCase, User, Users}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.http._
@@ -106,6 +108,108 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         givenAllRecords
         val result = await(connector.getRecords)
         result.VatCustomerInformationRecord should not be empty
+      }
+    }
+
+    "getAllSpecialCases" should {
+      "get a list of all special cases if 200" in {
+        givenAllSpecialCases
+        val result = await(connector.getAllSpecialCases)
+        result should not be empty
+        result should have size 3
+      }
+
+      "get an empty list if 204" in {
+        stubFor(
+          get(urlEqualTo(s"/agents-external-stubs/special-cases"))
+            .willReturn(aResponse()
+              .withStatus(Status.NO_CONTENT)))
+        val result = await(connector.getAllSpecialCases)
+        result shouldBe empty
+      }
+    }
+
+    "getSpecialCase" should {
+      "return entity if success" in {
+        stubFor(
+          get(urlEqualTo(s"/agents-external-stubs/special-cases/123"))
+            .willReturn(
+              aResponse()
+                .withStatus(Status.OK)
+                .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+                .withBody(validSpecialCaseResponse)))
+        val result: Option[SpecialCase] = await(connector.getSpecialCase("123"))
+        result shouldBe defined
+        result.map(_.requestMatch.path) shouldBe Some("/test")
+        result.map(_.requestMatch.method) shouldBe Some("PUT")
+        result.map(_.response.status) shouldBe Some(400)
+        result.flatMap(_.response.body) shouldBe Some("{\"code\":\"MY_CODE\"}")
+      }
+    }
+
+    "createSpecialCase" should {
+      "return entity ID if success" in {
+        stubFor(
+          post(urlEqualTo(s"/agents-external-stubs/special-cases"))
+            .withRequestBody(equalToJson(
+              s"""{
+                 |"requestMatch": {
+                 |   "method": "PUT",
+                 |   "path":"/test123"
+                 | },
+                 |"response": {
+                 |   "status":474
+                 | }
+                 |}""".stripMargin,
+              true,
+              true
+            ))
+            .willReturn(aResponse()
+              .withStatus(Status.CREATED)
+              .withHeader(HeaderNames.LOCATION, "/agents-external-stubs/special-cases/123")))
+        val result: String =
+          await(connector.createSpecialCase(SpecialCase(RequestMatch("/test123", "PUT"), SpecialCase.Response(474))))
+        result shouldBe "123"
+      }
+    }
+
+    "updateSpecialCase" should {
+      "return entity ID if success" in {
+        stubFor(
+          put(urlEqualTo(s"/agents-external-stubs/special-cases/123"))
+            .withRequestBody(equalToJson(
+              s"""{
+                 |  "requestMatch": {
+                 |    "path":"/test321",
+                 |    "method": "DELETE"
+                 |  },
+                 |  "response": {
+                 |    "status":521
+                 |  },
+                 |  "id":"123"
+                 |}""".stripMargin,
+              true,
+              true
+            ))
+            .willReturn(aResponse()
+              .withStatus(Status.ACCEPTED)
+              .withHeader(HeaderNames.LOCATION, "/agents-external-stubs/special-cases/123")))
+        val result: String =
+          await(
+            connector.updateSpecialCase(
+              SpecialCase(RequestMatch("/test321", "DELETE"), SpecialCase.Response(521), id = Some("123"))))
+        result shouldBe "123"
+      }
+    }
+
+    "deleteSpecialCase" should {
+      "return unit if success" in {
+        stubFor(
+          delete(urlEqualTo(s"/agents-external-stubs/special-cases/123"))
+            .willReturn(aResponse()
+              .withStatus(Status.NO_CONTENT)))
+        val result: Unit = await(connector.deleteSpecialCase("123"))
+        result shouldBe (())
       }
     }
   }

@@ -122,7 +122,7 @@ records.link.all=Manage master records
 
 records.title=Your master records
 records.show.header=Your master records on {0}
-records.show.description=Here you can manage all your master records on that planet.
+records.show.description=Here you can manage all your master records on the planet.
 
 records.edit.header=Amend the master record
 records.edit.description=Here you can edit the master record content. IMPORTANT: The payload of this request will NOT be automatically corrected before amending the record.
@@ -156,6 +156,25 @@ rest.query.cancel=Cancel
 rest.query.reset=Reset
 rest.query.link.short=Query
 rest.query.link=Query REST APIs like {0}
+
+specialCase.title=Special cases
+specialCase.show.all.header=Special cases of response
+specialCase.show.all.description=Here you can see and manage all special cases of response from the stubs (static responses, exceptions, errors), as defined on the planet.
+specialCase.edit.header=Special case of response
+specialCase.edit.description=Create or edit your special case of response.
+specialCase.form.requestMatch.method=Request method
+specialCase.form.requestMatch.path=Request path
+specialCase.form.requestMatch.path.hint=It can be any path, does not need to have stub implemented, but may not be / or start with /agents-external-stubs
+specialCase.form.response.status=Respond with status
+specialCase.form.response.body=Response content
+specialCase.form.response.headers=Response headers
+specialCase.form.create=Create
+specialCase.form.update=Update
+specialCase.form.cancel=Cancel
+specialCase.form.reset=Reset
+specialCase.link.short=Special Cases
+specialCase.link.all=Manage special cases
+specialCase.link.add=Add new special case
 
 planet.link.destroy=End this planet and destroy the data
 

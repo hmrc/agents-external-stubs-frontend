@@ -33,6 +33,11 @@ POST        /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstu
 
 GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(continue: Option[ContinueUrl] ?= None, userId: String)
 
+GET         /agents-external-stubs/special-cases         @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.showAllSpecialCasesPage(caseId: Option[String] ?= None)
+GET         /agents-external-stubs/special-cases/edit    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.showEditSpecialCasePage(caseId: Option[String] ?= None)
+POST        /agents-external-stubs/special-cases/update  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.upsertSpecialCase(caseId: Option[String] ?= None)
+GET         /agents-external-stubs/special-cases/delete  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.deleteSpecialCase(caseId: String)
+
 GET         /agents-external-stubs/planet/destroy @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PlanetController.destroyPlanet
 
 GET         /agents-external-stubs/help/*name     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.HelpController.showHelpPage(name: String)

@@ -145,4 +145,57 @@ class AgentsExternalStubsConnector @Inject()(
         case Upstream4xxException(e) => throw e
       }
 
+  def getAllSpecialCases(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[SpecialCase]] =
+    http
+      .GET[Option[Seq[SpecialCase]]](new URL(baseUrl, s"/agents-external-stubs/special-cases").toExternalForm)
+      .map {
+        case Some(seq) => seq
+        case None      => Seq.empty
+      }
+
+  def getSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SpecialCase]] =
+    http
+      .GET[SpecialCase](new URL(baseUrl, s"/agents-external-stubs/special-cases/$id").toExternalForm)
+      .map(Option.apply)
+      .recover {
+        case _: NotFoundException => None
+      }
+
+  def createSpecialCase(specialCase: SpecialCase)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
+    http
+      .POST[SpecialCase, HttpResponse](
+        new URL(baseUrl, s"/agents-external-stubs/special-cases").toExternalForm,
+        specialCase
+      )
+      .map(
+        r =>
+          r.header(HeaderNames.LOCATION)
+            .map(_.split("/").last)
+            .getOrElse(throw new Exception("Missing location header in the response")))
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
+
+  def updateSpecialCase(specialCase: SpecialCase)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
+    http
+      .PUT[SpecialCase, HttpResponse](
+        new URL(baseUrl, s"/agents-external-stubs/special-cases/${specialCase.id.get}").toExternalForm,
+        specialCase
+      )
+      .map(
+        r =>
+          r.header(HeaderNames.LOCATION)
+            .map(_.split("/").last)
+            .getOrElse(throw new Exception("Missing location header in the response")))
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
+
+  def deleteSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .DELETE[HttpResponse](new URL(baseUrl, s"/agents-external-stubs/special-cases/$id").toExternalForm)
+      .map(_ => ())
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
 }

@@ -9,7 +9,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 
-trait AgentsExternalStubsStubs extends ValidRecordResponses {
+trait AgentsExternalStubsStubs extends ValidStubResponses {
   me: WireMockSupport =>
 
   def givenUserCanSignIn(
@@ -105,9 +105,18 @@ trait AgentsExternalStubsStubs extends ValidRecordResponses {
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(validRecordsResponse)))
 
+  def givenAllSpecialCases =
+    stubFor(
+      get(urlEqualTo(s"/agents-external-stubs/special-cases"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(validSpecialCasesResponse)))
+
 }
 
-trait ValidRecordResponses {
+trait ValidStubResponses {
 
   val validRecordsResponse =
     """{
@@ -545,5 +554,71 @@ trait ValidRecordResponses {
       |    }
       |  ]
       |}""".stripMargin
+
+  val validSpecialCasesResponse: String =
+    """[
+      |  {
+      |    "requestMatch": {
+      |      "path": "/test",
+      |      "method": "GET"
+      |    },
+      |    "response": {
+      |      "status": 444,
+      |      "headers": []
+      |    },
+      |    "planetId": "Melmac",
+      |    "id": "5bc74d911200004600e37b7a"
+      |  },
+      |  {
+      |    "requestMatch": {
+      |      "path": "/test1",
+      |      "method": "GET"
+      |    },
+      |    "response": {
+      |      "status": 500,
+      |      "headers": []
+      |    },
+      |    "planetId": "Melmac",
+      |    "id": "5bc770901100004a003b0587"
+      |  },
+      |  {
+      |    "requestMatch": {
+      |      "path": "/test",
+      |      "method": "PUT"
+      |    },
+      |    "response": {
+      |      "status": 400,
+      |      "body": "{\"code\":\"MY_CODE\"}",
+      |      "headers": [
+      |        {
+      |          "name": "Content-Type",
+      |          "value": "application/json"
+      |        }
+      |      ]
+      |    },
+      |    "planetId": "Melmac",
+      |    "id": "5bc7716011000066003b0588"
+      |  }
+      |]""".stripMargin
+
+  val validSpecialCaseResponse =
+    """{
+      |    "requestMatch": {
+      |      "path": "/test",
+      |      "method": "PUT"
+      |    },
+      |    "response": {
+      |      "status": 400,
+      |      "body": "{\"code\":\"MY_CODE\"}",
+      |      "headers": [
+      |        {
+      |          "name": "Content-Type",
+      |          "value": "application/json"
+      |        }
+      |      ]
+      |    },
+      |    "planetId": "Melmac",
+      |    "id": "5bc7716011000066003b0588"
+      |  }""".stripMargin
 
 }

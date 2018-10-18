@@ -19,7 +19,7 @@
         @Messages("records.show.description")
     </p>
 
-    <table id="users" style="margin:1em 0;">
+    <table id="business-partner-records" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Business Partner Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=business-partner-record&seed=@{records.BusinessPartnerRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">Create new business partner</a></caption>
@@ -31,7 +31,7 @@
         </tbody>
     </table>
 
-    <table id="users" style="margin:1em 0;">
+    <table id="business-details" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Business Details Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=business-details&seed=@{records.BusinessDetailsRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">
@@ -46,7 +46,7 @@
         </tbody>
     </table>
 
-    <table id="users" style="margin:1em 0;">
+    <table id="vat-customer-informations" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">VAT Customer Information Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=vat-customer-information&seed=@{records.VatCustomerInformationRecord.map(o => (o.last \ "vrn").as[String]).getOrElse("1234567890")}">
@@ -61,7 +61,7 @@
         </tbody>
     </table>
 
-    <table id="users" style="margin:1em 0;">
+    <table id="mtd-relationships" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">MTD Relationship Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=relationship&seed=@{records.RelationshipRecord.map(o => (o.last \ "arn").as[String]).getOrElse("1234567890")}">
@@ -75,7 +75,7 @@
         </tbody>
     </table>
 
-    <table id="users" style="margin:1em 0;">
+    <table id="legacy-relationships" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Legacy Relationship Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=legacy-relationship&seed=@{records.LegacyRelationshipRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
@@ -89,7 +89,7 @@
         </tbody>
     </table>
 
-    <table id="users" style="margin:1em 0;">
+    <table id="legacy-agents" style="margin:1em 0;">
         <caption id="tableSubHeader" class="normal-text">Legacy Agents Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=legacy-agent&seed=@{records.LegacyAgentRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">

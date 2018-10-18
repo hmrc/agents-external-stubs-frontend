@@ -1,0 +1,113 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup}
+
+@import uk.gov.hmrc.play.binders.ContinueUrl
+@import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+@import play.api.libs.json.{Json,JsObject,JsValue,JsString,JsArray,JsBoolean}
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase
+@(specialCases: Seq[SpecialCase], caseId: Option[String], viewUrl: String=>Call, editUrl: String=>Call, removeUrl: String=>Call, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("specialCase.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+
+    @navigationBar(context)
+
+    <h1 class="heading-xlarge">@Messages("specialCase.show.all.header", context.planetId)</h1>
+
+    <p>
+        @Messages("specialCase.show.all.description")
+    </p>
+
+  @if(specialCases.isEmpty){
+    <p>
+        But ... no special case of response has been defined yet.
+
+          <div style="padding-top: .5em;">
+              <a id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@Messages("specialCase.link.add")</a>
+          </div>
+    </p>
+  } else {
+
+      <div>
+          <a id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@Messages("specialCase.link.add")</a>
+      </div>
+
+    <table id="special-cases" style="margin:1em 0;">
+        <colgroup>
+            <col style="width: 10%">
+            <col style="width: 55%">
+        </colgroup>
+        <colgroup>
+            <col style="width: 10%">
+            <col style="width: 5%">
+        </colgroup>
+        <col style="width: 20%">
+        <thead>
+            <tr>
+                <th scope="colgroup" colspan="2">Request</th>
+                <th scope="colgroup" colspan="2">Response</th>
+                <th scope="col" rowspan="2" style="text-align: center; vertical-align: top;">Action</th>
+            </tr>
+            <tr>
+                <th scope="col" style="font-size: 85%;">Method</th>
+                <th scope="col" style="font-size: 85%;">Path</th>
+                <th scope="col" style="font-size: 85%;">Status</th>
+                <th scope="col" style="font-size: 85%;">Type</th>
+            </tr>
+        </thead>
+
+        @for(sc <- specialCases.sortBy(s => s.requestMatch.method+" "+s.requestMatch.path)) {
+            <tr>
+                <td style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
+                    <div>@sc.requestMatch.method</div>
+                </td>
+                <td style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
+                    <div>@sc.requestMatch.path</div>
+                </td>
+                <td style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
+                    <div>@sc.response.status</div>
+                </td>
+                <td style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
+                    <div>@sc.response.body.flatMap(_ => sc.response.headers.flatMap(_.find(_.name == "Content-Type")).map(_.value)).getOrElse("")</div>
+                </td>
+                <td style="@if(sc.id == caseId){border-bottom-style: none;}">
+                    <div>
+                    @if(sc.response.body.isDefined && sc.id != caseId){
+                       <a href="@viewUrl(sc.id.get)">View</a> |
+                    } else {<span style="display:inline-block;width:2.5em;"></span>}
+                    <a href="@editUrl(sc.id.get)">Edit</a> |
+                    <a href="@removeUrl(sc.id.get)">Remove</a>
+                    </div>
+                </td>
+            </tr>
+            @if(sc.id == caseId){
+                <tr>
+                    <td></td>
+                    <td colspan="4" style="padding-top:0;">
+                        @if(sc.requestMatch.body.isDefined) {
+                            <h4 style="font-size: 85%;">Expected request body</h4>
+                            <div>@sc.requestMatch.contentType.getOrElse("Undefined content type!")</div>
+                            <pre>@sc.requestMatch.body</pre>
+                        }
+                        @if(sc.response.headers.isDefined && sc.response.headers.get.nonEmpty) {
+                            <h4 style="font-size: 85%;">Response headers</h4>
+                            @for(header <- sc.response.headers.get) {
+                                <div style="font-family: monospace;"><span style="display:inline-block; width: 30%;">@header.name</span>: <span>@header.value</span></div>
+                            }
+                        }
+                        @if(sc.response.body.isDefined) {
+                            <h4 style="font-size: 85%;">Response body</h4>
+                            <div style="font-family: monospace; font-size: 0.8em;margin-top:1em; overflow: scroll; max-height: 40em; padding: 1em; border-style: dotted; text-align: left;">
+                             @sc.response.body
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+  }
+
+}
