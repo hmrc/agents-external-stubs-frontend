@@ -57,16 +57,29 @@ class RestQueryController @Inject()(
                 .fold(
                   errors => Future.successful(BadRequest(errors)),
                   rq =>
-                    runQuery(rq).map(response =>
-                      Ok(html.rest_query(
-                        RestQueryForm.fill(rq),
-                        routes.RestQueryController.runQuery(),
-                        routes.UserController.showUserPage(),
-                        routes.RestQueryController.showRestQueryPage(None),
-                        Option(response),
-                        Option(rq.toCurlCommand),
-                        pageContext(credentials)
-                      )))
+                    runQuery(rq)
+                      .map(response =>
+                        Ok(html.rest_query(
+                          RestQueryForm.fill(rq),
+                          routes.RestQueryController.runQuery(),
+                          routes.UserController.showUserPage(),
+                          routes.RestQueryController.showRestQueryPage(None),
+                          Option(response),
+                          Option(rq.toCurlCommand),
+                          pageContext(credentials)
+                        )))
+                      .recover {
+                        case NonFatal(e) =>
+                          Ok(html.rest_query(
+                            RestQueryForm.fill(rq).withGlobalError(e.getMessage),
+                            routes.RestQueryController.runQuery(),
+                            routes.UserController.showUserPage(),
+                            routes.RestQueryController.showRestQueryPage(None),
+                            None,
+                            Option(rq.toCurlCommand),
+                            pageContext(credentials)
+                          ))
+                    }
                 )
 
           } else Future.successful(Forbidden)

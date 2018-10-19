@@ -22,6 +22,10 @@
             @r.status @r.statusText
         </h1>
 
+        @if(restQueryForm.hasErrors) {
+            @errorSummary(Messages("error.summary.heading"), restQueryForm, Seq.empty, None)
+        }
+
         <div class="form-hint" style="color:black;">
             @{restQueryForm.data("method")} @{restQueryForm.data("url")}
         </div>
@@ -45,6 +49,10 @@
         </div>
     }} else {
         <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("rest.query.header", (if(Set('a','e','o','u','y').contains(context.authorisedUserId.head.toLower)) "an " else "a ")+context.authorisedUserId)</h1>
+
+        @if(restQueryForm.hasErrors) {
+            @errorSummary(Messages("error.summary.heading"), restQueryForm, Seq.empty, None)
+        }
 
         <p class="form-hint">
         @Messages("rest.query.description", context.authorisedUserId)
