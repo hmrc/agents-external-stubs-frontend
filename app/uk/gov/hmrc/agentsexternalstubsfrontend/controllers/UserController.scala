@@ -10,7 +10,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsCon
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Address, Enrolment, Identifier, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
-import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{NotFoundException, SessionKeys}
 import uk.gov.hmrc.play.binders.ContinueUrl
@@ -27,7 +27,7 @@ class UserController @Inject()(
   val servicesDefinitionsService: ServicesDefinitionsService,
   val features: Features
 )(implicit val configuration: Configuration)
-    extends FrontendController with AuthActions with I18nSupport with WithPageContext {
+    extends FrontendController with AuthorisedFunctions with I18nSupport with WithPageContext {
 
   import UserController._
 
