@@ -3,6 +3,7 @@ import java.net.URL
 import javax.inject.{Inject, Provider, Singleton}
 import com.google.inject.AbstractModule
 import com.google.inject.name.{Named, Names}
+import com.typesafe.config.Config
 import org.slf4j.MDC
 import play.api.{Configuration, Environment, Logger}
 import uk.gov.hmrc.agentsexternalstubsfrontend.TcpProxies
@@ -120,7 +121,11 @@ class FrontendModule(val environment: Environment, val configuration: Configurat
 }
 
 @Singleton
-class HttpVerbs @Inject()(val auditConnector: AuditConnector, @Named("appName") val appName: String)
+class HttpVerbs @Inject()(
+  val auditConnector: AuditConnector,
+  @Named("appName") val appName: String,
+  config: Configuration)
     extends HttpGet with HttpPost with HttpPut with HttpPatch with HttpDelete with WSHttp with HttpAuditing {
   override val hooks = Seq(AuditingHook)
+  override protected def configuration: Option[Config] = Some(config.underlying)
 }
