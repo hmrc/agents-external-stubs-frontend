@@ -17,6 +17,6 @@ class FrontendAuthConnector @Inject()(@Named("auth-baseUrl") baseUrl: URL, confi
 
   override def http = new HttpPost with WSPost {
     override val hooks = NoneRequired
-    override protected def configuration: Option[Config] = Some(config.underlying)
+    override def configuration: Option[Config] = Some(config.underlying)
   }
 }

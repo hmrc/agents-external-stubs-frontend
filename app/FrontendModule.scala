@@ -127,5 +127,5 @@ class HttpVerbs @Inject()(
   config: Configuration)
     extends HttpGet with HttpPost with HttpPut with HttpPatch with HttpDelete with WSHttp with HttpAuditing {
   override val hooks = Seq(AuditingHook)
-  override protected def configuration: Option[Config] = Some(config.underlying)
+  override def configuration: Option[Config] = Some(config.underlying)
 }
