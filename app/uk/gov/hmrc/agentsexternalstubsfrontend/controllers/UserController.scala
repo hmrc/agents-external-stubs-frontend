@@ -1,5 +1,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
+import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Forms.{boolean, ignored, mapping, nonEmptyText, number, optional, seq, text}
@@ -16,7 +17,7 @@ import uk.gov.hmrc.http.{NotFoundException, SessionKeys}
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 @Singleton
@@ -25,9 +26,12 @@ class UserController @Inject()(
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   val servicesDefinitionsService: ServicesDefinitionsService,
-  val features: Features
+  val features: Features,
+  ecp: Provider[ExecutionContext]
 )(implicit val configuration: Configuration)
     extends FrontendController with AuthorisedFunctions with I18nSupport with WithPageContext {
+
+  implicit val ec: ExecutionContext = ecp.get
 
   import UserController._
 

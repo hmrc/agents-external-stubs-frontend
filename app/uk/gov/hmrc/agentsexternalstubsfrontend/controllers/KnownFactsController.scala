@@ -1,5 +1,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
+import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -12,7 +13,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.NotFoundException
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class KnownFactsController @Inject()(
@@ -20,9 +21,12 @@ class KnownFactsController @Inject()(
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   val servicesDefinitionsService: ServicesDefinitionsService,
-  val features: Features
+  val features: Features,
+  ecp: Provider[ExecutionContext]
 )(implicit val configuration: Configuration)
     extends FrontendController with AuthActions with I18nSupport with WithPageContext {
+
+  implicit val ec: ExecutionContext = ecp.get
 
   def showKnownFactsPage(enrolmentKey: String): Action[AnyContent] = Action.async { implicit request =>
     EnrolmentKey(enrolmentKey).fold(

@@ -1,5 +1,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
+import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
@@ -14,15 +15,18 @@ import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SignInController @Inject()(
   override val messagesApi: MessagesApi,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
-  val authConnector: AuthConnector
+  val authConnector: AuthConnector,
+  ecp: Provider[ExecutionContext]
 )(implicit val configuration: Configuration)
     extends FrontendController with AuthActions with I18nSupport {
+
+  implicit val ec: ExecutionContext = ecp.get
 
   import SignInController._
 

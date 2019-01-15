@@ -1,5 +1,6 @@
 import java.net.URL
 
+import akka.actor.ActorSystem
 import javax.inject.{Inject, Provider, Singleton}
 import com.google.inject.AbstractModule
 import com.google.inject.name.{Named, Names}
@@ -124,7 +125,8 @@ class FrontendModule(val environment: Environment, val configuration: Configurat
 class HttpVerbs @Inject()(
   val auditConnector: AuditConnector,
   @Named("appName") val appName: String,
-  config: Configuration)
+  config: Configuration,
+  val actorSystem: ActorSystem)
     extends HttpGet with HttpPost with HttpPut with HttpPatch with HttpDelete with WSHttp with HttpAuditing {
   override val hooks = Seq(AuditingHook)
   override def configuration: Option[Config] = Some(config.underlying)

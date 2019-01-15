@@ -3,6 +3,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 
+import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
@@ -29,9 +30,12 @@ class RestQueryController @Inject()(
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   val features: Features,
-  val wsClient: WSClient
+  val wsClient: WSClient,
+  ecp: Provider[ExecutionContext]
 )(implicit val configuration: Configuration)
     extends FrontendController with AuthActions with I18nSupport with WithPageContext {
+
+  implicit val ec: ExecutionContext = ecp.get
 
   import RestQueryController._
 

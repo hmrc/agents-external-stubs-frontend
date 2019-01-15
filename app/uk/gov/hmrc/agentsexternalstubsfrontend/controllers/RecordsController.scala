@@ -1,5 +1,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
+import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
@@ -14,7 +15,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 @Singleton
@@ -22,9 +23,12 @@ class RecordsController @Inject()(
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
-  val features: Features
+  val features: Features,
+  ecp: Provider[ExecutionContext]
 )(implicit val configuration: Configuration)
     extends FrontendController with AuthActions with I18nSupport with WithPageContext {
+
+  implicit val ec: ExecutionContext = ecp.get
 
   import RecordsController._
 
