@@ -12,7 +12,7 @@
   
     <h1 class="heading-xlarge">How to test Agent Authorisation API?</h1>
 
-    <h2 class="heading-medium">Prerequisites</h1>
+    <h2 class="heading-medium">Prerequisites</h2>
         <ol class="list-number">
             <li>Login to API developer hub and create a sandbox application</li>
             <li>Make note of your <em>clientID</em> from API developer Hub.</li>
@@ -67,7 +67,7 @@
                 <li>Identifier value = VATRegistrationDate to be used
 
                     <ul class="bullets">
-                        <li>Note that you will need to convert date from dd/mm/yy to yyyy/mm/dd</li>
+                        <li>Note that you will need to convert date from dd/mm/yy to yyyy-mm-dd</li>
                         <li>
                             <p>eg: 20/07/03 becomes 2003-07-03</p>
                             <p><a href="@controllers.routes.Assets.at("images/screen-10.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-10.jpg")" class="screens" ></a></p>
@@ -81,35 +81,68 @@
 <pre class="snippet--block">
     {
         "service":[ "MTD-IT" ],
+        "clientType": "personal",
         "clientIdType":"ni", 
         "clientId":"AB863145B",
         "knownFact":"OX1 3IK"
     }
 </pre>
 
-<h2 class="heading-medium">Sample API call</h3>
+<h2 class="heading-medium">Sample API call</h2>
 
 <pre class="snippet--block" style="display:table-caption;white-space: pre-line;">
-    curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application/json' -H "Authorization: Bearer 5946713224d32eab9615c47966a3b4" --data '{"service": ["MTD-IT"], "clientIdType": "ni", "clientId": "AB863145B", "knownFact": "OX12 3IK"}' https://test-api.service.hmrc.gov.uk/agents/NARN0238758/invitations
+    curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application/json' -H "Authorization: Bearer 5946713224d32eab9615c47966a3b4" --data '{"service": ["MTD-IT"], "clientType": "personal", "clientIdType": "ni", "clientId": "AB863145B", "knownFact": "OX12 3IK"}' https://test-api.service.hmrc.gov.uk/agents/NARN0238758/invitations
 </pre>
 
 
 <h2 class="heading-medium">Test data for MTD-VAT</h2>
+    <p>Please note: clientType for MTD-VAT can be either personal or business.</p>
 <pre class="snippet--block">
     { 
         "service":[ "MTD-VAT" ], 
+        "clientType":"business"
         "clientIdType":"vrn", 
         "clientId":"102569784", 
         "knownFact":"2003-07-20"
     }
 </pre>
 <pre class="snippet--block" style="display:table-caption;white-space: pre-line;">
-curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application/json' -H "Authorization: Bearer 5946713224d32eab9615c47966a3b4" --data '{"service": ["MTD-VAT"], "clientIdType": "vrn", "clientId": "102569784",  "knownFact":"2003-07-20"}' https://test-api.service.hmrc.gov.uk/agents/NARN0238758/invitations
+curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application/json' -H "Authorization: Bearer 5946713224d32eab9615c47966a3b4" --data '{"service": ["MTD-VAT"], "clientType": "business", "clientIdType": "vrn", "clientId": "102569784",  "knownFact":"2003-07-20"}' https://test-api.service.hmrc.gov.uk/agents/NARN0238758/invitations
 </pre>
 
-<h2 class="heading-medium">Create agent-client relationship in agents-external-stubs Prerequisites</h2>
+<h2 class="heading-medium">Create agent-client relationship in agents-external-stubs</h2>
+
+    <h3>Prerequisites</h3>
 
     <ul class="bullets">
+        <li>
+            <p>After creating an invitation you will need to call Get Invitation by Id and get the "clientActionUrl</p>
+
+            <p>Request</p>
+            <pre class="snippet--block" style="display:table-caption;white-space: pre-line;">
+                curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H "Authorization: Bearer 5946713224d32eab9615c47966a3b4" https://test-api.service.hmrc.gov.uk/agents/NARN0238758/invitations/AOXB1SJTD9LXR
+            </pre>
+
+            <p>Json Response Body</p>
+
+<pre class="snippet--block">
+    {
+        "_links":{
+            "self":{
+                "href":"/agents/FARN0001132/invitations/AOXB1SJTD9LXR"
+        }
+    },
+        "created":"2019-02-07T10:50:58.844Z",
+        "expiresOn":"2019-02-17T00:00:00.000",
+        "arn":"FARN0001132",
+        "service":[
+            "MTD-IT"
+        ],
+        "status":"Pending",
+        "clientActionUrl":"https://test-www.tax.service.gov.uk/invitations/personal/69BGN7CF/agency-test"
+    }
+</pre>
+        </li>
         <li>
             <p>Make sure you are signed in with the <code>client (client001) and planetID = hmrc</code></p>
             <p><a href="@controllers.routes.Assets.at("images/screen-11.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-11.jpg")" class="screens" ></a></p>
@@ -123,27 +156,30 @@ curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application
 
 <h2 class="heading-medium">Steps</h2>
 <ol class="list-number">
-    <li>Navigate to <a href="https://test-www.tax.service.gov.uk/invitations/<invitationID>">https://test-www.tax.service.gov.uk/invitations/&#60;invitationID&#62;</a> in a separate tab.</li>
-    <li>
-        <p>Get the invitationID from the response of create invitation in location header</p>
+    <li>Navigate to <a href="https://test-www.tax.service.gov.uk/invitations/<clientType>/<uid>/<agent-name>">https://test-www.tax.service.gov.uk/invitations/&#60;clientType&#62;/&#60;uid&#62;/&#60;agent-name&#62;</a> in a separate tab
         <p><a href="@controllers.routes.Assets.at("images/screen-13.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-13.jpg")" class="screens" ></a></p>
     </li>
     <li>
         <p>Select Yes Radio button and click on Continue. You will be served with consent page</p>
-        <p><a href="@controllers.routes.Assets.at("images/screen-14.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-14.jpg")" class="screens" ></a></p>
     </li>
-    <li>Select Yes radio button and click Continue</li>
-    <li>
-        <p>Success page should be served</p>
+    <li>Select check box for VAT and click Continue
+        <p><a href="@controllers.routes.Assets.at("images/screen-14.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-14.jpg")" class="screens" ></a></p>
+        <p>You will be served with check your answers page</p>
+    </li>
+    <li>Click "Continue and send response"
         <p><a href="@controllers.routes.Assets.at("images/screen-15.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-15.jpg")" class="screens" ></a></p>
     </li>
     <li>
-        <p>Go back to agents-external-stubs and click on “view” corresponding to the agent used to create an invitation.</p>
+        <p>Success page should be served</p>
         <p><a href="@controllers.routes.Assets.at("images/screen-16.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-16.jpg")" class="screens" ></a></p>
     </li>
     <li>
-        <p>You should be able to see the relationship successfully created with the client in the Delegated enrolment section.</p>
+        <p>Go back to agents-external-stubs and click on “view” corresponding to the agent used to create an invitation.</p>
         <p><a href="@controllers.routes.Assets.at("images/screen-17.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-17.jpg")" class="screens" ></a></p>
+    </li>
+    <li>
+        <p>You should be able to see the relationship successfully created with the client in the Delegated enrolment section.</p>
+        <p><a href="@controllers.routes.Assets.at("images/screen-18.jpg")" target="_blank" rel="noopener noreferrer"><img src="@controllers.routes.Assets.at("images/screen-18.jpg")" class="screens" ></a></p>
     </li>
 </ol>
 
@@ -161,7 +197,7 @@ curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application
 }
 </pre>
 
-Sample API call for create invitation (by providing bearer of the corresponding agent)
+Sample API call for check relationship (by providing bearer of the corresponding agent)
 
 <pre class="snippet--block" style="display:table-caption;white-space: pre-line;">curl -v -H "Accept: application/vnd.hmrc.1.0+json" -H 'content-type: application/json' -H "Authorization: Bearer 5946713224d32eab9615c47966a3b4" --data '{"service": ["MTD-IT"], "clientIdType": "ni", "clientId": "AB863145B", "knownFact": "OX12 3IK"}' https://test-api.service.hmrc.gov.uk/agents/NARN0238758/relationships</pre>
 
