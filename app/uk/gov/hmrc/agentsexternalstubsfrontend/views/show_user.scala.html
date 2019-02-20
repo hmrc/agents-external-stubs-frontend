@@ -243,57 +243,65 @@
 
     </div>
 
-    <h3>Principal enrolments</h3>
+    @if(user.affinityGroup.nonEmpty) {
+        <h3>Principal enrolments</h3>
 
-    @if(user.principalEnrolments.nonEmpty && user.principalEnrolments.get.nonEmpty){
-        <table style="width:100%">
-            <tr>
-                <th style="color:gray;">Service key</th>
-                <th style="color:gray;">Identifier Name</th>
-                <th style="color:gray;">Identifier Value</th>
-            </tr>
-            @for(e <- user.principalEnrolments.get){
-                @if(e.identifiers.nonEmpty){
-                    @for((i,j) <- e.identifiers.get.zipWithIndex) {
-                        <tr>
-                          @if(j==0) {
-                              <td rowspan="@{e.identifiers.get.size}">
-                              @if(context.features.showEnrolments) {
-                                  <a href="/agents-external-stubs/services#@e.key">
-                                    @e.key
-                                  </a>
-                              } else {
-                                  @e.key
-                              }
-                              </td>
-                          }
+        @if(user.principalEnrolments.nonEmpty && user.principalEnrolments.get.nonEmpty) {
+            <table style="width: 100%">
+                <tr>
+                    <th style="color: gray;">Service key</th>
+                    <th style="color: gray;">Identifier Name</th>
+                    <th style="color: gray;">Identifier Value</th>
+                </tr>
+                @for(e <- user.principalEnrolments.get) {
+                    @if(e.identifiers.nonEmpty) {
+                        @for((i, j) <- e.identifiers.get.zipWithIndex) {
+                            <tr>
+                                @if(j == 0) {
+                                    <td rowspan="@{
+                                        e.identifiers.get.size
+                                    }">
+                                    @if(context.features.showEnrolments) {
+                                        <a href="/agents-external-stubs/services#@e.key">
+                                        @e.key
+                                        </a>
+                                    } else {
+                                        @e.key
+                                    }
+                                    </td>
+                                }
                             <td>
-                                @i.key
+                            @i.key
                             </td>
                             <td>
-                                <a href="/agents-external-stubs/known-facts@{e.toEnrolmentKey.map(ek => "?enrolmentKey=" + ek.tag).getOrElse("")}">
+                                <a href="/agents-external-stubs/known-facts@{
+                                    e.toEnrolmentKey.map(ek => "?enrolmentKey=" + ek.tag).getOrElse("")
+                                }">
                                 @i.value
                                 </a>
                             </td>
-                        </tr>
-                    }
-                } else {
-                    <tr><td colspan="3">
+                            </tr>
+                        }
+                    } else {
+                        <tr><td colspan="3">
                         @if(context.features.showEnrolments) {
                             <a href="/agents-external-stubs/services#@e.key">
-                                @e.key
+                            @e.key
                             </a>
                         } else {
                             @e.key
                         }
-                    </td></tr>
+                        </td></tr>
+                    }
                 }
-            }
-        </table>
-    } else {
-        <span class="form-hint">This @{user.affinityGroup.map(_.toLowerCase).getOrElse("user")} has not been enrolled yet.</span>
+            </table>
+        } else {
+            <span class="form-hint">This @{
+                user.affinityGroup.map(_.toLowerCase).getOrElse("user")
+            } has not been enrolled yet.</span>
+        }
+        @addEnrolment(services, user)
     }
-    @addEnrolment(services, user)
 
     @if(user.affinityGroup.contains("Agent")) {
 
@@ -352,25 +360,43 @@
       </div>
     }
 
-    <div style="margin:2em 0;">
+    @if(user.affinityGroup.isEmpty && user.strideRoles.nonEmpty) {
+      <span class="form-hint">This user is an internal HMRC staff eligible for STRIDE authentication.</span>
+      <dl class="govuk-check-your-answers cya-questions-long margin-bottom-40">
+        <div>
+            <dt class="cya-question">
+            @Messages("user.show.strideRoles")
+            </dt>
+            <dd class="cya-answer" id="strideRoles">
+            @{user.strideRoles.mkString(", ")}
+            </dd>
+        </div>
+      </dl>
+    }
 
-        <a role="button" href="@editUrl.url">
-            <button class="button" id="update">
-            @Messages("user.show.edit")
-            </button>
-        </a>
+    @if(user.affinityGroup.nonEmpty || (user.affinityGroup.isEmpty && user.strideRoles.nonEmpty)) {
+        <div style="margin: 2em 0;">
 
-        @if(continue.isDefined) {
-            <a href="@{continue.get.url}">
-                @Messages("user.show.continue")
+            <a role="button" href="@editUrl.url">
+                <button class="button" id="update">
+                @Messages("user.show.edit")
+                </button>
             </a>
-        }
-        @if(userId!=context.authorisedUserId) {
-            <a class="button-secondary" href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a> |
-            <a class="button-secondary" href="/agents-external-stubs/sign-in?userId=@user.userId">Sign-in</a>
-        }
 
-    </div>
+            @if(continue.isDefined) {
+                <a href="@{
+                    continue.get.url
+                }">
+                @Messages("user.show.continue")
+                </a>
+            }
+            @if(userId != context.authorisedUserId) {
+                <a class="button-secondary" href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a> |
+                <a class="button-secondary" href="/agents-external-stubs/sign-in?userId=@user.userId">Sign-in</a>
+            }
+
+        </div>
+    }
 
     @if(user.recordIds.nonEmpty && user.recordIds.get.nonEmpty) {
 

@@ -27,6 +27,7 @@ login.planetId=Planet
 login.planetId.placeholder=What planet is your user from? E.g. Melmac
 login.planetId.hint=Test users and another data bundle into sandbox called a planet.
 login.submit=Sign in
+login.providerType=Authentication provider
 
 login.sa.header=Sign in
 login.sa.problems.header=Problems signing in
@@ -59,7 +60,7 @@ users.show.header=Your test users on {0}
 users.show.description=Here you can see and manage all the test users on the planet.
 
 user.title=Test user {0}
-user.show.header=This is {0}
+user.show.header=Meet {0}
 user.show.description=Here you can review user''s setup.
 
 user.current.title=Current test user
@@ -73,6 +74,7 @@ user.show.isPermanent=This user is permanent, will stay until manually removed.
 user.show.planetId=Your test planet
 user.show.authToken=Your bearer token
 user.show.sessionId=Session ID
+user.show.strideRoles=STRIDE Roles
 
 user.edit.header=Configure user {0}
 user.edit.description=Here you can change a configuration of the user. All fields are optional except an Affinity Group. If you omit any other field, then the sensible default will be given.
@@ -81,7 +83,7 @@ user.edit.update=Update
 user.edit.cancel=Cancel
 
 user.create.header=Create user {0}
-user.create.description=Here you can define affinity group of the user and her principal enrolment. In the next step you will be able to define other properties.
+user.create.description=Here you can define affinity group of the user and her principal enrolment. In the next step you will be able to define other properties. Leave affinity group none fo you aim to create STRIDE user.
 user.create.update_and_continue=Create and continue
 user.create.update=Create
 user.create.edit=Show full edit form

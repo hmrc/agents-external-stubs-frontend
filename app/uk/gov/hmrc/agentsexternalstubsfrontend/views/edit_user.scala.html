@@ -216,80 +216,82 @@
 
                 </div>
 
-                <a name="enrolments"></a>
-                <h2>Principal enrolments</h2>
+                @if(userForm.data.get("affinityGroup").nonEmpty && !userForm.data.get("affinityGroup").contains("none")) {
+                    <a name="enrolments"></a>
+                    <h2>Principal enrolments</h2>
 
-                <div id="principalEnrolments" class="form-group" style="text-align: right">
-                    <table style="width:100%">
-                        <colgroup>
-                            <col width="30%">
-                            <col width="30%">
-                            <col width="30%">
-                            <col width="10%">
-                        </colgroup>
-                        <tr>
-                            <th>Service key</th>
-                            <th>Identifier Name</th>
-                            <th>Identifier Value</th>
-                            <th></th>
-                        </tr>
+                    <div id="principalEnrolments" class="form-group" style="text-align: right">
+                        <table style="width:100%">
+                            <colgroup>
+                                <col width="30%">
+                                <col width="30%">
+                                <col width="30%">
+                                <col width="10%">
+                            </colgroup>
+                            <tr>
+                                <th>Service key</th>
+                                <th>Identifier Name</th>
+                                <th>Identifier Value</th>
+                                <th></th>
+                            </tr>
 
-                        @for(enrolment <- principalEnrolments){
-                            @for((identifier,i) <- enrolment(".identifier").zipWithIndex){
-                                <tr id="principalEnrolment-@i-row">
-                                  @if(i==0) {
-                                      <td rowspan="@{enrolment(".identifier").size}" style="vertical-align: top;">
-                                      @input(
-                                          userForm(s"${enrolment.key}.key"),
-                                          '_dataAttributes -> "style=width:100%;"
-                                      )
-                                      </td>
-                                  }
+                            @for(enrolment <- principalEnrolments){
+                                @for((identifier,i) <- enrolment(".identifier").zipWithIndex){
+                                    <tr id="principalEnrolment-@i-row">
+                                      @if(i==0) {
+                                          <td rowspan="@{enrolment(".identifier").size}" style="vertical-align: top;">
+                                          @input(
+                                              userForm(s"${enrolment.key}.key"),
+                                              '_dataAttributes -> "style=width:100%;"
+                                          )
+                                          </td>
+                                      }
 
-                                    <td>
-                                    @input(
-                                        userForm(s"${identifier.key}.key"),
-                                        '_dataAttributes -> "style=width:100%;"
-                                    )
-                                    <td>
-                                    @input(
-                                        userForm(s"${identifier.key}.value"),
-                                        '_dataAttributes -> "style=width:100%;"
-                                    )
-                                    </td>
-                                    <td>
-                                        <a style="text-decoration: underline;cursor: pointer;" onclick="document.getElementById('principalEnrolment-@i-row').remove()">
-                                            Remove
-                                        </a>
-                                    </td>
-                                </tr>
+                                        <td>
+                                        @input(
+                                            userForm(s"${identifier.key}.key"),
+                                            '_dataAttributes -> "style=width:100%;"
+                                        )
+                                        <td>
+                                        @input(
+                                            userForm(s"${identifier.key}.value"),
+                                            '_dataAttributes -> "style=width:100%;"
+                                        )
+                                        </td>
+                                        <td>
+                                            <a style="text-decoration: underline;cursor: pointer;" onclick="document.getElementById('principalEnrolment-@i-row').remove()">
+                                                Remove
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
                             }
-                        }
 
-                        <tr>
-                            <td>
-                            @input(
-                                userForm(s"principalEnrolments[${principalEnrolments.size}].key"),
-                                '_dataAttributes -> "style=width:100%;"
-                            )
-                            </td>
-                            <td>
-                            @input(
-                                userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key"),
-                                '_dataAttributes -> "style=width:100%;"
-                            )
-                            <td>
-                            @input(
-                                userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value"),
-                                '_dataAttributes -> "style=width:100%;"
-                            )
-                            </td>
-                            <td></td>
-                        </tr>
+                            <tr>
+                                <td>
+                                @input(
+                                    userForm(s"principalEnrolments[${principalEnrolments.size}].key"),
+                                    '_dataAttributes -> "style=width:100%;"
+                                )
+                                </td>
+                                <td>
+                                @input(
+                                    userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key"),
+                                    '_dataAttributes -> "style=width:100%;"
+                                )
+                                <td>
+                                @input(
+                                    userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value"),
+                                    '_dataAttributes -> "style=width:100%;"
+                                )
+                                </td>
+                                <td></td>
+                            </tr>
 
-                    </table>
+                        </table>
 
-                </div>
+                    </div>
+                }
 
                 @if(userForm.data.get("affinityGroup").contains("Agent")) {
                     <a name="delegated"></a>
@@ -369,6 +371,21 @@
 
                         </table>
 
+                    </div>
+                }
+
+                @if(userForm.data.get("affinityGroup").isEmpty || userForm.data.get("affinityGroup").contains("none")) {
+                    <a name="stride"></a>
+                    <h2>Stride roles</h2>
+
+                    <span class="form-hint">Only HMRC internal staff can have STRIDE roles. Provide role names comma separated.</span>
+
+                    <div class="form-group" style="margin-bottom: 0.5em;">
+                    @input(
+                        userForm("strideRoles"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_maxlength -> 60
+                    )
                     </div>
                 }
 

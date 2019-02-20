@@ -324,7 +324,9 @@ object UserController {
       "complianceIssues"  -> ignored[Option[Seq[String]]](None),
       "isPermanent"       -> optional(boolean),
       "recordIds"         -> ignored[Option[Seq[String]]](None),
-      "address"           -> optional(addressMapping)
+      "address"           -> optional(addressMapping),
+      "strideRoles" -> optional(nonEmptyText)
+        .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(",")))
     )(User.apply)(User.unapply))
 
   def fromNone[T](none: T): Option[T] => Option[T] = {

@@ -25,15 +25,25 @@
                     <span class="error-notification password">@Messages(error.message)</span>
                 }
                 <div class="form-group">
-                    <label class="label--inline" for="userId">@Html(Messages("login.username"))</label>
+                    <label class="label--inline" style="font-weight: bold;" for="userId">@Html(Messages("login.username"))</label>
                     <input class="form-control" type="text" id="userId" name="userId" required placeholder="@Messages("login.username.placeholder")" pattern="[A-Za-z0-9-_]{6,64}" />
                 </div>
 
                 <div class="form-group">@Messages("login.planetId.hint")</div>
 
                 <div class="form-group">
-                    <label class="label--inline" for="planetId">@Messages("login.planetId")</label>
+                    <label class="label--inline" style="font-weight: bold;" for="planetId">@Messages("login.planetId")</label>
                     <input  class="form-control" type="text" id="planetId" name="planetId" required placeholder="@Messages("login.planetId.placeholder")" />
+                </div>
+
+                <div class="form-group">
+                    <label class="label--inline" for="providerType">@Messages("login.providerType")</label>
+                    <select class="input--medium input--cleared" style="font-size: 0.9em;" id="providerType" name="providerType">
+                        <option name="GovernmentGateway">GovernmentGateway</option>
+                        <option name="PrivilegedApplication">PrivilegedApplication</option>
+                        <option name="OneTimeLogin">OneTimeLogin</option>
+                        <option name="Verify">Verify</option>
+                    </select>
                 </div>
 
                 <div class="form-group">

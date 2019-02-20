@@ -22,8 +22,10 @@ class UserFormSpec extends UnitSpec {
         "confidenceLevel"    -> "50",
         "affinityGroup"      -> "Individual",
         "credentialStrength" -> "none",
+        "strideRoles"        -> "",
         "credentialRole"     -> "none",
-        "nino"               -> "HW827856C")
+        "nino"               -> "HW827856C"
+      )
 
       form.bind(fieldValues).value shouldBe Some(value.copy(userId = "ignored"))
       form.fill(value).data shouldBe fieldValues.-("userId")
@@ -40,6 +42,7 @@ class UserFormSpec extends UnitSpec {
           "affinityGroup"      -> "none",
           "confidenceLevel"    -> "0",
           "credentialStrength" -> "none",
+          "strideRoles"        -> "",
           "credentialRole"     -> "none")
 
       form.bind(fieldValues).value shouldBe Some(value.copy(userId = "ignored"))
@@ -66,6 +69,7 @@ class UserFormSpec extends UnitSpec {
         "principalEnrolments[1].identifiers[0].key"   -> "ABC",
         "affinityGroup"                               -> "Agent",
         "credentialStrength"                          -> "strong",
+        "strideRoles"                                 -> "",
         "delegatedEnrolments[0].key"                  -> "TAR",
         "principalEnrolments[1].key"                  -> "BAR",
         "delegatedEnrolments[0].identifiers[0].key"   -> "XYZ",
@@ -92,6 +96,7 @@ class UserFormSpec extends UnitSpec {
           groupId = Some("ABA-712-878-NHG"),
           confidenceLevel = None,
           nino = None,
+          strideRoles = Seq("A", "BB", "cac"),
           credentialStrength = Some("strong"),
           affinityGroup = Some("Agent"),
           credentialRole = Some("Admin")
@@ -100,6 +105,7 @@ class UserFormSpec extends UnitSpec {
       val fieldValues = Map(
         "affinityGroup"      -> "Agent",
         "credentialStrength" -> "strong",
+        "strideRoles"        -> "A,BB,cac",
         "confidenceLevel"    -> "0",
         "userId"             -> "foo",
         "groupId"            -> "ABA-712-878-NHG",
