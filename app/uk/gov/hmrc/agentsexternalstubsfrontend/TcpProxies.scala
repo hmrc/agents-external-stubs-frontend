@@ -5,6 +5,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, Tcp}
 import akka.util.ByteString
 import javax.inject.{Inject, Named, Singleton}
+import play.api.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -13,6 +14,7 @@ import scala.util.Try
 class TcpProxies @Inject()(
   @Named("proxies.start") startProxies: String,
   @Named("company-auth-frontend.port") companyAuthFrontendPort: Int,
+  @Named("stride-auth-frontend.port") strideAuthFrontendPort: Int,
   @Named("http.port") httpPort: String
 )(implicit system: ActorSystem, materializer: Materializer) {
 
@@ -28,9 +30,17 @@ class TcpProxies @Inject()(
 
     val tcpProxy = Flow[ByteString].via(tcpOutgoingConnection)
 
-    Tcp(system)
-      .bindAndHandle(tcpProxy, interface = "localhost", port = companyAuthFrontendPort)
-      .map(s => println(s"Listening for company-auth-frontend requests on ${s.localAddress}"))
+    def startProxy(port: Int, serviceName: String): Future[Unit] =
+      Tcp(system)
+        .bindAndHandle(tcpProxy, interface = "localhost", port = port)
+        .map(s => Logger(getClass).info(s"Listening for $serviceName requests on ${s.localAddress}"))
+        .recover {
+          case e: Exception =>
+            Logger(getClass).error(s"Could not start TCP proxy for $serviceName requests on $port because of $e")
+        }
+
+    startProxy(companyAuthFrontendPort, "company-auth-frontend")
+    startProxy(strideAuthFrontendPort, "stride-auth-frontend")
 
   } else {
     println("TCP proxies feature switched off")

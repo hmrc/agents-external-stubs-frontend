@@ -35,25 +35,26 @@ class SignInController @Inject()(
     origin: Option[String],
     accountType: Option[String]): Action[AnyContent] =
     Action { implicit request =>
-      Ok(
-        html
-          .sign_in(SignInRequestForm, routes.SignInController.signIn(continue, origin, accountType)))
+      Ok(html
+        .sign_in(SignInRequestForm, routes.SignInController.signIn(continue, origin, accountType, "GovernmentGateway")))
     }
 
   def signIn(
     continue: Option[ContinueUrl],
     origin: Option[String],
-    accountType: Option[String] = None): Action[AnyContent] =
+    accountType: Option[String],
+    providerType: String): Action[AnyContent] =
     Action.async { implicit request =>
       SignInRequestForm
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              Ok(html.sign_in(formWithErrors, routes.SignInController.signIn(continue, origin, accountType)))),
+              Ok(html
+                .sign_in(formWithErrors, routes.SignInController.signIn(continue, origin, accountType, providerType)))),
           credentials =>
             for {
-              authenticatedSession <- agentsExternalStubsConnector.signIn(credentials)
+              authenticatedSession <- agentsExternalStubsConnector.signIn(credentials.copy(providerType = providerType))
               result <- Future(
                          withNewSession(
                            if (authenticatedSession.newUserCreated.getOrElse(false))
@@ -66,6 +67,18 @@ class SignInController @Inject()(
                          ))
             } yield result
         )
+    }
+
+  def showSignInStridePage(
+    successURL: ContinueUrl,
+    origin: Option[String],
+    failureURL: Option[String]): Action[AnyContent] =
+    Action { implicit request =>
+      Ok(
+        html
+          .sign_in(
+            SignInRequestForm,
+            routes.SignInController.signIn(Some(successURL), origin, None, "PrivilegedApplication")))
     }
 
   def signInUser(continue: Option[ContinueUrl], userId: String): Action[AnyContent] =
@@ -121,7 +134,7 @@ class SignInController @Inject()(
   def signInInternal(
     continue: Option[ContinueUrl],
     origin: Option[String],
-    accountType: Option[String] = None): Action[AnyContent] = signIn(continue, origin, accountType)
+    accountType: Option[String] = None): Action[AnyContent] = signIn(continue, origin, accountType, "GovernmentGateway")
 
   def signOutInternal(continue: Option[ContinueUrl]): Action[AnyContent] =
     Action.async { implicit request =>
