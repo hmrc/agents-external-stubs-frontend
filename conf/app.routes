@@ -1,18 +1,18 @@
 # microservice specific routes
 
-# stubs
+# authentication stubs
 GET         /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
 POST        /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String)
 GET         /gg/sign-out                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[ContinueUrl] ?= None)
+GET         /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPageInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
+POST        /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String)
+GET         /agents-external-stubs/gg/sign-out    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutInternal(continue: Option[ContinueUrl] ?= None)
 
 GET         /stride/sign-in                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePage(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
+GET         /agents-external-stubs/stride/sign-in @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePageInternal(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
 
-# actions
+# ui actions
 GET         /agents-external-stubs                @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start
-
-GET         /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPageInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
-POST        /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
-GET         /agents-external-stubs/gg/sign-out    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutInternal(continue: Option[ContinueUrl] ?= None)
 
 GET         /agents-external-stubs/user           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/user/create    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showCreateUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)

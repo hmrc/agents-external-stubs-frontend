@@ -56,8 +56,9 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "POST /agents-external-stubs/gg/sign-in" should {
       "redirect to continue URL if provided" in {
         val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
-        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None)(FakeRequest()
-          .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper"))
+        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, "GovernmentGateway")(
+          FakeRequest()
+            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper"))
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/there")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
@@ -67,8 +68,9 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
       "redirect to edit user with if new one created" in {
         val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
-        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None)(FakeRequest()
-          .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn"))
+        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, "GovernmentGateway")(
+          FakeRequest()
+            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn"))
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")

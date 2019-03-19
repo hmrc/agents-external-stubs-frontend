@@ -129,13 +129,29 @@ class SignInController @Inject()(
     Action { implicit request =>
       Ok(
         html
-          .sign_in(SignInRequestForm, routes.SignInController.signInInternal(continue, origin, accountType)))
+          .sign_in(
+            SignInRequestForm,
+            routes.SignInController.signInInternal(continue, origin, accountType, "GovernmentGateway")))
+    }
+
+  def showSignInStridePageInternal(
+    successURL: ContinueUrl,
+    origin: Option[String],
+    failureURL: Option[String]): Action[AnyContent] =
+    Action { implicit request =>
+      Ok(
+        html
+          .sign_in(
+            SignInRequestForm,
+            routes.SignInController.signInInternal(Some(successURL), origin, None, "PrivilegedApplication")))
     }
 
   def signInInternal(
     continue: Option[ContinueUrl],
     origin: Option[String],
-    accountType: Option[String] = None): Action[AnyContent] = signIn(continue, origin, accountType, "GovernmentGateway")
+    accountType: Option[String] = None,
+    providerType: String): Action[AnyContent] =
+    signIn(continue, origin, accountType, providerType)
 
   def signOutInternal(continue: Option[ContinueUrl]): Action[AnyContent] =
     Action.async { implicit request =>
