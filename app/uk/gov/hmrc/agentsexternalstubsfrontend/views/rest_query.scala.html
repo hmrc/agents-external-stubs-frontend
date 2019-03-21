@@ -69,7 +69,7 @@
                     <div class="form-group" style="vertical-align: middle;">
 
                         <button class="button" type="submit" id="update">
-                        @Messages("rest.query.submit")
+                            @restQueryForm("method").value.getOrElse(Messages("rest.query.submit"))
                         </button>
 
                         <a style="display: inline-block;
@@ -103,7 +103,7 @@
                 <div class="form-group" style="vertical-align: middle;">
 
                     <button class="button" type="submit" id="update-top">
-                    @Messages("rest.query.submit")
+                        @restQueryForm("method").value.getOrElse(Messages("rest.query.submit"))
                     </button>
 
                     <a style="display: inline-block;
@@ -123,7 +123,7 @@
                 <div class="form-group" style="vertical-align: middle;">
 
                     <button class="button" type="submit" id="update-bottom">
-                        @Messages("rest.query.submit")
+                        @restQueryForm("method").value.getOrElse(Messages("rest.query.submit"))
                     </button>
 
                     <a style="display: inline-block;
@@ -134,5 +134,16 @@
             </fieldset>
         }
     </div>
+  <script>
+      document.addEventListener('DOMContentLoaded',function() {
+          document.querySelector('select[name="method"]').onchange = function (event) {
+              if(event.target.value){
+                  document.getElementById("update").textContent = event.target.value;
+                  document.getElementById("update-top").textContent = event.target.value;
+                  document.getElementById("update-bottom").textContent = event.target.value;
+              }
+          };
+      },false);
+  </script>
 
 }
