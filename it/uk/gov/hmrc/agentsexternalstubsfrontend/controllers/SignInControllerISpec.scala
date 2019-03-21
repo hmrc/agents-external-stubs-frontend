@@ -2,6 +2,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{redirectLocation, session}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.http.SessionKeys
@@ -32,31 +33,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "POST /gg/sign-in" should {
       "redirect to continue URL if provided" in {
         val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
-        val result = controller.signIn(Some(ContinueUrl("/there")), None, None, "GovernmentGateway")(FakeRequest()
-          .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper"))
-        status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/there")
-        session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
-        session(result).get(SessionKeys.userId) shouldBe Some("/auth/oid/foo")
-        session(result).get(SessionKeys.sessionId) should not be empty
-      }
-
-      "redirect to edit user with if new one created" in {
-        val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
-        val result = controller.signIn(Some(ContinueUrl("/there")), None, None, "GovernmentGateway")(FakeRequest()
-          .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn"))
-        status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
-        session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
-        session(result).get(SessionKeys.userId) shouldBe Some("/auth/oid/foo")
-        session(result).get(SessionKeys.sessionId) should not be empty
-      }
-    }
-
-    "POST /agents-external-stubs/gg/sign-in" should {
-      "redirect to continue URL if provided" in {
-        val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
-        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, "GovernmentGateway")(
+        val result = controller.signIn(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper"))
         status(result) shouldBe 303
@@ -68,7 +45,33 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
       "redirect to edit user with if new one created" in {
         val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
-        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, "GovernmentGateway")(
+        val result = controller.signIn(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
+          FakeRequest()
+            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn"))
+        status(result) shouldBe 303
+        redirectLocation(result) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
+        session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
+        session(result).get(SessionKeys.userId) shouldBe Some("/auth/oid/foo")
+        session(result).get(SessionKeys.sessionId) should not be empty
+      }
+    }
+
+    "POST /agents-external-stubs/gg/sign-in" should {
+      "redirect to continue URL if provided" in {
+        val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
+        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
+          FakeRequest()
+            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper"))
+        status(result) shouldBe 303
+        redirectLocation(result) shouldBe Some("/there")
+        session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
+        session(result).get(SessionKeys.userId) shouldBe Some("/auth/oid/foo")
+        session(result).get(SessionKeys.sessionId) should not be empty
+      }
+
+      "redirect to edit user with if new one created" in {
+        val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
+        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn"))
         status(result) shouldBe 303

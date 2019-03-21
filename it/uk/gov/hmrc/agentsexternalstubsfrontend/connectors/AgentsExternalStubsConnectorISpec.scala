@@ -7,7 +7,7 @@ import play.api.http.Status
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase.RequestMatch
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{SpecialCase, User, Users}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, SpecialCase, User, Users}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.http._
@@ -31,7 +31,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         val response: AuthenticatedSession = await(connector.signIn(SignInRequest("foo", "bar")))
         response.authToken shouldBe sessionId
         response.userId shouldBe "foo"
-        response.providerType shouldBe "GovernmentGateway"
+        response.providerType shouldBe AuthProvider.GovernmentGateway
         response.newUserCreated shouldBe Some(true)
       }
 
@@ -40,7 +40,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         val response: AuthenticatedSession = await(connector.signIn(SignInRequest("foo", "bar")))
         response.authToken shouldBe sessionId
         response.userId shouldBe "foo"
-        response.providerType shouldBe "GovernmentGateway"
+        response.providerType shouldBe AuthProvider.GovernmentGateway
         response.newUserCreated shouldBe Some(false)
       }
 

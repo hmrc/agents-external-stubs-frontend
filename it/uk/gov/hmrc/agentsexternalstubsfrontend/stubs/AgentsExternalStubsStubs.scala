@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 import play.api.libs.json.{JsArray, JsNull, JsString, Json}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 
 trait AgentsExternalStubsStubs extends ValidStubResponses {
@@ -16,7 +16,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     userId: String,
     planetId: String,
     plainTextPassword: String = "p@ssw0rd",
-    providerType: String = "GovernmentGateway",
+    providerType: String = AuthProvider.GovernmentGateway,
     newUser: Boolean = true): String = {
     val authToken = UUID.randomUUID().toString
 
@@ -56,7 +56,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
                 "sessionId"    -> UUID.randomUUID().toString,
                 "userId"       -> "foo",
                 "authToken"    -> UUID.randomUUID().toString,
-                "providerType" -> "GovernmentGateway",
+                "providerType" -> AuthProvider.GovernmentGateway,
                 "planetId"     -> UUID.randomUUID().toString
               )
               .toString())))

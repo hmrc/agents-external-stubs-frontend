@@ -35,7 +35,7 @@ GET         /agents-external-stubs/services       @uk.gov.hmrc.agentsexternalstu
 GET         /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.showRestQueryPage(q: Option[String] ?= None)
 POST        /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.runQuery
 
-GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(continue: Option[ContinueUrl] ?= None, userId: String)
+GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(continue: Option[ContinueUrl] ?= None, userId: String, providerType: String ?= "GovernmentGateway")
 
 GET         /agents-external-stubs/special-cases         @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.showAllSpecialCasesPage(caseId: Option[String] ?= None)
 GET         /agents-external-stubs/special-cases/edit    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.showEditSpecialCasePage(caseId: Option[String] ?= None)

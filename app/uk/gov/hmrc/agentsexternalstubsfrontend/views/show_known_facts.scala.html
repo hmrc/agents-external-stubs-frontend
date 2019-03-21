@@ -90,7 +90,7 @@
                         <a href="/agents-external-stubs/user?userId=@{user.userId}">@{user.userId}</a>
                         <span style="display:inline-block;margin-left:0.2em;">(@{user.name})</span>
                         @if(user.userId!=context.authorisedUserId){
-                            <span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{user.userId}&continue=@{request.uri}">Sign-in</a></span>
+                            <span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{user.userId}&continue=@{request.uri}&providerType=@user.defaultProviderType">Sign-in</a></span>
                         } else {
                             <span style="color: black; font-weight: bold;">Current user </span>
                         }
@@ -110,7 +110,7 @@
                     <a href="/agents-external-stubs/user?userId=@{agent.userId}">@{agent.userId}</a>
                     <span style="display:inline-block;margin-left:0.2em;">(@{agent.agentFriendlyName})</span>
                     @if(agent.userId!=context.authorisedUserId){
-                        <span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{agent.userId}>Sign-in</a></span>
+                        <span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=@{agent.userId}&providerType=@agent.defaultProviderType>Sign-in</a></span>
                     }
                 </dd>
             </div>

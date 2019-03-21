@@ -7,6 +7,7 @@ import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{SignInController, routes}
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.error_template_Scope0.error_template_Scope1.error_template
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.govuk_wrapper_Scope0.govuk_wrapper_Scope1.govuk_wrapper
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.sign_in_Scope0.sign_in_Scope1.sign_in
@@ -24,7 +25,7 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
       val html = new sign_in()
         .render(
           loginForm = filledForm,
-          postUrl = routes.SignInController.signIn(None, Some("foo"), None, "GovernmentGateway"),
+          postUrl = routes.SignInController.signIn(None, Some("foo"), None, AuthProvider.GovernmentGateway),
           request = FakeRequest(),
           messages = Messages.Implicits.applicationMessages,
           config = app.configuration
@@ -42,10 +43,11 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
       content should include(Messages("login.username"))
       content should include(Messages("login.password"))
 
-      val html2 = new sign_in().f(filledForm, routes.SignInController.signIn(None, None, None, "GovernmentGateway"))(
-        FakeRequest(),
-        Messages.Implicits.applicationMessages,
-        app.configuration)
+      val html2 =
+        new sign_in().f(filledForm, routes.SignInController.signIn(None, None, None, AuthProvider.GovernmentGateway))(
+          FakeRequest(),
+          Messages.Implicits.applicationMessages,
+          app.configuration)
       contentAsString(html2) shouldBe (content)
     }
   }

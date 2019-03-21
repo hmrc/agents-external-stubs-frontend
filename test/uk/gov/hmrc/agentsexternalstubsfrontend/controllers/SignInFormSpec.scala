@@ -1,6 +1,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.play.test.UnitSpec
 
 class SignInFormSpec extends UnitSpec {
@@ -13,7 +14,11 @@ class SignInFormSpec extends UnitSpec {
       val value = SignInRequest(userId = "bar", plainTextPassword = "foo", planetId = "juniper")
 
       val fieldValues =
-        Map("userId" -> "bar", "password" -> "foo", "providerType" -> "GovernmentGateway", "planetId" -> "juniper")
+        Map(
+          "userId"       -> "bar",
+          "password"     -> "foo",
+          "providerType" -> AuthProvider.GovernmentGateway,
+          "planetId"     -> "juniper")
 
       form.bind(fieldValues).value shouldBe Some(value)
       form.fill(value).data shouldBe fieldValues
@@ -25,7 +30,11 @@ class SignInFormSpec extends UnitSpec {
       val value = SignInRequest(userId = "foo", plainTextPassword = "bar", planetId = "juniper")
 
       val fieldValues =
-        Map("userId" -> "foo", "password" -> "bar", "providerType" -> "GovernmentGateway", "planetId" -> "juniper")
+        Map(
+          "userId"       -> "foo",
+          "password"     -> "bar",
+          "providerType" -> AuthProvider.GovernmentGateway,
+          "planetId"     -> "juniper")
 
       form.bind(fieldValues).value shouldBe Some(value)
       form.fill(value).data shouldBe fieldValues

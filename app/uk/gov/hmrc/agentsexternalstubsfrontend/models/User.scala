@@ -31,6 +31,9 @@ case class User(
 
   def isEnrolledFor(service: String): Boolean =
     principalEnrolments.exists(_.exists(_.key == service))
+
+  val defaultProviderType: String =
+    if (strideRoles.nonEmpty) AuthProvider.PrivilegedApplication else AuthProvider.GovernmentGateway
 }
 
 object User {

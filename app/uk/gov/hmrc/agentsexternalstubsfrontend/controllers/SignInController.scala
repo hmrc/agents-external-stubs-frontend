@@ -9,6 +9,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
@@ -35,8 +36,12 @@ class SignInController @Inject()(
     origin: Option[String],
     accountType: Option[String]): Action[AnyContent] =
     Action { implicit request =>
-      Ok(html
-        .sign_in(SignInRequestForm, routes.SignInController.signIn(continue, origin, accountType, "GovernmentGateway")))
+      Ok(
+        html
+          .sign_in(
+            SignInRequestForm,
+            routes.SignInController
+              .signIn(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
     }
 
   def signIn(
@@ -78,16 +83,21 @@ class SignInController @Inject()(
         html
           .sign_in(
             SignInRequestForm,
-            routes.SignInController.signIn(Some(successURL), origin, None, "PrivilegedApplication")))
+            routes.SignInController
+              .signIn(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)))
     }
 
-  def signInUser(continue: Option[ContinueUrl], userId: String): Action[AnyContent] =
+  def signInUser(continue: Option[ContinueUrl], userId: String, providerType: String): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           for {
-            _                    <- agentsExternalStubsConnector.signOut()
-            authenticatedSession <- agentsExternalStubsConnector.signIn(SignInRequest(userId, credentials.planetId))
+            _ <- agentsExternalStubsConnector.signOut()
+            authenticatedSession <- agentsExternalStubsConnector.signIn(
+                                     SignInRequest(
+                                       userId = userId,
+                                       planetId = credentials.planetId,
+                                       providerType = providerType))
             result <- Future(
                        withNewSession(
                          if (authenticatedSession.newUserCreated.getOrElse(false))
@@ -131,7 +141,8 @@ class SignInController @Inject()(
         html
           .sign_in(
             SignInRequestForm,
-            routes.SignInController.signInInternal(continue, origin, accountType, "GovernmentGateway")))
+            routes.SignInController
+              .signInInternal(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
     }
 
   def showSignInStridePageInternal(
@@ -143,7 +154,8 @@ class SignInController @Inject()(
         html
           .sign_in(
             SignInRequestForm,
-            routes.SignInController.signInInternal(Some(successURL), origin, None, "PrivilegedApplication")))
+            routes.SignInController
+              .signInInternal(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)))
     }
 
   def signInInternal(
@@ -170,7 +182,7 @@ object SignInController {
     userId: String,
     planetId: String,
     plainTextPassword: String = "p@ssw0rd",
-    providerType: String = "GovernmentGateway")
+    providerType: String = AuthProvider.GovernmentGateway)
   object SignInRequest {
     implicit val writes: Writes[SignInRequest] = Json.writes[SignInRequest]
   }
@@ -180,6 +192,6 @@ object SignInController {
       "userId"       -> nonEmptyText,
       "planetId"     -> nonEmptyText,
       "password"     -> default(text, "p@ssw0rd"),
-      "providerType" -> optional(nonEmptyText).transform[String](_.getOrElse("GovernmentGateway"), Some(_))
+      "providerType" -> optional(nonEmptyText).transform[String](_.getOrElse(AuthProvider.GovernmentGateway), Some(_))
     )(SignInRequest.apply)(SignInRequest.unapply))
 }

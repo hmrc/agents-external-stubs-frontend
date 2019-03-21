@@ -19,7 +19,7 @@ trait AuthStubs {
          |{
          |  "authorise": [
          |    { "identifiers":[], "state":"Activated", "enrolment": "${enrolment.serviceName}" },
-         |    { "authProviders": ["GovernmentGateway"] }
+         |    { "authProviders": [AuthProvider.GovernmentGateway] }
          |  ],
          |  "retrieve":["authorisedEnrolments"]
          |}
