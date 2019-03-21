@@ -43,8 +43,10 @@
             }
             </div>
 
-            @if(r.header(HeaderNames.CONTENT_TYPE).contains("application/json")){
+            @if(r.header(HeaderNames.CONTENT_TYPE).exists(_.endsWith("json"))){
                 <div style="font-family: monospace; font-size: 0.8em;margin-top:1em;white-space: pre-wrap; overflow: scroll; max-height: 40em; padding: 1em; border-style: dotted">@{Json.prettyPrint(r.json)}</div>
+            } else {
+                <div style="font-family: monospace; font-size: 0.8em;margin-top:1em;white-space: pre-wrap; overflow: scroll; max-height: 40em; padding: 1em; border-style: dotted">@{r.body}</div>
             }
         </div>
     }} else {
@@ -100,7 +102,7 @@
 
                 <div class="form-group" style="vertical-align: middle;">
 
-                    <button class="button" type="submit" id="update">
+                    <button class="button" type="submit" id="update-top">
                     @Messages("rest.query.submit")
                     </button>
 
@@ -120,7 +122,7 @@
 
                 <div class="form-group" style="vertical-align: middle;">
 
-                    <button class="button" type="submit" id="update">
+                    <button class="button" type="submit" id="update-bottom">
                         @Messages("rest.query.submit")
                     </button>
 
