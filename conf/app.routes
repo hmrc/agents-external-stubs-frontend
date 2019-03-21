@@ -2,10 +2,10 @@
 
 # authentication stubs
 GET         /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
-POST        /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String)
+POST        /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String ?= "GovernmentGateway")
 GET         /gg/sign-out                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[ContinueUrl] ?= None)
 GET         /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPageInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
-POST        /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String)
+POST        /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String ?= "GovernmentGateway")
 GET         /agents-external-stubs/gg/sign-out    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutInternal(continue: Option[ContinueUrl] ?= None)
 
 GET         /stride/sign-in                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePage(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
