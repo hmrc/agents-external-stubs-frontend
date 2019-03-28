@@ -33,6 +33,14 @@ login.sa.header=Sign in
 login.sa.problems.header=Problems signing in
 login.sa.description=Enter your Government Gateway credentials to sign in. You received these when you created your HMRC online account.
 
+# Identity Verification page
+uplift.header=Identity Verification
+uplift.description=Here lies the stubbed Identity Verification journey. You can choose to either successfully complete the IV journey and uplift the user to a new confidence level, or to fail the IV journey.
+uplift.form.dropdown.confidenceLevel=Confidence level to 'uplift' to if succeeding
+uplift.form.radio.willSucceed=Succeed the IV journey, uplift the user, and redirect to the <i>completionURL</i>
+uplift.form.radio.willFail=Fail the IV journey and redirect to the <i>failureURL</i>
+uplift.form.submit=Complete IV and redirect
+
 # General Messages
 # Error messages for digital services
 global.error.400.title=Bad request - 400
