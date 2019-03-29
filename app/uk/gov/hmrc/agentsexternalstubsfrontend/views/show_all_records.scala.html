@@ -76,10 +76,10 @@
     </table>
 
     <table id="legacy-relationships" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Legacy Relationship Records
+        <caption id="tableSubHeader" class="normal-text">Legacy SA Agent Relationships
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=legacy-relationship&seed=@{records.LegacyRelationshipRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
-                Create new legacy relationship
+                Create new SA agent relationship
             </a>
         </caption>
         <col style="width: 90%">
@@ -90,10 +90,10 @@
     </table>
 
     <table id="legacy-agents" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Legacy Agents Records
+        <caption id="tableSubHeader" class="normal-text">Legacy SA Agent
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=legacy-agent&seed=@{records.LegacyAgentRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
-                Create new legacy agent
+                Create new legacy SA agent
             </a>
         </caption>
         <col style="width: 90%">
@@ -104,10 +104,10 @@
     </table>
 
     <table id="employer-auths" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">PAYE Agent Information
+        <caption id="tableSubHeader" class="normal-text">Legacy PAYE Agent Information
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=employer-auths&seed=@{records.EmployerAuths.map(o => (o.last \ "agentCode").as[String]).getOrElse("ABC123456789")}">
-                Create new paye agent information
+                Create new PAYE agent information
             </a>
         </caption>
         <col style="width: 90%">
