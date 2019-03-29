@@ -7,7 +7,8 @@ case class Records(
   LegacyAgentRecord: Option[Seq[JsObject]],
   BusinessDetailsRecord: Option[Seq[JsObject]],
   LegacyRelationshipRecord: Option[Seq[JsObject]],
-  RelationshipRecord: Option[Seq[JsObject]])
+  RelationshipRecord: Option[Seq[JsObject]],
+  EmployerAuths: Option[Seq[JsObject]])
 
 object Records {
   implicit val reads: Reads[Records] = Json.reads[Records]

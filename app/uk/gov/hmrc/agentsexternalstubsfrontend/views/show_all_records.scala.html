@@ -103,6 +103,20 @@
         </tbody>
     </table>
 
+    <table id="employer-auths" style="margin:1em 0;">
+        <caption id="tableSubHeader" class="normal-text">PAYE Agent Information
+            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            href="/agents-external-stubs/records/add?type=employer-auths&seed=@{records.EmployerAuths.map(o => (o.last \ "agentCode").as[String]).getOrElse("ABC123456789")}">
+                Create new paye agent information
+            </a>
+        </caption>
+        <col style="width: 90%">
+        <col style="width: 10%">
+        <tbody>
+        @recordRows(records.EmployerAuths, identity)
+        </tbody>
+    </table>
+
 }
 
 @recordRows(records: Option[Seq[JsObject]], excerpt: JsValue => JsValue) = {
