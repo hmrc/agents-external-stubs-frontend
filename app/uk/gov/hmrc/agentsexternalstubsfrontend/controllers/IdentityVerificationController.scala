@@ -66,6 +66,49 @@ class IdentityVerificationController @Inject()(
             )
         }
     }
+
+  def showUpliftPageInternal(
+    confidenceLevel: Int,
+    completionURL: ContinueUrl,
+    failureURL: ContinueUrl,
+    origin: Option[String]): Action[AnyContent] =
+    Action { implicit request =>
+      val initialValues = UpliftRequest(willSucceed = true, confidenceLevel)
+      Ok(
+        html
+          .iv_uplift(
+            UpliftRequestForm.fill(initialValues),
+            routes.IdentityVerificationController.upliftInternal(completionURL, failureURL)))
+    }
+
+  def upliftInternal(completionURL: ContinueUrl, failureURL: ContinueUrl): Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          UpliftRequestForm
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  Ok(
+                    html
+                      .iv_uplift(
+                        formWithErrors,
+                        routes.IdentityVerificationController.upliftInternal(completionURL, failureURL)))),
+              upliftRequest => {
+                if (upliftRequest.willSucceed) {
+                  for {
+                    currentUser <- agentsExternalStubsConnector.getUser(credentials.providerId)
+                    modifiedUser = currentUser.copy(confidenceLevel = Some(upliftRequest.confidenceLevel))
+                    _ <- agentsExternalStubsConnector.updateUser(modifiedUser)
+                  } yield Redirect(completionURL.url)
+                } else {
+                  Future.successful(Redirect(failureURL.url))
+                }
+              }
+            )
+        }
+    }
 }
 
 object IdentityVerificationController {

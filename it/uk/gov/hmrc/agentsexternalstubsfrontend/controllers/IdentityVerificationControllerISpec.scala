@@ -1,6 +1,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
-import com.github.tomakehurst.wiremock.client.WireMock.{putRequestedFor, verify, urlEqualTo, containing}
+import com.github.tomakehurst.wiremock.client.WireMock.{containing, putRequestedFor, urlEqualTo, verify}
 import play.api.Application
 import play.api.http.Writeable
 import play.api.mvc.{Request, Result}
@@ -26,7 +26,8 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
     "GET /mdtp/uplift" should {
       "display the identity verification uplift page" in new Setup {
-        val result = callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=200&completionURL=/good&failureURL=/bad"))
+        val result =
+          callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=200&completionURL=/good&failureURL=/bad"))
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("uplift.header"))
       }
@@ -51,14 +52,17 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
     "POST /mdtp/uplift" when {
       "IV was chosen to succeed" should {
-        val succeedRequest = addCsrfToken(FakeRequest(POST, "/mdtp/uplift?completionURL=/success&failureURL=/fail")
-          .withFormUrlEncodedBody("confidenceLevel" -> "200", "willSucceed" -> "true"))
+        val succeedRequest = addCsrfToken(
+          FakeRequest(POST, "/mdtp/uplift?completionURL=/success&failureURL=/fail")
+            .withFormUrlEncodedBody("confidenceLevel" -> "200", "willSucceed" -> "true"))
 
         "set the user's confidence level to the desired level" in new Setup {
           val result = callEndpointWith(succeedRequest)
 
-          verify(1, putRequestedFor(urlEqualTo(s"/agents-external-stubs/users/Test123"))
-            .withRequestBody(containing(""""confidenceLevel":200""")))
+          verify(
+            1,
+            putRequestedFor(urlEqualTo(s"/agents-external-stubs/users/Test123"))
+              .withRequestBody(containing(""""confidenceLevel":200""")))
         }
 
         "redirect to the completionURL" in new Setup {
@@ -70,8 +74,9 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
       }
 
       "IV was chosen to fail" should {
-        val failRequest = addCsrfToken(FakeRequest(POST, "/mdtp/uplift?completionURL=/success&failureURL=/fail")
-          .withFormUrlEncodedBody("confidenceLevel" -> "200", "willSucceed" -> "false"))
+        val failRequest = addCsrfToken(
+          FakeRequest(POST, "/mdtp/uplift?completionURL=/success&failureURL=/fail")
+            .withFormUrlEncodedBody("confidenceLevel" -> "200", "willSucceed" -> "false"))
 
         "leave the user's confidence level as it was" in new Setup {
           val result = callEndpointWith(failRequest)
@@ -85,6 +90,79 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
           redirectLocation(result) shouldBe Some("/fail")
         }
       }
+
+      "GET /agents-external-stubs/mdtp/uplift" should {
+        "display the identity verification uplift page" in new Setup {
+          val result = callEndpointWith(
+            FakeRequest(
+              GET,
+              "/agents-external-stubs/mdtp/uplift?confidenceLevel=200&completionURL=/good&failureURL=/bad"))
+          status(result) shouldBe 200
+          checkHtmlResultWithBodyText(result, htmlEscapedMessage("uplift.header"))
+        }
+
+        "return 400 bad request" when {
+          "the confidenceLevel query parameter is missing" in new Setup {
+            val result = callEndpointWith(
+              FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?completionURL=/good&failureURL=/bad"))
+            status(result) shouldBe 400
+          }
+
+          "the completionUrl query parameter is missing" in new Setup {
+            val result = callEndpointWith(
+              FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=200&failureURL=/bad"))
+            status(result) shouldBe 400
+          }
+
+          "the failureUrl query parameter is missing" in new Setup {
+            val result = callEndpointWith(
+              FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=200&completionURL=/good"))
+            status(result) shouldBe 400
+          }
+        }
+      }
+
+      "POST /agents-external-stubs/mdtp/uplift" when {
+        "IV was chosen to succeed" should {
+          val succeedRequest = addCsrfToken(
+            FakeRequest(POST, "/agents-external-stubs/mdtp/uplift?completionURL=/success&failureURL=/fail")
+              .withFormUrlEncodedBody("confidenceLevel" -> "200", "willSucceed" -> "true"))
+
+          "set the user's confidence level to the desired level" in new Setup {
+            val result = callEndpointWith(succeedRequest)
+
+            verify(
+              1,
+              putRequestedFor(urlEqualTo(s"/agents-external-stubs/users/Test123"))
+                .withRequestBody(containing(""""confidenceLevel":200""")))
+          }
+
+          "redirect to the completionURL" in new Setup {
+            val result = callEndpointWith(succeedRequest)
+
+            status(result) shouldBe 303
+            redirectLocation(result) shouldBe Some("/success")
+          }
+        }
+
+        "IV was chosen to fail" should {
+          val failRequest = addCsrfToken(
+            FakeRequest(POST, "/agents-external-stubs/mdtp/uplift?completionURL=/success&failureURL=/fail")
+              .withFormUrlEncodedBody("confidenceLevel" -> "200", "willSucceed" -> "false"))
+
+          "leave the user's confidence level as it was" in new Setup {
+            val result = callEndpointWith(failRequest)
+
+            verify(0, putRequestedFor(urlEqualTo(s"/agents-external-stubs/users/Test123")))
+          }
+
+          "redirect to the failureURL" in new Setup {
+            val result = callEndpointWith(failRequest)
+            status(result) shouldBe 303
+            redirectLocation(result) shouldBe Some("/fail")
+          }
+        }
+      }
     }
   }
 
@@ -93,9 +171,12 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
     val csrfFilter = app.injector.instanceOf[CSRFFilter]
     val token = csrfFilter.tokenProvider.generateToken
 
-    fakeRequest.copyFakeRequest(tags = fakeRequest.tags ++ Map(
-      Token.NameRequestTag -> csrfConfig.tokenName,
-      Token.RequestTag -> token
-    )).withHeaders((csrfConfig.headerName, token))
+    fakeRequest
+      .copyFakeRequest(
+        tags = fakeRequest.tags ++ Map(
+          Token.NameRequestTag -> csrfConfig.tokenName,
+          Token.RequestTag     -> token
+        ))
+      .withHeaders((csrfConfig.headerName, token))
   }
 }

@@ -13,8 +13,8 @@ class UpliftFormSpec extends UnitSpec {
       val value = UpliftRequest(willSucceed = true, confidenceLevel = 200)
 
       val fieldValues = Map(
-        "willSucceed"        -> "true",
-        "confidenceLevel"    -> "200"
+        "willSucceed"     -> "true",
+        "confidenceLevel" -> "200"
       )
 
       form.bind(fieldValues).value shouldBe Some(value)

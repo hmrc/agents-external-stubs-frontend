@@ -82,10 +82,8 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
       content should include(Messages("uplift.form.submit"))
 
       val html2 =
-        new iv_uplift().f(filledUpliftForm, postCall)(
-          FakeRequest(),
-          Messages.Implicits.applicationMessages,
-          app.configuration)
+        new iv_uplift()
+          .f(filledUpliftForm, postCall)(FakeRequest(), Messages.Implicits.applicationMessages, app.configuration)
       contentAsString(html2) shouldBe (content)
     }
   }
