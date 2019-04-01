@@ -1,0 +1,84 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown}
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.UpliftRequest
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+
+@(upliftForm:Form[UpliftRequest], postUrl: Call)(implicit request: Request[_], messages: Messages, config: Configuration)
+
+@main_template(title = Messages("login.title"), bodyClasses = None) {
+
+    @form(action = postUrl, 'id -> "upliftForm", 'novalidate -> "novalidate") {
+        <fieldset>
+            <legend>
+                <h1 class="heading-xlarge">@Messages("uplift.header")</h1>
+                <p>@Html(Messages("uplift.description"))</p>
+
+            </legend>
+
+            <div class="form-field-group @if(upliftForm.hasErrors) {form-field-group--error soft--ends}">
+                <div class="form-group soft--ends">
+                    @dropdown(
+                    upliftForm("confidenceLevel"),
+                    ConfidenceLevel.values.filterNot(_._1 == "0"),
+                    false,
+                    '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("uplift.form.dropdown.confidenceLevel") + """</span>"""),
+                    '_selectClass -> Html("""input--medium input--cleared""")
+                    )
+                </div>
+
+                <div class="form-group soft--ends">
+                    <div class="multiple-choice">
+                        <input
+                                type="radio"
+                                id="willSucceed-true"
+                                name="willSucceed"
+                                value="true"
+                                checked
+                        />
+                        <label for="willSucceed-true">@Html(Messages("uplift.form.radio.willSucceed"))</label>
+                    </div>
+                    <div class="multiple-choice">
+                        <input
+                                type="radio"
+                                id="willSucceed-false"
+                                name="willSucceed"
+                                value="false"
+                        />
+                        <label for="willSucceed-false">@Html(Messages("uplift.form.radio.willFail"))</label>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <button class="button" type="submit" id="upliftSubmit">@Messages("uplift.form.submit")</button>
+                </div>
+            </div>
+        </fieldset>
+    }
+
+    <div class="form-group">
+        <details role="group">
+            <summary role="button" aria-controls="details-content-0" aria-expanded="false">
+                <span class="summary">Why do I see this page?</span>
+            </summary>
+            <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="true">
+                <p>
+                    This page provides a fake 'Identity Verification' form served by Agents Stubs.
+                <p>
+                    When submitting this with a successful uplift, the currently logged in test user
+                    will be updated to the new confidence level and the browser is redirected to the provided <i>completionURL</i>.
+                </p>
+                <p>
+                    When submitting this with a failed uplift, the currently logged in test user remains at
+                    the same confidence level and the browser is redirected to the provided <i>failureURL</i>.
+                </p>
+
+                <div class="form-hint" style="margin-top: 0.5em;">
+                    Check Confluence documentation to see how your QA possibly can benefit from using Agents Stubs.
+                </div>
+            </div>
+        </details>
+    </div>
+}

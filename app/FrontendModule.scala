@@ -41,6 +41,7 @@ class FrontendModule(val environment: Environment, val configuration: Configurat
     bindServiceConfigProperty[Int]("agents-external-stubs.port")
     bindServiceConfigProperty[Int]("company-auth-frontend.port")
     bindServiceConfigProperty[Int]("stride-auth-frontend.port")
+    bindServiceConfigProperty[Int]("identity-verification-frontend.port")
 
     bindProperty("http.port")
     bindProperty("proxies.start")

@@ -11,6 +11,10 @@ GET         /agents-external-stubs/gg/sign-out    @uk.gov.hmrc.agentsexternalstu
 GET         /stride/sign-in                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePage(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
 GET         /agents-external-stubs/stride/sign-in @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePageInternal(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
 
+# identity verification stubs
+GET         /mdtp/uplift                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPage(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
+POST        /mdtp/uplift                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.uplift(completionURL: ContinueUrl, failureURL: ContinueUrl)
+
 # ui actions
 GET         /agents-external-stubs                @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start
 

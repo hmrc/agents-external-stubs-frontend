@@ -5,13 +5,16 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.Html
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{SignInController, routes}
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.UpliftRequest
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{IdentityVerificationController, SignInController, routes}
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.error_template_Scope0.error_template_Scope1.error_template
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.govuk_wrapper_Scope0.govuk_wrapper_Scope1.govuk_wrapper
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.iv_uplift_Scope0.iv_uplift_Scope1.iv_uplift
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.sign_in_Scope0.sign_in_Scope1.sign_in
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template_Scope0.main_template_Scope1.main_template
+import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.test.UnitSpec
 
 class ViewsSpec extends UnitSpec with OneAppPerSuite {
@@ -45,6 +48,41 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
 
       val html2 =
         new sign_in().f(filledForm, routes.SignInController.signIn(None, None, None, AuthProvider.GovernmentGateway))(
+          FakeRequest(),
+          Messages.Implicits.applicationMessages,
+          app.configuration)
+      contentAsString(html2) shouldBe (content)
+    }
+  }
+
+  "iv_uplift view" should {
+    val filledUpliftForm = IdentityVerificationController.UpliftRequestForm.fill(
+      UpliftRequest(willSucceed = true, confidenceLevel = 200)
+    )
+
+    "render title and messages" in new App {
+      val postCall = routes.IdentityVerificationController.uplift(ContinueUrl("succeeds.url"), ContinueUrl("fails.url"))
+      val html = new iv_uplift()
+        .render(
+          upliftForm = filledUpliftForm,
+          postUrl = postCall,
+          request = FakeRequest(),
+          messages = Messages.Implicits.applicationMessages,
+          config = app.configuration
+        )
+      val content = contentAsString(html)
+
+      import Messages.Implicits.applicationMessages
+
+      content should include(Messages("uplift.header"))
+      content should include(Messages("uplift.description"))
+      content should include(Messages("uplift.form.dropdown.confidenceLevel"))
+      content should include(Messages("uplift.form.radio.willSucceed"))
+      content should include(Messages("uplift.form.radio.willFail"))
+      content should include(Messages("uplift.form.submit"))
+
+      val html2 =
+        new iv_uplift().f(filledUpliftForm, postCall)(
           FakeRequest(),
           Messages.Implicits.applicationMessages,
           app.configuration)
