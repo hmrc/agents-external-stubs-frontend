@@ -44,6 +44,16 @@ class SignInController @Inject()(
               .signIn(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
     }
 
+  def showGovernmentGatewaySignInPage(accountType: Option[String], origin: Option[String], continue: Option[ContinueUrl]) =
+    Action { implicit request =>
+      Ok(
+        html
+          .sign_in(
+            SignInRequestForm,
+            routes.SignInController
+              .signIn(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
+    }
+
   def signIn(
     continue: Option[ContinueUrl],
     origin: Option[String],
