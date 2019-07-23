@@ -12,7 +12,7 @@ GET         /stride/sign-in                                    @uk.gov.hmrc.agen
 GET         /agents-external-stubs/stride/sign-in              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePageInternal(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
 
 # government gateway registration frontend stubs
-GET         /government-gateway-registration-frontend          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showGovernmentGatewaySignInPage(accountType: Option[String] ?= None, origin: Option[String] ?= None, continue: Option[ContinueUrl] ?= None)
+GET         /government-gateway-registration-frontend          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showGovernmentGatewaySignInPage(continue: Option[ContinueUrl] ?= None, origin: Option[String] ?= None, accountType: Option[String] ?= None)
 
 # identity verification stubs
 GET         /mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPage(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
