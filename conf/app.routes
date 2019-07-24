@@ -1,55 +1,58 @@
 # microservice specific routes
 
 # authentication stubs
-GET         /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
-POST        /gg/sign-in                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String ?= "GovernmentGateway")
-GET         /gg/sign-out                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[ContinueUrl] ?= None)
-GET         /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPageInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
-POST        /agents-external-stubs/gg/sign-in     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String ?= "GovernmentGateway")
-GET         /agents-external-stubs/gg/sign-out    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutInternal(continue: Option[ContinueUrl] ?= None)
+GET         /gg/sign-in                                        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
+POST        /gg/sign-in                                        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signIn(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String ?= "GovernmentGateway")
+GET         /gg/sign-out                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[ContinueUrl] ?= None)
+GET         /agents-external-stubs/gg/sign-in                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPageInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String])
+POST        /agents-external-stubs/gg/sign-in                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInInternal(continue: Option[ContinueUrl], origin: Option[String], accountType: Option[String], providerType: String ?= "GovernmentGateway")
+GET         /agents-external-stubs/gg/sign-out                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutInternal(continue: Option[ContinueUrl] ?= None)
 
-GET         /stride/sign-in                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePage(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
-GET         /agents-external-stubs/stride/sign-in @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePageInternal(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
+GET         /stride/sign-in                                    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePage(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
+GET         /agents-external-stubs/stride/sign-in              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePageInternal(successURL: ContinueUrl, origin: Option[String], failureURL: Option[String])
+
+# government gateway registration frontend stubs
+GET         /government-gateway-registration-frontend          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showGovernmentGatewaySignInPage(continue: Option[ContinueUrl] ?= None, origin: Option[String] ?= None, accountType: Option[String] ?= None)
 
 # identity verification stubs
-GET         /mdtp/uplift                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPage(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
-POST        /mdtp/uplift                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.uplift(completionURL: ContinueUrl, failureURL: ContinueUrl)
-GET         /agents-external-stubs/mdtp/uplift    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageInternal(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
-POST        /agents-external-stubs/mdtp/uplift    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(completionURL: ContinueUrl, failureURL: ContinueUrl)
+GET         /mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPage(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
+POST        /mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.uplift(completionURL: ContinueUrl, failureURL: ContinueUrl)
+GET         /agents-external-stubs/mdtp/uplift                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageInternal(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
+POST        /agents-external-stubs/mdtp/uplift                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(completionURL: ContinueUrl, failureURL: ContinueUrl)
 
 # ui actions
-GET         /agents-external-stubs                @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start
+GET         /agents-external-stubs                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start
 
-GET         /agents-external-stubs/user           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
-GET         /agents-external-stubs/user/create    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showCreateUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
-GET         /agents-external-stubs/user/edit      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showEditUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
-POST        /agents-external-stubs/user/update    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.updateUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None, create: Boolean ?= false)
-GET         /agents-external-stubs/user/amend     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.amendUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None, principalEnrolment: Option[String] ?= None)
-GET         /agents-external-stubs/user/remove    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.removeUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
-GET         /agents-external-stubs/users          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
+GET         /agents-external-stubs/user                        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
+GET         /agents-external-stubs/user/create                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showCreateUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
+GET         /agents-external-stubs/user/edit                   @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showEditUserPage(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
+POST        /agents-external-stubs/user/update                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.updateUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None, create: Boolean ?= false)
+GET         /agents-external-stubs/user/amend                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.amendUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None, principalEnrolment: Option[String] ?= None)
+GET         /agents-external-stubs/user/remove                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.removeUser(continue: Option[ContinueUrl] ?= None, userId: Option[String] ?= None)
+GET         /agents-external-stubs/users                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
 
-GET         /agents-external-stubs/records        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAllRecordsPage(showId: Option[String] ?= None)
-GET         /agents-external-stubs/records/edit   @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showEditRecordPage(id: String)
-POST        /agents-external-stubs/records/update @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.updateRecord(id: String)
-GET         /agents-external-stubs/records/delete @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.deleteRecord(id: String)
-GET         /agents-external-stubs/records/add    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAddRecordPage(`type`: String, seed: String)
-POST        /agents-external-stubs/records/create @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.createRecord(`type`: String, seed: String)
+GET         /agents-external-stubs/records                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAllRecordsPage(showId: Option[String] ?= None)
+GET         /agents-external-stubs/records/edit                @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showEditRecordPage(id: String)
+POST        /agents-external-stubs/records/update              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.updateRecord(id: String)
+GET         /agents-external-stubs/records/delete              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.deleteRecord(id: String)
+GET         /agents-external-stubs/records/add                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAddRecordPage(`type`: String, seed: String)
+POST        /agents-external-stubs/records/create              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.createRecord(`type`: String, seed: String)
 
-GET         /agents-external-stubs/known-facts    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.KnownFactsController.showKnownFactsPage(enrolmentKey: String)
-GET         /agents-external-stubs/services       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.KnownFactsController.showEnrolmentsPage
+GET         /agents-external-stubs/known-facts                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.KnownFactsController.showKnownFactsPage(enrolmentKey: String)
+GET         /agents-external-stubs/services                    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.KnownFactsController.showEnrolmentsPage
 
-GET         /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.showRestQueryPage(q: Option[String] ?= None)
-POST        /agents-external-stubs/rest-query     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.runQuery
+GET         /agents-external-stubs/rest-query                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.showRestQueryPage(q: Option[String] ?= None)
+POST        /agents-external-stubs/rest-query                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.runQuery
 
-GET         /agents-external-stubs/sign-in        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(continue: Option[ContinueUrl] ?= None, userId: String, providerType: String ?= "GovernmentGateway")
+GET         /agents-external-stubs/sign-in                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInUser(continue: Option[ContinueUrl] ?= None, userId: String, providerType: String ?= "GovernmentGateway")
 
-GET         /agents-external-stubs/special-cases         @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.showAllSpecialCasesPage(caseId: Option[String] ?= None)
-GET         /agents-external-stubs/special-cases/edit    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.showEditSpecialCasePage(caseId: Option[String] ?= None)
-POST        /agents-external-stubs/special-cases/update  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.upsertSpecialCase(caseId: Option[String] ?= None)
-GET         /agents-external-stubs/special-cases/delete  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.deleteSpecialCase(caseId: String)
+GET         /agents-external-stubs/special-cases               @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.showAllSpecialCasesPage(caseId: Option[String] ?= None)
+GET         /agents-external-stubs/special-cases/edit          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.showEditSpecialCasePage(caseId: Option[String] ?= None)
+POST        /agents-external-stubs/special-cases/update        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.upsertSpecialCase(caseId: Option[String] ?= None)
+GET         /agents-external-stubs/special-cases/delete        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.deleteSpecialCase(caseId: String)
 
-GET         /agents-external-stubs/planet/destroy @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PlanetController.destroyPlanet
+GET         /agents-external-stubs/planet/destroy              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PlanetController.destroyPlanet
 
-GET         /agents-external-stubs/help/*name     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.HelpController.showHelpPage(name: String)
+GET         /agents-external-stubs/help/*name                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.HelpController.showHelpPage(name: String)
 
-GET         /agents-external-stubs/assets/*file   controllers.Assets.at(path="/public", file)
+GET         /agents-external-stubs/assets/*file                controllers.Assets.at(path="/public", file)
