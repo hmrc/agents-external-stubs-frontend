@@ -38,6 +38,14 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       }
     }
 
+    "GET /agents-external-stubs/government-gateway-registration-frontend" should {
+      "display the sign in page" in {
+        val result = controller.showGovernmentGatewaySignInPageInternal(Some(ContinueUrl("/there")), Some("here"), None)(FakeRequest())
+        status(result) shouldBe 200
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
+      }
+    }
+
     "POST /gg/sign-in" should {
       "redirect to continue URL if provided" in {
         val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)

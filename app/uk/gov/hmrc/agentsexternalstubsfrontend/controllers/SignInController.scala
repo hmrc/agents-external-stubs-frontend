@@ -150,6 +150,11 @@ class SignInController @Inject()(
               .signInInternal(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
     }
 
+  def showGovernmentGatewaySignInPageInternal(
+    continue: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String]) = showSignInPageInternal(continue, origin, accountType)
+
   def showSignInStridePageInternal(
     successURL: ContinueUrl,
     origin: Option[String],
@@ -188,6 +193,7 @@ object SignInController {
     planetId: String,
     plainTextPassword: String = "p@ssw0rd",
     providerType: String = AuthProvider.GovernmentGateway)
+
   object SignInRequest {
     implicit val writes: Writes[SignInRequest] = Json.writes[SignInRequest]
   }
