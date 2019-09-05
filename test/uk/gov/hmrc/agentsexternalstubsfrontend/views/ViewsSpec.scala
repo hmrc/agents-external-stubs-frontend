@@ -57,18 +57,18 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
 
   "iv_uplift view" should {
     val filledUpliftForm = IdentityVerificationController.UpliftRequestForm.fill(
-      UpliftRequest(willSucceed = true, confidenceLevel = 200)
+      UpliftRequest("AB 62 62 25 C", "success")
     )
 
     "render title and messages" in new App {
-      val postCall = routes.IdentityVerificationController.uplift(ContinueUrl("succeeds.url"), ContinueUrl("fails.url"))
+      val postCall = routes.IdentityVerificationController.uplift("123456789")
       val html = new iv_uplift()
         .render(
-          upliftForm = filledUpliftForm,
-          postUrl = postCall,
-          request = FakeRequest(),
-          messages = Messages.Implicits.applicationMessages,
-          config = app.configuration
+          filledUpliftForm,
+          postCall,
+          FakeRequest(),
+          Messages.Implicits.applicationMessages,
+          app.configuration
         )
       val content = contentAsString(html)
 

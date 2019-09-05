@@ -1,6 +1,6 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, inputRadioGroup, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
+@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown, errorSummary, dateFieldsFreeInlineLegend, singleCheckbox}
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
 @(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, hasContinue: Boolean, services: Seq[(String,String)], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
