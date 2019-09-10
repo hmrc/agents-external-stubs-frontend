@@ -1,5 +1,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.views
 
+import java.util.UUID
+
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
@@ -18,6 +20,21 @@ import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.test.UnitSpec
 
 class ViewsSpec extends UnitSpec with OneAppPerSuite {
+
+  val journeyIdValue: String = UUID.randomUUID().toString
+
+  val options: String => Seq[(String, String)] = (journeyId: String) =>
+    Seq(
+      s"success~$journeyId"              -> "Success",
+      s"preconditionFailed~$journeyId"   -> "Precondition Failed",
+      s"lockedOut~$journeyId"            -> "Locked Out",
+      s"insufficientEvidence~$journeyId" -> "Insufficient Evidence",
+      s"failedMatching~$journeyId"       -> "Failed Matching",
+      s"technicalIssue~$journeyId"       -> "Technical Issue",
+      s"userAborted~$journeyId"          -> "User Aborted",
+      s"timedOut~$journeyId"             -> "Timed Out",
+      s"failedIV~$journeyId"             -> "Failed IV"
+  )
 
   private val filledForm = SignInController.SignInRequestForm.fill(
     SignInRequest(userId = "My contact name", plainTextPassword = "AA1 1AA", planetId = "juniper")
@@ -61,10 +78,12 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
     )
 
     "render title and messages" in new App {
-      val postCall = routes.IdentityVerificationController.uplift("123456789")
+      val postCall = routes.IdentityVerificationController
+        .uplift("123456789", 200, ContinueUrl("/good"), ContinueUrl("/bad"), Some("aif"))
       val html = new iv_uplift()
         .render(
           filledUpliftForm,
+          options(journeyIdValue),
           postCall,
           FakeRequest(),
           Messages.Implicits.applicationMessages,
@@ -83,7 +102,10 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
 
       val html2 =
         new iv_uplift()
-          .f(filledUpliftForm, postCall)(FakeRequest(), Messages.Implicits.applicationMessages, app.configuration)
+          .f(filledUpliftForm, options(journeyIdValue), postCall)(
+            FakeRequest(),
+            Messages.Implicits.applicationMessages,
+            app.configuration)
       contentAsString(html2) shouldBe (content)
     }
   }

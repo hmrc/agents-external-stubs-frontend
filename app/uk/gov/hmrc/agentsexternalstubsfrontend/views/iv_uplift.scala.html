@@ -5,7 +5,7 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@(pageForm: Form[UpliftRequest], formAction: Call)(implicit request: Request[_], messages: Messages, configuration: Configuration)
+@(pageForm: Form[UpliftRequest], options: Seq[(String, String)], formAction: Call)(implicit request: Request[_], messages: Messages, configuration: Configuration)
 
 @main_template(title = Messages("login.title"), bodyClasses = None) {
 
@@ -37,17 +37,7 @@ form = pageForm
 <div class="form-group client-validated">
     @input_radio_group(
     pageForm("option"),
-    radioOptions = Seq(
-    "success" -> "Success",
-    "preconditionFailed" -> "Precondition Failed",
-    "lockedOut" -> "Locked Out",
-    "insufficientEvidence" -> "Insufficient Evidence",
-    "failedMatching" -> "Failed Matching",
-    "technicalIssue"-> "Technical Issue",
-    "userAborted"-> "User Aborted",
-    "timedOut" -> "Timed Out",
-    "failedIV" -> "Failed IV"
-    ),
+    radioOptions = options,
     '_groupClass -> "form-group",
     '_labelClass -> "block-label",
     '_legend -> s"${Messages("configure_journey.requiredResult.label")}",

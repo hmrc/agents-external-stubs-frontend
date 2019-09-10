@@ -7,7 +7,6 @@ import play.api.libs.json._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.iv_models.{Journey, JourneyType, ServiceContract}
 import uk.gov.hmrc.http._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -199,20 +198,4 @@ class AgentsExternalStubsConnector @Inject()(
       .recover {
         case Upstream4xxException(e) => throw e
       }
-
-  def createJourneyId(serviceContract: ServiceContract, journeyType: JourneyType)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[String] = {
-    val json = Json.toJson(serviceContract).as[JsObject] ++ Json.obj("journeyType" -> journeyType)
-    println(s"So $json")
-    http.POST[JsValue, JsObject](s"$baseUrl/journey", json).map { response =>
-      (response \ "journeyId").as[String]
-    }
-  }
-
-  def getJourneyId(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Journey] =
-    http.GET[Journey](s"$baseUrl/journey/$journeyId")
-
-  def deleteJourney(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Int] =
-    http.DELETE[HttpResponse](s"$baseUrl/journey/$journeyId").map(_.status)
 }

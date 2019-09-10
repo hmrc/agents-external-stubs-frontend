@@ -4,9 +4,8 @@ import java.util.UUID
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
-import play.api.libs.json.{JsArray, JsNull, JsString, Json}
+import play.api.libs.json.{JsArray, Json}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.iv_models.JourneyType
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
 
@@ -114,25 +113,6 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withStatus(Status.OK)
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(validSpecialCasesResponse)))
-
-  def givenCreateJourney =
-    stubFor(post(urlEqualTo(s"/journey"))
-      .willReturn(aResponse()
-        .withStatus(Status.CREATED)
-        .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
-        .withBody(validCreateJourney("1234"))
-      )
-    )
-
-  def givenGetJourney(journeyId: String, journeyType: JourneyType) =
-    stubFor(get(urlEqualTo(s"/journey/$journeyId"))
-      .willReturn(
-        aResponse()
-          .withStatus(Status.OK)
-          .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
-          .withBody(validGetJourney(journeyId, journeyType))
-      )
-    )
 }
 
 trait ValidStubResponses {
@@ -639,29 +619,5 @@ trait ValidStubResponses {
       |    "planetId": "Melmac",
       |    "id": "5bc7716011000066003b0588"
       |  }""".stripMargin
-
-
-  case class ServiceContract(origin: Option[String], completionURL: String, failureURL: String, confidenceLevel: Int)
-
-  val validCreateJourney = (journeyId: String) =>
-    s"""
-      |{
-      | "journeyId":"$journeyId"
-      |}
-    """.stripMargin
-
-  val validGetJourney = (journeyId: String, journeyType: JourneyType) =>
-    s"""
-       |{
-       |   "journeyId":"$journeyId",
-       |   "journeyType":"$journeyType",
-       |   "serviceContract": {
-       |      "origin":"aif",
-       |      "completionURL":"/good",
-       |      "failureURL":"/bad",
-       |      "confidenceLevel": 200
-       |   }
-       |}
-     """.stripMargin
 
 }
