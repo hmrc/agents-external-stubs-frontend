@@ -41,6 +41,21 @@ uplift.form.radio.willSucceed=Succeed the IV journey, uplift the user, and redir
 uplift.form.radio.willFail=Fail the IV journey and redirect to the <i>failureURL</i>
 uplift.form.submit=Complete IV and redirect
 
+# Identity Verification page Proto
+error-summary.heading=There are errors on the page.
+
+configure_journey.title=Identity Verification - Stubbed Journey configuration
+configure_journey.header=Identity Verification Stub
+configure_journey.header.registration=You are attempting to perform a user registration
+configure_journey.header.uplift=You are attempting to perform a user uplift
+configure_journey.forNino.required=You must provide a Nino
+configure_journey.requiredConfidenceLevel.required=You must select a Confidence Level
+configure_journey.requiredResult.required=You must select a Journey Result
+configure_journey.requiredResult.label=With Journey Result:
+configure_journey.requiredConfidenceLevel.label=You are requesting Confidence Level:
+configure_journey.forNino.label=For Nino:
+
+
 # General Messages
 # Error messages for digital services
 global.error.400.title=Bad request - 400

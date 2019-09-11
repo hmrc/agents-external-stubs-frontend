@@ -16,10 +16,14 @@ GET         /government-gateway-registration-frontend                           
 GET         /agents-external-stubs/government-gateway-registration-frontend        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showGovernmentGatewaySignInPageInternal(continue: Option[ContinueUrl] ?= None, origin: Option[String] ?= None, accountType: Option[String] ?= None)
 
 # identity verification stubs
-GET         /mdtp/uplift                                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPage(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
-POST        /mdtp/uplift                                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.uplift(completionURL: ContinueUrl, failureURL: ContinueUrl)
-GET         /agents-external-stubs/mdtp/uplift                                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageInternal(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
-POST        /agents-external-stubs/mdtp/uplift                                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(completionURL: ContinueUrl, failureURL: ContinueUrl)
+
+GET        /mdtp/uplift                                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageProxy(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
+POST       /mdtp/uplift                                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftProxy(journeyId: String, confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
+GET        /mdtp/journey/journeyId/:journeyIdAndReason                              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultProxy(journeyIdAndReason: String)
+GET        /agents-external-stubs/mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageInternal(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
+POST       /agents-external-stubs/mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(journeyId: String, confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
+GET        /agents-external-stubs/mdtp/journey/journeyId/:journeyIdAndReason        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultInternal(journeyIdAndReason: String)
+
 
 # ui actions
 GET         /agents-external-stubs                                                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start

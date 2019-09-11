@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
-import play.api.libs.json.{JsArray, JsNull, JsString, Json}
+import play.api.libs.json.{JsArray, Json}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.WireMockSupport
@@ -113,7 +113,6 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withStatus(Status.OK)
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(validSpecialCasesResponse)))
-
 }
 
 trait ValidStubResponses {

@@ -10,11 +10,11 @@ class UpliftFormSpec extends UnitSpec {
     "bind all input fields and return UpliftRequest and fill it back" in {
       val form = IdentityVerificationController.UpliftRequestForm
 
-      val value = UpliftRequest(willSucceed = true, confidenceLevel = 200)
+      val value = UpliftRequest("AB626225C", "success")
 
       val fieldValues = Map(
-        "willSucceed"     -> "true",
-        "confidenceLevel" -> "200"
+        "nino"   -> "AB626225C",
+        "option" -> "success"
       )
 
       form.bind(fieldValues).value shouldBe Some(value)
