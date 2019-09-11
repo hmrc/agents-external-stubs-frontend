@@ -82,24 +82,6 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
       }
     }
 
-    "GET /mdtp/journey/journeyId/:journeyIdAndReason" when {
-
-      "return 200 with Json" in new Setup {
-        val fakeRequest = FakeRequest(GET, "/mdtp/journey/journeyId/success~1234")
-
-        val result = callEndpointWith(fakeRequest)
-        status(result) shouldBe 200
-        (jsonBodyOf(result) \ "reason").as[String] shouldBe "success"
-      }
-
-      "return 404 with no Json" in new Setup {
-        val failedFakeRequest = FakeRequest(GET, "/mdtp/journey/journeyId/1234")
-
-        val result = callEndpointWith(failedFakeRequest)
-        status(result) shouldBe 404
-      }
-    }
-
     "GET /agents-external-stubs/mdtp/uplift" should {
       "display the identity verification uplift page" in new Setup {
 
@@ -162,6 +144,42 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
           redirectLocation(result) shouldBe Some("/bad?journeyId=1234")
           header("X-Result-Location", result) shouldBe Some("/mdtp/journey/journeyId/preconditionFailed~1234")
         }
+      }
+    }
+
+    "GET /mdtp/journey/journeyId/:journeyIdAndReason" should {
+
+      "return 200 with Json" in new Setup {
+        val fakeRequest = FakeRequest(GET, "/mdtp/journey/journeyId/success~1234")
+
+        val result = callEndpointWith(fakeRequest)
+        status(result) shouldBe 200
+        (jsonBodyOf(result) \ "reason").as[String] shouldBe "success"
+      }
+
+      "return 404 with no Json" in new Setup {
+        val failedFakeRequest = FakeRequest(GET, "/mdtp/journey/journeyId/1234")
+
+        val result = callEndpointWith(failedFakeRequest)
+        status(result) shouldBe 404
+      }
+    }
+
+    "GET /agents-external-stubs/mdtp/journey/journeyId/:journeyIdAndReason" when {
+
+      "return 200 with Json" in new Setup {
+        val fakeRequest = FakeRequest(GET, "/agents-external-stubs/mdtp/journey/journeyId/success~1234")
+
+        val result = callEndpointWith(fakeRequest)
+        status(result) shouldBe 200
+        (jsonBodyOf(result) \ "reason").as[String] shouldBe "success"
+      }
+
+      "return 404 with no Json" in new Setup {
+        val failedFakeRequest = FakeRequest(GET, "/agents-external-stubs/mdtp/journey/journeyId/1234")
+
+        val result = callEndpointWith(failedFakeRequest)
+        status(result) shouldBe 404
       }
     }
   }

@@ -47,11 +47,24 @@ class IdentityVerificationController @Inject()(
       s"failedIV~$journeyId"             -> "Failed IV"
   )
 
-  def showUpliftPage(
+  private val upliftUrl = (
     confidenceLevel: Int,
     completionURL: ContinueUrl,
     failureURL: ContinueUrl,
-    origin: Option[String]): Action[AnyContent] =
+    origin: Option[String],
+    doProxy: Boolean) =>
+    if (doProxy)
+      routes.IdentityVerificationController
+        .upliftProxy(journeyIdValue, confidenceLevel, completionURL, failureURL, origin)
+    else
+      routes.IdentityVerificationController
+        .upliftInternal(journeyIdValue, confidenceLevel, completionURL, failureURL, origin)
+
+  private def showUpliftPage(
+    confidenceLevel: Int,
+    completionURL: ContinueUrl,
+    failureURL: ContinueUrl,
+    origin: Option[String])(doProxy: Boolean): Action[AnyContent] =
     Action.async { implicit request =>
       authorised().retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         agentsExternalStubsConnector.getUser(credentials.providerId).map { currentUser =>
@@ -61,50 +74,10 @@ class IdentityVerificationController @Inject()(
               .iv_uplift(
                 UpliftRequestForm.fill(UpliftRequest(nino, "")),
                 options(journeyIdValue),
-                routes.IdentityVerificationController
-                  .uplift(journeyIdValue, confidenceLevel, completionURL, failureURL, origin)
+                upliftUrl(confidenceLevel, completionURL, failureURL, origin, doProxy)
               ))
         }
       }
-    }
-
-  def uplift(
-    journeyId: String,
-    confidenceLevel: Int,
-    completionURL: ContinueUrl,
-    failureURL: ContinueUrl,
-    origin: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
-      authorised()
-        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          UpliftRequestForm
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(
-                  Ok(
-                    html
-                      .iv_uplift(
-                        formWithErrors,
-                        options(journeyId),
-                        routes.IdentityVerificationController
-                          .uplift(journeyId, confidenceLevel, completionURL, failureURL, origin)))),
-              upliftRequest => {
-                val journeyIdMatches = upliftRequest.option.contains(journeyId)
-                val isSuccessful = upliftRequest.option.contains("success")
-                if (journeyIdMatches && isSuccessful) {
-                  for {
-                    currentUser <- agentsExternalStubsConnector.getUser(credentials.providerId)
-                    modifiedUser = currentUser.copy(confidenceLevel = Some(200))
-                    _ <- agentsExternalStubsConnector.updateUser(modifiedUser)
-                  } yield redirectWithJourneyId(completionURL.url, journeyId, upliftRequest.option)
-                } else {
-                  Future.successful(redirectWithJourneyId(failureURL.url, journeyId, upliftRequest.option)
-                    .withHeaders("X-Result-Location" -> s"/mdtp/journey/journeyId/${upliftRequest.option}"))
-                }
-              }
-            )
-        }
     }
 
   private def redirectWithJourneyId(targetUrl: String, journeyId: String, option: String): Result = {
@@ -114,42 +87,26 @@ class IdentityVerificationController @Inject()(
       .withHeaders("X-Result-Location" -> s"/mdtp/journey/journeyId/$option")
   }
 
-  def getIvResult(journeyIdAndReason: String): Action[AnyContent] = Action.async { implicit request =>
-    if (journeyIdAndReason.nonEmpty && journeyIdAndReason.contains("~")) {
-      val split = journeyIdAndReason.split("~")
-      val reason = split.head
-      val journeyId = split.last
-      Future.successful(Ok(Json.obj("token" -> journeyId, "reason" -> reason)))
-    } else Future.successful(NotFound)
-  }
+  def showUpliftPageProxy(
+    confidenceLevel: Int,
+    completionURL: ContinueUrl,
+    failureURL: ContinueUrl,
+    origin: Option[String]): Action[AnyContent] =
+    showUpliftPage(confidenceLevel, completionURL, failureURL, origin)(true)
 
   def showUpliftPageInternal(
     confidenceLevel: Int,
     completionURL: ContinueUrl,
     failureURL: ContinueUrl,
     origin: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
-      authorised().retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-        agentsExternalStubsConnector.getUser(credentials.providerId).map { currentUser =>
-          val nino: String = currentUser.nino.map(_.value).getOrElse("")
-          Ok(
-            html
-              .iv_uplift(
-                UpliftRequestForm.fill(UpliftRequest(nino, "")),
-                options(journeyIdValue),
-                routes.IdentityVerificationController
-                  .uplift(journeyIdValue, confidenceLevel, completionURL, failureURL, origin)
-              ))
-        }
-      }
-    }
+    showUpliftPage(confidenceLevel, completionURL, failureURL, origin)(false)
 
-  def upliftInternal(
+  private def uplift(
     journeyId: String,
     confidenceLevel: Int,
     completionURL: ContinueUrl,
     failureURL: ContinueUrl,
-    origin: Option[String]): Action[AnyContent] =
+    origin: Option[String])(doProxy: Boolean): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
@@ -163,8 +120,7 @@ class IdentityVerificationController @Inject()(
                       .iv_uplift(
                         formWithErrors,
                         options(journeyId),
-                        routes.IdentityVerificationController
-                          .uplift(journeyId, confidenceLevel, completionURL, failureURL, origin)))),
+                        upliftUrl(200, completionURL, failureURL, origin, doProxy)))),
               upliftRequest => {
                 val journeyIdMatches = upliftRequest.option.contains(journeyId)
                 val isSuccessful = upliftRequest.option.contains("success")
@@ -181,6 +137,35 @@ class IdentityVerificationController @Inject()(
             )
         }
     }
+
+  def upliftProxy(
+    journeyId: String,
+    confidenceLevel: Int,
+    completionURL: ContinueUrl,
+    failureURL: ContinueUrl,
+    origin: Option[String]): Action[AnyContent] =
+    uplift(journeyId, confidenceLevel, completionURL, failureURL, origin)(true)
+
+  def upliftInternal(
+    journeyId: String,
+    confidenceLevel: Int,
+    completionURL: ContinueUrl,
+    failureURL: ContinueUrl,
+    origin: Option[String]): Action[AnyContent] =
+    uplift(journeyId, confidenceLevel, completionURL, failureURL, origin)(false)
+
+  private def getIvResult(journeyIdAndReason: String) = Action.async { implicit request =>
+    if (journeyIdAndReason.nonEmpty && journeyIdAndReason.contains("~")) {
+      val split = journeyIdAndReason.split("~")
+      val reason = split.head
+      val journeyId = split.last
+      Future.successful(Ok(Json.obj("token" -> journeyId, "reason" -> reason)))
+    } else Future.successful(NotFound)
+  }
+
+  def getIvResultProxy(journeyIdAndReason: String): Action[AnyContent] = getIvResult(journeyIdAndReason)
+
+  def getIvResultInternal(journeyIdAndReason: String): Action[AnyContent] = getIvResult(journeyIdAndReason)
 }
 
 object IdentityVerificationController {

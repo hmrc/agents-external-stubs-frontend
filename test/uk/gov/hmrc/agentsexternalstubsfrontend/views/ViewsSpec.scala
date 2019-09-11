@@ -79,7 +79,7 @@ class ViewsSpec extends UnitSpec with OneAppPerSuite {
 
     "render title and messages" in new App {
       val postCall = routes.IdentityVerificationController
-        .uplift("123456789", 200, ContinueUrl("/good"), ContinueUrl("/bad"), Some("aif"))
+        .upliftProxy("123456789", 200, ContinueUrl("/good"), ContinueUrl("/bad"), Some("aif"))
       val html = new iv_uplift()
         .render(
           filledUpliftForm,
