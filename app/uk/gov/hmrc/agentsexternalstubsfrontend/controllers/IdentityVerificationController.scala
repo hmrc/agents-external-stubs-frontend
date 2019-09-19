@@ -36,15 +36,15 @@ class IdentityVerificationController @Inject()(
 
   val options: String => Seq[(String, String)] = (journeyId: String) =>
     Seq(
-      s"success~$journeyId"              -> "Success",
-      s"preconditionFailed~$journeyId"   -> "Precondition Failed",
-      s"lockedOut~$journeyId"            -> "Locked Out",
-      s"insufficientEvidence~$journeyId" -> "Insufficient Evidence",
-      s"failedMatching~$journeyId"       -> "Failed Matching",
-      s"technicalIssue~$journeyId"       -> "Technical Issue",
-      s"userAborted~$journeyId"          -> "User Aborted",
-      s"timedOut~$journeyId"             -> "Timed Out",
-      s"failedIV~$journeyId"             -> "Failed IV"
+      s"Success~$journeyId"              -> "Success",
+      s"PreconditionFailed~$journeyId"   -> "Precondition Failed",
+      s"LockedOut~$journeyId"            -> "Locked Out",
+      s"InsufficientEvidence~$journeyId" -> "Insufficient Evidence",
+      s"FailedMatching~$journeyId"       -> "Failed Matching",
+      s"TechnicalIssue~$journeyId"       -> "Technical Issue",
+      s"UserAborted~$journeyId"          -> "User Aborted",
+      s"TimedOut~$journeyId"             -> "Timed Out",
+      s"FailedIV~$journeyId"             -> "Failed IV"
   )
 
   private val upliftUrl = (
@@ -84,7 +84,6 @@ class IdentityVerificationController @Inject()(
     val cleanUrl = URLDecoder.decode(targetUrl, "UTF-8")
     val tokenAppendChar = if (cleanUrl.contains("?")) "&" else "?"
     Redirect(s"$cleanUrl${tokenAppendChar}journeyId=$journeyId")
-      .withHeaders("X-Result-Location" -> s"/mdtp/journey/journeyId/$option")
   }
 
   def showUpliftPageProxy(
@@ -123,7 +122,7 @@ class IdentityVerificationController @Inject()(
                         upliftUrl(200, completionURL, failureURL, origin, doProxy)))),
               upliftRequest => {
                 val journeyIdMatches = upliftRequest.option.contains(journeyId)
-                val isSuccessful = upliftRequest.option.contains("success")
+                val isSuccessful = upliftRequest.option.contains("Success")
                 if (journeyIdMatches && isSuccessful) {
                   for {
                     currentUser <- agentsExternalStubsConnector.getUser(credentials.providerId)
@@ -131,12 +130,21 @@ class IdentityVerificationController @Inject()(
                     _ <- agentsExternalStubsConnector.updateUser(modifiedUser)
                   } yield redirectWithJourneyId(completionURL.url, journeyId, upliftRequest.option)
                 } else {
+                  storeResult((journeyId, upliftRequest.option.split('~').head))
                   Future.successful(redirectWithJourneyId(failureURL.url, journeyId, upliftRequest.option))
                 }
               }
             )
         }
     }
+
+  var identityVerificationResults = scala.collection.mutable.Map[String, String]()
+
+  private def storeResult(pair: (String, String)): Unit =
+    identityVerificationResults += (pair._1 -> pair._2)
+
+  private def getResult(journeyId: String): Option[String] =
+    identityVerificationResults.get(journeyId)
 
   def upliftProxy(
     journeyId: String,
@@ -154,13 +162,19 @@ class IdentityVerificationController @Inject()(
     origin: Option[String]): Action[AnyContent] =
     uplift(journeyId, confidenceLevel, completionURL, failureURL, origin)(false)
 
-  private def getIvResult(journeyIdAndReason: String) = Action.async { implicit request =>
-    if (journeyIdAndReason.nonEmpty && journeyIdAndReason.contains("~")) {
-      val split = journeyIdAndReason.split("~")
-      val reason = split.head
-      val journeyId = split.last
-      Future.successful(Ok(Json.obj("token" -> journeyId, "reason" -> reason)))
-    } else Future.successful(NotFound)
+  private def getIvResult(journeyId: String) = Action.async { implicit request =>
+    if (journeyId.nonEmpty) {
+      try {
+        val result = getResult(journeyId).get
+        Future.successful(Ok(Json.obj("token" -> journeyId, "result" -> result)))
+      } catch {
+        case _: NoSuchElementException => Future.successful(NotFound)
+      } finally {
+        identityVerificationResults.clear()
+      }
+    } else {
+      Future.successful(NotFound)
+    }
   }
 
   def getIvResultProxy(journeyIdAndReason: String): Action[AnyContent] = getIvResult(journeyIdAndReason)

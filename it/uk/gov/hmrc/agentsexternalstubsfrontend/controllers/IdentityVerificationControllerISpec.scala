@@ -56,28 +56,26 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
       "IV was chosen to succeed" should {
         val succeedRequest = addCsrfToken(
           FakeRequest(POST, "/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai")
-            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "success~1234"))
+            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "Success~1234"))
 
         "redirect to the completionURL" in new Setup {
           val result = callEndpointWith(succeedRequest)
 
           status(result) shouldBe 303
           redirectLocation(result) shouldBe Some("/good?journeyId=1234")
-          header("X-Result-Location", result) shouldBe Some("/mdtp/journey/journeyId/success~1234")
         }
       }
 
       "IV was chosen to fail" should {
         val failRequest = addCsrfToken(
           FakeRequest(POST, "/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai")
-            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "preconditionFailed~1234"))
+            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234"))
 
         "redirect to the failureURL" in new Setup {
 
           val result = callEndpointWith(failRequest)
           status(result) shouldBe 303
           redirectLocation(result) shouldBe Some("/bad?journeyId=1234")
-          header("X-Result-Location", result) shouldBe Some("/mdtp/journey/journeyId/preconditionFailed~1234")
         }
       }
     }
@@ -121,7 +119,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
       "IV was chosen to succeed" should {
         val succeedRequest = addCsrfToken(
           FakeRequest(POST, "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai")
-            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "success~1234"))
+            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "Success~1234"))
 
         "redirect to the completionURL" in new Setup {
 
@@ -129,32 +127,37 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
           status(result) shouldBe 303
           redirectLocation(result) shouldBe Some("/good?journeyId=1234")
-          header("X-Result-Location", result) shouldBe Some("/mdtp/journey/journeyId/success~1234")
         }
       }
 
       "IV was chosen to fail" should {
         val failRequest = addCsrfToken(
           FakeRequest(POST, "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai")
-            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "preconditionFailed~1234"))
+            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234"))
 
         "redirect to the failureURL" in new Setup {
           val result = callEndpointWith(failRequest)
           status(result) shouldBe 303
           redirectLocation(result) shouldBe Some("/bad?journeyId=1234")
-          header("X-Result-Location", result) shouldBe Some("/mdtp/journey/journeyId/preconditionFailed~1234")
         }
       }
     }
 
-    "GET /mdtp/journey/journeyId/:journeyIdAndReason" should {
+    "GET /mdtp/journey/journeyId/:journeyId" should {
 
       "return 200 with Json" in new Setup {
-        val fakeRequest = FakeRequest(GET, "/mdtp/journey/journeyId/success~1234")
+
+        val failRequest = addCsrfToken(
+          FakeRequest(POST, "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai")
+            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234"))
+
+        callEndpointWith(failRequest)
+
+        val fakeRequest = FakeRequest(GET, "/mdtp/journey/journeyId/1234")
 
         val result = callEndpointWith(fakeRequest)
         status(result) shouldBe 200
-        (jsonBodyOf(result) \ "reason").as[String] shouldBe "success"
+        (jsonBodyOf(result) \ "result").as[String] shouldBe "PreconditionFailed"
       }
 
       "return 404 with no Json" in new Setup {
@@ -165,14 +168,21 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
       }
     }
 
-    "GET /agents-external-stubs/mdtp/journey/journeyId/:journeyIdAndReason" when {
+    "GET /agents-external-stubs/mdtp/journey/journeyId/:journeyId" when {
 
       "return 200 with Json" in new Setup {
-        val fakeRequest = FakeRequest(GET, "/agents-external-stubs/mdtp/journey/journeyId/success~1234")
+
+        val failRequest = addCsrfToken(
+          FakeRequest(POST, "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai")
+            .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234"))
+
+        callEndpointWith(failRequest)
+
+        val fakeRequest = FakeRequest(GET, "/agents-external-stubs/mdtp/journey/journeyId/1234")
 
         val result = callEndpointWith(fakeRequest)
         status(result) shouldBe 200
-        (jsonBodyOf(result) \ "reason").as[String] shouldBe "success"
+        (jsonBodyOf(result) \ "result").as[String] shouldBe "PreconditionFailed"
       }
 
       "return 404 with no Json" in new Setup {
