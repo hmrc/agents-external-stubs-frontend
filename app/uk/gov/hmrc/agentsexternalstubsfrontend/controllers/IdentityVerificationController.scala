@@ -37,6 +37,8 @@ class IdentityVerificationController @Inject()(
   val options: String => Seq[(String, String)] = (journeyId: String) =>
     Seq(
       s"Success~$journeyId"              -> "Success",
+      s"Incomplete~$journeyId"           -> "Incomplete",
+      s"FailedDirectorCheck~$journeyId"  -> "FailedDirectorCheck",
       s"PreconditionFailed~$journeyId"   -> "Precondition Failed",
       s"LockedOut~$journeyId"            -> "Locked Out",
       s"InsufficientEvidence~$journeyId" -> "Insufficient Evidence",
