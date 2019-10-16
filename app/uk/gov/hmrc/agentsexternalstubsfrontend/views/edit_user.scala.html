@@ -87,34 +87,41 @@
                     )
                     </div>
 
-                    @if(userForm.data.get("affinityGroup").contains("Individual")) {
-                        <div class="form-group soft--ends">
-                        @dropdown(
-                            userForm("confidenceLevel"),
-                            ConfidenceLevel.values,
-                            false,
-                            '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.confidenceLevel") + """</span>"""),
-                            '_selectClass -> Html("""input--medium input--cleared""")
-                        )
-                        </div>
+                    @if(!userForm.data.get("affinityGroup").contains("Individual")) {
+                        <p>NOTE: These three fields (confidenceLevel, NINO and DOB) are normally only set for <strong>Individuals</strong>!
+                            Setting these for other affinity groups may result in non-compliant data.
+                        </p>
+                    }
 
-                        <div class="form-group">
-                            @input(
-                                userForm("nino"),
-                                '_label -> Messages("user.form.nino"),
-                                '_inputClass -> "input--medium input--cleared",
-                                '_labelTextClass -> "h2-heading",
-                                '_labelClass -> "soft--ends"
-                            )
-                        </div>
+                    <div class="form-group soft--ends">
+                    @dropdown(
+                        userForm("confidenceLevel"),
+                        ConfidenceLevel.values,
+                        false,
+                        '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.confidenceLevel") + """</span>"""),
+                        '_selectClass -> Html("""input--medium input--cleared""")
+                    )
+                    </div>
 
-                        <div class="form-group">
-                        @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
-                            '_legend -> Html("""<span class="h2-heading soft--ends">"""+ Messages("user.form.dateOfBirth")+ """</span>"""),
+                    <div class="form-group">
+                        @input(
+                            userForm("nino"),
+                            '_label -> Messages("user.form.nino"),
+                            '_inputClass -> "input--medium input--cleared",
+                            '_labelTextClass -> "h2-heading",
                             '_labelClass -> "soft--ends"
                         )
-                        </div>
-                    }
+                    </div>
+
+                    <div class="form-group">
+                    @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
+                        '_legend -> Html("""<span class="h2-heading soft--ends">"""+ Messages("user.form.dateOfBirth")+ """</span>"""),
+                        '_labelClass -> "soft--ends"
+                    )
+                    </div>
+
+                    <br/>
+                    <br/>
 
                     <div class="form-group">
                         @input(
