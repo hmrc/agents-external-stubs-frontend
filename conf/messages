@@ -55,6 +55,10 @@ configure_journey.requiredResult.label=With Journey Result:
 configure_journey.requiredConfidenceLevel.label=You are requesting Confidence Level:
 configure_journey.forNino.label=For Nino:
 
+pdv.title=Personal Details Validation - Stubbed Journey configuration
+pdv.header=Personal Details Validation Stub
+pdv.forNino.required=You must provide a Nino
+pdv.forNino.label=For Nino:
 
 # General Messages
 # Error messages for digital services

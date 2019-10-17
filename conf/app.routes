@@ -24,6 +24,11 @@ GET        /agents-external-stubs/mdtp/uplift                                   
 POST       /agents-external-stubs/mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(journeyId: String, confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
 GET        /agents-external-stubs/mdtp/journey/journeyId/:journeyIdAndReason        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultInternal(journeyIdAndReason: String)
 
+# personal details validation stubs
+
+GET        /start                     uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.start(completionUrl: ContinueUrl)
+
+POST       /submit                    uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.submit(completionUrl: ContinueUrl)
 
 # ui actions
 GET         /agents-external-stubs                                                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start

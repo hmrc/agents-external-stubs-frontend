@@ -17,6 +17,7 @@ class TcpProxies @Inject()(
   @Named("stride-auth-frontend.port") strideAuthFrontendPort: Int,
   @Named("identity-verification-frontend.port") identityVerificationFrontendPort: Int,
   @Named("government-gateway-registration-frontend.port") governmentGatewayRegistrationFrontendPort: Int,
+  @Named("personal-details-validation-frontend.port") personalDetailsValidationFrontendPort: Int,
   @Named("http.port") httpPort: String
 )(implicit system: ActorSystem, materializer: Materializer) {
 
@@ -45,6 +46,7 @@ class TcpProxies @Inject()(
     startProxy(strideAuthFrontendPort, "stride-auth-frontend")
     startProxy(identityVerificationFrontendPort, "identity-verification-frontend")
     startProxy(governmentGatewayRegistrationFrontendPort, "government-gateway-registration-frontend")
+    startProxy(personalDetailsValidationFrontendPort, "personal-details-validation-frontend")
 
   } else {
     println("TCP proxies feature switched off")
