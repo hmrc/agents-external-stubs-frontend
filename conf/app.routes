@@ -19,11 +19,20 @@ GET         /agents-external-stubs/government-gateway-registration-frontend     
 
 GET        /mdtp/uplift                                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageProxy(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
 POST       /mdtp/uplift                                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftProxy(journeyId: String, confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
-GET        /mdtp/journey/journeyId/:journeyId                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultProxy(journeyId: String)
 GET        /agents-external-stubs/mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageInternal(confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
 POST       /agents-external-stubs/mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(journeyId: String, confidenceLevel: Int, completionURL: ContinueUrl, failureURL: ContinueUrl, origin: Option[String])
+
+GET        /mdtp/journey/journeyId/:journeyId                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultProxy(journeyId: String)
 GET        /agents-external-stubs/mdtp/journey/journeyId/:journeyIdAndReason        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultInternal(journeyIdAndReason: String)
 
+# personal details validation stubs
+
+GET        /start                     uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.start(completionUrl: ContinueUrl)
+# this version for running in non-local envs (configure external-url to include prefix '/agents-external-stubs' in app config)
+GET        /agents-external-stubs/start                     uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.start(completionUrl: ContinueUrl)
+
+POST       /submit                    uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.submit(completionUrl: ContinueUrl)
+POST       /agents-external-stubs/submit                    uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.submit(completionUrl: ContinueUrl)
 
 # ui actions
 GET         /agents-external-stubs                                                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start

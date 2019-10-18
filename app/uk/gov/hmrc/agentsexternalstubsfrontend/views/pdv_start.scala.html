@@ -1,0 +1,31 @@
+@import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.PdvRequest
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@(pageForm: Form[PdvRequest], formAction: Call)(implicit request: Request[_], messages: Messages, configuration: Configuration)
+
+@main_template(title = Messages("login.title"), bodyClasses = None) {
+
+    <h1 class="form-title heading-large push--top">@Messages("pdv.header")</h1>
+
+    @form(action = formAction) {
+        @{if(pageForm.hasErrors) {
+            errorSummary(
+                heading = Messages("error-summary.heading"),
+                form = pageForm
+            )
+        }}
+
+        <div class="form-group client-validated">
+        @input(
+            pageForm("nino"),
+            '_label -> Messages("configure_journey.forNino.label"),
+            '_labelTextClass -> "form-label-bold"
+        )
+        </div>
+        <div class="form-group">
+            <button class="button" type="submit">Submit</button>
+        </div>
+    }
+}@@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.PdvRequest
