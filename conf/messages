@@ -57,8 +57,8 @@ configure_journey.forNino.label=For Nino:
 
 pdv.title=Personal Details Validation - Stubbed Journey configuration
 pdv.header=Personal Details Validation Stub
-pdv.forNino.required=You must provide a Nino
-pdv.forNino.label=For Nino:
+pdv.success.required=You must choose an option
+pdv.success.label=Successful PDV journey?
 
 # General Messages
 # Error messages for digital services

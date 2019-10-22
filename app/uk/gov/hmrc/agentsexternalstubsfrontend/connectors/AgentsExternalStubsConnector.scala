@@ -198,4 +198,13 @@ class AgentsExternalStubsConnector @Inject()(
       .recover {
         case Upstream4xxException(e) => throw e
       }
+
+  def storePdvResult(id: String, success: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .POSTEmpty[HttpResponse](new URL(baseUrl, s"/agents-external-stubs/pdv-result/$id/$success").toExternalForm)
+      .map(_ => ())
+      .recover {
+        case Upstream4xxException(e) => throw e
+      }
+
 }

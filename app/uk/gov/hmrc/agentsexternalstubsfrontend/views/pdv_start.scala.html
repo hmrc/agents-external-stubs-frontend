@@ -18,12 +18,13 @@
         }}
 
         <div class="form-group client-validated">
-        @input(
-            pageForm("nino"),
-            '_label -> Messages("configure_journey.forNino.label"),
+        @singleCheckbox(
+            pageForm("success"),
+            '_label -> Messages("pdv.success.label"),
             '_labelTextClass -> "form-label-bold"
         )
         </div>
+
         <div class="form-group">
             <button class="button" type="submit">Submit</button>
         </div>
