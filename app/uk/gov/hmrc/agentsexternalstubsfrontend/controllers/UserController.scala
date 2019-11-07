@@ -137,15 +137,17 @@ class UserController @Inject()(
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           agentsExternalStubsConnector
             .getUser(userId.getOrElse(credentials.providerId))
-            .map(user =>
-              Ok(html.edit_user(
-                UserForm.fill(user),
-                routes.UserController.updateUser(continue, userId),
-                routes.UserController.showUserPage(continue, userId),
-                user.userId,
-                continue.isDefined,
-                pageContext(credentials)
-              )))
+            .map(user => {
+              Ok(
+                html.edit_user(
+                  UserForm.fill(user),
+                  routes.UserController.updateUser(continue, userId),
+                  routes.UserController.showUserPage(continue, userId),
+                  user.userId,
+                  continue.isDefined,
+                  pageContext(credentials)
+                ))
+            })
         }
     }
 
@@ -326,7 +328,10 @@ object UserController {
       "recordIds"         -> ignored[Option[Seq[String]]](None),
       "address"           -> optional(addressMapping),
       "strideRoles" -> optional(nonEmptyText)
-        .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(",")))
+        .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(","))),
+      "suspendedServices" -> optional(seq(optional(nonEmptyText))).transform[Seq[String]](_.map(_.collect {
+        case Some(x) => x
+      }).getOrElse(Seq.empty), s => Some(s.map(Some(_))))
     )(User.apply)(User.unapply))
 
   def fromNone[T](none: T): Option[T] => Option[T] = {

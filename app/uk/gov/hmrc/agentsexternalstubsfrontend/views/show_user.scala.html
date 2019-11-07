@@ -360,6 +360,37 @@
       </div>
     }
 
+    @if(user.affinityGroup.contains("Agent")) {
+
+        <h3>Suspended Services</h3>
+
+        @if(user.suspendedServices.nonEmpty) {
+            <table style="width:100%">
+                <tr>
+                    <th style="color:gray;">Service key</th>
+                </tr>
+                @for((suspendedService, index) <- user.suspendedServices.zipWithIndex){
+                            <tr>
+                                    <td>
+                                    @if(context.features.showEnrolments) {
+                                        <a href="/agents-external-stubs/services#@suspendedService">
+                                        @suspendedService
+                                        </a>
+                                    } else {
+                                        @suspendedService
+                                    }
+                                    </td>
+                            </tr>
+                }
+            </table>
+        } else {
+            <span class="form-hint">This agent is not suspended.</span>
+        }
+        <div style="margin-top: 0.5em;width: 100%;text-align: right;">
+            <a href="/agents-external-stubs/user/edit?userId=@user.userId#suspendedServices">Add suspension</a>
+        </div>
+    }
+
     @if(user.affinityGroup.isEmpty && user.strideRoles.nonEmpty) {
       <span class="form-hint">This user is an internal HMRC staff eligible for STRIDE authentication.</span>
       <dl class="govuk-check-your-answers cya-questions-long margin-bottom-40">
