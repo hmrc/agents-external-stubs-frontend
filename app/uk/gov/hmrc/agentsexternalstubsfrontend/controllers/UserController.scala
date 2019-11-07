@@ -329,9 +329,9 @@ object UserController {
       "address"           -> optional(addressMapping),
       "strideRoles" -> optional(nonEmptyText)
         .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(","))),
-      "suspendedServices" -> optional(seq(optional(nonEmptyText))).transform[Seq[String]](_.map(_.collect {
+      "suspendedServices" -> optional(seq(optional(nonEmptyText))).transform[Option[Seq[String]]](_.map(_.collect {
         case Some(x) => x
-      }).getOrElse(Seq.empty), s => Some(s.map(Some(_))))
+      }), _.map(_.map(Option.apply)))
     )(User.apply)(User.unapply))
 
   def fromNone[T](none: T): Option[T] => Option[T] = {

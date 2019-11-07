@@ -15,14 +15,12 @@
 }
 
 @suspendedServices = @{
-
     def getSuspendedServices(userData: Map[String, String]): List[String] = {
         userData match {
             case map if map.isEmpty => Nil
             case map => if(map.head._1.startsWith("suspendedServices")) map.head._2 :: getSuspendedServices(map.tail) else getSuspendedServices(map.tail)
         }
     }
-
     getSuspendedServices(userForm.data)
 }
 

@@ -369,7 +369,7 @@
                 <tr>
                     <th style="color:gray;">Service key</th>
                 </tr>
-                @for((suspendedService, index) <- user.suspendedServices.zipWithIndex){
+                @for((suspendedService, index) <- user.suspendedServices.get.zipWithIndex){
                             <tr>
                                     <td>
                                     @if(context.features.showEnrolments) {

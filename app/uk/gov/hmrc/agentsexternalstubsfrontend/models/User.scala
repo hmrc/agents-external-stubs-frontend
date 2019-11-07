@@ -27,7 +27,7 @@ case class User(
   recordIds: Option[Seq[String]] = None,
   address: Option[Address] = None,
   strideRoles: Seq[String] = Seq.empty,
-  suspendedServices: Seq[String] = Seq.empty
+  suspendedServices: Option[Seq[String]] = None
 ) {
 
   def isEnrolledFor(service: String): Boolean =
