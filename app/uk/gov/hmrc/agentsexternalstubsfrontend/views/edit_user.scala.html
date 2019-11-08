@@ -4,14 +4,18 @@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
-@(userForm:Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(userForm: Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @principalEnrolments = @{
-    ViewHelper.buildTree("",userForm.data)("principalEnrolments")
+    ViewHelper.buildTree("", userForm.data)("principalEnrolments")
 }
 
 @delegatedEnrolments = @{
-    ViewHelper.buildTree("",userForm.data)("delegatedEnrolments")
+    ViewHelper.buildTree("", userForm.data)("delegatedEnrolments")
+}
+
+@suspendedServices = @{
+    ViewHelper.buildTree("", userForm.data)("suspendedServices")
 }
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title", userId), bodyClasses = Some("full-width")) {
@@ -29,373 +33,24 @@
     </p>
 
     <div>
-        @form(action = postUrl, 'id -> "userForm", 'novalidate -> "novalidate") {
-            <fieldset>
-                <div class="form-field-group">
+    @form(action = postUrl, 'id -> "userForm", 'novalidate -> "novalidate") {
+        <div>
+            <div class="form-field-group">
 
-                    <div class="form-group soft--ends">
-                    @dropdown(
-                        userForm("affinityGroup"),
-                        AffinityGroup.values.map(i => (i,i)),
-                        false,
-                        '_label -> Html("""<span class="h2-heading">"""+ Messages("user.form.affinityGroup") + """</span>"""),
-                        '_selectClass -> Html("""input--medium input--cleared""")
-                    )
-                    </div>
-
-                    <div class="form-group">
-                    @input(
-                        userForm("name"),
-                        '_label -> Messages("user.form.name"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_labelTextClass -> "h2-heading",
-                        '_labelClass -> "soft--ends"
-                    )
-                    </div>
-
-                    <div class="form-group">
-
-                        <button class="button" type="submit" id="update">
-                        @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
-                        </button>
-
-                        <a class="button-secondary" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
-
-                    </div>
-
-                    <div class="form-group soft--ends">
-                        <span class="form-hint">
-                            If the user is an Admin of its group, then you might not be able to change this without changing groupId as well.
-                        </span>
-                        @dropdown(
-                            userForm("credentialRole"),
-                            CredentialRole.values.map(i => (i, i)),
-                            false,
-                            '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.credentialRole") + """</span>"""),
-                            '_selectClass -> Html("""input--medium input--cleared""")
-                        )
-
-                    </div>
-
-                    <div class="form-group soft--ends">
-                    @dropdown(
-                        userForm("credentialStrength"),
-                        CredStrength.values.map(i => (i,i)),
-                        false,
-                        '_label -> Html("""<span class="h2-heading soft--ends">"""+ Messages("user.form.credentialStrength") + """</span>"""),
-                        '_selectClass -> Html("""input--medium input--cleared""")
-                    )
-                    </div>
-
-                    @if(userForm.data.get("affinityGroup").contains("Individual")) {
-                        <div class="form-group soft--ends">
-                        @dropdown(
-                            userForm("confidenceLevel"),
-                            ConfidenceLevel.values,
-                            false,
-                            '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.confidenceLevel") + """</span>"""),
-                            '_selectClass -> Html("""input--medium input--cleared""")
-                        )
-                        </div>
-
-                        <div class="form-group">
-                            @input(
-                                userForm("nino"),
-                                '_label -> Messages("user.form.nino"),
-                                '_inputClass -> "input--medium input--cleared",
-                                '_labelTextClass -> "h2-heading",
-                                '_labelClass -> "soft--ends"
-                            )
-                        </div>
-
-                        <div class="form-group">
-                        @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
-                            '_legend -> Html("""<span class="h2-heading soft--ends">"""+ Messages("user.form.dateOfBirth")+ """</span>"""),
-                            '_labelClass -> "soft--ends"
-                        )
-                        </div>
-                    }
-
-                    <div class="form-group">
-                        @input(
-                            userForm("groupId"),
-                            '_label -> Messages("user.form.groupIdentifier"),
-                            '_inputClass -> "input--medium input--cleared",
-                            '_labelTextClass -> "h2-heading",
-                            '_labelClass -> "soft--ends"
-                        )
-                    </div>
-
-                    @if(userForm.data.get("affinityGroup").contains("Agent")) {
-                        <div class="form-group">
-                        @input(
-                            userForm("agentCode"),
-                            '_label -> Messages("user.form.agentCode"),
-                            '_inputClass -> "input--medium input--cleared",
-                            '_labelTextClass -> "h2-heading",
-                            '_labelClass -> "soft--ends"
-                        )
-                        </div>
-
-                        <div class="form-group">
-                        @input(
-                            userForm("agentFriendlyName"),
-                            '_label -> Messages("user.form.agentFriendlyName"),
-                            '_inputClass -> "input--medium input--cleared",
-                            '_labelTextClass -> "h2-heading",
-                            '_labelClass -> "soft--ends"
-                        )
-                        </div>
-                    }
-
-                    <a name="address"></a>
-
-                    <div class="form-group" style="margin-bottom: 0.5em;">
-                        <span class="h2-heading">@Messages("user.form.address")</span>
-                        @input(
-                            userForm("address.line1"),
-                            '_inputClass -> "input--medium input--cleared",
-                            '_maxlength -> 35
-                        )
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 0.5em;">
-                    @input(
-                        userForm("address.line2"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_maxlength -> 35
-                    )
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 0.5em;">
-                    @input(
-                        userForm("address.line3"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_maxlength -> 35
-                    )
-                    </div>
-
-                    <div class="form-group">
-                    @input(
-                        userForm("address.line4"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_maxlength -> 35
-                    )
-                    </div>
-
-                    <div class="form-group">
-                    @input(
-                        userForm("address.postcode"),
-                        '_label -> Messages("user.form.address.postcode"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_labelTextClass -> "h2-heading",
-                        '_labelClass -> "soft--ends",
-                        '_maxlength -> 10
-                    )
-                    </div>
-
-                    <div class="form-group">
-                    @dropdown(
-                        userForm("address.countryCode"),
-                        CountryCodes.values,
-                        false,
-                        '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.address.countryCode") + """</span>"""),
-                        '_selectClass -> Html("""input--medium input--cleared""")
-                    )
-                    </div>
-
+                <div class="form-group soft--ends">
+                @dropdown(
+                    userForm("affinityGroup"),
+                    AffinityGroup.values.map(i => (i, i)),
+                    false,
+                    '_label -> Html("""<span class="h2-heading">""" + Messages("user.form.affinityGroup") + """</span>"""),
+                    '_selectClass -> Html("""input--medium input--cleared""")
+                )
                 </div>
 
                 <div class="form-group">
-
-                    <button class="button" type="submit" id="update">
-                    @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
-                    </button>
-
-                    <a class="button-secondary" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
-
-                </div>
-
-                @if(userForm.data.get("affinityGroup").nonEmpty && !userForm.data.get("affinityGroup").contains("none")) {
-                    <a name="enrolments"></a>
-                    <h2>Principal enrolments</h2>
-
-                    <div id="principalEnrolments" class="form-group" style="text-align: right">
-                        <table style="width:100%">
-                            <colgroup>
-                                <col width="30%">
-                                <col width="30%">
-                                <col width="30%">
-                                <col width="10%">
-                            </colgroup>
-                            <tr>
-                                <th>Service key</th>
-                                <th>Identifier Name</th>
-                                <th>Identifier Value</th>
-                                <th></th>
-                            </tr>
-
-                            @for(enrolment <- principalEnrolments){
-                                @for((identifier,i) <- enrolment(".identifier").zipWithIndex){
-                                    <tr id="principalEnrolment-@i-row">
-                                      @if(i==0) {
-                                          <td rowspan="@{enrolment(".identifier").size}" style="vertical-align: top;">
-                                          @input(
-                                              userForm(s"${enrolment.key}.key"),
-                                              '_dataAttributes -> "style=width:100%;"
-                                          )
-                                          </td>
-                                      }
-
-                                        <td>
-                                        @input(
-                                            userForm(s"${identifier.key}.key"),
-                                            '_dataAttributes -> "style=width:100%;"
-                                        )
-                                        <td>
-                                        @input(
-                                            userForm(s"${identifier.key}.value"),
-                                            '_dataAttributes -> "style=width:100%;"
-                                        )
-                                        </td>
-                                        <td>
-                                            <a style="text-decoration: underline;cursor: pointer;" onclick="document.getElementById('principalEnrolment-@i-row').remove()">
-                                                Remove
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-
-                            <tr>
-                                <td>
-                                @input(
-                                    userForm(s"principalEnrolments[${principalEnrolments.size}].key"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
-                                </td>
-                                <td>
-                                @input(
-                                    userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
-                                <td>
-                                @input(
-                                    userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
-                                </td>
-                                <td></td>
-                            </tr>
-
-                        </table>
-
-                    </div>
-                }
-
-                @if(userForm.data.get("affinityGroup").contains("Agent")) {
-                    <a name="delegated"></a>
-                    <h2>Delegated enrolments</h2>
-
-                    <span class="form-hint">Only Agents can have delegated enrolments.</span>
-
-                    <div id="delegatedEnrolments" class="form-group" style="text-align: right">
-                        <table style="width:100%">
-                            <colgroup>
-                                <col width="30%">
-                                <col width="30%">
-                                <col width="30%">
-                                <col width="10%">
-                            </colgroup>
-                            <tr>
-                                <th>Service key</th>
-                                <th>Identifier Name</th>
-                                <th>Identifier Value</th>
-                                <th></th>
-                            </tr>
-
-                            @for(enrolment <- delegatedEnrolments){
-                                @for((identifier,i) <- enrolment(".identifier").zipWithIndex){
-                                    <tr id="delegatedEnrolment-@i-row">
-                                        @if(i==0) {
-                                            <td rowspan="@{enrolment(".identifier").size}" style="vertical-align: top;">
-                                            @input(
-                                                userForm(s"${enrolment.key}.key"),
-                                                '_dataAttributes -> "style=width:100%;"
-                                            )
-                                            </td>
-                                        }
-
-                                    <td>
-                                        @input(
-                                            userForm(s"${identifier.key}.key"),
-                                            '_dataAttributes -> "style=width:100%;"
-                                        )
-                                    <td>
-                                    @input(
-                                        userForm(s"${identifier.key}.value"),
-                                        '_dataAttributes -> "style=width:100%;"
-                                    )
-                                    </td>
-                                      <td>
-                                        <a style="text-decoration: underline;cursor: pointer;" onclick="document.getElementById('delegatedEnrolment-@i-row').remove()">
-                                            Remove
-                                        </a>
-                                      </td>
-                                    </tr>
-                                }
-                            }
-
-                            <tr>
-                                <td>
-                                @input(
-                                    userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].key"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
-                                </td>
-                                <td>
-                                @input(
-                                    userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].key"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
-                                <td>
-                                @input(
-                                    userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].value"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
-                                </td>
-                                <td>
-
-                                </td>
-                            </tr>
-
-                        </table>
-
-                    </div>
-                }
-
-                @if(userForm.data.get("affinityGroup").isEmpty || userForm.data.get("affinityGroup").contains("none")) {
-                    <a name="stride"></a>
-                    <h2>Stride roles</h2>
-
-                    <span class="form-hint">Only HMRC internal staff can have STRIDE roles. Provide role names comma separated.</span>
-
-                    <div class="form-group" style="margin-bottom: 0.5em;">
-                    @input(
-                        userForm("strideRoles"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_maxlength -> 60
-                    )
-                    </div>
-                }
-
-                <h2>Specials</h2>
-
-                <span class="form-hint">@Messages("user.form.isNonCompliant.hint")</span>
-
-                <div class="form-group">
-                @singleCheckbox(userForm("isNonCompliant"),
-                    '_label -> Messages("user.form.isNonCompliant"),
+                @input(
+                    userForm("name"),
+                    '_label -> Messages("user.form.name"),
                     '_inputClass -> "input--medium input--cleared",
                     '_labelTextClass -> "h2-heading",
                     '_labelClass -> "soft--ends"
@@ -408,14 +63,422 @@
                     @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
                     </button>
 
-                    <a class="button-secondary" href="@{cancelCall.url}">@Messages("user.edit.cancel")</a>
+                    <a class="button-secondary" href="@{
+                        cancelCall.url
+                    }">@Messages("user.edit.cancel")</a>
 
                 </div>
+
+                <div class="form-group soft--ends">
+                    <span class="form-hint">
+                        If the user is an Admin of its group, then you might not be able to change this without changing groupId as well.
+                    </span>
+                    @dropdown(
+                        userForm("credentialRole"),
+                        CredentialRole.values.map(i => (i, i)),
+                        false,
+                        '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.credentialRole") + """</span>"""),
+                        '_selectClass -> Html("""input--medium input--cleared""")
+                    )
+
+                </div>
+
+                <div class="form-group soft--ends">
+                @dropdown(
+                    userForm("credentialStrength"),
+                    CredStrength.values.map(i => (i, i)),
+                    false,
+                    '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.credentialStrength") + """</span>"""),
+                    '_selectClass -> Html("""input--medium input--cleared""")
+                )
+                </div>
+
+                @if(userForm.data.get("affinityGroup").contains("Individual")) {
+                    <div class="form-group soft--ends">
+                    @dropdown(
+                        userForm("confidenceLevel"),
+                        ConfidenceLevel.values,
+                        false,
+                        '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.confidenceLevel") + """</span>"""),
+                        '_selectClass -> Html("""input--medium input--cleared""")
+                    )
+                    </div>
+
+                    <div class="form-group">
+                    @input(
+                        userForm("nino"),
+                        '_label -> Messages("user.form.nino"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_labelTextClass -> "h2-heading",
+                        '_labelClass -> "soft--ends"
+                    )
+                    </div>
+
+                    <div class="form-group">
+                    @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
+                        '_legend -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.dateOfBirth") + """</span>"""),
+                        '_labelClass -> "soft--ends"
+                    )
+                    </div>
+                }
+
+                <div class="form-group">
+                @input(
+                    userForm("groupId"),
+                    '_label -> Messages("user.form.groupIdentifier"),
+                    '_inputClass -> "input--medium input--cleared",
+                    '_labelTextClass -> "h2-heading",
+                    '_labelClass -> "soft--ends"
+                )
+                </div>
+
+                @if(userForm.data.get("affinityGroup").contains("Agent")) {
+                    <div class="form-group">
+                    @input(
+                        userForm("agentCode"),
+                        '_label -> Messages("user.form.agentCode"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_labelTextClass -> "h2-heading",
+                        '_labelClass -> "soft--ends"
+                    )
+                    </div>
+
+                    <div class="form-group">
+                    @input(
+                        userForm("agentFriendlyName"),
+                        '_label -> Messages("user.form.agentFriendlyName"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_labelTextClass -> "h2-heading",
+                        '_labelClass -> "soft--ends"
+                    )
+                    </div>
+                }
+
+                <a name="address"></a>
+
+                <div class="form-group" style="margin-bottom: 0.5em;">
+                    <span class="h2-heading">@Messages("user.form.address")</span>
+                    @input(
+                        userForm("address.line1"),
+                        '_inputClass -> "input--medium input--cleared",
+                        '_maxlength -> 35
+                    )
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.5em;">
+                @input(
+                    userForm("address.line2"),
+                    '_inputClass -> "input--medium input--cleared",
+                    '_maxlength -> 35
+                )
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.5em;">
+                @input(
+                    userForm("address.line3"),
+                    '_inputClass -> "input--medium input--cleared",
+                    '_maxlength -> 35
+                )
+                </div>
+
+                <div class="form-group">
+                @input(
+                    userForm("address.line4"),
+                    '_inputClass -> "input--medium input--cleared",
+                    '_maxlength -> 35
+                )
+                </div>
+
+                <div class="form-group">
+                @input(
+                    userForm("address.postcode"),
+                    '_label -> Messages("user.form.address.postcode"),
+                    '_inputClass -> "input--medium input--cleared",
+                    '_labelTextClass -> "h2-heading",
+                    '_labelClass -> "soft--ends",
+                    '_maxlength -> 10
+                )
+                </div>
+
+                <div class="form-group">
+                @dropdown(
+                    userForm("address.countryCode"),
+                    CountryCodes.values,
+                    false,
+                    '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.address.countryCode") + """</span>"""),
+                    '_selectClass -> Html("""input--medium input--cleared""")
+                )
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <button class="button" type="submit" id="update">
+                @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
+                </button>
+
+                <a class="button-secondary" href="@{
+                    cancelCall.url
+                }">@Messages("user.edit.cancel")</a>
+
+            </div>
+
+            @if(userForm.data.get("affinityGroup").nonEmpty && !userForm.data.get("affinityGroup").contains("none")) {
+                <a name="enrolments"></a>
+                <h2>Principal enrolments</h2>
+
+                <div id="principalEnrolments" class="form-group" style="text-align: right">
+                    <table style="width: 100%">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="10%">
+                        </colgroup>
+                        <tr>
+                            <th>Service key</th>
+                            <th>Identifier Name</th>
+                            <th>Identifier Value</th>
+                            <th></th>
+                        </tr>
+
+                        @for(enrolment <- principalEnrolments) {
+                            @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
+                                <tr id="principalEnrolment-@i-row">
+                                    @if(i == 0) {
+                                        <td rowspan="@{
+                                            enrolment(".identifier").size
+                                        }" style="vertical-align: top;">
+                                        @input(
+                                            userForm(s"${enrolment.key}.key"),
+                                            '_dataAttributes -> "style=width:100%;"
+                                        )
+                                        </td>
+                                    }
+
+                                <td>
+                                    @input(
+                                        userForm(s"${identifier.key}.key"),
+                                        '_dataAttributes -> "style=width:100%;"
+                                    )
+                                <td>
+                                @input(
+                                    userForm(s"${identifier.key}.value"),
+                                    '_dataAttributes -> "style=width:100%;"
+                                )
+                                </td>
+                                <td>
+                                    <a style="text-decoration: underline;
+                                        cursor: pointer;" onclick="document.getElementById('principalEnrolment-@i-row').remove()">
+                                                Remove
+                                    </a>
+                                </td>
+                                </tr>
+                            }
+                        }
+
+                        <tr>
+                            <td>
+                            @input(
+                                userForm(s"principalEnrolments[${principalEnrolments.size}].key"),
+                                '_dataAttributes -> "style=width:100%;"
+                            )
+                            </td>
+                            <td>
+                            @input(
+                                userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key"),
+                                '_dataAttributes -> "style=width:100%;"
+                            )
+                            <td>
+                            @input(
+                                userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value"),
+                                '_dataAttributes -> "style=width:100%;"
+                            )
+                            </td>
+                            <td></td>
+                        </tr>
+
+                    </table>
+
+                </div>
+            }
+
+            @if(userForm.data.get("affinityGroup").contains("Agent")) {
+                <a name="delegated"></a>
+                <h2>Delegated enrolments</h2>
+
+                <span class="form-hint">Only Agents can have delegated enrolments.</span>
+
+                <div id="delegatedEnrolments" class="form-group" style="text-align: right">
+                    <table style="width: 100%">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="10%">
+                        </colgroup>
+                        <tr>
+                            <th>Service key</th>
+                            <th>Identifier Name</th>
+                            <th>Identifier Value</th>
+                            <th></th>
+                        </tr>
+
+                        @for(enrolment <- delegatedEnrolments) {
+                            @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
+                                <tr id="delegatedEnrolment-@i-row">
+                                    @if(i == 0) {
+                                        <td rowspan="@{
+                                            enrolment(".identifier").size
+                                        }" style="vertical-align: top;">
+                                        @input(
+                                            userForm(s"${enrolment.key}.key"),
+                                            '_dataAttributes -> "style=width:100%;"
+                                        )
+                                        </td>
+                                    }
+
+                                <td>
+                                    @input(
+                                        userForm(s"${identifier.key}.key"),
+                                        '_dataAttributes -> "style=width:100%;"
+                                    )
+                                <td>
+                                @input(
+                                    userForm(s"${identifier.key}.value"),
+                                    '_dataAttributes -> "style=width:100%;"
+                                )
+                                </td>
+                                <td>
+                                    <a style="text-decoration: underline;
+                                        cursor: pointer;" onclick="document.getElementById('delegatedEnrolment-@i-row').remove()">
+                                            Remove
+                                    </a>
+                                </td>
+                                </tr>
+                            }
+                        }
+
+                        <tr>
+                            <td>
+                            @input(
+                                userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].key"),
+                                '_dataAttributes -> "style=width:100%;"
+                            )
+                            </td>
+                            <td>
+                            @input(
+                                userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].key"),
+                                '_dataAttributes -> "style=width:100%;"
+                            )
+                            <td>
+                            @input(
+                                userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].value"),
+                                '_dataAttributes -> "style=width:100%;"
+                            )
+                            </td>
+                            <td>
+
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+            }
+
+            @if(userForm.data.get("affinityGroup").isEmpty || userForm.data.get("affinityGroup").contains("none")) {
+                <a name="stride"></a>
+                <h2>Stride roles</h2>
+
+                <span class="form-hint">
+                    Only HMRC internal staff can have STRIDE roles. Provide role names comma separated.</span>
+
+                <div class="form-group" style="margin-bottom: 0.5em;">
+                @input(
+                    userForm("strideRoles"),
+                    '_inputClass -> "input--medium input--cleared",
+                    '_maxlength -> 60
+                )
+                </div>
+            }
+
+            @if(userForm.data.get("affinityGroup").contains("Agent")) {
+                <a name = "suspendedServices"></a>
+                <h2>Suspended Services</h2>
+                <span class="form-hint">Only Agents can be suspended.</span>
+
+                <div id="suspendedServices" class="form-group" style="text-align: right">
+                    <table style="width: 100%">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="10%">
+                        </colgroup>
+                        <tr>
+                            <th>Service key</th>
+                            <th></th>
+                        </tr>
+                        @for((suspendedService, index) <- suspendedServices.zipWithIndex) {
+                            <tr id="suspendedServices-@index-row">
+                                <td style="vertical-align: top;">
+                                @input(
+                                    userForm(s"suspendedServices[$index]"),
+                                    '_dataAttributes -> "style=width:38%;"
+                                )
+                                </td>
+                                <td>
+                                    <a style="text-decoration: underline;
+                                        cursor: pointer;" onclick="document.getElementById('suspendedServices-@index-row').remove()">
+                                            Remove
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        <tr>
+                            <td>
+                            @input(
+                                userForm(s"suspendedServices[${suspendedServices.size}]"),
+                                '_dataAttributes -> "style=width:38%;"
+                            )
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+
+            }
+
+
+            <h2>Specials</h2>
+
+            <span class="form-hint">@Messages("user.form.isNonCompliant.hint")</span>
+
+            <div class="form-group">
+            @singleCheckbox(userForm("isNonCompliant"),
+                '_label -> Messages("user.form.isNonCompliant"),
+                '_inputClass -> "input--medium input--cleared",
+                '_labelTextClass -> "h2-heading",
+                '_labelClass -> "soft--ends"
+            )
+            </div>
+
+            <div class="form-group">
+
+                <button class="button" type="submit" id="update">
+                @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
+                </button>
+
+                <a class="button-secondary" href="@{
+                    cancelCall.url
+                }">@Messages("user.edit.cancel")</a>
+
+            </div>
 
 
             </fieldset>
 
-        }
+            }
     </div>
 
 }

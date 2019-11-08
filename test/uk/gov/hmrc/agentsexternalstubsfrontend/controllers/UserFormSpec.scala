@@ -62,7 +62,8 @@ class UserFormSpec extends UnitSpec {
           affinityGroup = Some("Agent"),
           credentialRole = Some("Admin"),
           principalEnrolments = Some(Seq(Enrolment("FOO"), Enrolment("BAR", Some(Seq(Identifier("ABC", "123")))))),
-          delegatedEnrolments = Some(Seq(Enrolment("TAR", Some(Seq(Identifier("XYZ", "987")))), Enrolment("ZOO")))
+          delegatedEnrolments = Some(Seq(Enrolment("TAR", Some(Seq(Identifier("XYZ", "987")))), Enrolment("ZOO"))),
+          suspendedServices = Some(Set("HMRC-MTD-IT"))
         )
 
       val fieldValues = Map(
@@ -80,7 +81,8 @@ class UserFormSpec extends UnitSpec {
         "delegatedEnrolments[0].identifiers[0].value" -> "987",
         "userId"                                      -> "foo",
         "groupId"                                     -> "ABA-712-878-NHG",
-        "credentialRole"                              -> "Admin"
+        "credentialRole"                              -> "Admin",
+        "suspendedServices[0]"                        -> "HMRC-MTD-IT"
       )
 
       form.fill(value).data shouldBe fieldValues.-("userId")
