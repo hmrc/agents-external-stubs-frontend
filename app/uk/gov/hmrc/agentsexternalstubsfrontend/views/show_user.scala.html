@@ -4,7 +4,7 @@
 
 @import uk.gov.hmrc.play.binders.ContinueUrl
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
-@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String,services: Seq[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String,enrolments: Seq[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @sidebarLinks = {
     <nav id="secondary-nav" role="navigation">
@@ -300,7 +300,7 @@
                 user.affinityGroup.map(_.toLowerCase).getOrElse("user")
             } has not been enrolled yet.</span>
         }
-        @addEnrolment(services, user)
+        @addEnrolment(enrolments, user)
     }
 
     @if(user.affinityGroup.contains("Agent")) {
@@ -440,13 +440,13 @@
 
 }
 
-@addEnrolment(services: Seq[String], user: User) = {
-    @if(services.nonEmpty) {
+@addEnrolment(enrolments: Seq[String], user: User) = {
+    @if(enrolments.nonEmpty) {
         <div style="margin-top: 0.5em;width: 100%;text-align: right;">
             <form id="add_enrolment" action="/agents-external-stubs/user/amend">
                 <select id="principalEnrolment" name="principalEnrolment" class="">
-                @for(service <- services) {
-                    <option id="enrolment-@service" value="@service">@service</option>
+                @for(enrolment <- enrolments) {
+                    <option id="enrolment-@enrolment" value="@enrolment">@enrolment</option>
                 }
                 </select>
                 <input type="hidden" name="userId" value="@user.userId"/>

@@ -15,13 +15,7 @@
 }
 
 @suspendedServices = @{
-    def getSuspendedServices(userData: Map[String, String]): List[String] = {
-        userData match {
-            case map if map.isEmpty => Nil
-            case map => if(map.head._1.startsWith("suspendedServices")) map.head._2 :: getSuspendedServices(map.tail) else getSuspendedServices(map.tail)
-        }
-    }
-    getSuspendedServices(userForm.data)
+    ViewHelper.buildTree("", userForm.data)("suspendedServices")
 }
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title", userId), bodyClasses = Some("full-width")) {
@@ -441,17 +435,17 @@
                                 </td>
                             </tr>
                         }
-                <tr>
-                    <td>
-                    @input(
-                        userForm(s"suspendedServices[${suspendedServices.length}]"),
-                        '_dataAttributes -> "style=width:38%;"
-                    )
-                    </td>
-                    <td></td>
-                </tr>
-                </table>
-            </div>
+                        <tr>
+                            <td>
+                            @input(
+                                userForm(s"suspendedServices[${suspendedServices.size}]"),
+                                '_dataAttributes -> "style=width:38%;"
+                            )
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
 
             }
 
@@ -482,9 +476,9 @@
             </div>
 
 
-        </fieldset>
+            </fieldset>
 
-    }
+            }
     </div>
 
 }
