@@ -63,7 +63,7 @@ class UserFormSpec extends UnitSpec {
           credentialRole = Some("Admin"),
           principalEnrolments = Some(Seq(Enrolment("FOO"), Enrolment("BAR", Some(Seq(Identifier("ABC", "123")))))),
           delegatedEnrolments = Some(Seq(Enrolment("TAR", Some(Seq(Identifier("XYZ", "987")))), Enrolment("ZOO"))),
-          suspendedServices = Some(Seq("HMRC-MTD-IT"))
+          suspendedServices = Some(Set("HMRC-MTD-IT"))
         )
 
       val fieldValues = Map(
