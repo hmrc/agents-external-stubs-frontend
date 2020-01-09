@@ -362,22 +362,22 @@
 
     @if(user.affinityGroup.contains("Agent")) {
 
-        <h3>Suspended Services</h3>
+        <h3>Suspended Regimes</h3>
 
-        @if(user.suspendedServices.nonEmpty) {
+        @if(user.suspendedRegimes.nonEmpty) {
             <table style="width:100%">
                 <tr>
-                    <th style="color:gray;">Service key</th>
+                    <th style="color:gray;">Regime</th>
                 </tr>
-                @for((suspendedService, index) <- user.suspendedServices.get.zipWithIndex){
+                @for((suspendedRegime, index) <- user.suspendedRegimes.get.zipWithIndex){
                             <tr>
                                     <td>
                                     @if(context.features.showEnrolments) {
-                                        <a href="/agents-external-stubs/services#@suspendedService">
-                                        @suspendedService
+                                        <a href="/agents-external-stubs/services#@suspendedRegime">
+                                        @suspendedRegime
                                         </a>
                                     } else {
-                                        @suspendedService
+                                        @suspendedRegime
                                     }
                                     </td>
                             </tr>
@@ -387,7 +387,7 @@
             <span class="form-hint">This agent is not suspended.</span>
         }
         <div style="margin-top: 0.5em;width: 100%;text-align: right;">
-            <a href="/agents-external-stubs/user/edit?userId=@user.userId#suspendedServices">Add suspension</a>
+            <a href="/agents-external-stubs/user/edit?userId=@user.userId#suspendedRegimes">Add suspension</a>
         </div>
     }
 

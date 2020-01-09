@@ -14,8 +14,8 @@
     ViewHelper.buildTree("", userForm.data)("delegatedEnrolments")
 }
 
-@suspendedServices = @{
-    ViewHelper.buildTree("", userForm.data)("suspendedServices")
+@suspendedRegimes = @{
+    ViewHelper.buildTree("", userForm.data)("suspendedRegimes")
 }
 
 @uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title", userId), bodyClasses = Some("full-width")) {
@@ -405,31 +405,31 @@
             }
 
             @if(userForm.data.get("affinityGroup").contains("Agent")) {
-                <a name = "suspendedServices"></a>
-                <h2>Suspended Services</h2>
-                <span class="form-hint">Only Agents can be suspended.</span>
+                <a name = "suspendedRegimes"></a>
+                <h2>Suspended Regimes</h2>
+                <span class="form-hint">Only Agents can be suspended. Valid Regimes: ITSA, VATC, TRS, CGT, ALL</span>
 
-                <div id="suspendedServices" class="form-group" style="text-align: right">
+                <div id="suspendedRegimes" class="form-group" style="text-align: right">
                     <table style="width: 100%">
                         <colgroup>
                             <col width="30%">
                             <col width="10%">
                         </colgroup>
                         <tr>
-                            <th>Service key</th>
+                            <th>Regime</th>
                             <th></th>
                         </tr>
-                        @for((suspendedService, index) <- suspendedServices.zipWithIndex) {
-                            <tr id="suspendedServices-@index-row">
+                        @for((suspendedService, index) <- suspendedRegimes.zipWithIndex) {
+                            <tr id="suspendedRegimes-@index-row">
                                 <td style="vertical-align: top;">
                                 @input(
-                                    userForm(s"suspendedServices[$index]"),
+                                    userForm(s"suspendedRegimes[$index]"),
                                     '_dataAttributes -> "style=width:38%;"
                                 )
                                 </td>
                                 <td>
                                     <a style="text-decoration: underline;
-                                        cursor: pointer;" onclick="document.getElementById('suspendedServices-@index-row').remove()">
+                                        cursor: pointer;" onclick="document.getElementById('suspendedRegimes-@index-row').remove()">
                                             Remove
                                     </a>
                                 </td>
@@ -438,7 +438,7 @@
                         <tr>
                             <td>
                             @input(
-                                userForm(s"suspendedServices[${suspendedServices.size}]"),
+                                userForm(s"suspendedRegimes[${suspendedRegimes.size}]"),
                                 '_dataAttributes -> "style=width:38%;"
                             )
                             </td>
