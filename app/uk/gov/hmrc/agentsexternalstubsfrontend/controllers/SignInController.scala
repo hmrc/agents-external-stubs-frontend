@@ -132,8 +132,6 @@ class SignInController @Inject()(
       request.session +
         (SessionKeys.sessionId -> session.sessionId) +
         (SessionKeys.authToken -> s"Bearer ${session.authToken}") +
-        (SessionKeys.userId    -> s"/auth/oid/${session.userId}") +
-        (SessionKeys.token     -> "deprecated") +
         ("planetId"            -> session.planetId)
     )
 

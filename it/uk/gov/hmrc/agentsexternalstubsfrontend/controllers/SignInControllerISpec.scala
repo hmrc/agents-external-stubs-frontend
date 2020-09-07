@@ -55,7 +55,6 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/there")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
-        session(result).get(SessionKeys.userId) shouldBe Some("/auth/oid/foo")
         session(result).get(SessionKeys.sessionId) should not be empty
       }
 
@@ -67,7 +66,6 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
-        session(result).get(SessionKeys.userId) shouldBe Some("/auth/oid/foo")
         session(result).get(SessionKeys.sessionId) should not be empty
       }
     }
@@ -81,7 +79,6 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/there")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
-        session(result).get(SessionKeys.userId) shouldBe Some("/auth/oid/foo")
         session(result).get(SessionKeys.sessionId) should not be empty
       }
 
@@ -93,7 +90,6 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
-        session(result).get(SessionKeys.userId) shouldBe Some("/auth/oid/foo")
         session(result).get(SessionKeys.sessionId) should not be empty
       }
     }
