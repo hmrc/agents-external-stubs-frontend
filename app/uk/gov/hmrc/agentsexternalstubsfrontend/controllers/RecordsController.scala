@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
@@ -12,8 +28,9 @@ import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{create_record, edit_record, show_all_records}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -23,10 +40,13 @@ class RecordsController @Inject()(
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
+  showAllRecordsView: show_all_records,
+  editRecordView: edit_record,
+  createRecordView: create_record,
   val features: Features,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration)
-    extends FrontendController with AuthActions with I18nSupport with WithPageContext {
+)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+    extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
 
   implicit val ec: ExecutionContext = ecp.get
 
@@ -36,7 +56,7 @@ class RecordsController @Inject()(
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         agentsExternalStubsConnector.getRecords
-          .map(records => Ok(html.show_all_records(records, showId, pageContext(credentials))))
+          .map(records => Ok(showAllRecordsView(records, showId, pageContext(credentials))))
       }
   }
 
@@ -54,7 +74,7 @@ class RecordsController @Inject()(
         agentsExternalStubsConnector
           .getRecord(id)
           .map(record =>
-            Ok(html.edit_record(
+            Ok(editRecordView(
               RecordForm.fill(record.-("id").-("_links")),
               routes.RecordsController.updateRecord(id),
               routes.RecordsController.showAllRecordsPage(Some(id)),
@@ -72,7 +92,7 @@ class RecordsController @Inject()(
             formWithErrors =>
               Future.successful(
                 Ok(
-                  html.edit_record(
+                  editRecordView(
                     formWithErrors,
                     routes.RecordsController.updateRecord(id),
                     routes.RecordsController.showAllRecordsPage(Some(id)),
@@ -83,7 +103,7 @@ class RecordsController @Inject()(
                 .map(_ => Redirect(routes.RecordsController.showAllRecordsPage(Some(id))))
                 .recover {
                   case e =>
-                    Ok(html.edit_record(
+                    Ok(editRecordView(
                       RecordForm.fill(record).withError("json", e.getMessage),
                       routes.RecordsController.updateRecord(id),
                       routes.RecordsController.showAllRecordsPage(Some(id)),
@@ -100,7 +120,7 @@ class RecordsController @Inject()(
         agentsExternalStubsConnector
           .generateRecord(`type`, seed)
           .map(record =>
-            Ok(html.create_record(
+            Ok(createRecordView(
               RecordForm.fill(record.-("id").-("_links")),
               routes.RecordsController.createRecord(`type`, seed),
               routes.RecordsController.showAllRecordsPage(None),
@@ -117,7 +137,7 @@ class RecordsController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              Future.successful(Ok(html.create_record(
+              Future.successful(Ok(createRecordView(
                 formWithErrors,
                 routes.RecordsController.createRecord(`type`, seed),
                 routes.RecordsController.showAllRecordsPage(None),
@@ -130,7 +150,7 @@ class RecordsController @Inject()(
                 .map(recordIdOpt => Redirect(routes.RecordsController.showAllRecordsPage(recordIdOpt)))
                 .recover {
                   case e =>
-                    Ok(html.create_record(
+                    Ok(createRecordView(
                       RecordForm.fill(record).withError("json", e.getMessage),
                       routes.RecordsController.createRecord(`type`, seed),
                       routes.RecordsController.showAllRecordsPage(None),

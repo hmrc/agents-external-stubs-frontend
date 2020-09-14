@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
@@ -11,8 +27,9 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsCon
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, SpecialCase}
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{edit_special_case, show_all_special_cases}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,10 +38,12 @@ class SpecialCasesController @Inject()(
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
+  showAllSpecialCasesView: show_all_special_cases,
+  editSpecialCaseView: edit_special_case,
   val features: Features,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration)
-    extends FrontendController with AuthActions with I18nSupport with WithPageContext {
+)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+    extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
 
   implicit val ec: ExecutionContext = ecp.get
 
@@ -36,7 +55,7 @@ class SpecialCasesController @Inject()(
         agentsExternalStubsConnector.getAllSpecialCases
           .map(
             specialCases =>
-              Ok(html.show_all_special_cases(
+              Ok(showAllSpecialCasesView(
                 specialCases,
                 caseId,
                 id => routes.SpecialCasesController.showAllSpecialCasesPage(Some(id)),
@@ -57,7 +76,7 @@ class SpecialCasesController @Inject()(
               .map {
                 case Some(specialCase) =>
                   Ok(
-                    html.edit_special_case(
+                    editSpecialCaseView(
                       SpecialCaseForm.fill(specialCase),
                       caseId,
                       routes.SpecialCasesController.upsertSpecialCase(caseId),
@@ -67,7 +86,7 @@ class SpecialCasesController @Inject()(
                     ))
                 case None =>
                   Ok(
-                    html.edit_special_case(
+                    editSpecialCaseView(
                       SpecialCaseForm.withGlobalError(s"Special Case with id=$id has not been found."),
                       caseId,
                       routes.SpecialCasesController.upsertSpecialCase(None),
@@ -78,7 +97,7 @@ class SpecialCasesController @Inject()(
               }
           case None =>
             Future.successful(
-              Ok(html.edit_special_case(
+              Ok(editSpecialCaseView(
                 SpecialCaseForm,
                 None,
                 routes.SpecialCasesController.upsertSpecialCase(caseId),
@@ -97,7 +116,7 @@ class SpecialCasesController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              Future.successful(Ok(html.edit_special_case(
+              Future.successful(Ok(editSpecialCaseView(
                 formWithErrors,
                 caseId,
                 routes.SpecialCasesController.upsertSpecialCase(caseId),

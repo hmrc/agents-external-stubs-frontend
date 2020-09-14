@@ -1,9 +1,25 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.views.html.helpers.{form, input, dropdown}
-
 @import uk.gov.hmrc.play.binders.ContinueUrl
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+
+@this(mainTemplate: main_template)
+
 @(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String,enrolments: Seq[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @sidebarLinks = {
@@ -103,7 +119,7 @@
     }
 }
 
-@uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template(title = Messages("user.title", user.userId), bodyClasses = None, sidebarLinks = Some(sidebarLinks)) {
+@mainTemplate(title = Messages("user.title", user.userId), bodyClasses = None, sidebarLinks = Some(sidebarLinks)) {
 
     <h1 class="heading-xlarge">
     @if(userId==context.authorisedUserId){ @Messages("user.current.show.header", userId) }else{ @Messages("user.show.header", userId) }

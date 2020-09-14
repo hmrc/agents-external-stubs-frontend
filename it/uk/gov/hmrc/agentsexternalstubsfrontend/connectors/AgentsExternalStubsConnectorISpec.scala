@@ -1,7 +1,5 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
-import java.net.URL
-
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 import play.mvc.Http.HeaderNames
@@ -18,9 +16,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  private lazy val connector: AgentsExternalStubsConnector = new AgentsExternalStubsConnector(
-    new URL(s"http://localhost:$wireMockPort"),
-    app.injector.instanceOf[HttpGet with HttpPost with HttpPut with HttpDelete])
+  private lazy val connector: AgentsExternalStubsConnector = app.injector.instanceOf[AgentsExternalStubsConnector]
 
   "AgentsExternalStubsConnector" when {
 

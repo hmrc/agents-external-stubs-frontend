@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import java.nio.charset.StandardCharsets
@@ -17,9 +33,10 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.rest_query
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -31,9 +48,10 @@ class RestQueryController @Inject()(
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   val features: Features,
   val wsClient: WSClient,
+  restQueryView: rest_query,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration)
-    extends FrontendController with AuthActions with I18nSupport with WithPageContext {
+)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+    extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
 
   implicit val ec: ExecutionContext = ecp.get
 
@@ -46,7 +64,7 @@ class RestQueryController @Inject()(
           q match {
             case None =>
               Future.successful(
-                Ok(html.rest_query(
+                Ok(restQueryView(
                   RestQueryForm.fill(RestQuery("GET", "https://", None)),
                   routes.RestQueryController.runQuery(),
                   routes.UserController.showUserPage(),
@@ -63,7 +81,7 @@ class RestQueryController @Inject()(
                   rq =>
                     runQuery(rq)
                       .map(response =>
-                        Ok(html.rest_query(
+                        Ok(restQueryView(
                           RestQueryForm.fill(rq),
                           routes.RestQueryController.runQuery(),
                           routes.UserController.showUserPage(),
@@ -74,7 +92,7 @@ class RestQueryController @Inject()(
                         )))
                       .recover {
                         case NonFatal(e) =>
-                          Ok(html.rest_query(
+                          Ok(restQueryView(
                             RestQueryForm.fill(rq).withGlobalError(e.getMessage),
                             routes.RestQueryController.runQuery(),
                             routes.UserController.showUserPage(),
@@ -99,7 +117,7 @@ class RestQueryController @Inject()(
             .bindFromRequest()
             .fold(
               formWithErrors =>
-                Future.successful(Ok(html.rest_query(
+                Future.successful(Ok(restQueryView(
                   formWithErrors,
                   routes.RestQueryController.runQuery(),
                   routes.UserController.showUserPage(),
