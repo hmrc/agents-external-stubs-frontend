@@ -1,3 +1,19 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers._
@@ -5,21 +21,24 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.play.views.html.helpers._
 
+@this(mainTemplate: main_template, form: FormWithCSRF, input: Input, inputRadioGroup: InputRadioGroup, errorSummary: ErrorSummary)
+
 @(pageForm: Form[UpliftRequest], options: Seq[(String, String)], formAction: Call)(implicit request: Request[_], messages: Messages, configuration: Configuration)
 
-@main_template(title = Messages("login.title"), bodyClasses = None) {
+@mainTemplate(title = Messages("login.title"), bodyClasses = None) {
 
 <h1 class="form-title heading-large push--top">@Messages("configure_journey.header")</h1>
 
 <h1 class="form-title heading-medium">@Messages("configure_journey.header.uplift")</h1>
 
 @form(action = formAction) {
-@{if(pageForm.hasErrors) {
-errorSummary(
-heading = Messages("error-summary.heading"),
-form = pageForm
-)
-}}
+    @{if(pageForm.hasErrors) {
+        errorSummary(
+            heading = Messages("error-summary.heading"),
+            form = pageForm
+        )
+    }
+}
 
 <div class="form-group client-validated">
     <label for="confidenceLevel" class="form-label">
@@ -35,7 +54,7 @@ form = pageForm
     )
 </div>
 <div class="form-group client-validated">
-    @input_radio_group(
+    @inputRadioGroup(
     pageForm("option"),
     radioOptions = options,
     '_groupClass -> "form-group",

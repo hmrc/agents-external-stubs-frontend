@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
@@ -11,10 +27,11 @@ import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.sign_in
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.binders.ContinueUrl
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -22,10 +39,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class SignInController @Inject()(
   override val messagesApi: MessagesApi,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
+  signInView: sign_in,
   val authConnector: AuthConnector,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration)
-    extends FrontendController with AuthActions with I18nSupport {
+)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+    extends FrontendController(cc) with AuthActions with I18nSupport {
 
   implicit val ec: ExecutionContext = ecp.get
 
@@ -37,11 +55,10 @@ class SignInController @Inject()(
     accountType: Option[String]): Action[AnyContent] =
     Action { implicit request =>
       Ok(
-        html
-          .sign_in(
-            SignInRequestForm,
-            routes.SignInController
-              .signIn(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
+        signInView(
+          SignInRequestForm,
+          routes.SignInController
+            .signIn(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
     }
 
   def showGovernmentGatewaySignInPage(
@@ -59,9 +76,8 @@ class SignInController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            Future.successful(
-              Ok(html
-                .sign_in(formWithErrors, routes.SignInController.signIn(continue, origin, accountType, providerType)))),
+            Future.successful(Ok(
+              signInView(formWithErrors, routes.SignInController.signIn(continue, origin, accountType, providerType)))),
           credentials =>
             for {
               authenticatedSession <- agentsExternalStubsConnector.signIn(credentials.copy(providerType = providerType))
@@ -85,11 +101,10 @@ class SignInController @Inject()(
     failureURL: Option[String]): Action[AnyContent] =
     Action { implicit request =>
       Ok(
-        html
-          .sign_in(
-            SignInRequestForm,
-            routes.SignInController
-              .signIn(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)))
+        signInView(
+          SignInRequestForm,
+          routes.SignInController
+            .signIn(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)))
     }
 
   def signInUser(continue: Option[ContinueUrl], userId: String, providerType: String): Action[AnyContent] =
@@ -141,11 +156,10 @@ class SignInController @Inject()(
     accountType: Option[String]): Action[AnyContent] =
     Action { implicit request =>
       Ok(
-        html
-          .sign_in(
-            SignInRequestForm,
-            routes.SignInController
-              .signInInternal(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
+        signInView(
+          SignInRequestForm,
+          routes.SignInController
+            .signInInternal(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
     }
 
   def showGovernmentGatewaySignInPageInternal(
@@ -159,11 +173,10 @@ class SignInController @Inject()(
     failureURL: Option[String]): Action[AnyContent] =
     Action { implicit request =>
       Ok(
-        html
-          .sign_in(
-            SignInRequestForm,
-            routes.SignInController
-              .signInInternal(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)))
+        signInView(
+          SignInRequestForm,
+          routes.SignInController
+            .signInInternal(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)))
     }
 
   def signInInternal(

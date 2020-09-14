@@ -2,10 +2,10 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import play.api.Application
 import play.api.http.Writeable
-import play.api.mvc.{Request, Result}
+import play.api.libs.typedmap.TypedKey
+import play.api.mvc.{Headers, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, _}
-import play.filters.csrf.CSRF.Token
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, AuthStubs}
@@ -199,12 +199,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
     val csrfFilter = app.injector.instanceOf[CSRFFilter]
     val token = csrfFilter.tokenProvider.generateToken
 
-    fakeRequest
-      .copyFakeRequest(
-        tags = fakeRequest.tags ++ Map(
-          Token.NameRequestTag -> csrfConfig.tokenName,
-          Token.RequestTag     -> token
-        ))
-      .withHeaders((csrfConfig.headerName, token))
+    fakeRequest.addAttr(TypedKey("tokenName"), csrfConfig.tokenName)
+      .withHeaders(Headers(csrfConfig.headerName -> token))
   }
 }

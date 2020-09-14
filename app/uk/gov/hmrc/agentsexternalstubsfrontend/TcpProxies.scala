@@ -1,27 +1,44 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.agentsexternalstubsfrontend
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, Tcp}
 import akka.util.ByteString
-import javax.inject.{Inject, Named, Singleton}
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
+import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
-class TcpProxies @Inject()(
-  @Named("proxies.start") startProxies: String,
-  @Named("company-auth-frontend.port") companyAuthFrontendPort: Int,
-  @Named("stride-auth-frontend.port") strideAuthFrontendPort: Int,
-  @Named("identity-verification-frontend.port") identityVerificationFrontendPort: Int,
-  @Named("government-gateway-registration-frontend.port") governmentGatewayRegistrationFrontendPort: Int,
-  @Named("personal-details-validation-frontend.port") personalDetailsValidationFrontendPort: Int,
-  @Named("http.port") httpPort: String
-)(implicit system: ActorSystem, materializer: Materializer) {
+class TcpProxies @Inject()(appConfig: FrontendConfig)(implicit system: ActorSystem, materializer: Materializer) {
 
-  if (startProxies == "true") {
+  private val startProxies = appConfig.proxiesStart
+  private val companyAuthFrontendPort = appConfig.companyAuthFEPort
+  private val strideAuthFrontendPort = appConfig.strideAuthFEPort
+  private val identityVerificationFrontendPort = appConfig.ivFEPort
+  private val governmentGatewayRegistrationFrontendPort = appConfig.ggRegEPort
+  private val personalDetailsValidationFrontendPort = appConfig.pvDetailsValidationFEPort
+  private val httpPort = appConfig.httpPort
+
+  if (startProxies) {
     println("Starting TCP proxies ...")
 
     implicit val ec: ExecutionContext = system.dispatcher

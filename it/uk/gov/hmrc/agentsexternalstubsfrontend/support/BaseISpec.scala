@@ -1,24 +1,29 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.support
 
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Result
-import play.api.test.{DefaultAwaitTimeout, FakeRequest}
 import play.api.test.Helpers._
+import play.api.test.{DefaultAwaitTimeout, FakeRequest}
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AuthStubs, DataStreamStubs}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.it.Port
+import uk.gov.hmrc.play.test.UnitSpec
 
 class BaseISpec
-    extends UnitSpec with OneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs
+    extends UnitSpec with GuiceOneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs
     with MetricsTestSupport with DefaultAwaitTimeout {
 
   override implicit lazy val app: Application = appBuilder.build()
+
+  val appConfig: FrontendConfig = app.injector.instanceOf[FrontendConfig]
+  val httpClient: HttpClient = app.injector.instanceOf[HttpClient]
 
   protected def appBuilder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()

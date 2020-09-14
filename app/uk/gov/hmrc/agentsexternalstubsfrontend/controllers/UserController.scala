@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
@@ -10,12 +26,12 @@ import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Address, Enrolment, Identifier, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{NotFoundException, SessionKeys}
 import uk.gov.hmrc.play.binders.ContinueUrl
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -26,10 +42,15 @@ class UserController @Inject()(
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   val servicesDefinitionsService: ServicesDefinitionsService,
+  showUserView: show_user,
+  createUserView: create_user,
+  editUserView: edit_user,
+  errorTemplateView: error_template,
+  showAllUsersView: show_all_users,
   val features: Features,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration)
-    extends FrontendController with AuthorisedFunctions with I18nSupport with WithPageContext {
+)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+    extends FrontendController(cc) with AuthorisedFunctions with I18nSupport with WithPageContext {
 
   implicit val ec: ExecutionContext = ecp.get
 
@@ -44,7 +65,7 @@ class UserController @Inject()(
           agentsExternalStubsConnector
             .getUser(userId.getOrElse(credentials.providerId))
             .map(user =>
-              Ok(html.show_user(
+              Ok(showUserView(
                 user,
                 request.session.get(SessionKeys.authToken),
                 request.session.get(SessionKeys.sessionId),
@@ -78,7 +99,7 @@ class UserController @Inject()(
                     if (user.affinityGroup.isDefined)
                       Redirect(routes.UserController.showEditUserPage(continue, userId))
                     else
-                      Ok(html.create_user(
+                      Ok(createUserView(
                         UserForm.fill(user),
                         routes.UserController
                           .updateUser(
@@ -97,7 +118,7 @@ class UserController @Inject()(
                     userId match {
                       case Some(id) =>
                         Ok(
-                          html.create_user(
+                          createUserView(
                             UserForm.fill(User(id)),
                             routes.UserController
                               .updateUser(
@@ -116,7 +137,7 @@ class UserController @Inject()(
                 }
             case None =>
               Future.successful(
-                Ok(html.create_user(
+                Ok(createUserView(
                   UserForm.fill(User(credentials.providerId)),
                   routes.UserController
                     .updateUser(Some(ContinueUrl(routes.UserController.showEditUserPage(continue).url)), create = true),
@@ -139,7 +160,7 @@ class UserController @Inject()(
             .getUser(userId.getOrElse(credentials.providerId))
             .map(user => {
               Ok(
-                html.edit_user(
+                editUserView(
                   UserForm.fill(user),
                   routes.UserController.updateUser(continue, userId),
                   routes.UserController.showUserPage(continue, userId),
@@ -160,7 +181,7 @@ class UserController @Inject()(
             .fold(
               formWithErrors =>
                 if (create)
-                  Future.successful(Ok(html.create_user(
+                  Future.successful(Ok(createUserView(
                     UserForm.fill(User(userId.get)),
                     routes.UserController
                       .updateUser(
@@ -175,7 +196,7 @@ class UserController @Inject()(
                     pageContext(credentials)
                   )))
                 else
-                  Future.successful(Ok(html.edit_user(
+                  Future.successful(Ok(editUserView(
                     formWithErrors,
                     routes.UserController.updateUser(continue, userId),
                     routes.UserController.showUserPage(continue, userId),
@@ -211,7 +232,7 @@ class UserController @Inject()(
                       Redirect(continueUrl.url)))
                   .recover {
                     case e: Exception =>
-                      Ok(html.edit_user(
+                      Ok(editUserView(
                         UserForm.fill(user).withGlobalError(e.getMessage),
                         routes.UserController.updateUser(continue, userId),
                         routes.UserController.showUserPage(continue, userId),
@@ -234,7 +255,7 @@ class UserController @Inject()(
             .map(_ => Redirect(routes.UserController.showAllUsersPage()))
             .recover {
               case NonFatal(e) =>
-                Ok(html.error_template(messagesApi("error.title"), s"Error while removing $id", e.getMessage))
+                Ok(errorTemplateView("error.title", s"Error while removing $id", e.getMessage))
             }
         }
     }
@@ -269,7 +290,7 @@ class UserController @Inject()(
             .map(
               users =>
                 Ok(
-                  html.show_all_users(
+                  showAllUsersView(
                     users,
                     request.session.get(SessionKeys.authToken),
                     routes.UserController.showUserPage(None),
