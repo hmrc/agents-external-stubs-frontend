@@ -179,6 +179,7 @@ rest.query.header=Query REST APIs like {0}
 rest.query.description=Here you can query directly any backend service API having current authorised user {0} in scope.
 rest.query.form.method=HTTP Verb
 rest.query.form.url=Service endpoint URL
+rest.query.form.headers=Custom headers (optional)
 rest.query.form.payload=JSON payload (optional)
 rest.query.submit=Run
 rest.query.cancel=Cancel
