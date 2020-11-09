@@ -23,16 +23,14 @@ import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
-import play.api.data.Forms.{mapping, optional, text, seq, tuple}
+import play.api.data.Forms.{mapping, optional, text}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.mvc._
-import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.rest_query
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
@@ -136,17 +134,13 @@ class RestQueryController @Inject()(
 
   private def runQuery(
     query: RestQuery)(implicit ec: ExecutionContext, request: Request[AnyContent]): Future[WSResponse] = {
-    val headers = Map(
-        HeaderNames.AUTHORIZATION -> request.session.get(SessionKeys.authToken).get,
-        "X-Session-ID"            -> request.session.get(SessionKeys.sessionId).get) ++ 
-        query.headers.map(RestQueryController.parseHeaders).getOrElse(Map.empty)  
     if (Try(new URL(query.url)).isFailure) 
       Future.failed(new Exception(s"Invalid URL ${query.url}"))
     else {
       Try{
           val wsRequest = wsClient
           .url(query.url)
-          .withHttpHeaders(headers.toSeq:_*)
+          .withHttpHeaders(query.headersWithDefault.toSeq:_*)
         query.method match {
           case "GET"    => wsRequest.get()
           case "POST"   => wsRequest.post(query.payload.getOrElse(JsNull))
@@ -165,19 +159,22 @@ class RestQueryController @Inject()(
 
 object RestQueryController {
 
-  case class RestQuery(method: String, url: String, payload: Option[JsValue], headers: Option[String]) {
+  case class RestQuery(method: String, url: String, payload: Option[JsValue], headers: Option[String] = None) {
     def encode: String =
       new String(
         Base64.getUrlEncoder.encode(Json.toJson(this).toString().getBytes(StandardCharsets.UTF_8)),
         StandardCharsets.UTF_8)
 
-    def toCurlCommand(implicit request: Request[AnyContent]): String = {
-      val h = Map(
-        "Authorization"->request.session.get(SessionKeys.authToken).get,
-        "X-Session-ID" -> request.session.get(SessionKeys.sessionId).get
-      ) ++ headers.map(RestQueryController.parseHeaders).getOrElse(Map.empty)
+    def headersWithDefault(implicit request: Request[AnyContent]): Map[String,String] = {
+      val h = headers.map(RestQueryController.parseHeaders).getOrElse(Map.empty)
+      h ++ 
+      (if(h.exists(_._1.toLowerCase() == "authorization")) Map.empty else Map("Authorization" -> request.session.get(SessionKeys.authToken).get)) ++ 
+      (if(h.exists(_._1.toLowerCase() == "x-session-id")) Map.empty else Map("X-Session-ID" -> request.session.get(SessionKeys.sessionId).get)) ++
+      (if (!h.exists(_._1.toLowerCase() == "content-type") && (method == "POST" || method == "PUT")) Map("Content-Type" -> "application/json") else Map.empty)
+    }    
 
-      s"""curl -v -X $method ${h.map{case (key,value) => s"""-H "$key: $value""""}.mkString(" ")} ${if (method == "POST" || method == "PUT") """-H "Content-Type: application/json"""" else ""} ${payload
+    def toCurlCommand(implicit request: Request[AnyContent]): String = {
+      s"""curl -v -X $method ${headersWithDefault.map{case (key,value) => s"""-H "$key: $value""""}.mkString(" ")} ${payload
         .map(p => s"""--data '$p'""")
         .getOrElse("")} $url"""
     }
