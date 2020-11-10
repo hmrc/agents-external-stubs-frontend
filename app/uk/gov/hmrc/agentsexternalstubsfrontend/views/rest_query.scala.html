@@ -129,6 +129,14 @@
 
                 <div class="form-field-group">
                     @textArea(
+                        restQueryForm("headers"),
+                        '_label -> Html("""<span class="h2-heading">"""+ Messages("rest.query.form.headers") + """</span>"""),
+                        '_inputClass -> "textarea-small"
+                    )
+                </div>
+
+                <div class="form-field-group">
+                    @textArea(
                         restQueryForm("payload"),
                         '_label -> Html("""<span class="h2-heading">"""+ Messages("rest.query.form.payload") + """</span>"""),
                         '_inputClass -> "textarea-large"
