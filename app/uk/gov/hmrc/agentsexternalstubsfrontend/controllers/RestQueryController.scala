@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,58 +126,66 @@ class RestQueryController @Inject()(
                   None,
                   pageContext(credentials)
                 ))),
-              query => Future.successful(Redirect(routes.RestQueryController.showRestQueryPage(Some(query.encode))))
+              query => Future.successful(Redirect(routes.RestQueryController.showRestQueryPage(query.encode)))
             )
         else Future.successful(Forbidden)
       }
   }
 
   private def runQuery(
-    query: RestQuery)(implicit ec: ExecutionContext, request: Request[AnyContent]): Future[WSResponse] = {
-    if (Try(new URL(query.url)).isFailure) 
+    query: RestQuery)(implicit ec: ExecutionContext, request: Request[AnyContent]): Future[WSResponse] =
+    if (Try(new URL(query.url)).isFailure)
       Future.failed(new Exception(s"Invalid URL ${query.url}"))
     else {
-      Try{
-          val wsRequest = wsClient
+      Try {
+        val wsRequest = wsClient
           .url(query.url)
-          .withHttpHeaders(query.headersWithDefault.toSeq:_*)
+          .withHttpHeaders(query.headersWithDefault.toSeq: _*)
         query.method match {
           case "GET"    => wsRequest.get()
           case "POST"   => wsRequest.post(query.payload.getOrElse(JsNull))
           case "PUT"    => wsRequest.put(query.payload.getOrElse(JsNull))
           case "DELETE" => wsRequest.delete()
-          case _        => Future.failed(new Exception(s"Method ${query.method} is not supported, try GET, POST, PUT or DELETE"))
+          case _ =>
+            Future.failed(new Exception(s"Method ${query.method} is not supported, try GET, POST, PUT or DELETE"))
         }
       }.fold(
         e => Future.failed(new Exception(s"Error executing the request: ${e.getMessage}")),
         identity
       )
     }
-  }
 
 }
 
 object RestQueryController {
 
   case class RestQuery(method: String, url: String, payload: Option[JsValue], headers: Option[String] = None) {
-    def encode: String =
-      new String(
+    def encode: Option[String] = {
+      val s = new String(
         Base64.getUrlEncoder.encode(Json.toJson(this).toString().getBytes(StandardCharsets.UTF_8)),
         StandardCharsets.UTF_8)
+      if (s.length() > 2048) None else Some(s)
+    }
 
-    def headersWithDefault(implicit request: Request[AnyContent]): Map[String,String] = {
+    def headersWithDefault(implicit request: Request[AnyContent]): Map[String, String] = {
       val h = headers.map(RestQueryController.parseHeaders).getOrElse(Map.empty)
-      h ++ 
-      (if(h.exists(_._1.toLowerCase() == "authorization")) Map.empty else Map("Authorization" -> request.session.get(SessionKeys.authToken).get)) ++ 
-      (if(h.exists(_._1.toLowerCase() == "x-session-id")) Map.empty else Map("X-Session-ID" -> request.session.get(SessionKeys.sessionId).get)) ++
-      (if (!h.exists(_._1.toLowerCase() == "content-type") && (method == "POST" || method == "PUT")) Map("Content-Type" -> "application/json") else Map.empty)
-    }    
+      h ++
+        (if (h.exists(_._1.toLowerCase() == "authorization") || h.exists(_._1.toLowerCase() == "no-authorization"))
+           Map.empty
+         else Map("Authorization" -> request.session.get(SessionKeys.authToken).get)) ++
+        (if (h.exists(_._1.toLowerCase() == "x-session-id")) Map.empty
+         else Map("X-Session-ID" -> request.session.get(SessionKeys.sessionId).get)) ++
+        (if (!h.exists(_._1.toLowerCase() == "content-type") && (method == "POST" || method == "PUT"))
+           Map("Content-Type" -> "application/json")
+         else Map.empty)
+    }
 
-    def toCurlCommand(implicit request: Request[AnyContent]): String = {
-      s"""curl -v -X $method ${headersWithDefault.map{case (key,value) => s"""-H "$key: $value""""}.mkString(" ")} ${payload
+    def toCurlCommand(implicit request: Request[AnyContent]): String =
+      s"""curl -v -X $method ${headersWithDefault
+        .map { case (key, value) => s"""-H "$key: $value"""" }
+        .mkString(" ")} ${payload
         .map(p => s"""--data '$p'""")
         .getOrElse("")} $url"""
-    }
   }
 
   object RestQuery {
@@ -203,31 +211,35 @@ object RestQueryController {
       "payload" -> optional(text)
         .verifying(validJson)
         .transform[Option[JsValue]](_.map(Json.parse), _.map(Json.prettyPrint)),
-      "headers" -> optional(text).verifying("error.headers", _.forall{ h => parseHeaders(h); true})
+      "headers" -> optional(text).verifying("error.headers", _.forall { h =>
+        parseHeaders(h); true
+      })
     )(RestQuery.apply)(RestQuery.unapply))
 
-  def prettyPrintHeaders(headers: Seq[(String,String)]): Option[String] = 
-    if (headers.isEmpty) None 
-    else 
-      Some( headers.map { 
-        case (key, value) => s"$key: $value"
-      }.mkString("\n"))
+  def prettyPrintHeaders(headers: Seq[(String, String)]): Option[String] =
+    if (headers.isEmpty) None
+    else
+      Some(
+        headers
+          .map {
+            case (key, value) => s"$key: $value"
+          }
+          .mkString("\n"))
 
-  def parseHeaders(headers: String): Map[String,String] = 
-    if (headers.isEmpty) Map.empty 
-    else 
-      headers
-        .lines
-        .map { line => 
+  def parseHeaders(headers: String): Map[String, String] =
+    if (headers.isEmpty) Map.empty
+    else
+      headers.lines
+        .map { line =>
           val key = line.takeWhile(_ != ':')
-          if(key.nonEmpty) {
+          if (key.nonEmpty) {
             val value = line.drop(key.length + 1)
-            if(value.nonEmpty) {
+            if (value.nonEmpty) {
               Some((key.trim(), value.trim()))
             } else None
           } else None
         }
-        .collect {case Some(x) => x}
+        .collect { case Some(x) => x }
         .toMap
 
 }
