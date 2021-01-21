@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class HelpController @Inject()(
+class HelpController @Inject() (
   override val messagesApi: MessagesApi,
   helpAuthApiView: help_agent_authorisation_api,
   ecp: Provider[ExecutionContext]

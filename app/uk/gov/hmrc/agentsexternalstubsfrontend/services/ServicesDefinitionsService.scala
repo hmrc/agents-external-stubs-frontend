@@ -25,9 +25,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 @Singleton
-class ServicesDefinitionsService @Inject()(
+class ServicesDefinitionsService @Inject() (
   agentsExternalStubsConnector: AgentsExternalStubsConnector,
-  materializer: Materializer) {
+  materializer: Materializer
+) {
 
   lazy val servicesDefinitions: Services = Await
     .result(agentsExternalStubsConnector.getServicesInfo()(HeaderCarrier(), materializer.executionContext), 30.seconds)

@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
-class TcpProxies @Inject()(appConfig: FrontendConfig)(implicit system: ActorSystem, materializer: Materializer) {
+class TcpProxies @Inject() (appConfig: FrontendConfig)(implicit system: ActorSystem, materializer: Materializer) {
 
   private val startProxies = appConfig.proxiesStart
   private val companyAuthFrontendPort = appConfig.companyAuthFEPort
@@ -54,9 +54,8 @@ class TcpProxies @Inject()(appConfig: FrontendConfig)(implicit system: ActorSyst
       Tcp(system)
         .bindAndHandle(tcpProxy, interface = "localhost", port = port)
         .map(s => Logger(getClass).info(s"Listening for $serviceName requests on ${s.localAddress}"))
-        .recover {
-          case e: Exception =>
-            Logger(getClass).error(s"Could not start TCP proxy for $serviceName requests on $port because of $e")
+        .recover { case e: Exception =>
+          Logger(getClass).error(s"Could not start TCP proxy for $serviceName requests on $port because of $e")
         }
 
     startProxy(companyAuthFrontendPort, "company-auth-frontend")

@@ -19,8 +19,11 @@ class PlanetControllerISpec extends BaseISpec with AgentsExternalStubsStubs with
         givenAuthorised("Test123")
         stubFor(
           delete(urlEqualTo("/agents-external-stubs/planets/foobar"))
-            .willReturn(aResponse()
-              .withStatus(204)))
+            .willReturn(
+              aResponse()
+                .withStatus(204)
+            )
+        )
 
         val request = FakeRequest(GET, "/agents-external-stubs/planet/destroy")
 

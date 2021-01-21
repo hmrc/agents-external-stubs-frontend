@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 @Singleton
-class RecordsController @Inject()(
+class RecordsController @Inject() (
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
@@ -74,12 +74,15 @@ class RecordsController @Inject()(
         agentsExternalStubsConnector
           .getRecord(id)
           .map(record =>
-            Ok(editRecordView(
-              RecordForm.fill(record.-("id").-("_links")),
-              routes.RecordsController.updateRecord(id),
-              routes.RecordsController.showAllRecordsPage(Some(id)),
-              pageContext(credentials)
-            )))
+            Ok(
+              editRecordView(
+                RecordForm.fill(record.-("id").-("_links")),
+                routes.RecordsController.updateRecord(id),
+                routes.RecordsController.showAllRecordsPage(Some(id)),
+                pageContext(credentials)
+              )
+            )
+          )
       }
   }
 
@@ -96,20 +99,24 @@ class RecordsController @Inject()(
                     formWithErrors,
                     routes.RecordsController.updateRecord(id),
                     routes.RecordsController.showAllRecordsPage(Some(id)),
-                    pageContext(credentials)))),
+                    pageContext(credentials)
+                  )
+                )
+              ),
             record =>
               agentsExternalStubsConnector
                 .updateRecord(id, record)
                 .map(_ => Redirect(routes.RecordsController.showAllRecordsPage(Some(id))))
-                .recover {
-                  case e =>
-                    Ok(editRecordView(
+                .recover { case e =>
+                  Ok(
+                    editRecordView(
                       RecordForm.fill(record).withError("json", e.getMessage),
                       routes.RecordsController.updateRecord(id),
                       routes.RecordsController.showAllRecordsPage(Some(id)),
                       pageContext(credentials)
-                    ))
-              }
+                    )
+                  )
+                }
           )
       }
   }
@@ -120,13 +127,16 @@ class RecordsController @Inject()(
         agentsExternalStubsConnector
           .generateRecord(`type`, seed)
           .map(record =>
-            Ok(createRecordView(
-              RecordForm.fill(record.-("id").-("_links")),
-              routes.RecordsController.createRecord(`type`, seed),
-              routes.RecordsController.showAllRecordsPage(None),
-              routes.RecordsController.showAddRecordPage(`type`, shake(seed)),
-              pageContext(credentials)
-            )))
+            Ok(
+              createRecordView(
+                RecordForm.fill(record.-("id").-("_links")),
+                routes.RecordsController.createRecord(`type`, seed),
+                routes.RecordsController.showAllRecordsPage(None),
+                routes.RecordsController.showAddRecordPage(`type`, shake(seed)),
+                pageContext(credentials)
+              )
+            )
+          )
       }
   }
 
@@ -137,27 +147,32 @@ class RecordsController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              Future.successful(Ok(createRecordView(
-                formWithErrors,
-                routes.RecordsController.createRecord(`type`, seed),
-                routes.RecordsController.showAllRecordsPage(None),
-                routes.RecordsController.showAddRecordPage(`type`, shake(seed)),
-                pageContext(credentials)
-              ))),
+              Future.successful(
+                Ok(
+                  createRecordView(
+                    formWithErrors,
+                    routes.RecordsController.createRecord(`type`, seed),
+                    routes.RecordsController.showAllRecordsPage(None),
+                    routes.RecordsController.showAddRecordPage(`type`, shake(seed)),
+                    pageContext(credentials)
+                  )
+                )
+              ),
             record =>
               agentsExternalStubsConnector
                 .createRecord(`type`, record)
                 .map(recordIdOpt => Redirect(routes.RecordsController.showAllRecordsPage(recordIdOpt)))
-                .recover {
-                  case e =>
-                    Ok(createRecordView(
+                .recover { case e =>
+                  Ok(
+                    createRecordView(
                       RecordForm.fill(record).withError("json", e.getMessage),
                       routes.RecordsController.createRecord(`type`, seed),
                       routes.RecordsController.showAllRecordsPage(None),
                       routes.RecordsController.showAddRecordPage(`type`, shake(seed)),
                       pageContext(credentials)
-                    ))
-              }
+                    )
+                  )
+                }
           )
       }
   }
@@ -172,10 +187,13 @@ class RecordsController @Inject()(
 
 object RecordsController {
 
-  val validJson: Constraint[String] = Constraint(
-    json => try { Json.parse(json); Valid } catch { case NonFatal(e) => Invalid(e.getMessage) })
+  val validJson: Constraint[String] = Constraint(json =>
+    try { Json.parse(json); Valid }
+    catch { case NonFatal(e) => Invalid(e.getMessage) }
+  )
 
   val RecordForm: Form[JsObject] =
     Form[JsObject](
-      mapping("json" -> text.verifying(validJson))(t => Json.parse(t).as[JsObject])(j => Some(Json.prettyPrint(j))))
+      mapping("json" -> text.verifying(validJson))(t => Json.parse(t).as[JsObject])(j => Some(Json.prettyPrint(j)))
+    )
 }

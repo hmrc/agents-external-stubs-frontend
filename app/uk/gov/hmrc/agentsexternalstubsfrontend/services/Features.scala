@@ -19,7 +19,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 
 @Singleton
-class Features @Inject()(configuration: Configuration) {
+class Features @Inject() (configuration: Configuration) {
 
   def mayShowRestQuery(planetId: String): Boolean =
     showRestQuery || whitelistedPlanetPrefix.exists(planetId.startsWith)

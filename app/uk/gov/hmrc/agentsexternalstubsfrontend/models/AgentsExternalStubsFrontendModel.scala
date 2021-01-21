@@ -22,7 +22,8 @@ case class AgentsExternalStubsFrontendModel(
   parameter1: String,
   parameter2: Option[String],
   telephoneNumber: Option[String],
-  emailAddress: Option[String])
+  emailAddress: Option[String]
+)
 
 object AgentsExternalStubsFrontendModel {
   implicit val modelFormat = Json.format[AgentsExternalStubsFrontendModel]
