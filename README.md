@@ -25,6 +25,16 @@ All users and other data on each planet are removed after 12h unless marked as p
 
 ## Stubbed UIs
 
+### [BAS Gateway Frontend](https://github.com/hmrc/bas-gateway-frontend/blob/master/README.md)
+#### GET         /bas-gateway/sign-in  
+Initiates the login journey, eventually creating an authenticated MDTP session                                      
+#### GET         /bas-gateway/sso-sign-in
+Initiates the sso login flow for BAS through MDTP
+#### GET         /bas-gateway/sign-out-without-state
+#### GET         /bas-gateway/sign-out-with-state
+#### GET         /bas-gateway/register 
+Sends the user to register a new SCP account
+
 ### [Company Auth Frontend](https://github.com/hmrc/company-auth-frontend/blob/master/README.md)
 #### GET /gg/sign-in?continue=:continueUrl&accountType=:accountType&origin=:origin
 Shows login page.

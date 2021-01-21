@@ -26,7 +26,6 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.sign_in
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
@@ -41,7 +40,8 @@ class SignInController @Inject() (
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   signInView: sign_in,
   val authConnector: AuthConnector,
-  ecp: Provider[ExecutionContext]
+  ecp: Provider[ExecutionContext],
+  sessionCookieBaker: SessionCookieBaker
 )(implicit val configuration: Configuration, cc: MessagesControllerComponents)
     extends FrontendController(cc) with AuthActions with I18nSupport {
 
@@ -64,11 +64,63 @@ class SignInController @Inject() (
       )
     }
 
+  def register(
+    continueUrl: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String]
+  ): Action[AnyContent] =
+    showSignInPage(continueUrl, origin, accountType)
+
+  def showSignInPageSCP(
+    continue_url: Option[ContinueUrl],
+    origin: Option[String]
+  ): Action[AnyContent] =
+    showSignInPage(continue_url, origin, None)
+
   def showGovernmentGatewaySignInPage(
     continue: Option[ContinueUrl],
     origin: Option[String],
     accountType: Option[String]
   ) = showSignInPage(continue, origin, accountType)
+
+  def signInSsoSCP(
+    continue_url: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String]
+  ): Action[AnyContent] =
+    signInSsoImpl(continue_url, origin, accountType, false)
+
+  def signInSsoInternalSCP(
+    continue_url: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String]
+  ): Action[AnyContent] =
+    signInSsoImpl(continue_url, origin, accountType, true)
+
+  private def signInSsoImpl(
+    continue_url: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String],
+    internal: Boolean
+  ): Action[AnyContent] =
+    Action.async { implicit request =>
+      (for {
+        authenticatedSession <- agentsExternalStubsConnector.currentSession()
+        result <- Future(
+                    continue_url.fold(
+                      Redirect(routes.UserController.showUserPage(None))
+                    )(continueUrl => Redirect(continueUrl.url))
+                  )
+      } yield result)
+        .recover { case _ =>
+          Redirect(
+            if (internal)
+              routes.SignInController.showSignInPageInternalSCP(continue_url, origin)
+            else
+              routes.SignInController.showSignInPageSCP(continue_url, origin)
+          )
+        }
+    }
 
   def signIn(
     continue: Option[ContinueUrl],
@@ -149,9 +201,22 @@ class SignInController @Inject() (
       agentsExternalStubsConnector
         .signOut()
         .map(_ =>
-          continue.fold(Redirect(routes.SignInController.showSignInPage(None, None, None).url).withNewSession)(c =>
-            Redirect(c.url).withNewSession
-          )
+          continue.fold(
+            Redirect(routes.SignInController.showSignInPage(None, None, None).url)
+              .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
+          )(c => Redirect(c.url).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+        )
+    }
+
+  def signOutSCP(continue: Option[ContinueUrl]): Action[AnyContent] =
+    Action.async { implicit request =>
+      agentsExternalStubsConnector
+        .signOut()
+        .map(_ =>
+          continue.fold(
+            Redirect(routes.SignInController.showSignInPageSCP(None, None).url)
+              .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
+          )(c => Redirect(c.url).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
         )
     }
 
@@ -179,6 +244,19 @@ class SignInController @Inject() (
         )
       )
     }
+
+  def showSignInPageInternalSCP(
+    continue_url: Option[ContinueUrl],
+    origin: Option[String]
+  ): Action[AnyContent] =
+    showSignInPageInternal(continue_url, origin, None)
+
+  def registerInternal(
+    continueUrl: Option[ContinueUrl],
+    origin: Option[String],
+    accountType: Option[String]
+  ): Action[AnyContent] =
+    showSignInPageInternal(continueUrl, origin, accountType)
 
   def showGovernmentGatewaySignInPageInternal(
     continue: Option[ContinueUrl],
@@ -214,9 +292,22 @@ class SignInController @Inject() (
       agentsExternalStubsConnector
         .signOut()
         .map(_ =>
-          continue.fold(Redirect(routes.SignInController.showSignInPageInternal(None, None, None).url).withNewSession)(
-            c => Redirect(c.url).withNewSession
-          )
+          continue.fold(
+            Redirect(routes.SignInController.showSignInPageInternal(None, None, None).url)
+              .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
+          )(c => Redirect(c.url).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+        )
+    }
+
+  def signOutInternalSCP(continue: Option[ContinueUrl]): Action[AnyContent] =
+    Action.async { implicit request =>
+      agentsExternalStubsConnector
+        .signOut()
+        .map(_ =>
+          continue.fold(
+            Redirect(routes.SignInController.showSignInPageInternalSCP(None, None).url)
+              .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
+          )(c => Redirect(c.url).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
         )
     }
 
