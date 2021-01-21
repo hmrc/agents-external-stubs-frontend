@@ -31,7 +31,8 @@ class UserFormSpec extends UnitSpec {
         userId = "bar",
         affinityGroup = Some(User.Individual),
         confidenceLevel = Some(50),
-        nino = Some(Nino("HW827856C")))
+        nino = Some(Nino("HW827856C"))
+      )
 
       val fieldValues = Map(
         "userId"             -> "bar",
@@ -59,7 +60,8 @@ class UserFormSpec extends UnitSpec {
           "confidenceLevel"    -> "0",
           "credentialStrength" -> "none",
           "strideRoles"        -> "",
-          "credentialRole"     -> "none")
+          "credentialRole"     -> "none"
+        )
 
       form.bind(fieldValues).value shouldBe Some(value.copy(userId = "ignored"))
       form.fill(value).data shouldBe fieldValues.-("userId")

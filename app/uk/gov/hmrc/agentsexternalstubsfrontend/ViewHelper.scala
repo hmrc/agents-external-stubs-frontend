@@ -29,25 +29,28 @@ object ViewHelper {
   def excerpt(json: JsValue, paths: String*): JsValue =
     paths
       .map(p => p.split("\\."))
-      .map(
-        path =>
-          (
-            path,
-            path.foldLeft[JsLookupResult](JsDefined(json))((j, p) =>
-              j match {
-                case JsDefined(arr: JsArray) =>
-                  try {
-                    JsDefined(arr(p.toInt))
-                  } catch {
-                    case NonFatal(_) => j
-                  }
-                case JsDefined(_) => j \ p
-                case _            => j
-            })))
+      .map(path =>
+        (
+          path,
+          path.foldLeft[JsLookupResult](JsDefined(json))((j, p) =>
+            j match {
+              case JsDefined(arr: JsArray) =>
+                try JsDefined(arr(p.toInt))
+                catch {
+                  case NonFatal(_) => j
+                }
+              case JsDefined(_) => j \ p
+              case _            => j
+            }
+          )
+        )
+      )
       .map {
         case (path, JsDefined(value)) =>
-          path.init.foldRight[JsValue](if (isArrayIndex(path.last)) Json.arr(value)
-          else Json.obj(path.last -> value))((s, o) => if (isArrayIndex(s)) Json.arr(o) else Json.obj(s -> o))
+          path.init.foldRight[JsValue](
+            if (isArrayIndex(path.last)) Json.arr(value)
+            else Json.obj(path.last -> value)
+          )((s, o) => if (isArrayIndex(s)) Json.arr(o) else Json.obj(s -> o))
         case _ => Json.obj()
       }
       .foldLeft[JsValue](Json.obj()) {
@@ -56,19 +59,19 @@ object ViewHelper {
         case (x1, x2)                     => throw new UnsupportedOperationException(s"Could not merge $x1 and $x2")
       }
 
-  private def isArrayIndex(s: String): Boolean = s == "*" || (try { s.toInt; true } catch { case NonFatal(_) => false })
+  private def isArrayIndex(s: String): Boolean = s == "*" || (try { s.toInt; true }
+  catch { case NonFatal(_) => false })
 
   private def deepMerge(o1: JsObject, o2: JsObject): JsObject = {
-    val result = o1.value ++ o2.value.map {
-      case (otherKey, otherValue) =>
-        val maybeExistingValue = o1.value.get(otherKey)
+    val result = o1.value ++ o2.value.map { case (otherKey, otherValue) =>
+      val maybeExistingValue = o1.value.get(otherKey)
 
-        val newValue = (maybeExistingValue, otherValue) match {
-          case (Some(e: JsObject), o: JsObject) => deepMerge(e, o)
-          case (Some(e: JsArray), a: JsArray)   => deepMerge(e, a)
-          case _                                => otherValue
-        }
-        otherKey -> newValue
+      val newValue = (maybeExistingValue, otherValue) match {
+        case (Some(e: JsObject), o: JsObject) => deepMerge(e, o)
+        case (Some(e: JsArray), a: JsArray)   => deepMerge(e, a)
+        case _                                => otherValue
+      }
+      otherKey -> newValue
     }
     JsObject(result)
   }
@@ -107,18 +110,20 @@ object ViewHelper {
         .groupBy { case (k, _) => k.takeWhile(_ != ']') }
         .toSeq
         .sortBy(_._1)
-        .map {
-          case (k, data1) =>
-            val leafs = data1.collect {
-              case (k1, v1) if k1.dropWhile(_ != ']').drop(1).isEmpty => Leaf(key + k1, v1)
-            }.toSeq
-            if (data1.size == 1 && leafs.size == 1) leafs.head
-            else {
-              val node = buildTree(key + k + ']', data1.collect {
+        .map { case (k, data1) =>
+          val leafs = data1.collect {
+            case (k1, v1) if k1.dropWhile(_ != ']').drop(1).isEmpty => Leaf(key + k1, v1)
+          }.toSeq
+          if (data1.size == 1 && leafs.size == 1) leafs.head
+          else {
+            val node = buildTree(
+              key + k + ']',
+              data1.collect {
                 case (k1, v1) if k1.dropWhile(_ != ']').drop(1).nonEmpty => (k1.dropWhile(_ != ']').drop(1), v1)
-              })
-              node.copy(nodes = leafs ++ node.nodes)
-            }
+              }
+            )
+            node.copy(nodes = leafs ++ node.nodes)
+          }
         }
     )
 

@@ -34,7 +34,8 @@ class SignInFormSpec extends UnitSpec {
           "userId"       -> "bar",
           "password"     -> "foo",
           "providerType" -> AuthProvider.GovernmentGateway,
-          "planetId"     -> "juniper")
+          "planetId"     -> "juniper"
+        )
 
       form.bind(fieldValues).value shouldBe Some(value)
       form.fill(value).data shouldBe fieldValues
@@ -50,7 +51,8 @@ class SignInFormSpec extends UnitSpec {
           "userId"       -> "foo",
           "password"     -> "bar",
           "providerType" -> AuthProvider.GovernmentGateway,
-          "planetId"     -> "juniper")
+          "planetId"     -> "juniper"
+        )
 
       form.bind(fieldValues).value shouldBe Some(value)
       form.fill(value).data shouldBe fieldValues

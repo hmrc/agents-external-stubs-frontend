@@ -24,7 +24,10 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "GET /government-gateway-registration-frontend" should {
       "display the sign in page" in {
-        val result = controller.showGovernmentGatewaySignInPage(Some(ContinueUrl("/there")), Some("unknown"), Some("agent"))(FakeRequest())
+        val result =
+          controller.showGovernmentGatewaySignInPage(Some(ContinueUrl("/there")), Some("unknown"), Some("agent"))(
+            FakeRequest()
+          )
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
       }
@@ -40,7 +43,10 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "GET /agents-external-stubs/government-gateway-registration-frontend" should {
       "display the sign in page" in {
-        val result = controller.showGovernmentGatewaySignInPageInternal(Some(ContinueUrl("/there")), Some("here"), None)(FakeRequest())
+        val result =
+          controller.showGovernmentGatewaySignInPageInternal(Some(ContinueUrl("/there")), Some("here"), None)(
+            FakeRequest()
+          )
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
       }
@@ -51,7 +57,8 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
         val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
         val result = controller.signIn(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
-            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper"))
+            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper")
+        )
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/there")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
@@ -62,7 +69,8 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
         val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
         val result = controller.signIn(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
-            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn"))
+            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")
+        )
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
@@ -75,7 +83,8 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
         val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
         val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
-            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper"))
+            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper")
+        )
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/there")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
@@ -86,7 +95,8 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
         val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
         val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
-            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn"))
+            .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")
+        )
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")

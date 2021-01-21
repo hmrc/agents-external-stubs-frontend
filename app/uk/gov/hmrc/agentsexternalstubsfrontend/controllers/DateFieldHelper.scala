@@ -45,14 +45,13 @@ object DateFieldHelper {
       case NonFatal(_) => None
     }
 
-  val formatDateFromFields: (String, String, String) => String = {
-    case (y, m, d) =>
-      if (y.isEmpty || m.isEmpty || d.isEmpty) ""
-      else {
-        val month = if (m.length == 1) "0" + m else m
-        val day = if (d.length == 1) "0" + d else d
-        s"$y-$month-$day"
-      }
+  val formatDateFromFields: (String, String, String) => String = { case (y, m, d) =>
+    if (y.isEmpty || m.isEmpty || d.isEmpty) ""
+    else {
+      val month = if (m.length == 1) "0" + m else m
+      val day = if (d.length == 1) "0" + d else d
+      s"$y-$month-$day"
+    }
   }
 
   def dateFieldsMapping(constraintDate: Constraint[String]): Mapping[LocalDate] =
@@ -66,5 +65,6 @@ object DateFieldHelper {
 
   val validDobDateFormat: Constraint[String] =
     ValidateHelper.validateField("error.date-of-birth.required", "enter.date-of-birth.invalid-format")(date =>
-      validateDate(date))
+      validateDate(date)
+    )
 }

@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SpecialCasesController @Inject()(
+class SpecialCasesController @Inject() (
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
@@ -53,16 +53,18 @@ class SpecialCasesController @Inject()(
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         agentsExternalStubsConnector.getAllSpecialCases
-          .map(
-            specialCases =>
-              Ok(showAllSpecialCasesView(
+          .map(specialCases =>
+            Ok(
+              showAllSpecialCasesView(
                 specialCases,
                 caseId,
                 id => routes.SpecialCasesController.showAllSpecialCasesPage(Some(id)),
                 id => routes.SpecialCasesController.showEditSpecialCasePage(Some(id)),
                 routes.SpecialCasesController.deleteSpecialCase,
                 pageContext(credentials)
-              )))
+              )
+            )
+          )
       }
   }
 
@@ -83,7 +85,8 @@ class SpecialCasesController @Inject()(
                       routes.SpecialCasesController.showEditSpecialCasePage(caseId),
                       routes.SpecialCasesController.showAllSpecialCasesPage(caseId),
                       pageContext(credentials)
-                    ))
+                    )
+                  )
                 case None =>
                   Ok(
                     editSpecialCaseView(
@@ -93,18 +96,22 @@ class SpecialCasesController @Inject()(
                       routes.SpecialCasesController.showEditSpecialCasePage(None),
                       routes.SpecialCasesController.showAllSpecialCasesPage(None),
                       pageContext(credentials)
-                    ))
+                    )
+                  )
               }
           case None =>
             Future.successful(
-              Ok(editSpecialCaseView(
-                SpecialCaseForm,
-                None,
-                routes.SpecialCasesController.upsertSpecialCase(caseId),
-                routes.SpecialCasesController.showEditSpecialCasePage(caseId),
-                routes.SpecialCasesController.showAllSpecialCasesPage(caseId),
-                pageContext(credentials)
-              )))
+              Ok(
+                editSpecialCaseView(
+                  SpecialCaseForm,
+                  None,
+                  routes.SpecialCasesController.upsertSpecialCase(caseId),
+                  routes.SpecialCasesController.showEditSpecialCasePage(caseId),
+                  routes.SpecialCasesController.showAllSpecialCasesPage(caseId),
+                  pageContext(credentials)
+                )
+              )
+            )
         }
       }
   }
@@ -116,14 +123,18 @@ class SpecialCasesController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              Future.successful(Ok(editSpecialCaseView(
-                formWithErrors,
-                caseId,
-                routes.SpecialCasesController.upsertSpecialCase(caseId),
-                routes.SpecialCasesController.showEditSpecialCasePage(caseId),
-                routes.SpecialCasesController.showAllSpecialCasesPage(caseId),
-                pageContext(credentials)
-              ))),
+              Future.successful(
+                Ok(
+                  editSpecialCaseView(
+                    formWithErrors,
+                    caseId,
+                    routes.SpecialCasesController.upsertSpecialCase(caseId),
+                    routes.SpecialCasesController.showEditSpecialCasePage(caseId),
+                    routes.SpecialCasesController.showAllSpecialCasesPage(caseId),
+                    pageContext(credentials)
+                  )
+                )
+              ),
             specialCase =>
               (caseId match {
                 case Some(_) =>
@@ -175,6 +186,7 @@ object SpecialCasesController {
       "requestMatch" -> requestMatchMapping,
       "response"     -> responseMapping,
       "id"           -> optional(text)
-    )(SpecialCase.apply)(SpecialCase.unapply))
+    )(SpecialCase.apply)(SpecialCase.unapply)
+  )
 
 }

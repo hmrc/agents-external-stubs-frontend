@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class FrontendConfig @Inject()(servicesConfig: ServicesConfig) {
+class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
 
   val appName = "agents-external-stubs-frontend"
 

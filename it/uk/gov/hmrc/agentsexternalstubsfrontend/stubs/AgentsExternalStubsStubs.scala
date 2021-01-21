@@ -17,15 +17,23 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     planetId: String,
     plainTextPassword: String = "p@ssw0rd",
     providerType: String = AuthProvider.GovernmentGateway,
-    newUser: Boolean = true): String = {
+    newUser: Boolean = true
+  ): String = {
     val authToken = UUID.randomUUID().toString
 
-    stubFor(post(urlEqualTo(s"/agents-external-stubs/sign-in"))
-      .withRequestBody(equalToJson(
-        s"""{"userId":"$userId", "plainTextPassword":"$plainTextPassword", "providerType":"$providerType", "planetId": "$planetId"}"""))
-      .willReturn(aResponse()
-        .withStatus(if (newUser) Status.CREATED else Status.ACCEPTED)
-        .withHeader("Location", s"/agents-external-stubs/session/$authToken")))
+    stubFor(
+      post(urlEqualTo(s"/agents-external-stubs/sign-in"))
+        .withRequestBody(
+          equalToJson(
+            s"""{"userId":"$userId", "plainTextPassword":"$plainTextPassword", "providerType":"$providerType", "planetId": "$planetId"}"""
+          )
+        )
+        .willReturn(
+          aResponse()
+            .withStatus(if (newUser) Status.CREATED else Status.ACCEPTED)
+            .withHeader("Location", s"/agents-external-stubs/session/$authToken")
+        )
+    )
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/session/$authToken"))
         .willReturn(
@@ -38,8 +46,12 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
                   "userId"       -> userId,
                   "authToken"    -> authToken,
                   "providerType" -> providerType,
-                  "planetId"     -> planetId)
-                .toString())))
+                  "planetId"     -> planetId
+                )
+                .toString()
+            )
+        )
+    )
 
     authToken
   }
@@ -51,21 +63,28 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
           aResponse()
             .withStatus(200)
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
-            .withBody(Json
-              .obj(
-                "sessionId"    -> UUID.randomUUID().toString,
-                "userId"       -> "foo",
-                "authToken"    -> UUID.randomUUID().toString,
-                "providerType" -> AuthProvider.GovernmentGateway,
-                "planetId"     -> UUID.randomUUID().toString
-              )
-              .toString())))
+            .withBody(
+              Json
+                .obj(
+                  "sessionId"    -> UUID.randomUUID().toString,
+                  "userId"       -> "foo",
+                  "authToken"    -> UUID.randomUUID().toString,
+                  "providerType" -> AuthProvider.GovernmentGateway,
+                  "planetId"     -> UUID.randomUUID().toString
+                )
+                .toString()
+            )
+        )
+    )
 
   def givenUserCanSignOut =
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/sign-out"))
-        .willReturn(aResponse()
-          .withStatus(Status.NO_CONTENT)))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.NO_CONTENT)
+        )
+    )
 
   def givenUser(user: User): Unit = {
     stubFor(
@@ -73,17 +92,24 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
         .willReturn(
           aResponse()
             .withStatus(Status.OK)
-            .withBody(Json.toJson(user).toString())))
+            .withBody(Json.toJson(user).toString())
+        )
+    )
     stubFor(
       put(urlEqualTo(s"/agents-external-stubs/users/${user.userId}"))
         .willReturn(
           aResponse()
             .withStatus(Status.ACCEPTED)
-            .withHeader("Location", s"/agents-external-stubs/users/${user.userId}")))
+            .withHeader("Location", s"/agents-external-stubs/users/${user.userId}")
+        )
+    )
     stubFor(
       delete(urlEqualTo(s"/agents-external-stubs/users/${user.userId}"))
-        .willReturn(aResponse()
-          .withStatus(Status.NO_CONTENT)))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.NO_CONTENT)
+        )
+    )
   }
 
   def givenUsers(users: User*) =
@@ -92,9 +118,13 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
         .willReturn(
           aResponse()
             .withStatus(Status.OK)
-            .withBody(Json
-              .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
-              .toString())))
+            .withBody(
+              Json
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .toString()
+            )
+        )
+    )
 
   def givenAllRecords =
     stubFor(
@@ -103,7 +133,9 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
           aResponse()
             .withStatus(Status.OK)
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
-            .withBody(validRecordsResponse)))
+            .withBody(validRecordsResponse)
+        )
+    )
 
   def givenAllSpecialCases =
     stubFor(
@@ -112,7 +144,9 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
           aResponse()
             .withStatus(Status.OK)
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
-            .withBody(validSpecialCasesResponse)))
+            .withBody(validSpecialCasesResponse)
+        )
+    )
 }
 
 trait ValidStubResponses {

@@ -46,7 +46,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       s"userAborted~$journeyId"          -> "User Aborted",
       s"timedOut~$journeyId"             -> "Timed Out",
       s"failedIV~$journeyId"             -> "Failed IV"
-  )
+    )
 
   private val filledForm = SignInController.SignInRequestForm.fill(
     SignInRequest(userId = "My contact name", plainTextPassword = "AA1 1AA", planetId = "juniper")
@@ -85,8 +85,9 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         signInForm.f(filledForm, routes.SignInController.signIn(None, None, None, AuthProvider.GovernmentGateway))(
           FakeRequest(),
           Messages.Implicits.applicationMessages,
-          app.configuration)
-      contentAsString(html2) shouldBe (content)
+          app.configuration
+        )
+      contentAsString(html2) shouldBe content
     }
   }
 
@@ -121,8 +122,9 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
           .f(filledUpliftForm, options(journeyIdValue), postCall)(
             FakeRequest(),
             Messages.Implicits.applicationMessages,
-            app.configuration)
-      contentAsString(html2) shouldBe (content)
+            app.configuration
+          )
+      contentAsString(html2) shouldBe content
     }
   }
 
@@ -136,7 +138,8 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         heading = heading,
         message = message,
         messages = Messages.Implicits.applicationMessages,
-        configuration = app.configuration)
+        configuration = app.configuration
+      )
       val content = contentAsString(html)
       content should include(pageTitle)
       content should include(heading)
@@ -144,7 +147,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
 
       val html2 =
         errorTemplateView.f(pageTitle, heading, message)(Messages.Implicits.applicationMessages, app.configuration)
-      contentAsString(html2) shouldBe (content)
+      contentAsString(html2) shouldBe content
     }
   }
 
@@ -181,7 +184,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         Some("my-custom-main-class"),
         Some(Html("My custom script"))
       )(Html("My custom main content HTML"))(Messages.Implicits.applicationMessages, FakeRequest(), app.configuration)
-      contentAsString(html2) shouldBe (content)
+      contentAsString(html2) shouldBe content
     }
   }
 
@@ -226,7 +229,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         Some(Html("My custom script")),
         Seq("My custom GA code")
       )(Messages.Implicits.applicationMessages, app.configuration)
-      contentAsString(html2) shouldBe (content)
+      contentAsString(html2) shouldBe content
     }
   }
 }

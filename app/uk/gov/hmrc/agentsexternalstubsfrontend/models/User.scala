@@ -66,7 +66,8 @@ case class Address(
   line3: Option[String] = None,
   line4: Option[String] = None,
   postcode: Option[String] = None,
-  countryCode: Option[String] = None) {
+  countryCode: Option[String] = None
+) {
 
   def isUKAddress: Boolean = countryCode.contains("GB")
 

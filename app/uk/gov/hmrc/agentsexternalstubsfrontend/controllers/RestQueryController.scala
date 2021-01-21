@@ -42,7 +42,7 @@ import scala.util.Try
 import java.net.URL
 
 @Singleton
-class RestQueryController @Inject()(
+class RestQueryController @Inject() (
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
@@ -64,15 +64,18 @@ class RestQueryController @Inject()(
           q match {
             case None =>
               Future.successful(
-                Ok(restQueryView(
-                  RestQueryForm.fill(RestQuery("GET", "https://", None, None)),
-                  routes.RestQueryController.runQuery(),
-                  routes.UserController.showUserPage(),
-                  routes.RestQueryController.showRestQueryPage(None),
-                  None,
-                  None,
-                  pageContext(credentials)
-                )))
+                Ok(
+                  restQueryView(
+                    RestQueryForm.fill(RestQuery("GET", "https://", None, None)),
+                    routes.RestQueryController.runQuery(),
+                    routes.UserController.showUserPage(),
+                    routes.RestQueryController.showRestQueryPage(None),
+                    None,
+                    None,
+                    pageContext(credentials)
+                  )
+                )
+              )
             case Some(query) =>
               RestQuery
                 .decode(query)
@@ -81,18 +84,21 @@ class RestQueryController @Inject()(
                   rq =>
                     runQuery(rq)
                       .map(response =>
-                        Ok(restQueryView(
-                          RestQueryForm.fill(rq),
-                          routes.RestQueryController.runQuery(),
-                          routes.UserController.showUserPage(),
-                          routes.RestQueryController.showRestQueryPage(None),
-                          Option(response),
-                          Option(rq.toCurlCommand),
-                          pageContext(credentials)
-                        )))
-                      .recover {
-                        case NonFatal(e) =>
-                          Ok(restQueryView(
+                        Ok(
+                          restQueryView(
+                            RestQueryForm.fill(rq),
+                            routes.RestQueryController.runQuery(),
+                            routes.UserController.showUserPage(),
+                            routes.RestQueryController.showRestQueryPage(None),
+                            Option(response),
+                            Option(rq.toCurlCommand),
+                            pageContext(credentials)
+                          )
+                        )
+                      )
+                      .recover { case NonFatal(e) =>
+                        Ok(
+                          restQueryView(
                             RestQueryForm.fill(rq).withGlobalError(e.getMessage),
                             routes.RestQueryController.runQuery(),
                             routes.UserController.showUserPage(),
@@ -100,11 +106,13 @@ class RestQueryController @Inject()(
                             None,
                             Option(rq.toCurlCommand),
                             pageContext(credentials)
-                          ))
-                    }
+                          )
+                        )
+                      }
                 )
 
-          } else Future.successful(Forbidden)
+          }
+        else Future.successful(Forbidden)
       }
 
   }
@@ -117,15 +125,19 @@ class RestQueryController @Inject()(
             .bindFromRequest()
             .fold(
               formWithErrors =>
-                Future.successful(Ok(restQueryView(
-                  formWithErrors,
-                  routes.RestQueryController.runQuery(),
-                  routes.UserController.showUserPage(),
-                  routes.RestQueryController.showRestQueryPage(None),
-                  None,
-                  None,
-                  pageContext(credentials)
-                ))),
+                Future.successful(
+                  Ok(
+                    restQueryView(
+                      formWithErrors,
+                      routes.RestQueryController.runQuery(),
+                      routes.UserController.showUserPage(),
+                      routes.RestQueryController.showRestQueryPage(None),
+                      None,
+                      None,
+                      pageContext(credentials)
+                    )
+                  )
+                ),
               query => Future.successful(Redirect(routes.RestQueryController.showRestQueryPage(query.encode)))
             )
         else Future.successful(Forbidden)
@@ -133,7 +145,8 @@ class RestQueryController @Inject()(
   }
 
   private def runQuery(
-    query: RestQuery)(implicit ec: ExecutionContext, request: Request[AnyContent]): Future[WSResponse] =
+    query: RestQuery
+  )(implicit ec: ExecutionContext, request: Request[AnyContent]): Future[WSResponse] =
     if (Try(new URL(query.url)).isFailure)
       Future.failed(new Exception(s"Invalid URL ${query.url}"))
     else {
@@ -163,7 +176,8 @@ object RestQueryController {
     def encode: Option[String] = {
       val s = new String(
         Base64.getUrlEncoder.encode(Json.toJson(this).toString().getBytes(StandardCharsets.UTF_8)),
-        StandardCharsets.UTF_8)
+        StandardCharsets.UTF_8
+      )
       if (s.length() > 2048) None else Some(s)
     }
 
@@ -192,16 +206,17 @@ object RestQueryController {
     implicit val format: Format[RestQuery] = Json.format[RestQuery]
 
     def decode(s: String): Either[String, RestQuery] =
-      try {
-        Right(Json.parse(new String(Base64.getUrlDecoder.decode(s), StandardCharsets.UTF_8)).as[RestQuery])
-      } catch {
+      try Right(Json.parse(new String(Base64.getUrlDecoder.decode(s), StandardCharsets.UTF_8)).as[RestQuery])
+      catch {
         case NonFatal(e) => Left(e.getMessage)
       }
   }
 
   val validJson: Constraint[Option[String]] = Constraint {
-    case Some(json) => try { Json.parse(json); Valid } catch { case NonFatal(e) => Invalid(e.getMessage) }
-    case None       => Valid
+    case Some(json) =>
+      try { Json.parse(json); Valid }
+      catch { case NonFatal(e) => Invalid(e.getMessage) }
+    case None => Valid
   }
 
   val RestQueryForm: Form[RestQuery] = Form[RestQuery](
@@ -211,20 +226,25 @@ object RestQueryController {
       "payload" -> optional(text)
         .verifying(validJson)
         .transform[Option[JsValue]](_.map(Json.parse), _.map(Json.prettyPrint)),
-      "headers" -> optional(text).verifying("error.headers", _.forall { h =>
-        parseHeaders(h); true
-      })
-    )(RestQuery.apply)(RestQuery.unapply))
+      "headers" -> optional(text).verifying(
+        "error.headers",
+        _.forall { h =>
+          parseHeaders(h); true
+        }
+      )
+    )(RestQuery.apply)(RestQuery.unapply)
+  )
 
   def prettyPrintHeaders(headers: Seq[(String, String)]): Option[String] =
     if (headers.isEmpty) None
     else
       Some(
         headers
-          .map {
-            case (key, value) => s"$key: $value"
+          .map { case (key, value) =>
+            s"$key: $value"
           }
-          .mkString("\n"))
+          .mkString("\n")
+      )
 
   def parseHeaders(headers: String): Map[String, String] =
     if (headers.isEmpty) Map.empty

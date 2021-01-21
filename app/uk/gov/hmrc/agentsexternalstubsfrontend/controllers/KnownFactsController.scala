@@ -33,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class KnownFactsController @Inject()(
+class KnownFactsController @Inject() (
   override val messagesApi: MessagesApi,
   val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
@@ -52,33 +52,34 @@ class KnownFactsController @Inject()(
     EnrolmentKey(enrolmentKey).fold(
       _ =>
         Future.successful(
-          Ok(errorTemplateView("knownFacts.title", "Invalid request", "Provided enrolment key format is not valid."))),
+          Ok(errorTemplateView("knownFacts.title", "Invalid request", "Provided enrolment key format is not valid."))
+        ),
       _ =>
         authorised()
           .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
             agentsExternalStubsConnector
               .getKnownFacts(enrolmentKey)
-              .map(
-                enrolmentInfo =>
-                  Ok(
-                    showKnownFactsView(
-                      enrolmentInfo,
-                      servicesDefinitionsService.servicesDefinitions
-                        .getService(enrolmentInfo.enrolmentKey.service)
-                        .getOrElse(throw new Exception()),
-                      pageContext(credentials)
-                    )
+              .map(enrolmentInfo =>
+                Ok(
+                  showKnownFactsView(
+                    enrolmentInfo,
+                    servicesDefinitionsService.servicesDefinitions
+                      .getService(enrolmentInfo.enrolmentKey.service)
+                      .getOrElse(throw new Exception()),
+                    pageContext(credentials)
+                  )
                 )
               )
-              .recover {
-                case _: NotFoundException =>
-                  Ok(
-                    errorTemplateView(
-                      "knownFacts.title",
-                      "Known facts not found",
-                      "Known facts for the provided enrolment key does not exist on this test planet."))
+              .recover { case _: NotFoundException =>
+                Ok(
+                  errorTemplateView(
+                    "knownFacts.title",
+                    "Known facts not found",
+                    "Known facts for the provided enrolment key does not exist on this test planet."
+                  )
+                )
               }
-        }
+          }
     )
   }
 
@@ -89,8 +90,10 @@ class KnownFactsController @Inject()(
           Future.successful(
             Ok(
               showAllServicesView(servicesDefinitionsService.servicesDefinitions, pageContext(credentials))
-            ))
-        } else Future.successful(Forbidden)
+            )
+          )
+        }
+    else Future.successful(Forbidden)
   }
 
 }

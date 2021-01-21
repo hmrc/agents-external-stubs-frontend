@@ -36,14 +36,12 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PersonalDetailsValidationController @Inject()(
+class PersonalDetailsValidationController @Inject() (
   override val messagesApi: MessagesApi,
   override val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
-  pdvStartView: pdv_start)(
-  implicit val configuration: Configuration,
-  cc: MessagesControllerComponents,
-  ec: ExecutionContext)
+  pdvStartView: pdv_start
+)(implicit val configuration: Configuration, cc: MessagesControllerComponents, ec: ExecutionContext)
     extends FrontendController(cc) with AuthActions with I18nSupport {
 
   def start(completionUrl: ContinueUrl): Action[AnyContent] = Action.async { implicit request =>
@@ -53,7 +51,8 @@ class PersonalDetailsValidationController @Inject()(
           pdvStartView(
             PersonalDetailsValidationController.PdvRequestForm.fill(PdvRequest(success = true)),
             routes.PersonalDetailsValidationController.submit(completionUrl)
-          ))
+          )
+        )
       }
     }
   }
@@ -68,8 +67,9 @@ class PersonalDetailsValidationController @Inject()(
               pdvStartView(
                 formWithErrors,
                 routes.PersonalDetailsValidationController.submit(completionUrl)
-              ))
-        ),
+              )
+            )
+          ),
         pdvRequest => {
           val validationId = UUID.randomUUID().toString
           agentsExternalStubsConnector

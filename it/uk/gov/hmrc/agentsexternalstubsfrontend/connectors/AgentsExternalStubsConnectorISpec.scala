@@ -51,8 +51,11 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "throw an exception if the response is 400" in {
         stubFor(
           post(urlEqualTo(s"/agents-external-stubs/sign-in"))
-            .willReturn(aResponse()
-              .withStatus(Status.BAD_REQUEST)))
+            .willReturn(
+              aResponse()
+                .withStatus(Status.BAD_REQUEST)
+            )
+        )
 
         intercept[BadRequestException] {
           await(connector.signIn(SignInRequest("foo", "bar")))
@@ -118,8 +121,11 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "get an empty list if 204" in {
         stubFor(
           get(urlEqualTo(s"/agents-external-stubs/special-cases"))
-            .willReturn(aResponse()
-              .withStatus(Status.NO_CONTENT)))
+            .willReturn(
+              aResponse()
+                .withStatus(Status.NO_CONTENT)
+            )
+        )
         val result = await(connector.getAllSpecialCases)
         result shouldBe empty
       }
@@ -133,7 +139,9 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
               aResponse()
                 .withStatus(Status.OK)
                 .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
-                .withBody(validSpecialCaseResponse)))
+                .withBody(validSpecialCaseResponse)
+            )
+        )
         val result: Option[SpecialCase] = await(connector.getSpecialCase("123"))
         result shouldBe defined
         result.map(_.requestMatch.path) shouldBe Some("/test")
@@ -147,22 +155,27 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return entity ID if success" in {
         stubFor(
           post(urlEqualTo(s"/agents-external-stubs/special-cases"))
-            .withRequestBody(equalToJson(
-              s"""{
-                 |"requestMatch": {
-                 |   "method": "PUT",
-                 |   "path":"/test123"
-                 | },
-                 |"response": {
-                 |   "status":474
-                 | }
-                 |}""".stripMargin,
-              true,
-              true
-            ))
-            .willReturn(aResponse()
-              .withStatus(Status.CREATED)
-              .withHeader(HeaderNames.LOCATION, "/agents-external-stubs/special-cases/123")))
+            .withRequestBody(
+              equalToJson(
+                s"""{
+                   |"requestMatch": {
+                   |   "method": "PUT",
+                   |   "path":"/test123"
+                   | },
+                   |"response": {
+                   |   "status":474
+                   | }
+                   |}""".stripMargin,
+                true,
+                true
+              )
+            )
+            .willReturn(
+              aResponse()
+                .withStatus(Status.CREATED)
+                .withHeader(HeaderNames.LOCATION, "/agents-external-stubs/special-cases/123")
+            )
+        )
         val result: String =
           await(connector.createSpecialCase(SpecialCase(RequestMatch("/test123", "PUT"), SpecialCase.Response(474))))
         result shouldBe "123"
@@ -173,27 +186,34 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return entity ID if success" in {
         stubFor(
           put(urlEqualTo(s"/agents-external-stubs/special-cases/123"))
-            .withRequestBody(equalToJson(
-              s"""{
-                 |  "requestMatch": {
-                 |    "path":"/test321",
-                 |    "method": "DELETE"
-                 |  },
-                 |  "response": {
-                 |    "status":521
-                 |  },
-                 |  "id":"123"
-                 |}""".stripMargin,
-              true,
-              true
-            ))
-            .willReturn(aResponse()
-              .withStatus(Status.ACCEPTED)
-              .withHeader(HeaderNames.LOCATION, "/agents-external-stubs/special-cases/123")))
+            .withRequestBody(
+              equalToJson(
+                s"""{
+                   |  "requestMatch": {
+                   |    "path":"/test321",
+                   |    "method": "DELETE"
+                   |  },
+                   |  "response": {
+                   |    "status":521
+                   |  },
+                   |  "id":"123"
+                   |}""".stripMargin,
+                true,
+                true
+              )
+            )
+            .willReturn(
+              aResponse()
+                .withStatus(Status.ACCEPTED)
+                .withHeader(HeaderNames.LOCATION, "/agents-external-stubs/special-cases/123")
+            )
+        )
         val result: String =
           await(
             connector.updateSpecialCase(
-              SpecialCase(RequestMatch("/test321", "DELETE"), SpecialCase.Response(521), id = Some("123"))))
+              SpecialCase(RequestMatch("/test321", "DELETE"), SpecialCase.Response(521), id = Some("123"))
+            )
+          )
         result shouldBe "123"
       }
     }
@@ -202,8 +222,11 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return unit if success" in {
         stubFor(
           delete(urlEqualTo(s"/agents-external-stubs/special-cases/123"))
-            .willReturn(aResponse()
-              .withStatus(Status.NO_CONTENT)))
+            .willReturn(
+              aResponse()
+                .withStatus(Status.NO_CONTENT)
+            )
+        )
         val result: Unit = await(connector.deleteSpecialCase("123"))
         result shouldBe (())
       }

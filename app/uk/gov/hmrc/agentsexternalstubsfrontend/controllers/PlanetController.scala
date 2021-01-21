@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PlanetController @Inject()(
+class PlanetController @Inject() (
   val authConnector: AuthConnector,
   agentsExternalStubsConnector: AgentsExternalStubsConnector,
   ecp: Provider[ExecutionContext]

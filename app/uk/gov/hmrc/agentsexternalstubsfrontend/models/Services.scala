@@ -23,7 +23,8 @@ case class Service(
   affinityGroups: Seq[String],
   identifiers: Seq[Service.Identifier],
   knownFacts: Seq[Service.KnownFact],
-  flags: Service.Flags) {
+  flags: Service.Flags
+) {
 
   def getIdentifier(name: String): Option[Service.Identifier] = identifiers.find(_.name.toUpperCase == name.toUpperCase)
 
@@ -42,7 +43,8 @@ object Service {
     agentExcludesPrincipal: Boolean,
     multipleEnrolment: Boolean,
     autoEnrolment: Boolean,
-    autoActivation: Boolean)
+    autoActivation: Boolean
+  )
 }
 
 case class Services(services: Seq[Service]) {

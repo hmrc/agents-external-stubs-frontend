@@ -26,7 +26,7 @@ package object controllers {
 
     def postcode: Mapping[String] = text(maxLength = 8) verifying nonEmptyPostcodeConstraint
     def telephoneNumber: Mapping[Option[String]] = optional(text(maxLength = 24) verifying telephoneNumberConstraint)
-    def validName: Mapping[String] = text(maxLength = 56) verifying (validNameConstraint)
+    def validName: Mapping[String] = text(maxLength = 56) verifying validNameConstraint
     def emailAddress: Mapping[Option[String]] = optional(text(maxLength = 129) verifying emailAddressConstraint)
 
     private val postcodeWithoutSpacesRegex = "^[A-Z]{1,2}[0-9][0-9A-Z]?[0-9][A-Z]{2}$|BFPO[0-9]{1,5}$".r

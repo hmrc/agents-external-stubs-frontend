@@ -32,12 +32,13 @@ import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ErrorHandler @Inject()(
+class ErrorHandler @Inject() (
   val env: Environment,
   val messagesApi: MessagesApi,
   appConfig: FrontendConfig,
   errorTemplateView: error_template,
-  val auditConnector: AuditConnector)(implicit val config: Configuration, ec: ExecutionContext)
+  val auditConnector: AuditConnector
+)(implicit val config: Configuration, ec: ExecutionContext)
     extends FrontendErrorHandler with AuthRedirects with ErrorAuditing {
 
   val appName = appConfig.appName
@@ -61,19 +62,24 @@ class ErrorHandler @Inject()(
           errorTemplateView(
             Messages("global.error.403.title"),
             Messages("global.error.403.heading"),
-            Messages("global.error.403.message"))).withHeaders(CACHE_CONTROL -> "no-cache")
+            Messages("global.error.403.message")
+          )
+        ).withHeaders(CACHE_CONTROL -> "no-cache")
       case ex =>
         Logger(getClass).warn(s"There has been a failure", ex)
         InternalServerError(
           errorTemplateView(
             Messages("global.error.500.title"),
             Messages("global.error.500.heading"),
-            Messages("global.error.500.message"))).withHeaders(CACHE_CONTROL -> "no-cache")
+            Messages("global.error.500.message")
+          )
+        ).withHeaders(CACHE_CONTROL -> "no-cache")
     }
   }
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
-    implicit request: Request[_]) =
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
+    request: Request[_]
+  ) =
     errorTemplateView(pageTitle, heading, message)
 }
 
@@ -108,21 +114,28 @@ trait ErrorAuditing extends HttpAuditEvent {
     }
     auditConnector.sendEvent(
       dataEvent(eventType, transactionName, request, Map(TransactionFailureReason -> ex.getMessage))(
-        HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))))
+        HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+      )
+    )
   }
 
-  def auditClientError(request: RequestHeader, statusCode: Int, message: String)(
-    implicit ec: ExecutionContext): Unit = {
+  def auditClientError(request: RequestHeader, statusCode: Int, message: String)(implicit
+    ec: ExecutionContext
+  ): Unit = {
     import play.api.http.Status._
     statusCode match {
       case NOT_FOUND =>
         auditConnector.sendEvent(
           dataEvent(ResourceNotFound, notFoundError, request, Map(TransactionFailureReason -> message))(
-            HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))))
+            HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+          )
+        )
       case BAD_REQUEST =>
         auditConnector.sendEvent(
           dataEvent(ServerValidationError, badRequestError, request, Map(TransactionFailureReason -> message))(
-            HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))))
+            HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+          )
+        )
       case _ =>
     }
   }

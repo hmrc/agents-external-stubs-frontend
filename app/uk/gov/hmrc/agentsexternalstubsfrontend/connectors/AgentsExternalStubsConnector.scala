@@ -35,33 +35,35 @@ case class AuthenticatedSession(
   authToken: String,
   providerType: String,
   planetId: String,
-  newUserCreated: Option[Boolean] = None)
+  newUserCreated: Option[Boolean] = None
+)
 
 object AuthenticatedSession {
   implicit val reads: Reads[AuthenticatedSession] = Json.reads[AuthenticatedSession]
 }
 
 @Singleton
-class AgentsExternalStubsConnector @Inject()(appConfig: FrontendConfig, http: HttpClient) {
+class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: HttpClient) {
 
   val baseUrl = appConfig.aesBaseUrl
 
   def signIn(
-    credentials: SignInRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] =
+    credentials: SignInRequest
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] =
     http
       .POST[SignInRequest, HttpResponse](new URL(s"$baseUrl/agents-external-stubs/sign-in").toExternalForm, credentials)
-      .map(
-        response =>
-          (
-            response
-              .header(HeaderNames.LOCATION)
-              .getOrElse(throw new IllegalStateException()),
-            response.status))
-      .flatMap {
-        case (location, status) =>
-          http
-            .GET[AuthenticatedSession](new URL(s"$baseUrl$location").toExternalForm)
-            .map(_.copy(newUserCreated = Some(status == 201)))
+      .map(response =>
+        (
+          response
+            .header(HeaderNames.LOCATION)
+            .getOrElse(throw new IllegalStateException()),
+          response.status
+        )
+      )
+      .flatMap { case (location, status) =>
+        http
+          .GET[AuthenticatedSession](new URL(s"$baseUrl$location").toExternalForm)
+          .map(_.copy(newUserCreated = Some(status == 201)))
       }
 
   def signOut()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
@@ -80,16 +82,16 @@ class AgentsExternalStubsConnector @Inject()(appConfig: FrontendConfig, http: Ht
     http
       .POST[User, HttpResponse](new URL(s"$baseUrl/agents-external-stubs/users").toExternalForm, user)
       .map(_ => ())
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
   def updateUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .PUT[User, HttpResponse](new URL(s"$baseUrl/agents-external-stubs/users/${user.userId}").toExternalForm, user)
       .map(_ => ())
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
   def getUsers(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] =
@@ -99,8 +101,8 @@ class AgentsExternalStubsConnector @Inject()(appConfig: FrontendConfig, http: Ht
     http
       .DELETE[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm)
       .map(_ => ())
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
   def getRecords(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Records] =
@@ -109,11 +111,13 @@ class AgentsExternalStubsConnector @Inject()(appConfig: FrontendConfig, http: Ht
   def getRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     http.GET[JsObject](new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm)
 
-  def generateRecord(recordType: String, seed: String)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[JsObject] =
+  def generateRecord(recordType: String, seed: String)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[JsObject] =
     http.GET[JsObject](
-      new URL(s"$baseUrl/agents-external-stubs/records/$recordType/generate?seed=$seed&minimal=false").toExternalForm)
+      new URL(s"$baseUrl/agents-external-stubs/records/$recordType/generate?seed=$seed&minimal=false").toExternalForm
+    )
 
   def updateRecord(id: String, record: JsObject)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
@@ -122,29 +126,30 @@ class AgentsExternalStubsConnector @Inject()(appConfig: FrontendConfig, http: Ht
         record.+("id" -> JsString(id))
       )
       .map(_ => ())
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
   def deleteRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .DELETE[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm)
       .map(_ => ())
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
-  def createRecord(recordType: String, record: JsObject)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[Option[String]] =
+  def createRecord(recordType: String, record: JsObject)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[String]] =
     http
       .POST[JsValue, HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/records/$recordType").toExternalForm,
         record
       )
       .map(r => (r.json \ "_links" \ 0 \ "href").asOpt[String].map(_.split("/").last))
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
   def getKnownFacts(enrolmentKey: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[EnrolmentInfo] =
@@ -159,8 +164,8 @@ class AgentsExternalStubsConnector @Inject()(appConfig: FrontendConfig, http: Ht
     http
       .DELETE[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/planets/$planetId").toExternalForm)
       .map(_ => ())
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
   def getAllSpecialCases(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[SpecialCase]] =
@@ -175,8 +180,8 @@ class AgentsExternalStubsConnector @Inject()(appConfig: FrontendConfig, http: Ht
     http
       .GET[SpecialCase](new URL(s"$baseUrl/agents-external-stubs/special-cases/$id").toExternalForm)
       .map(Option.apply)
-      .recover {
-        case _: NotFoundException => None
+      .recover { case _: NotFoundException =>
+        None
       }
 
   def createSpecialCase(specialCase: SpecialCase)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
@@ -185,13 +190,13 @@ class AgentsExternalStubsConnector @Inject()(appConfig: FrontendConfig, http: Ht
         new URL(s"$baseUrl/agents-external-stubs/special-cases").toExternalForm,
         specialCase
       )
-      .map(
-        r =>
-          r.header(HeaderNames.LOCATION)
-            .map(_.split("/").last)
-            .getOrElse(throw new Exception("Missing location header in the response")))
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .map(r =>
+        r.header(HeaderNames.LOCATION)
+          .map(_.split("/").last)
+          .getOrElse(throw new Exception("Missing location header in the response"))
+      )
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
   def updateSpecialCase(specialCase: SpecialCase)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
@@ -200,29 +205,29 @@ class AgentsExternalStubsConnector @Inject()(appConfig: FrontendConfig, http: Ht
         new URL(s"$baseUrl/agents-external-stubs/special-cases/${specialCase.id.get}").toExternalForm,
         specialCase
       )
-      .map(
-        r =>
-          r.header(HeaderNames.LOCATION)
-            .map(_.split("/").last)
-            .getOrElse(throw new Exception("Missing location header in the response")))
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .map(r =>
+        r.header(HeaderNames.LOCATION)
+          .map(_.split("/").last)
+          .getOrElse(throw new Exception("Missing location header in the response"))
+      )
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
   def deleteSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .DELETE[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/special-cases/$id").toExternalForm)
       .map(_ => ())
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
   def storePdvResult(id: String, success: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .POSTEmpty[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/pdv-result/$id/$success").toExternalForm)
       .map(_ => ())
-      .recover {
-        case Upstream4xxException(e) => throw e
+      .recover { case Upstream4xxException(e) =>
+        throw e
       }
 
 }

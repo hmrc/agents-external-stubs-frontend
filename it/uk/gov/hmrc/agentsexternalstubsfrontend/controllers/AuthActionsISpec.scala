@@ -1,10 +1,10 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
-import play.api.mvc.{ Request, Result }
+import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
-import uk.gov.hmrc.auth.core.{ AuthConnector, AuthorisationException, InsufficientEnrolments }
-import uk.gov.hmrc.http.{ HeaderCarrier, SessionKeys }
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, InsufficientEnrolments}
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import play.api.mvc.Results._
 
 import scala.concurrent.Future
@@ -19,13 +19,11 @@ class AuthActionsISpec extends BaseISpec {
     implicit val request = FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    def withAuthorisedAsAgent[A]: Result = {
-      await(super.withAuthorisedAsAgent { arn => Future.successful(Ok(arn.value)) })
-    }
+    def withAuthorisedAsAgent[A]: Result =
+      await(super.withAuthorisedAsAgent(arn => Future.successful(Ok(arn.value))))
 
-    def withAuthorisedAsClient[A]: Result = {
-      await(super.withAuthorisedAsClient { mtdItTd => Future.successful(Ok(mtdItTd.value)) })
-    }
+    def withAuthorisedAsClient[A]: Result =
+      await(super.withAuthorisedAsClient(mtdItTd => Future.successful(Ok(mtdItTd.value))))
 
   }
 
@@ -39,7 +37,8 @@ class AuthActionsISpec extends BaseISpec {
            |  { "key":"HMRC-AS-AGENT", "identifiers": [
            |    { "key":"AgentReferenceNumber", "value": "fooArn" }
            |  ]}
-           |]}""".stripMargin)
+           |]}""".stripMargin
+      )
       val result = TestController.withAuthorisedAsAgent
       status(result) shouldBe 200
       bodyOf(result) shouldBe "fooArn"
@@ -60,7 +59,8 @@ class AuthActionsISpec extends BaseISpec {
            |  { "key":"HMRC-MTD-IT", "identifiers": [
            |    { "key":"MTDITID", "value": "fooMtdItId" }
            |  ]}
-           |]}""".stripMargin)
+           |]}""".stripMargin
+      )
       an[InsufficientEnrolments] shouldBe thrownBy {
         TestController.withAuthorisedAsAgent
       }
@@ -74,7 +74,8 @@ class AuthActionsISpec extends BaseISpec {
            |  { "key":"HMRC-AS-AGENT", "identifiers": [
            |    { "key":"BAR", "value": "fooArn" }
            |  ]}
-           |]}""".stripMargin)
+           |]}""".stripMargin
+      )
       an[InsufficientEnrolments] shouldBe thrownBy {
         TestController.withAuthorisedAsAgent
       }
@@ -91,7 +92,8 @@ class AuthActionsISpec extends BaseISpec {
            |  { "key":"HMRC-MTD-IT", "identifiers": [
            |    { "key":"MTDITID", "value": "fooMtdItId" }
            |  ]}
-           |]}""".stripMargin)
+           |]}""".stripMargin
+      )
 
       val result = TestController.withAuthorisedAsClient
       status(result) shouldBe 200
@@ -106,7 +108,8 @@ class AuthActionsISpec extends BaseISpec {
            |  { "key":"HMRC-AS-AGENT", "identifiers": [
            |    { "key":"AgentReferenceNumber", "value": "fooArn" }
            |  ]}
-           |]}""".stripMargin)
+           |]}""".stripMargin
+      )
       an[InsufficientEnrolments] shouldBe thrownBy {
         TestController.withAuthorisedAsClient
       }
@@ -120,7 +123,8 @@ class AuthActionsISpec extends BaseISpec {
            |  { "key":"HMRC-MTD-IT", "identifiers": [
            |    { "key":"BAR", "value": "fooMtdItId" }
            |  ]}
-           |]}""".stripMargin)
+           |]}""".stripMargin
+      )
       an[InsufficientEnrolments] shouldBe thrownBy {
         TestController.withAuthorisedAsClient
       }

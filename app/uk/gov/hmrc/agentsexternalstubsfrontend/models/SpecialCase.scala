@@ -20,7 +20,8 @@ import play.api.libs.json.{Format, Json}
 case class SpecialCase(
   requestMatch: SpecialCase.RequestMatch,
   response: SpecialCase.Response,
-  id: Option[String] = None)
+  id: Option[String] = None
+)
 
 object SpecialCase {
 
@@ -28,7 +29,8 @@ object SpecialCase {
     path: String,
     method: String = "GET",
     body: Option[String] = None,
-    contentType: Option[String] = None)
+    contentType: Option[String] = None
+  )
 
   case class Header(name: String, value: String)
 

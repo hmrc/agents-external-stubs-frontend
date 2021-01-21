@@ -36,7 +36,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SignInController @Inject()(
+class SignInController @Inject() (
   override val messagesApi: MessagesApi,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   signInView: sign_in,
@@ -52,45 +52,54 @@ class SignInController @Inject()(
   def showSignInPage(
     continue: Option[ContinueUrl],
     origin: Option[String],
-    accountType: Option[String]): Action[AnyContent] =
+    accountType: Option[String]
+  ): Action[AnyContent] =
     Action { implicit request =>
       Ok(
         signInView(
           SignInRequestForm,
           routes.SignInController
-            .signIn(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
+            .signIn(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)
+        )
+      )
     }
 
   def showGovernmentGatewaySignInPage(
     continue: Option[ContinueUrl],
     origin: Option[String],
-    accountType: Option[String]) = showSignInPage(continue, origin, accountType)
+    accountType: Option[String]
+  ) = showSignInPage(continue, origin, accountType)
 
   def signIn(
     continue: Option[ContinueUrl],
     origin: Option[String],
     accountType: Option[String],
-    providerType: String): Action[AnyContent] =
+    providerType: String
+  ): Action[AnyContent] =
     Action.async { implicit request =>
       SignInRequestForm
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            Future.successful(Ok(
-              signInView(formWithErrors, routes.SignInController.signIn(continue, origin, accountType, providerType)))),
+            Future.successful(
+              Ok(
+                signInView(formWithErrors, routes.SignInController.signIn(continue, origin, accountType, providerType))
+              )
+            ),
           credentials =>
             for {
               authenticatedSession <- agentsExternalStubsConnector.signIn(credentials.copy(providerType = providerType))
               result <- Future(
-                         withNewSession(
-                           if (authenticatedSession.newUserCreated.getOrElse(false))
-                             Redirect(routes.UserController.showCreateUserPage(continue))
-                           else
-                             continue.fold(
-                               Redirect(routes.UserController.showUserPage(None))
-                             )(continueUrl => Redirect(continueUrl.url)),
-                           authenticatedSession
-                         ))
+                          withNewSession(
+                            if (authenticatedSession.newUserCreated.getOrElse(false))
+                              Redirect(routes.UserController.showCreateUserPage(continue))
+                            else
+                              continue.fold(
+                                Redirect(routes.UserController.showUserPage(None))
+                              )(continueUrl => Redirect(continueUrl.url)),
+                            authenticatedSession
+                          )
+                        )
             } yield result
         )
     }
@@ -98,13 +107,16 @@ class SignInController @Inject()(
   def showSignInStridePage(
     successURL: ContinueUrl,
     origin: Option[String],
-    failureURL: Option[String]): Action[AnyContent] =
+    failureURL: Option[String]
+  ): Action[AnyContent] =
     Action { implicit request =>
       Ok(
         signInView(
           SignInRequestForm,
           routes.SignInController
-            .signIn(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)))
+            .signIn(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)
+        )
+      )
     }
 
   def signInUser(continue: Option[ContinueUrl], userId: String, providerType: String): Action[AnyContent] =
@@ -113,21 +125,21 @@ class SignInController @Inject()(
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           for {
             _ <- agentsExternalStubsConnector.signOut()
-            authenticatedSession <- agentsExternalStubsConnector.signIn(
-                                     SignInRequest(
-                                       userId = userId,
-                                       planetId = credentials.planetId,
-                                       providerType = providerType))
+            authenticatedSession <-
+              agentsExternalStubsConnector.signIn(
+                SignInRequest(userId = userId, planetId = credentials.planetId, providerType = providerType)
+              )
             result <- Future(
-                       withNewSession(
-                         if (authenticatedSession.newUserCreated.getOrElse(false))
-                           Redirect(routes.UserController.showCreateUserPage(continue))
-                         else
-                           continue.fold(
-                             Redirect(routes.UserController.showUserPage(None))
-                           )(continueUrl => Redirect(continueUrl.url)),
-                         authenticatedSession
-                       ))
+                        withNewSession(
+                          if (authenticatedSession.newUserCreated.getOrElse(false))
+                            Redirect(routes.UserController.showCreateUserPage(continue))
+                          else
+                            continue.fold(
+                              Redirect(routes.UserController.showUserPage(None))
+                            )(continueUrl => Redirect(continueUrl.url)),
+                          authenticatedSession
+                        )
+                      )
           } yield result
         }
     }
@@ -138,11 +150,14 @@ class SignInController @Inject()(
         .signOut()
         .map(_ =>
           continue.fold(Redirect(routes.SignInController.showSignInPage(None, None, None).url).withNewSession)(c =>
-            Redirect(c.url).withNewSession))
+            Redirect(c.url).withNewSession
+          )
+        )
     }
 
-  private def withNewSession(result: Result, session: AuthenticatedSession)(
-    implicit request: Request[AnyContent]): Result =
+  private def withNewSession(result: Result, session: AuthenticatedSession)(implicit
+    request: Request[AnyContent]
+  ): Result =
     result.withSession(
       request.session +
         (SessionKeys.sessionId -> session.sessionId) +
@@ -153,37 +168,45 @@ class SignInController @Inject()(
   def showSignInPageInternal(
     continue: Option[ContinueUrl],
     origin: Option[String],
-    accountType: Option[String]): Action[AnyContent] =
+    accountType: Option[String]
+  ): Action[AnyContent] =
     Action { implicit request =>
       Ok(
         signInView(
           SignInRequestForm,
           routes.SignInController
-            .signInInternal(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)))
+            .signInInternal(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)
+        )
+      )
     }
 
   def showGovernmentGatewaySignInPageInternal(
     continue: Option[ContinueUrl],
     origin: Option[String],
-    accountType: Option[String]) = showSignInPageInternal(continue, origin, accountType)
+    accountType: Option[String]
+  ) = showSignInPageInternal(continue, origin, accountType)
 
   def showSignInStridePageInternal(
     successURL: ContinueUrl,
     origin: Option[String],
-    failureURL: Option[String]): Action[AnyContent] =
+    failureURL: Option[String]
+  ): Action[AnyContent] =
     Action { implicit request =>
       Ok(
         signInView(
           SignInRequestForm,
           routes.SignInController
-            .signInInternal(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)))
+            .signInInternal(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)
+        )
+      )
     }
 
   def signInInternal(
     continue: Option[ContinueUrl],
     origin: Option[String],
     accountType: Option[String] = None,
-    providerType: String): Action[AnyContent] =
+    providerType: String
+  ): Action[AnyContent] =
     signIn(continue, origin, accountType, providerType)
 
   def signOutInternal(continue: Option[ContinueUrl]): Action[AnyContent] =
@@ -192,7 +215,9 @@ class SignInController @Inject()(
         .signOut()
         .map(_ =>
           continue.fold(Redirect(routes.SignInController.showSignInPageInternal(None, None, None).url).withNewSession)(
-            c => Redirect(c.url).withNewSession))
+            c => Redirect(c.url).withNewSession
+          )
+        )
     }
 
 }
@@ -203,7 +228,8 @@ object SignInController {
     userId: String,
     planetId: String,
     plainTextPassword: String = "p@ssw0rd",
-    providerType: String = AuthProvider.GovernmentGateway)
+    providerType: String = AuthProvider.GovernmentGateway
+  )
 
   object SignInRequest {
     implicit val writes: Writes[SignInRequest] = Json.writes[SignInRequest]
@@ -215,5 +241,6 @@ object SignInController {
       "planetId"     -> nonEmptyText,
       "password"     -> default(text, "p@ssw0rd"),
       "providerType" -> optional(nonEmptyText).transform[String](_.getOrElse(AuthProvider.GovernmentGateway), Some(_))
-    )(SignInRequest.apply)(SignInRequest.unapply))
+    )(SignInRequest.apply)(SignInRequest.unapply)
+  )
 }
