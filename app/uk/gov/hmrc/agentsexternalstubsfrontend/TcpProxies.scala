@@ -32,6 +32,7 @@ class TcpProxies @Inject() (appConfig: FrontendConfig)(implicit system: ActorSys
 
   private val startProxies = appConfig.proxiesStart
   private val companyAuthFrontendPort = appConfig.companyAuthFEPort
+  private val basGatewayFrontendPort = appConfig.basGatewayFEPort
   private val strideAuthFrontendPort = appConfig.strideAuthFEPort
   private val identityVerificationFrontendPort = appConfig.ivFEPort
   private val governmentGatewayRegistrationFrontendPort = appConfig.ggRegEPort
@@ -59,6 +60,7 @@ class TcpProxies @Inject() (appConfig: FrontendConfig)(implicit system: ActorSys
         }
 
     startProxy(companyAuthFrontendPort, "company-auth-frontend")
+    startProxy(basGatewayFrontendPort, "bas-gateway-frontend")
     startProxy(strideAuthFrontendPort, "stride-auth-frontend")
     startProxy(identityVerificationFrontendPort, "identity-verification-frontend")
     startProxy(governmentGatewayRegistrationFrontendPort, "government-gateway-registration-frontend")

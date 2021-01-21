@@ -77,6 +77,15 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
         )
     )
 
+  def givenNoCurrentSessionExist(): Unit =
+    stubFor(
+      get(urlEqualTo("/agents-external-stubs/session/current"))
+        .willReturn(
+          aResponse()
+            .withStatus(404)
+        )
+    )
+
   def givenUserCanSignOut =
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/sign-out"))

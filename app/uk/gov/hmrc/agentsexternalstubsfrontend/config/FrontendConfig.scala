@@ -31,6 +31,8 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
 
   val companyAuthFEPort = getConfInt("company-auth-frontend.port")
 
+  val basGatewayFEPort = getConfInt("bas-gateway-frontend.port")
+
   val strideAuthFEPort = getConfInt("stride-auth-frontend.port")
 
   val ivFEPort = getConfInt("identity-verification-frontend.port")
