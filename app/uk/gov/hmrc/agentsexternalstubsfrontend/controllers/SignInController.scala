@@ -33,6 +33,7 @@ import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
+import org.joda.time.DateTime
 
 @Singleton
 class SignInController @Inject() (
@@ -225,9 +226,10 @@ class SignInController @Inject() (
   ): Result =
     result.withSession(
       request.session +
-        (SessionKeys.sessionId -> session.sessionId) +
-        (SessionKeys.authToken -> s"Bearer ${session.authToken}") +
-        ("planetId"            -> session.planetId)
+        (SessionKeys.sessionId            -> session.sessionId) +
+        (SessionKeys.authToken            -> s"Bearer ${session.authToken}") +
+        (SessionKeys.lastRequestTimestamp -> DateTime.now.getMillis.toString) +
+        ("planetId"                       -> session.planetId)
     )
 
   def showSignInPageInternal(
@@ -319,7 +321,8 @@ object SignInController {
     userId: String,
     planetId: String,
     plainTextPassword: String = "p@ssw0rd",
-    providerType: String = AuthProvider.GovernmentGateway
+    providerType: String = AuthProvider.GovernmentGateway,
+    syncToAuthLoginApi: Boolean = true
   )
 
   object SignInRequest {
@@ -328,10 +331,11 @@ object SignInController {
 
   val SignInRequestForm: Form[SignInRequest] = Form[SignInRequest](
     mapping(
-      "userId"       -> nonEmptyText,
-      "planetId"     -> nonEmptyText,
-      "password"     -> default(text, "p@ssw0rd"),
-      "providerType" -> optional(nonEmptyText).transform[String](_.getOrElse(AuthProvider.GovernmentGateway), Some(_))
+      "userId"             -> nonEmptyText,
+      "planetId"           -> nonEmptyText,
+      "password"           -> default(text, "p@ssw0rd"),
+      "providerType"       -> optional(nonEmptyText).transform[String](_.getOrElse(AuthProvider.GovernmentGateway), Some(_)),
+      "syncToAuthLoginApi" -> ignored(true)
     )(SignInRequest.apply)(SignInRequest.unapply)
   )
 }
