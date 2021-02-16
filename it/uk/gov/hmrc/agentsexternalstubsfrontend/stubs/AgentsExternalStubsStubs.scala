@@ -25,7 +25,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
       post(urlEqualTo(s"/agents-external-stubs/sign-in"))
         .withRequestBody(
           equalToJson(
-            s"""{"userId":"$userId", "plainTextPassword":"$plainTextPassword", "providerType":"$providerType", "planetId": "$planetId"}"""
+            s"""{"userId":"$userId", "plainTextPassword":"$plainTextPassword", "providerType":"$providerType", "planetId": "$planetId", "syncToAuthLoginApi": true}"""
           )
         )
         .willReturn(
