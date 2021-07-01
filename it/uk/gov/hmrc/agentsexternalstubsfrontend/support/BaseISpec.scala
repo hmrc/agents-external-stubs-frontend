@@ -11,8 +11,8 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AuthStubs, DataStreamStubs}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.play.it.Port
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -57,6 +57,6 @@ class BaseISpec
   protected def htmlEscapedMessage(key: String): String = HtmlFormat.escape(Messages(key)).toString
 
   implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier =
-    HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
 }

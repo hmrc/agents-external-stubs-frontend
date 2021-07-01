@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import java.util.UUID
-
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
@@ -27,10 +26,9 @@ import play.api.libs.json.{Json, OFormat}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.PdvRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.pdv_start
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.play.binders.ContinueUrl
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,7 +42,7 @@ class PersonalDetailsValidationController @Inject() (
 )(implicit val configuration: Configuration, cc: MessagesControllerComponents, ec: ExecutionContext)
     extends FrontendController(cc) with AuthActions with I18nSupport {
 
-  def start(completionUrl: ContinueUrl): Action[AnyContent] = Action.async { implicit request =>
+  def start(completionUrl: RedirectUrl): Action[AnyContent] = Action.async { implicit request =>
     authorised().retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
       agentsExternalStubsConnector.getUser(credentials.providerId).map { currentUser =>
         Ok(
@@ -57,7 +55,7 @@ class PersonalDetailsValidationController @Inject() (
     }
   }
 
-  def submit(completionUrl: ContinueUrl): Action[AnyContent] = Action.async { implicit request =>
+  def submit(completionUrl: RedirectUrl): Action[AnyContent] = Action.async { implicit request =>
     PersonalDetailsValidationController.PdvRequestForm
       .bindFromRequest()
       .fold(
@@ -74,7 +72,7 @@ class PersonalDetailsValidationController @Inject() (
           val validationId = UUID.randomUUID().toString
           agentsExternalStubsConnector
             .storePdvResult(validationId, pdvRequest.success)
-            .map(_ => Redirect(completionUrl.url, Map("validationId" -> Seq(validationId))))
+            .map(_ => Redirect(completionUrl.unsafeValue, Map("validationId" -> Seq(validationId))))
         }
       )
   }

@@ -27,7 +27,6 @@ import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{create_record, edit_record, show_all_records}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController

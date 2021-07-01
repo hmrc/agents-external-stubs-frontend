@@ -1,6 +1,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.http.{HttpHeader, HttpHeaders}
 import play.api.http.Status
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
@@ -54,6 +55,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
             .willReturn(
               aResponse()
                 .withStatus(Status.BAD_REQUEST)
+                .withHeaders(new HttpHeaders(new HttpHeader(HeaderNames.LOCATION, "")))
             )
         )
 
@@ -118,12 +120,13 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         result should have size 3
       }
 
-      "get an empty list if 204" in {
+      "get an empty list" in {
         stubFor(
           get(urlEqualTo(s"/agents-external-stubs/special-cases"))
             .willReturn(
               aResponse()
-                .withStatus(Status.NO_CONTENT)
+                .withStatus(Status.OK)
+                .withBody("[]")
             )
         )
         val result = await(connector.getAllSpecialCases)

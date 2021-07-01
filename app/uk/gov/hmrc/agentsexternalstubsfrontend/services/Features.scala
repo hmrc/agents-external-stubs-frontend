@@ -25,13 +25,13 @@ class Features @Inject() (configuration: Configuration) {
     showRestQuery || whitelistedPlanetPrefix.exists(planetId.startsWith)
 
   private lazy val showRestQuery: Boolean = configuration
-    .getBoolean("features.show-rest-query")
+    .getOptional[Boolean]("features.show-rest-query")
     .getOrElse(true)
 
   lazy val showEnrolments: Boolean = configuration
-    .getBoolean("features.show-enrolments")
+    .getOptional[Boolean]("features.show-enrolments")
     .getOrElse(true)
 
   private lazy val whitelistedPlanetPrefix: Option[String] = configuration
-    .getString("whitelisted-planet-prefix")
+    .getOptional[String]("whitelisted-planet-prefix")
 }

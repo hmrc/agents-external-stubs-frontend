@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsCon
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class PlanetController @Inject() (

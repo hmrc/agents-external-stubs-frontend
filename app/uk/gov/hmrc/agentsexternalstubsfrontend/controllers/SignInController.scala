@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
+
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
@@ -29,11 +30,11 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.sign_in
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.play.binders.ContinueUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.joda.time.DateTime
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 @Singleton
 class SignInController @Inject() (
@@ -51,7 +52,7 @@ class SignInController @Inject() (
   import SignInController._
 
   def showSignInPage(
-    continue: Option[ContinueUrl],
+    continue: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
@@ -66,40 +67,40 @@ class SignInController @Inject() (
     }
 
   def register(
-    continueUrl: Option[ContinueUrl],
+    RedirectUrl: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    showSignInPage(continueUrl, origin, accountType)
+    showSignInPage(RedirectUrl, origin, accountType)
 
   def showSignInPageSCP(
-    continue_url: Option[ContinueUrl],
+    continue_url: Option[RedirectUrl],
     origin: Option[String]
   ): Action[AnyContent] =
     showSignInPage(continue_url, origin, None)
 
   def showGovernmentGatewaySignInPage(
-    continue: Option[ContinueUrl],
+    continue: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ) = showSignInPage(continue, origin, accountType)
 
   def signInSsoSCP(
-    continue_url: Option[ContinueUrl],
+    continue_url: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
     signInSsoImpl(continue_url, origin, accountType, false)
 
   def signInSsoInternalSCP(
-    continue_url: Option[ContinueUrl],
+    continue_url: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
     signInSsoImpl(continue_url, origin, accountType, true)
 
   private def signInSsoImpl(
-    continue_url: Option[ContinueUrl],
+    continue_url: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String],
     internal: Boolean
@@ -110,7 +111,7 @@ class SignInController @Inject() (
         result <- Future(
                     continue_url.fold(
                       Redirect(routes.UserController.showUserPage(None))
-                    )(continueUrl => Redirect(continueUrl.url))
+                    )(RedirectUrl => Redirect(RedirectUrl.unsafeValue))
                   )
       } yield result)
         .recover { case _ =>
@@ -124,7 +125,7 @@ class SignInController @Inject() (
     }
 
   def signIn(
-    continue: Option[ContinueUrl],
+    continue: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String],
     providerType: String
@@ -149,7 +150,7 @@ class SignInController @Inject() (
                             else
                               continue.fold(
                                 Redirect(routes.UserController.showUserPage(None))
-                              )(continueUrl => Redirect(continueUrl.url)),
+                              )(RedirectUrl => Redirect(RedirectUrl.unsafeValue)),
                             authenticatedSession
                           )
                         )
@@ -158,7 +159,7 @@ class SignInController @Inject() (
     }
 
   def showSignInStridePage(
-    successURL: ContinueUrl,
+    successURL: RedirectUrl,
     origin: Option[String],
     failureURL: Option[String]
   ): Action[AnyContent] =
@@ -172,7 +173,7 @@ class SignInController @Inject() (
       )
     }
 
-  def signInUser(continue: Option[ContinueUrl], userId: String, providerType: String): Action[AnyContent] =
+  def signInUser(continue: Option[RedirectUrl], userId: String, providerType: String): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
@@ -189,7 +190,7 @@ class SignInController @Inject() (
                           else
                             continue.fold(
                               Redirect(routes.UserController.showUserPage(None))
-                            )(continueUrl => Redirect(continueUrl.url)),
+                            )(RedirectUrl => Redirect(RedirectUrl.unsafeValue)),
                           authenticatedSession
                         )
                       )
@@ -197,7 +198,7 @@ class SignInController @Inject() (
         }
     }
 
-  def signOut(continue: Option[ContinueUrl]): Action[AnyContent] =
+  def signOut(continue: Option[RedirectUrl]): Action[AnyContent] =
     Action.async { implicit request =>
       agentsExternalStubsConnector
         .signOut()
@@ -205,11 +206,11 @@ class SignInController @Inject() (
           continue.fold(
             Redirect(routes.SignInController.showSignInPage(None, None, None).url)
               .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
-          )(c => Redirect(c.url).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+          )(c => Redirect(c.unsafeValue).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
         )
     }
 
-  def signOutSCP(continue: Option[ContinueUrl]): Action[AnyContent] =
+  def signOutSCP(continue: Option[RedirectUrl]): Action[AnyContent] =
     Action.async { implicit request =>
       agentsExternalStubsConnector
         .signOut()
@@ -217,7 +218,7 @@ class SignInController @Inject() (
           continue.fold(
             Redirect(routes.SignInController.showSignInPageSCP(None, None).url)
               .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
-          )(c => Redirect(c.url).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+          )(c => Redirect(c.unsafeValue).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
         )
     }
 
@@ -233,7 +234,7 @@ class SignInController @Inject() (
     )
 
   def showSignInPageInternal(
-    continue: Option[ContinueUrl],
+    continue: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
@@ -248,26 +249,26 @@ class SignInController @Inject() (
     }
 
   def showSignInPageInternalSCP(
-    continue_url: Option[ContinueUrl],
+    continue_url: Option[RedirectUrl],
     origin: Option[String]
   ): Action[AnyContent] =
     showSignInPageInternal(continue_url, origin, None)
 
   def registerInternal(
-    continueUrl: Option[ContinueUrl],
+    RedirectUrl: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    showSignInPageInternal(continueUrl, origin, accountType)
+    showSignInPageInternal(RedirectUrl, origin, accountType)
 
   def showGovernmentGatewaySignInPageInternal(
-    continue: Option[ContinueUrl],
+    continue: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ) = showSignInPageInternal(continue, origin, accountType)
 
   def showSignInStridePageInternal(
-    successURL: ContinueUrl,
+    successURL: RedirectUrl,
     origin: Option[String],
     failureURL: Option[String]
   ): Action[AnyContent] =
@@ -282,14 +283,14 @@ class SignInController @Inject() (
     }
 
   def signInInternal(
-    continue: Option[ContinueUrl],
+    continue: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String] = None,
     providerType: String
   ): Action[AnyContent] =
     signIn(continue, origin, accountType, providerType)
 
-  def signOutInternal(continue: Option[ContinueUrl]): Action[AnyContent] =
+  def signOutInternal(continue: Option[RedirectUrl]): Action[AnyContent] =
     Action.async { implicit request =>
       agentsExternalStubsConnector
         .signOut()
@@ -297,11 +298,11 @@ class SignInController @Inject() (
           continue.fold(
             Redirect(routes.SignInController.showSignInPageInternal(None, None, None).url)
               .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
-          )(c => Redirect(c.url).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+          )(c => Redirect(c.unsafeValue).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
         )
     }
 
-  def signOutInternalSCP(continue: Option[ContinueUrl]): Action[AnyContent] =
+  def signOutInternalSCP(continue: Option[RedirectUrl]): Action[AnyContent] =
     Action.async { implicit request =>
       agentsExternalStubsConnector
         .signOut()
@@ -309,7 +310,7 @@ class SignInController @Inject() (
           continue.fold(
             Redirect(routes.SignInController.showSignInPageInternalSCP(None, None).url)
               .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
-          )(c => Redirect(c.url).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+          )(c => Redirect(c.unsafeValue).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
         )
     }
 

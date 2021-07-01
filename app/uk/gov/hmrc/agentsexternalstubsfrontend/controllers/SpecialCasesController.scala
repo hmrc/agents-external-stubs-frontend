@@ -24,9 +24,8 @@ import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, SpecialCase}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{edit_special_case, show_all_special_cases}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController

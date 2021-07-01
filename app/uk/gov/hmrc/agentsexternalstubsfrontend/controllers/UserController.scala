@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
+
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Forms.{boolean, ignored, mapping, nonEmptyText, number, optional, seq, text}
@@ -30,7 +31,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{NotFoundException, SessionKeys}
-import uk.gov.hmrc.play.binders.ContinueUrl
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,7 +59,7 @@ class UserController @Inject() (
 
   val start: Action[AnyContent] = showUserPage(None, None)
 
-  def showUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
+  def showUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
@@ -90,7 +91,7 @@ class UserController @Inject() (
         }
     }
 
-  def showCreateUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
+  def showCreateUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
@@ -107,7 +108,7 @@ class UserController @Inject() (
                         UserForm.fill(user),
                         routes.UserController
                           .updateUser(
-                            Some(ContinueUrl(routes.UserController.showEditUserPage(continue, userId).url)),
+                            Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
                             userId,
                             create = true
                           ),
@@ -128,7 +129,7 @@ class UserController @Inject() (
                           UserForm.fill(User(id)),
                           routes.UserController
                             .updateUser(
-                              Some(ContinueUrl(routes.UserController.showEditUserPage(continue, userId).url)),
+                              Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
                               userId,
                               create = true
                             ),
@@ -150,7 +151,7 @@ class UserController @Inject() (
                     UserForm.fill(User(credentials.providerId)),
                     routes.UserController
                       .updateUser(
-                        Some(ContinueUrl(routes.UserController.showEditUserPage(continue).url)),
+                        Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
                         create = true
                       ),
                     routes.UserController.showEditUserPage(continue),
@@ -166,7 +167,7 @@ class UserController @Inject() (
         }
     }
 
-  def showEditUserPage(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
+  def showEditUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
@@ -187,7 +188,7 @@ class UserController @Inject() (
         }
     }
 
-  def updateUser(continue: Option[ContinueUrl], userId: Option[String], create: Boolean): Action[AnyContent] =
+  def updateUser(continue: Option[RedirectUrl], userId: Option[String], create: Boolean): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
@@ -202,7 +203,7 @@ class UserController @Inject() (
                         UserForm.fill(User(userId.get)),
                         routes.UserController
                           .updateUser(
-                            Some(ContinueUrl(routes.UserController.showEditUserPage(continue, userId).url)),
+                            Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
                             userId,
                             create = true
                           ),
@@ -257,7 +258,7 @@ class UserController @Inject() (
                      .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId))))
                   .map(_ =>
                     continue.fold(Redirect(routes.UserController.showUserPage(continue, userId)))(continueUrl =>
-                      Redirect(continueUrl.url)
+                      Redirect(continueUrl.unsafeValue)
                     )
                   )
                   .recover { case e: Exception =>
@@ -276,7 +277,7 @@ class UserController @Inject() (
         }
     }
 
-  def removeUser(continue: Option[ContinueUrl], userId: Option[String]): Action[AnyContent] =
+  def removeUser(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
@@ -291,7 +292,7 @@ class UserController @Inject() (
     }
 
   def amendUser(
-    continue: Option[ContinueUrl],
+    continue: Option[RedirectUrl],
     userId: Option[String],
     principalEnrolment: Option[String]
   ): Action[AnyContent] =
