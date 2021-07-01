@@ -16,13 +16,13 @@ lazy val scoverageSettings = {
 
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"       %% "bootstrap-frontend-play-27" % "2.24.0",
+  "uk.gov.hmrc"       %% "bootstrap-frontend-play-27" % "5.6.0",
   "uk.gov.hmrc"       %% "govuk-template"             % "5.56.0-play-27",
   "uk.gov.hmrc"       %% "play-ui"                    % "8.11.0-play-27",
   "uk.gov.hmrc"       %% "auth-client"                % "3.0.0-play-27",
-  "uk.gov.hmrc"       %% "agent-mtd-identifiers"      % "0.23.0-play-27",
+  "uk.gov.hmrc"       %% "agent-mtd-identifiers"      % "0.25.0-play-27",
   "uk.gov.hmrc"       %% "play-partials"              % "6.11.0-play-27",
-  "uk.gov.hmrc"       %% "agent-kenshoo-monitoring"   % "4.4.0",
+  "uk.gov.hmrc"       %% "agent-kenshoo-monitoring"   % "4.7.0-play-27",
   "com.typesafe.play" %% "play-json-joda"             % "2.7.4"
 )
 
@@ -39,14 +39,28 @@ lazy val root = (project in file("."))
   .settings(
     name := "agents-external-stubs-frontend",
     organization := "uk.gov.hmrc",
-    scalaVersion := "2.12.10",
+    scalaVersion := "2.12.12",
+    scalacOptions ++= Seq(
+      "-Xlint:-missing-interpolator,_",
+      "-Yno-adapted-args",
+      "-Ywarn-dead-code",
+      "-deprecation",
+      "-feature",
+      "-unchecked",
+      "-language:implicitConversions",
+      "-P:silencer:pathFilters=views;routes"),
     majorVersion := 0,
     PlayKeys.playDefaultPort := 9099,
     resolvers ++= Seq(
       Resolver.typesafeRepo("releases"),
     ),
     libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
+    libraryDependencies ++= Seq(
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.0" cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % "1.7.0" % Provided cross CrossVersion.full
+    ),
     routesImport += "uk.gov.hmrc.play.binders._",
+    routesImport += "uk.gov.hmrc.play.bootstrap.binders._",
     publishingSettings,
     scoverageSettings,
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",

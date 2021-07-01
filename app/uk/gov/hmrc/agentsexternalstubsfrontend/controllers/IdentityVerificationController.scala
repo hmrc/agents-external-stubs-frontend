@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import java.net.URLDecoder
 import java.util.UUID
-
 import com.google.inject.Provider
+
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
@@ -31,7 +31,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsCon
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.iv_uplift
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.play.binders.ContinueUrl
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -69,8 +69,8 @@ class IdentityVerificationController @Inject() (
 
   private val upliftUrl = (
     confidenceLevel: Int,
-    completionURL: ContinueUrl,
-    failureURL: ContinueUrl,
+    completionURL: RedirectUrl,
+    failureURL: RedirectUrl,
     origin: Option[String],
     doProxy: Boolean
   ) =>
@@ -83,8 +83,8 @@ class IdentityVerificationController @Inject() (
 
   private def showUpliftPage(
     confidenceLevel: Int,
-    completionURL: ContinueUrl,
-    failureURL: ContinueUrl,
+    completionURL: RedirectUrl,
+    failureURL: RedirectUrl,
     origin: Option[String]
   )(doProxy: Boolean): Action[AnyContent] =
     Action.async { implicit request =>
@@ -110,16 +110,16 @@ class IdentityVerificationController @Inject() (
 
   def showUpliftPageProxy(
     confidenceLevel: Int,
-    completionURL: ContinueUrl,
-    failureURL: ContinueUrl,
+    completionURL: RedirectUrl,
+    failureURL: RedirectUrl,
     origin: Option[String]
   ): Action[AnyContent] =
     showUpliftPage(confidenceLevel, completionURL, failureURL, origin)(true)
 
   def showUpliftPageInternal(
     confidenceLevel: Int,
-    completionURL: ContinueUrl,
-    failureURL: ContinueUrl,
+    completionURL: RedirectUrl,
+    failureURL: RedirectUrl,
     origin: Option[String]
   ): Action[AnyContent] =
     showUpliftPage(confidenceLevel, completionURL, failureURL, origin)(false)
@@ -127,8 +127,8 @@ class IdentityVerificationController @Inject() (
   private def uplift(
     journeyId: String,
     confidenceLevel: Int,
-    completionURL: ContinueUrl,
-    failureURL: ContinueUrl,
+    completionURL: RedirectUrl,
+    failureURL: RedirectUrl,
     origin: Option[String]
   )(doProxy: Boolean): Action[AnyContent] =
     Action.async { implicit request =>
@@ -155,10 +155,10 @@ class IdentityVerificationController @Inject() (
                     currentUser <- agentsExternalStubsConnector.getUser(credentials.providerId)
                     modifiedUser = currentUser.copy(confidenceLevel = Some(200))
                     _ <- agentsExternalStubsConnector.updateUser(modifiedUser)
-                  } yield redirectWithJourneyId(completionURL.url, journeyId, upliftRequest.option)
+                  } yield redirectWithJourneyId(completionURL.unsafeValue, journeyId, upliftRequest.option)
                 } else {
                   storeResult((journeyId, upliftRequest.option.split('~').head))
-                  Future.successful(redirectWithJourneyId(failureURL.url, journeyId, upliftRequest.option))
+                  Future.successful(redirectWithJourneyId(failureURL.unsafeValue, journeyId, upliftRequest.option))
                 }
               }
             )
@@ -176,8 +176,8 @@ class IdentityVerificationController @Inject() (
   def upliftProxy(
     journeyId: String,
     confidenceLevel: Int,
-    completionURL: ContinueUrl,
-    failureURL: ContinueUrl,
+    completionURL: RedirectUrl,
+    failureURL: RedirectUrl,
     origin: Option[String]
   ): Action[AnyContent] =
     uplift(journeyId, confidenceLevel, completionURL, failureURL, origin)(true)
@@ -185,13 +185,13 @@ class IdentityVerificationController @Inject() (
   def upliftInternal(
     journeyId: String,
     confidenceLevel: Int,
-    completionURL: ContinueUrl,
-    failureURL: ContinueUrl,
+    completionURL: RedirectUrl,
+    failureURL: RedirectUrl,
     origin: Option[String]
   ): Action[AnyContent] =
     uplift(journeyId, confidenceLevel, completionURL, failureURL, origin)(false)
 
-  private def getIvResult(journeyId: String) = Action.async { implicit request =>
+  private def getIvResult(journeyId: String) = Action.async {
     if (journeyId.nonEmpty) {
       try {
         val result = getResult(journeyId).get

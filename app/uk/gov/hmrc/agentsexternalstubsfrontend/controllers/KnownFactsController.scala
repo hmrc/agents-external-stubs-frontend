@@ -24,7 +24,6 @@ import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.EnrolmentKey
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{error_template, show_all_services, show_known_facts}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.NotFoundException

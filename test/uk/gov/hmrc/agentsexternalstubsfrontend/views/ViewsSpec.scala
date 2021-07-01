@@ -17,9 +17,8 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.views
 
 import java.util.UUID
-
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.{Lang, Messages, MessagesApi, MessagesProvider}
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.Html
@@ -28,7 +27,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.Sign
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{IdentityVerificationController, SignInController, routes}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
-import uk.gov.hmrc.play.binders.ContinueUrl
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.test.UnitSpec
 
 class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
@@ -98,7 +97,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
 
     "render title and messages" in new App {
       val postCall = routes.IdentityVerificationController
-        .upliftProxy("123456789", 200, ContinueUrl("/good"), ContinueUrl("/bad"), Some("aif"))
+        .upliftProxy("123456789", 200, RedirectUrl("/good"), RedirectUrl("/bad"), Some("aif"))
       val html = upLiftView
         .render(
           filledUpliftForm,

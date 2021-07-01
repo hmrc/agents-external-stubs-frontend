@@ -4,7 +4,6 @@ import play.api.http.Writeable
 import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, _}
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, AuthStubs}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 

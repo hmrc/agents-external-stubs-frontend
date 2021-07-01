@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
-import java.net.URL
+import play.api.http.Status
 
+import java.net.URL
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
 import play.mvc.Http.HeaderNames
@@ -25,7 +26,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,25 +46,27 @@ object AuthenticatedSession {
 @Singleton
 class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: HttpClient) {
 
+  import uk.gov.hmrc.http.HttpReads.Implicits._
+
   val baseUrl = appConfig.aesBaseUrl
 
   def signIn(
     credentials: SignInRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] =
     http
-      .POST[SignInRequest, HttpResponse](new URL(s"$baseUrl/agents-external-stubs/sign-in").toExternalForm, credentials)
-      .map(response =>
-        (
-          response
-            .header(HeaderNames.LOCATION)
-            .getOrElse(throw new IllegalStateException()),
-          response.status
-        )
+      .POST[SignInRequest, HttpResponse](
+        new URL(s"$baseUrl/agents-external-stubs/sign-in").toExternalForm,
+        credentials
       )
-      .flatMap { case (location, status) =>
-        http
-          .GET[AuthenticatedSession](new URL(s"$baseUrl$location").toExternalForm)
-          .map(_.copy(newUserCreated = Some(status == 201)))
+      .flatMap { r =>
+        (r.status, r.header(HeaderNames.LOCATION)) match {
+          case (Status.BAD_REQUEST, _) => throw new BadRequestException(s"$baseUrl/agents-external-stubs/sign-in")
+          case (_, None)               => throw new IllegalStateException()
+          case (s, Some(l)) =>
+            http
+              .GET[AuthenticatedSession](new URL(s"$baseUrl$l").toExternalForm)
+              .map(_.copy(newUserCreated = Some(s == 201)))
+        }
       }
 
   def signOut()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =

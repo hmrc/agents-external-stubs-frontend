@@ -146,7 +146,7 @@ class RestQueryController @Inject() (
 
   private def runQuery(
     query: RestQuery
-  )(implicit ec: ExecutionContext, request: Request[AnyContent]): Future[WSResponse] =
+  )(implicit request: Request[AnyContent]): Future[WSResponse] =
     if (Try(new URL(query.url)).isFailure)
       Future.failed(new Exception(s"Invalid URL ${query.url}"))
     else {

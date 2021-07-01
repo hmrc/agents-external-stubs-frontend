@@ -16,11 +16,11 @@
 
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.binders.ContinueUrl
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 @this(mainTemplate: main_template)
 
-@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[ContinueUrl], userId: String,enrolments: Seq[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[RedirectUrl], userId: String,enrolments: Seq[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
 @sidebarLinks = {
     <nav id="secondary-nav" role="navigation">
@@ -248,7 +248,7 @@
         </a>
 
         @if(continue.isDefined) {
-            <a href="@{continue.get.url}">
+            <a href="@{continue.get.unsafeValue}">
             @Messages("user.show.continue")
             </a>
         }
@@ -432,7 +432,7 @@
 
             @if(continue.isDefined) {
                 <a href="@{
-                    continue.get.url
+                    continue.get.unsafeValue
                 }">
                 @Messages("user.show.continue")
                 </a>

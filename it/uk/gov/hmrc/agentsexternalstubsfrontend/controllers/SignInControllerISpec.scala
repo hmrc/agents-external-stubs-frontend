@@ -6,8 +6,8 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.play.binders.ContinueUrl
 import play.api.mvc.Cookie
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
@@ -17,7 +17,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "GET /gg/sign-in" should {
       "display signIn page" in {
-        val result = controller.showSignInPage(Some(ContinueUrl("/there")), Some("here"), None)(FakeRequest())
+        val result = controller.showSignInPage(Some(RedirectUrl("/there")), Some("here"), None)(FakeRequest())
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
       }
@@ -25,7 +25,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "GET /bas-gateway/sign-in" should {
       "display signIn page" in {
-        val result = controller.showSignInPageSCP(Some(ContinueUrl("/there")), None)(FakeRequest())
+        val result = controller.showSignInPageSCP(Some(RedirectUrl("/there")), None)(FakeRequest())
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
       }
@@ -33,7 +33,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "GET /bas-gateway/register" should {
       "display signIn page" in {
-        val result = controller.register(Some(ContinueUrl("/there")), None, None)(FakeRequest())
+        val result = controller.register(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
       }
@@ -42,7 +42,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "GET /government-gateway-registration-frontend" should {
       "display the sign in page" in {
         val result =
-          controller.showGovernmentGatewaySignInPage(Some(ContinueUrl("/there")), Some("unknown"), Some("agent"))(
+          controller.showGovernmentGatewaySignInPage(Some(RedirectUrl("/there")), Some("unknown"), Some("agent"))(
             FakeRequest()
           )
         status(result) shouldBe 200
@@ -52,7 +52,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "GET /agents-external-stubs/gg/sign-in" should {
       "display signIn page" in {
-        val result = controller.showSignInPageInternal(Some(ContinueUrl("/there")), Some("here"), None)(FakeRequest())
+        val result = controller.showSignInPageInternal(Some(RedirectUrl("/there")), Some("here"), None)(FakeRequest())
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
       }
@@ -60,7 +60,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "GET /agents-external-stubs/bas-gateway/sign-in" should {
       "display signIn page" in {
-        val result = controller.showSignInPageInternalSCP(Some(ContinueUrl("/there")), None)(FakeRequest())
+        val result = controller.showSignInPageInternalSCP(Some(RedirectUrl("/there")), None)(FakeRequest())
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
       }
@@ -68,7 +68,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
     "GET /agents-external-stubs/bas-gateway/register" should {
       "display signIn page" in {
-        val result = controller.registerInternal(Some(ContinueUrl("/there")), None, None)(FakeRequest())
+        val result = controller.registerInternal(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
       }
@@ -77,7 +77,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "GET /agents-external-stubs/government-gateway-registration-frontend" should {
       "display the sign in page" in {
         val result =
-          controller.showGovernmentGatewaySignInPageInternal(Some(ContinueUrl("/there")), Some("here"), None)(
+          controller.showGovernmentGatewaySignInPageInternal(Some(RedirectUrl("/there")), Some("here"), None)(
             FakeRequest()
           )
         status(result) shouldBe 200
@@ -88,7 +88,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "POST /gg/sign-in" should {
       "redirect to continue URL if provided" in {
         val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
-        val result = controller.signIn(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
+        val result = controller.signIn(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper")
         )
@@ -100,7 +100,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
       "redirect to edit user with if new one created" in {
         val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
-        val result = controller.signIn(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
+        val result = controller.signIn(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")
         )
@@ -114,7 +114,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "GET /bas-gateway/sso-sign-in" should {
       "display signIn page if no session and continue url" in {
         givenNoCurrentSessionExist()
-        val result = controller.signInSsoSCP(Some(ContinueUrl("/there")), None, None)(FakeRequest())
+        val result = controller.signInSsoSCP(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/bas-gateway/sign-in?continue_url=%2Fthere")
       }
@@ -128,7 +128,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
       "display internal signIn page if no session and continue url" in {
         givenNoCurrentSessionExist()
-        val result = controller.signInSsoInternalSCP(Some(ContinueUrl("/there")), None, None)(FakeRequest())
+        val result = controller.signInSsoInternalSCP(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/agents-external-stubs/bas-gateway/sign-in?continue_url=%2Fthere")
       }
@@ -142,7 +142,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
       "redirect to continue url if session exist" in {
         givenCurrentSession()
-        val result = controller.signInSsoSCP(Some(ContinueUrl("/there")), None, None)(FakeRequest())
+        val result = controller.signInSsoSCP(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 303
         redirectLocation(result) shouldBe Some("/there")
       }
@@ -158,7 +158,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "POST /agents-external-stubs/gg/sign-in" should {
       "redirect to continue URL if provided" in {
         val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
-        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
+        val result = controller.signInInternal(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper")
         )
@@ -170,7 +170,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
 
       "redirect to edit user with if new one created" in {
         val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
-        val result = controller.signInInternal(Some(ContinueUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
+        val result = controller.signInInternal(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest()
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")
         )
@@ -184,7 +184,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "GET /gg/sign-out" should {
       "remove current session and redirect to the provided continue url" in {
         givenUserCanSignOut
-        val result = controller.signOut(Some(ContinueUrl("/there")))(
+        val result = controller.signOut(Some(RedirectUrl("/there")))(
           FakeRequest()
             .withSession("foo" -> "bar")
             .withCookies(Cookie("FOO", "BAR"))
@@ -212,7 +212,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "GET /bas-gateway/sign-out-without-state" should {
       "remove current session and redirect to the provided continue url" in {
         givenUserCanSignOut
-        val result = controller.signOutSCP(Some(ContinueUrl("/there")))(
+        val result = controller.signOutSCP(Some(RedirectUrl("/there")))(
           FakeRequest()
             .withSession("foo" -> "bar")
             .withCookies(Cookie("FOO", "BAR"))
@@ -240,7 +240,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "GET /agents-external-stubs/gg/sign-out" should {
       "remove current session and redirect to the provided continue url" in {
         givenUserCanSignOut
-        val result = controller.signOutInternal(Some(ContinueUrl("/there")))(
+        val result = controller.signOutInternal(Some(RedirectUrl("/there")))(
           FakeRequest()
             .withSession("foo" -> "bar")
             .withCookies(Cookie("FOO", "BAR"))
@@ -268,7 +268,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
     "GET /agents-external-stubs/bas-gateway/sign-out-without-state" should {
       "remove current session and redirect to the provided continue url" in {
         givenUserCanSignOut
-        val result = controller.signOutInternalSCP(Some(ContinueUrl("/there")))(
+        val result = controller.signOutInternalSCP(Some(RedirectUrl("/there")))(
           FakeRequest()
             .withSession("foo" -> "bar")
             .withCookies(Cookie("FOO", "BAR"))
