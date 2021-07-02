@@ -44,7 +44,7 @@ class ErrorHandler @Inject() (
   val appName = appConfig.appName
 
   private val isDevEnv =
-    if (env.mode.equals(Mode.Test)) false else config.get[String]("run.mode").forall(Mode.Dev.toString.equals)
+    if (env.mode.equals(Mode.Test)) false else env.mode.equals(Mode.Dev)
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
     auditClientError(request, statusCode, message)
