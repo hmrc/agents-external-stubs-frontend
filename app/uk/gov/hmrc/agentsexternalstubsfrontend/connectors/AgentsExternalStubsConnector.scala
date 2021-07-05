@@ -46,7 +46,8 @@ object AuthenticatedSession {
 @Singleton
 class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: HttpClient) {
 
-  import uk.gov.hmrc.http.HttpReads.Implicits._
+  implicit val legacyRawReads =
+    HttpReads.Implicits.throwOnFailure(HttpReads.Implicits.readEitherOf(HttpReads.Implicits.readRaw))
 
   val baseUrl = appConfig.aesBaseUrl
 
