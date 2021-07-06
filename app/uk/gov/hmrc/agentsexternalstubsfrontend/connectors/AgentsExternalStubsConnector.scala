@@ -46,8 +46,7 @@ object AuthenticatedSession {
 @Singleton
 class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: HttpClient) {
 
-  implicit val legacyRawReads =
-    HttpReads.Implicits.throwOnFailure(HttpReads.Implicits.readEitherOf(HttpReads.Implicits.readRaw))
+  import uk.gov.hmrc.http.HttpReads.Implicits._
 
   val baseUrl = appConfig.aesBaseUrl
 
@@ -80,67 +79,59 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .GET[AuthenticatedSession](new URL(s"$baseUrl/agents-external-stubs/session/current").toExternalForm)
 
   def getUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[User] =
-    http.GET[User](new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm)
+    http.GET[User](new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm).recover(handleGetResponse)
 
   def createUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
-      .POST[User, HttpResponse](new URL(s"$baseUrl/agents-external-stubs/users").toExternalForm, user)
-      .map(_ => ())
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .POST[User, HttpResponse](
+        new URL(s"$baseUrl/agents-external-stubs/users").toExternalForm,
+        user
+      ) map handleNoContentResponse
 
   def updateUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
-      .PUT[User, HttpResponse](new URL(s"$baseUrl/agents-external-stubs/users/${user.userId}").toExternalForm, user)
-      .map(_ => ())
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .PUT[User, HttpResponse](
+        new URL(s"$baseUrl/agents-external-stubs/users/${user.userId}").toExternalForm,
+        user
+      ) map handleNoContentResponse
 
   def getUsers(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] =
     http.GET[Users](new URL(s"$baseUrl/agents-external-stubs/users").toExternalForm)
 
   def removeUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
-      .DELETE[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm)
-      .map(_ => ())
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .DELETE[HttpResponse](
+        new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm
+      ) map handleNoContentResponse
 
   def getRecords(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Records] =
-    http.GET[Records](new URL(s"$baseUrl/agents-external-stubs/records").toExternalForm)
+    http.GET[Records](new URL(s"$baseUrl/agents-external-stubs/records").toExternalForm).recover(handleGetResponse)
 
   def getRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
-    http.GET[JsObject](new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm)
+    http.GET[JsObject](new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm).recover(handleGetResponse)
 
   def generateRecord(recordType: String, seed: String)(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[JsObject] =
-    http.GET[JsObject](
-      new URL(s"$baseUrl/agents-external-stubs/records/$recordType/generate?seed=$seed&minimal=false").toExternalForm
-    )
+    http
+      .GET[JsObject](
+        new URL(s"$baseUrl/agents-external-stubs/records/$recordType/generate?seed=$seed&minimal=false").toExternalForm
+      )
+      .recover(handleGetResponse)
 
   def updateRecord(id: String, record: JsObject)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .PUT[JsValue, HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm,
         record.+("id" -> JsString(id))
-      )
-      .map(_ => ())
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      ) map handleNoContentResponse
 
   def deleteRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
-      .DELETE[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm)
-      .map(_ => ())
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .DELETE[HttpResponse](
+        new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm
+      ) map handleNoContentResponse
 
   def createRecord(recordType: String, record: JsObject)(implicit
     hc: HeaderCarrier,
@@ -151,26 +142,29 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
         new URL(s"$baseUrl/agents-external-stubs/records/$recordType").toExternalForm,
         record
       )
-      .map(r => (r.json \ "_links" \ 0 \ "href").asOpt[String].map(_.split("/").last))
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .map(r =>
+        r.status match {
+          case Status.NO_CONTENT => (r.json \ "_links" \ 0 \ "href").asOpt[String].map(_.split("/").last)
+          case s                 => throw new RuntimeException(s"unexpected error, status: $s")
+        }
+      )
 
   def getKnownFacts(enrolmentKey: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[EnrolmentInfo] =
-    http.GET[EnrolmentInfo](new URL(s"$baseUrl/agents-external-stubs/known-facts/$enrolmentKey").toExternalForm)
+    http
+      .GET[EnrolmentInfo](new URL(s"$baseUrl/agents-external-stubs/known-facts/$enrolmentKey").toExternalForm)
+      .recover(handleGetResponse)
 
   def getServicesInfo()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Services] =
     http
       .GET[Services](new URL(s"$baseUrl/agents-external-stubs/config/services").toExternalForm)
       .map(s => s.copy(s.services.sortBy(_.name)))
+      .recover(handleGetResponse)
 
   def destroyPlanet(planetId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
-      .DELETE[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/planets/$planetId").toExternalForm)
-      .map(_ => ())
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .DELETE[HttpResponse](
+        new URL(s"$baseUrl/agents-external-stubs/planets/$planetId").toExternalForm
+      ) map handleNoContentResponse
 
   def getAllSpecialCases(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[SpecialCase]] =
     http
@@ -179,6 +173,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
         case Some(seq) => seq
         case None      => Seq.empty
       }
+      .recover(handleGetResponse)
 
   def getSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SpecialCase]] =
     http
@@ -187,6 +182,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover { case _: NotFoundException =>
         None
       }
+      .recover(handleGetResponse)
 
   def createSpecialCase(specialCase: SpecialCase)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
     http
@@ -220,18 +216,28 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
 
   def deleteSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
-      .DELETE[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/special-cases/$id").toExternalForm)
-      .map(_ => ())
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .DELETE[HttpResponse](
+        new URL(s"$baseUrl/agents-external-stubs/special-cases/$id").toExternalForm
+      ) map handleNoContentResponse
 
   def storePdvResult(id: String, success: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
-      .POSTEmpty[HttpResponse](new URL(s"$baseUrl/agents-external-stubs/pdv-result/$id/$success").toExternalForm)
-      .map(_ => ())
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .POSTEmpty[HttpResponse](
+        new URL(s"$baseUrl/agents-external-stubs/pdv-result/$id/$success").toExternalForm
+      ) map handleNoContentResponse
 
+  // This replicates existing behaviour
+  private def handleNoContentResponse(r: HttpResponse): Unit =
+    r.status match {
+      case Status.NO_CONTENT => ()
+      case Status.OK         => ()
+      case Status.ACCEPTED   => ()
+      case Status.NOT_FOUND  => ()
+      case s                 => throw new RuntimeException(s"unexpected error, status: $s")
+    }
+
+  private def handleGetResponse[U]: PartialFunction[Throwable, U] = {
+    case Upstream4xxResponse(message, upstreamResponseCode, _, _) if upstreamResponseCode == Status.NOT_FOUND =>
+      throw new NotFoundException(message)
+  }
 }
