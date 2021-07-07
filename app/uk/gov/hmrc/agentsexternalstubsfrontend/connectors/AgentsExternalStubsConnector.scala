@@ -168,11 +168,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
 
   def getAllSpecialCases(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[SpecialCase]] =
     http
-      .GET[Option[Seq[SpecialCase]]](new URL(s"$baseUrl/agents-external-stubs/special-cases").toExternalForm)
-      .map {
-        case Some(seq) => seq
-        case None      => Seq.empty
-      }
+      .GET[Seq[SpecialCase]](new URL(s"$baseUrl/agents-external-stubs/special-cases").toExternalForm)
       .recover(handleGetResponse)
 
   def getSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SpecialCase]] =
