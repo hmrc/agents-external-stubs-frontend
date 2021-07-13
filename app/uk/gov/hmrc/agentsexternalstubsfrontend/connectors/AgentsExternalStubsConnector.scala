@@ -79,21 +79,25 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .GET[AuthenticatedSession](new URL(s"$baseUrl/agents-external-stubs/session/current").toExternalForm)
 
   def getUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[User] =
-    http.GET[User](new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm).recover(handleGetResponse)
+    http.GET[User](new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm).recover(handleNotFound)
 
   def createUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .POST[User, HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/users").toExternalForm,
         user
-      ) map handleNoContentResponse
+      )
+      .recover(handleNotFound)
+      .map(_ => ())
 
   def updateUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .PUT[User, HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/users/${user.userId}").toExternalForm,
         user
-      ) map handleNoContentResponse
+      )
+      .recover(handleNotFound)
+      .map(_ => ())
 
   def getUsers(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] =
     http.GET[Users](new URL(s"$baseUrl/agents-external-stubs/users").toExternalForm)
@@ -102,13 +106,15 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
     http
       .DELETE[HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm
-      ) map handleNoContentResponse
+      )
+      .recover(handleNotFound)
+      .map(_ => ())
 
   def getRecords(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Records] =
-    http.GET[Records](new URL(s"$baseUrl/agents-external-stubs/records").toExternalForm).recover(handleGetResponse)
+    http.GET[Records](new URL(s"$baseUrl/agents-external-stubs/records").toExternalForm).recover(handleNotFound)
 
   def getRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
-    http.GET[JsObject](new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm).recover(handleGetResponse)
+    http.GET[JsObject](new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm).recover(handleNotFound)
 
   def generateRecord(recordType: String, seed: String)(implicit
     hc: HeaderCarrier,
@@ -118,20 +124,24 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .GET[JsObject](
         new URL(s"$baseUrl/agents-external-stubs/records/$recordType/generate?seed=$seed&minimal=false").toExternalForm
       )
-      .recover(handleGetResponse)
+      .recover(handleNotFound)
 
   def updateRecord(id: String, record: JsObject)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .PUT[JsValue, HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm,
         record.+("id" -> JsString(id))
-      ) map handleNoContentResponse
+      )
+      .recover(handleNotFound)
+      .map(_ => ())
 
   def deleteRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .DELETE[HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/records/$id").toExternalForm
-      ) map handleNoContentResponse
+      )
+      .recover(handleNotFound)
+      .map(_ => ())
 
   def createRecord(recordType: String, record: JsObject)(implicit
     hc: HeaderCarrier,
@@ -152,19 +162,21 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
   def getKnownFacts(enrolmentKey: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[EnrolmentInfo] =
     http
       .GET[EnrolmentInfo](new URL(s"$baseUrl/agents-external-stubs/known-facts/$enrolmentKey").toExternalForm)
-      .recover(handleGetResponse)
+      .recover(handleNotFound)
 
   def getServicesInfo()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Services] =
     http
       .GET[Services](new URL(s"$baseUrl/agents-external-stubs/config/services").toExternalForm)
       .map(s => s.copy(s.services.sortBy(_.name)))
-      .recover(handleGetResponse)
+      .recover(handleNotFound)
 
   def destroyPlanet(planetId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .DELETE[HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/planets/$planetId").toExternalForm
-      ) map handleNoContentResponse
+      )
+      .recover(handleNotFound)
+      .map(_ => ())
 
   def getAllSpecialCases(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[SpecialCase]] =
     http
@@ -173,7 +185,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
         case Some(seq) => seq
         case None      => Seq.empty
       }
-      .recover(handleGetResponse)
+      .recover(handleNotFound)
 
   def getSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SpecialCase]] =
     http
@@ -182,7 +194,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover { case _: NotFoundException =>
         None
       }
-      .recover(handleGetResponse)
+      .recover(handleNotFound)
 
   def createSpecialCase(specialCase: SpecialCase)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
     http
@@ -195,9 +207,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
           .map(_.split("/").last)
           .getOrElse(throw new Exception("Missing location header in the response"))
       )
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .recover(handleNotFound)
 
   def updateSpecialCase(specialCase: SpecialCase)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
     http
@@ -210,34 +220,27 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
           .map(_.split("/").last)
           .getOrElse(throw new Exception("Missing location header in the response"))
       )
-      .recover { case Upstream4xxException(e) =>
-        throw e
-      }
+      .recover(handleNotFound)
 
   def deleteSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .DELETE[HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/special-cases/$id").toExternalForm
-      ) map handleNoContentResponse
+      )
+      .recover(handleNotFound)
+      .map(_ => ())
 
   def storePdvResult(id: String, success: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .POSTEmpty[HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/pdv-result/$id/$success").toExternalForm
-      ) map handleNoContentResponse
+      )
+      .recover(handleNotFound)
+      .map(_ => ())
 
-  // This replicates existing behaviour
-  private def handleNoContentResponse(r: HttpResponse): Unit =
-    r.status match {
-      case Status.NO_CONTENT => ()
-      case Status.OK         => ()
-      case Status.ACCEPTED   => ()
-      case Status.NOT_FOUND  => ()
-      case s                 => throw new RuntimeException(s"unexpected error, status: $s")
-    }
-
-  private def handleGetResponse[U]: PartialFunction[Throwable, U] = {
+  private def handleNotFound[U]: PartialFunction[Throwable, U] = {
     case Upstream4xxResponse(message, upstreamResponseCode, _, _) if upstreamResponseCode == Status.NOT_FOUND =>
       throw new NotFoundException(message)
+    case e => throw e
   }
 }
