@@ -185,7 +185,9 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
         case Some(seq) => seq
         case None      => Seq.empty
       }
-      .recover(handleNotFound)
+      .recover { case _ =>
+        Seq.empty
+      }
 
   def getSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SpecialCase]] =
     http
