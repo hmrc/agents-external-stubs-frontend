@@ -17,6 +17,7 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.play.binders.ContinueUrl
+@import views.html.helper.CSRF
 
 @this(mainTemplate: main_template, navigationBar: navigationBar)
 
@@ -33,6 +34,9 @@
         @Messages("users.link.create")
         </h3>
         <form action="/agents-external-stubs/user/create">
+            @{
+                play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
+            }
             <div style="vertical-align: middle;">
                 <label for="userId" style="font-size: 0.7em; color: gray;">Expected ID pattern [A-Za-z0-9-_]{3,64}</label>
                 <input type="text" name="userId" pattern="[A-Za-z0-9-_]{3,64}" required>

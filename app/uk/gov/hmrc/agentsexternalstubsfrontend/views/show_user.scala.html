@@ -17,6 +17,7 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+@import views.html.helper.CSRF
 
 @this(mainTemplate: main_template)
 
@@ -79,6 +80,9 @@
       </h3>
       <div class="cya-answer">
           <form action="/agents-external-stubs/user/create">
+              @{
+                  play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
+              }
               <div style="vertical-align: middle;">
                 <label for="userId" style="font-size: 0.7em; color: gray;">Expected ID pattern [A-Za-z0-9-_]{3,64}</label>
                 <input type="text" name="userId" pattern="[A-Za-z0-9-_]{3,64}" required>
@@ -98,6 +102,9 @@
       }
       <div style="padding-top: 1em;">
           <form id="destroyPlanet" name="destroyPlanet" action="/agents-external-stubs/planet/destroy">
+              @{
+                  play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
+              }
               <a id="link_planet_destroy" style="text-decoration: underline; cursor: pointer;" onclick="if(confirm('Please confirm you wish to destroy current planet and lost the associated data?')){document.forms.namedItem('destroyPlanet').submit()};">
                 @Messages("planet.link.destroy")
               </a>
@@ -460,6 +467,9 @@
     @if(enrolments.nonEmpty) {
         <div style="margin-top: 0.5em;width: 100%;text-align: right;">
             <form id="add_enrolment" action="/agents-external-stubs/user/amend">
+                @{
+                    play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
+                }
                 <select id="principalEnrolment" name="principalEnrolment" class="">
                 @for(enrolment <- enrolments) {
                     <option id="enrolment-@enrolment" value="@enrolment">@enrolment</option>
