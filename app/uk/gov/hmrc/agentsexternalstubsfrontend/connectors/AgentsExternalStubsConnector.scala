@@ -154,8 +154,8 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       )
       .map(r =>
         r.status match {
-          case Status.NO_CONTENT => (r.json \ "_links" \ 0 \ "href").asOpt[String].map(_.split("/").last)
-          case s                 => throw new RuntimeException(s"unexpected error, status: $s")
+          case Status.CREATED => (r.json \ "_links" \ 0 \ "href").asOpt[String].map(_.split("/").last)
+          case s              => throw new RuntimeException(s"unexpected error, status: $s")
         }
       )
 
