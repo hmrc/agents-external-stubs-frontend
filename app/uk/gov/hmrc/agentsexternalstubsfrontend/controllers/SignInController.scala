@@ -67,11 +67,11 @@ class SignInController @Inject() (
     }
 
   def register(
-    RedirectUrl: Option[RedirectUrl],
+    continueUrl: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    showSignInPage(RedirectUrl, origin, accountType)
+    showSignInPage(continueUrl, origin, accountType)
 
   def showSignInPageSCP(
     continue_url: Option[RedirectUrl],
