@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.views
 import java.util.UUID
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi}
+import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.Html
@@ -28,7 +29,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{IdentityVerification
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
 
 class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
 
@@ -52,12 +53,14 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
   )
 
   implicit val lang: Lang = Lang("en")
+  implicit val requestHeader: RequestHeader = FakeRequest()
   val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   val signInForm = app.injector.instanceOf[sign_in]
   val errorTemplateView = app.injector.instanceOf[error_template]
   val upLiftView = app.injector.instanceOf[iv_uplift]
   val govUkWrapper = app.injector.instanceOf[govuk_wrapper]
   val mainTemplateView = app.injector.instanceOf[main_template]
+  val appMessages = messagesApi.preferred(Seq())
 
   "signIn view" should {
     "render title and messages" in new App {
@@ -66,7 +69,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
           loginForm = filledForm,
           postUrl = routes.SignInController.signIn(None, Some("foo"), None, AuthProvider.GovernmentGateway),
           request = FakeRequest(),
-          messages = Messages.Implicits.applicationMessages,
+          messages = appMessages,
           config = app.configuration
         )
       val content = contentAsString(html)
@@ -83,7 +86,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       val html2 =
         signInForm.f(filledForm, routes.SignInController.signIn(None, None, None, AuthProvider.GovernmentGateway))(
           FakeRequest(),
-          Messages.Implicits.applicationMessages,
+          appMessages,
           app.configuration
         )
       contentAsString(html2) shouldBe content
@@ -104,7 +107,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
           options(journeyIdValue),
           postCall,
           FakeRequest(),
-          Messages.Implicits.applicationMessages,
+          appMessages,
           app.configuration
         )
       val content = contentAsString(html)
@@ -120,7 +123,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         upLiftView
           .f(filledUpliftForm, options(journeyIdValue), postCall)(
             FakeRequest(),
-            Messages.Implicits.applicationMessages,
+            appMessages,
             app.configuration
           )
       contentAsString(html2) shouldBe content
@@ -136,8 +139,9 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         pageTitle = pageTitle,
         heading = heading,
         message = message,
-        messages = Messages.Implicits.applicationMessages,
-        configuration = app.configuration
+        messages = appMessages,
+        configuration = app.configuration,
+        request = requestHeader
       )
       val content = contentAsString(html)
       content should include(pageTitle)
@@ -145,7 +149,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       content should include(message)
 
       val html2 =
-        errorTemplateView.f(pageTitle, heading, message)(Messages.Implicits.applicationMessages, app.configuration)
+        errorTemplateView.f(pageTitle, heading, message)(appMessages, app.configuration, requestHeader)
       contentAsString(html2) shouldBe content
     }
   }
@@ -161,7 +165,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         mainClass = Some("my-custom-main-class"),
         scriptElem = Some(Html("My custom script")),
         mainContent = Html("My custom main content HTML"),
-        messages = Messages.Implicits.applicationMessages,
+        messages = appMessages,
         request = FakeRequest(),
         configuration = app.configuration
       )
@@ -182,7 +186,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         Some("my-custom-body-class"),
         Some("my-custom-main-class"),
         Some(Html("My custom script"))
-      )(Html("My custom main content HTML"))(Messages.Implicits.applicationMessages, FakeRequest(), app.configuration)
+      )(Html("My custom main content HTML"))(appMessages, FakeRequest(), app.configuration)
       contentAsString(html2) shouldBe content
     }
   }
@@ -201,8 +205,9 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         serviceInfoContent = Html("My custom service info content"),
         scriptElem = Some(Html("My custom script")),
         gaCode = Seq("My custom GA code"),
-        messages = Messages.Implicits.applicationMessages,
-        configuration = app.configuration
+        messages = appMessages,
+        configuration = app.configuration,
+        request = requestHeader
       )
 
       val content = contentAsString(html)
@@ -227,7 +232,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         Html("My custom service info content"),
         Some(Html("My custom script")),
         Seq("My custom GA code")
-      )(Messages.Implicits.applicationMessages, app.configuration)
+      )(appMessages, app.configuration, requestHeader)
       contentAsString(html2) shouldBe content
     }
   }

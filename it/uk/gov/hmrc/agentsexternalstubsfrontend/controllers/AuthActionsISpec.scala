@@ -6,6 +6,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, InsufficientEnrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import play.api.mvc.Results._
+import play.api.test.Helpers._
 
 import scala.concurrent.Future
 

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.views
 
 import play.api.libs.json.{JsArray, Json}
 import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
 
 class ViewHelperSpec extends UnitSpec {
 

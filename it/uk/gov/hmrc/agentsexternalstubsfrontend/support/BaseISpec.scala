@@ -13,8 +13,6 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AuthStubs, DataStreamStubs
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.play.it.Port
-import uk.gov.hmrc.play.test.UnitSpec
 
 class BaseISpec
     extends UnitSpec with GuiceOneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs

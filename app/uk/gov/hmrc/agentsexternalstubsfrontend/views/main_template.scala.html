@@ -15,9 +15,10 @@
  *@
 
 @import uk.gov.hmrc.play.views.html.layouts
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.govuk_wrapper
 @import play.api.Configuration
 
-@this(govUkWrapper: govuk_wrapper, uiSidebar: uk.gov.hmrc.play.views.html.layouts.Sidebar)
+@this(govUkWrapper: govuk_wrapper, uiSidebar: uk.gov.hmrc.play.views.html.layouts.Sidebar, article: layouts.Article)
 
 @(title: String,
   sidebarLinks: Option[Html] = None,
@@ -39,6 +40,6 @@
                bodyClasses = bodyClasses,
                sidebar = sidebar,
                contentHeader = contentHeader,
-               mainContent = layouts.article(mainContent),
+               mainContent = article(mainContent),
                serviceInfoContent = serviceInfoContent,
                scriptElem = scriptElem)

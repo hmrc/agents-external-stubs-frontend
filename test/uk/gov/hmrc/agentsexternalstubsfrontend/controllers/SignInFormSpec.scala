@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
 
 class SignInFormSpec extends UnitSpec {
 
