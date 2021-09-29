@@ -14,8 +14,6 @@
  * limitations under the License.
  *@
 
-@import layouts.{govuk_template => hmrcGovUkTemplate}
-@import uk.gov.hmrc.play.views.html.{helpers => uiHelpers, layouts => uiLayouts}
 @import play.api.Configuration
 @import play.twirl.api.HtmlFormat
 
@@ -42,7 +40,7 @@
         mainContent: Html = HtmlFormat.empty,
         serviceInfoContent: Html = HtmlFormat.empty,
         scriptElem: Option[Html] = None,
-        gaCode: Seq[String] = Seq.empty)(implicit messages: Messages, configuration: Configuration)
+        gaCode: Seq[String] = Seq.empty)(implicit messages: Messages, configuration: Configuration, request: RequestHeader)
 
 @headScripts = {
     <link href="@controllers.routes.Assets.at("stylesheets/styles.css")" media="screen" rel="stylesheet" type="text/css">
@@ -74,8 +72,8 @@
 }
 
 @bodyEnd = {
-@uiFooter(analyticsToken = configuration.getString("google-analytics.token"),
-    analyticsHost = configuration.getString("google-analytics.host").get,
+@uiFooter(analyticsToken = configuration.getOptional[String]("google-analytics.token"),
+    analyticsHost = configuration.get[String]("google-analytics.host"),
     ssoUrl = None,
     scriptElem = scriptElem,
     gaCalls = None,
@@ -99,7 +97,7 @@
 }
 
 @getHelpForm = @{
-    helperReportAProblemLink(configuration.getString("reportAProblemPartialUrl").get, configuration.getString("reportAProblemNonJSUrl").get)
+    helperReportAProblemLink(configuration.get[String]("reportAProblemPartialUrl"), configuration.get[String]("reportAProblemNonJSUrl"))
 }
 
 @content = {

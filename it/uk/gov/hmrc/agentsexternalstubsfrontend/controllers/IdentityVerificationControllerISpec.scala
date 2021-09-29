@@ -12,6 +12,8 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, 
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.domain.Nino
 
+import scala.concurrent.Future
+
 class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalStubsStubs with AuthStubs {
 
   def callEndpointWith[A: Writeable](request: Request[A]): Result = await(play.api.test.Helpers.route(app, request).get)
@@ -179,7 +181,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
         val result = callEndpointWith(fakeRequest)
         status(result) shouldBe 200
-        (jsonBodyOf(result) \ "result").as[String] shouldBe "PreconditionFailed"
+        (contentAsJson(Future.successful(result)) \ "result").as[String] shouldBe "PreconditionFailed"
       }
 
       "return 404 with no Json" in new Setup {
@@ -208,7 +210,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
         val result = callEndpointWith(fakeRequest)
         status(result) shouldBe 200
-        (jsonBodyOf(result) \ "result").as[String] shouldBe "PreconditionFailed"
+        (contentAsJson(Future.successful(result)) \ "result").as[String] shouldBe "PreconditionFailed"
       }
 
       "return 404 with no Json" in new Setup {

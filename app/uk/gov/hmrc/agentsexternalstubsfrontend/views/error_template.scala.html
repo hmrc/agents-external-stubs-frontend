@@ -15,10 +15,11 @@
  *@
 
 @import play.api.Configuration
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.govuk_wrapper
 
 @this(govUkWrapper: govuk_wrapper)
 
-@(pageTitle: String, heading: String, message: String)(implicit messages: Messages, configuration: Configuration)
+@(pageTitle: String, heading: String, message: String)(implicit messages: Messages, configuration: Configuration, request: RequestHeader)
 
 @contentHeader = {
     <h1 class="heading-xlarge">@heading</h1>

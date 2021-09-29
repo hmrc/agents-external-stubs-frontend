@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, Identifier, User}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
 
 class UserFormSpec extends UnitSpec {
 

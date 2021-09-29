@@ -1,7 +1,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{cookies, redirectLocation, session}
+import play.api.test.Helpers._
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
@@ -19,7 +19,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "display signIn page" in {
         val result = controller.showSignInPage(Some(RedirectUrl("/there")), Some("here"), None)(FakeRequest())
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
+        checkHtmlResultWithBodyText(result.futureValue, htmlEscapedMessage("start.title"))
       }
     }
 
@@ -27,7 +27,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "display signIn page" in {
         val result = controller.showSignInPageSCP(Some(RedirectUrl("/there")), None)(FakeRequest())
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
+        checkHtmlResultWithBodyText(result.futureValue, htmlEscapedMessage("start.title"))
       }
     }
 
@@ -35,7 +35,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "display signIn page" in {
         val result = controller.register(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
+        checkHtmlResultWithBodyText(result.futureValue, htmlEscapedMessage("start.title"))
       }
     }
 
@@ -46,7 +46,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             FakeRequest()
           )
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
+        checkHtmlResultWithBodyText(result.futureValue, htmlEscapedMessage("start.title"))
       }
     }
 
@@ -54,7 +54,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "display signIn page" in {
         val result = controller.showSignInPageInternal(Some(RedirectUrl("/there")), Some("here"), None)(FakeRequest())
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
+        checkHtmlResultWithBodyText(result.futureValue, htmlEscapedMessage("start.title"))
       }
     }
 
@@ -62,7 +62,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "display signIn page" in {
         val result = controller.showSignInPageInternalSCP(Some(RedirectUrl("/there")), None)(FakeRequest())
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
+        checkHtmlResultWithBodyText(result.futureValue, htmlEscapedMessage("start.title"))
       }
     }
 
@@ -70,7 +70,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "display signIn page" in {
         val result = controller.registerInternal(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
+        checkHtmlResultWithBodyText(result.futureValue, htmlEscapedMessage("start.title"))
       }
     }
 
@@ -81,7 +81,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             FakeRequest()
           )
         status(result) shouldBe 200
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("start.title"))
+        checkHtmlResultWithBodyText(result.futureValue, htmlEscapedMessage("start.title"))
       }
     }
 
@@ -93,7 +93,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper")
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/there")
+        redirectLocation(result.futureValue) shouldBe Some("/there")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
         session(result).get(SessionKeys.sessionId) should not be empty
       }
@@ -105,7 +105,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
+        redirectLocation(result.futureValue) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
         session(result).get(SessionKeys.sessionId) should not be empty
       }
@@ -116,42 +116,44 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
         givenNoCurrentSessionExist()
         val result = controller.signInSsoSCP(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/bas-gateway/sign-in?continue_url=%2Fthere")
+        redirectLocation(result.futureValue) shouldBe Some("/bas-gateway/sign-in?continue_url=%2Fthere")
       }
 
       "display signIn page if no session and no continue url" in {
         givenNoCurrentSessionExist()
         val result = controller.signInSsoSCP(None, None, None)(FakeRequest())
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/bas-gateway/sign-in")
+        redirectLocation(result.futureValue) shouldBe Some("/bas-gateway/sign-in")
       }
 
       "display internal signIn page if no session and continue url" in {
         givenNoCurrentSessionExist()
         val result = controller.signInSsoInternalSCP(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/agents-external-stubs/bas-gateway/sign-in?continue_url=%2Fthere")
+        redirectLocation(result.futureValue) shouldBe Some(
+          "/agents-external-stubs/bas-gateway/sign-in?continue_url=%2Fthere"
+        )
       }
 
       "display internal signIn page if no session and no continue url" in {
         givenNoCurrentSessionExist()
         val result = controller.signInSsoInternalSCP(None, None, None)(FakeRequest())
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/agents-external-stubs/bas-gateway/sign-in")
+        redirectLocation(result.futureValue) shouldBe Some("/agents-external-stubs/bas-gateway/sign-in")
       }
 
       "redirect to continue url if session exist" in {
         givenCurrentSession()
         val result = controller.signInSsoSCP(Some(RedirectUrl("/there")), None, None)(FakeRequest())
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/there")
+        redirectLocation(result.futureValue) shouldBe Some("/there")
       }
 
       "redirect to the user page if session exist but no continue url" in {
         givenCurrentSession()
         val result = controller.signInSsoSCP(None, None, None)(FakeRequest())
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/agents-external-stubs/user")
+        redirectLocation(result.futureValue) shouldBe Some("/agents-external-stubs/user")
       }
     }
 
@@ -163,7 +165,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper")
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/there")
+        redirectLocation(result.futureValue) shouldBe Some("/there")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
         session(result).get(SessionKeys.sessionId) should not be empty
       }
@@ -175,7 +177,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
+        redirectLocation(result.futureValue) shouldBe Some("/agents-external-stubs/user/create?continue=%2Fthere")
         session(result).get(SessionKeys.authToken) shouldBe Some(s"Bearer $authToken")
         session(result).get(SessionKeys.sessionId) should not be empty
       }
@@ -190,7 +192,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withCookies(Cookie("FOO", "BAR"))
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/there")
+        redirectLocation(result.futureValue) shouldBe Some("/there")
         cookies(result).get("PLAY_SESSION") shouldBe None
         cookies(result).get("FOO") shouldBe None
       }
@@ -203,7 +205,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withCookies(Cookie("FOO", "BAR"))
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/gg/sign-in")
+        redirectLocation(result.futureValue) shouldBe Some("/gg/sign-in")
         cookies(result).get("PLAY_SESSION") shouldBe None
         cookies(result).get("FOO") shouldBe None
       }
@@ -218,7 +220,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withCookies(Cookie("FOO", "BAR"))
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/there")
+        redirectLocation(result.futureValue) shouldBe Some("/there")
         cookies(result).get("PLAY_SESSION") shouldBe None
         cookies(result).get("FOO") shouldBe None
       }
@@ -231,7 +233,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withCookies(Cookie("FOO", "BAR"))
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/bas-gateway/sign-in")
+        redirectLocation(result.futureValue) shouldBe Some("/bas-gateway/sign-in")
         cookies(result).get("PLAY_SESSION") shouldBe None
         cookies(result).get("FOO") shouldBe None
       }
@@ -246,7 +248,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withCookies(Cookie("FOO", "BAR"))
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/there")
+        redirectLocation(result.futureValue) shouldBe Some("/there")
         cookies(result).get("PLAY_SESSION") shouldBe None
         cookies(result).get("FOO") shouldBe None
       }
@@ -259,7 +261,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withCookies(Cookie("FOO", "BAR"))
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/agents-external-stubs/gg/sign-in")
+        redirectLocation(result.futureValue) shouldBe Some("/agents-external-stubs/gg/sign-in")
         cookies(result).get("PLAY_SESSION") shouldBe None
         cookies(result).get("FOO") shouldBe None
       }
@@ -274,7 +276,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withCookies(Cookie("FOO", "BAR"))
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/there")
+        redirectLocation(result.futureValue) shouldBe Some("/there")
         cookies(result).get("PLAY_SESSION") shouldBe None
         cookies(result).get("FOO") shouldBe None
       }
@@ -287,7 +289,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
             .withCookies(Cookie("FOO", "BAR"))
         )
         status(result) shouldBe 303
-        redirectLocation(result) shouldBe Some("/agents-external-stubs/bas-gateway/sign-in")
+        redirectLocation(result.futureValue) shouldBe Some("/agents-external-stubs/bas-gateway/sign-in")
         cookies(result).get("PLAY_SESSION") shouldBe None
         cookies(result).get("FOO") shouldBe None
       }

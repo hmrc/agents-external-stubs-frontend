@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.UpliftRequest
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
 
 class UpliftFormSpec extends UnitSpec {
 
