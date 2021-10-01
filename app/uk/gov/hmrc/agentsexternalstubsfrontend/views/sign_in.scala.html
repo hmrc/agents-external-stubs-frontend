@@ -27,11 +27,13 @@
     @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
         <fieldset>
             <legend>
-                <h1 class="heading-xlarge">@Messages("login.sa.header")</h1>
-                <p>
-                @Html(Messages("login.sa.description"))
-                </p>
+                <h1 class="heading-xlarge">
+                    @Messages("login.sa.header")
+                </h1>
             </legend>
+
+            <p>@Html(Messages("login.sa.description"))</p>
+
             <div class="form-field-group @if(loginForm.hasErrors) {form-field-group--error soft--ends}">
                 @loginForm.errors("userId").map { error =>
                     <span class="error-notification username">Invalid Username: @Messages(error.message)</span>
@@ -42,16 +44,23 @@
                 @loginForm.globalErrors.map { error =>
                     <span class="error-notification password">@Messages(error.message)</span>
                 }
+
                 <div class="form-group">
-                    <label class="label--inline" style="font-weight: bold;" for="userId">@Html(Messages("login.username"))</label>
-                    <input class="form-control" type="text" id="userId" name="userId" required placeholder="@Messages("login.username.placeholder")" pattern="[A-Za-z0-9-_]{6,64}" />
+                    <label class="govuk-label" style="font-weight: bold;" for="userId">@Html(Messages("login.username"))</label>
+                    <div id="username-hint" class="govuk-hint form-hint">
+                        @Messages("login.username.placeholder")
+                    </div>
+                    <input class="govuk-input form-control" type="text" id="userId" name="userId" required aria-describedby="username-hint" pattern="[A-Za-z0-9-_]{6,64}" />
                 </div>
 
-                <div class="form-group">@Messages("login.planetId.hint")</div>
+                <p class="govuk-body">@Messages("login.planetId.hint")</p>
 
                 <div class="form-group">
-                    <label class="label--inline" style="font-weight: bold;" for="planetId">@Messages("login.planetId")</label>
-                    <input  class="form-control" type="text" id="planetId" name="planetId" required placeholder="@Messages("login.planetId.placeholder")" />
+                    <label class="govuk-label" style="font-weight: bold;" for="planetId">@Messages("login.planetId")</label>
+                    <div id="planet-hint" class="govuk-hint form-hint">
+                        @Messages("login.planetId.placeholder")
+                    </div>
+                    <input class="form-control" type="text" id="planetId" name="planetId" required aria-describedby="planet-hint"/>
                 </div>
 
                 <div class="form-group">
