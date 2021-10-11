@@ -25,7 +25,8 @@ GET         /stride/sign-in                                                     
 GET         /agents-external-stubs/stride/sign-in                                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePageInternal(successURL: RedirectUrl, origin: Option[String], failureURL: Option[String])
 
 # auth-login-stub support
-GET         /auth-login-stub/gg-sign-in                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
+GET         /auth-login-stub/gg-sign-in                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue_url: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
+GET         /auth-login-stub/session/logout                                         @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[RedirectUrl] ?= None)
 
 # government gateway registration frontend stubs
 GET         /government-gateway-registration-frontend                              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showGovernmentGatewaySignInPage(continue: Option[RedirectUrl] ?= None, origin: Option[String] ?= None, accountType: Option[String] ?= None)
