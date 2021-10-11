@@ -41,6 +41,8 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
 
   val pvDetailsValidationFEPort = getConfInt("personal-details-validation-frontend.port")
 
+  val authLoginStubPort = getConfInt("auth-login-stub.port")
+
   val httpPort = servicesConfig.getInt("http.port")
 
   val proxiesStart = servicesConfig.getBoolean("proxies.start")

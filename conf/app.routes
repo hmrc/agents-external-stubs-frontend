@@ -24,6 +24,9 @@ GET         /agents-external-stubs/gg/sign-out                                  
 GET         /stride/sign-in                                                        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePage(successURL: RedirectUrl, origin: Option[String], failureURL: Option[String])
 GET         /agents-external-stubs/stride/sign-in                                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePageInternal(successURL: RedirectUrl, origin: Option[String], failureURL: Option[String])
 
+# auth-login-stub support
+GET         /auth-login-stub/gg-sign-in                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
+
 # government gateway registration frontend stubs
 GET         /government-gateway-registration-frontend                              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showGovernmentGatewaySignInPage(continue: Option[RedirectUrl] ?= None, origin: Option[String] ?= None, accountType: Option[String] ?= None)
 GET         /agents-external-stubs/government-gateway-registration-frontend        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showGovernmentGatewaySignInPageInternal(continue: Option[RedirectUrl] ?= None, origin: Option[String] ?= None, accountType: Option[String] ?= None)
@@ -33,7 +36,7 @@ GET         /agents-external-stubs/government-gateway-registration-frontend     
 GET        /mdtp/uplift                                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageProxy(confidenceLevel: Int, completionURL: RedirectUrl, failureURL: RedirectUrl, origin: Option[String])
 POST       /mdtp/uplift                                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftProxy(journeyId: String, confidenceLevel: Int, completionURL: RedirectUrl, failureURL: RedirectUrl, origin: Option[String])
 GET        /agents-external-stubs/mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageInternal(confidenceLevel: Int, completionURL: RedirectUrl, failureURL: RedirectUrl, origin: Option[String])
-POST       /agents-external-stubs/mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(journeyId: String, confidenceLevel: Int, completionURL: RedirectUrl, failureURL: RedirectUrl, origin: Option[String])
+POST       /agents-external-stubs/mdtp/uplift                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(journeyId: String, confidenceLevel: Int, completionURL: RedirectUrl, failureURL: RedirectUrl, origin: Option[String])
 
 GET        /mdtp/journey/journeyId/:journeyId                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultProxy(journeyId: String)
 GET        /agents-external-stubs/mdtp/journey/journeyId/:journeyIdAndReason        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultInternal(journeyIdAndReason: String)
