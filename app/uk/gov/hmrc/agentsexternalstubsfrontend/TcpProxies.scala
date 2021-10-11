@@ -37,6 +37,7 @@ class TcpProxies @Inject() (appConfig: FrontendConfig)(implicit system: ActorSys
   private val identityVerificationFrontendPort = appConfig.ivFEPort
   private val governmentGatewayRegistrationFrontendPort = appConfig.ggRegEPort
   private val personalDetailsValidationFrontendPort = appConfig.pvDetailsValidationFEPort
+  private val authLoginStubPort = appConfig.authLoginStubPort
   private val httpPort = appConfig.httpPort
 
   if (startProxies) {
@@ -65,6 +66,7 @@ class TcpProxies @Inject() (appConfig: FrontendConfig)(implicit system: ActorSys
     startProxy(identityVerificationFrontendPort, "identity-verification-frontend")
     startProxy(governmentGatewayRegistrationFrontendPort, "government-gateway-registration-frontend")
     startProxy(personalDetailsValidationFrontendPort, "personal-details-validation-frontend")
+    startProxy(authLoginStubPort, "auth-login-stub")
 
   } else {
     println("TCP proxies feature switched off")
