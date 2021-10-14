@@ -24,7 +24,8 @@ case class Records(
   BusinessDetailsRecord: Option[Seq[JsObject]],
   LegacyRelationshipRecord: Option[Seq[JsObject]],
   RelationshipRecord: Option[Seq[JsObject]],
-  EmployerAuths: Option[Seq[JsObject]]
+  EmployerAuths: Option[Seq[JsObject]],
+  PPTSubscriptionDisplayRecord: Option[Seq[JsObject]]
 )
 
 object Records {

@@ -136,6 +136,20 @@
         </tbody>
     </table>
 
+    <table id="ppt-subscription-display-records" style="margin:1em 0;">
+        <caption id="tableSubHeader" class="normal-text">PPT Subscription Display Records
+            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            href="/agents-external-stubs/records/add?type=ppt-subscription&seed=@{records.PPTSubscriptionDisplayRecord.map(o => (o.last \ "pptReference").as[String]).getOrElse("XAPPT1234567890")}">
+                Create new PPT Subscription Display
+            </a>
+        </caption>
+        <col style="width: 90%">
+        <col style="width: 10%">
+        <tbody>
+        @recordRows(records.PPTSubscriptionDisplayRecord, identity)
+        </tbody>
+    </table>
+
 }
 
 @recordRows(records: Option[Seq[JsObject]], excerpt: JsValue => JsValue) = {
