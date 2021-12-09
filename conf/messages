@@ -110,7 +110,7 @@ user.edit.update=Update
 user.edit.cancel=Cancel
 
 user.create.header=Create user {0}
-user.create.description=Here you can define affinity group of the user and her principal enrolment. In the next step you will be able to define other properties. Leave affinity group none fo you aim to create STRIDE user.
+user.create.description=Here you can define affinity group of the user and her principal enrolment. In the next step you will be able to define other properties. Leave affinity group none if you aim to create STRIDE user.
 user.create.update_and_continue=Create and continue
 user.create.update=Create
 user.create.edit=Show full edit form

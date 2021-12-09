@@ -17,44 +17,49 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import play.api.libs.json.JsObject
-@import uk.gov.hmrc.play.views.html.helpers.{FormWithCSRF, TextArea}
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichTextarea
 
-@this(mainTemplate: main_template, form: FormWithCSRF, textArea: TextArea, navigationBar: navigationBar)
+@this(
+        mainTemplate: main_template,
+        form: FormWithCSRF,
+        govukTextarea: GovukTextarea,
+        govukButton: GovukButton,
+        navigationBar: navigationBar
+)
 
 @(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
 
-@mainTemplate(title = Messages("records.title"), bodyClasses = Some("full-width")) {
+@mainTemplate(title = Messages("records.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="heading-xlarge">@Messages("records.edit.header")</h1>
+    <h1 class="govuk-heading-xl">@Messages("records.edit.header")</h1>
 
-    <p class="form-hint">
-    @Messages("records.edit.description")
+    <p class="govuk-hint">
+        @Messages("records.edit.description")
     </p>
 
     <div>
         @form(action = postUrl, 'id -> "recordForm", 'novalidate -> "novalidate") {
-            <fieldset>
-                <div class="form-field-group">
-
-                 @textArea(
-                     recordForm("json"),
-                     '_inputClass -> "textarea-large"
-                 )
-
-                </div>
-                <div class="form-group" style="vertical-align: middle;">
-
-                    <button class="button" type="submit" id="update">
-                        @Messages("records.edit.submit")
-                    </button>
-
-                    <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("records.edit.cancel")</a>
-
-                </div>
-            </fieldset>
-
+            @govukTextarea(Textarea(
+                rows = 20,
+                classes = "textarea-large"
+            ).withFormField(recordForm("json")))
+            <div class="govuk-button-group">
+                @govukButton(Button(
+                    content = Text(Messages("records.edit.submit")),
+                    attributes = Map("type" -> "submit", "id" -> "update")
+                ))
+                <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("records.edit.cancel")</a>
+            </div>
         }
     </div>
 

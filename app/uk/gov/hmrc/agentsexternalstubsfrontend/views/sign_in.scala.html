@@ -14,77 +14,92 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
-@import uk.gov.hmrc.play.views.html.helpers.FormWithCSRF
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukFieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorLink
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukDetails
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.details.Details
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
-@this(mainTemplate: main_template, form: FormWithCSRF)
+@this(
+        mainTemplate: main_template,
+        form: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukInput: GovukInput,
+        govukFieldset: GovukFieldset,
+        govukDetails: GovukDetails)
 
-@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest], postUrl: Call)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest], postUrl: Call)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = Messages("login.title"), bodyClasses = None) {
+@mainTemplate(title = Messages("login.title")) {
 
     @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
-        <fieldset>
-            <legend>
-                <h1 class="heading-xlarge">
-                    @Messages("login.sa.header")
-                </h1>
-            </legend>
+        @govukFieldset(Fieldset(
+            legend = Some(Legend(
+                content = Text(Messages("login.sa.header")),
+                isPageHeading = true,
+                classes = "govuk-fieldset__legend--xl"
+            ))
+        ))
 
-            <p>@Html(Messages("login.sa.description"))</p>
+        @if(loginForm.hasErrors) {
+            @govukErrorSummary(ErrorSummary(
+                title = Text(Messages("error.summary.heading")),
+                errorList = Seq(
+                    loginForm.errors("userId").map(error => ErrorLink(content = Text(s"Invalid Username: ${Messages(error.message)}"))),
+                    loginForm.errors("planetId").map(error => ErrorLink(content = Text(s"Invalid Planet: ${Messages(error.message)}"))),
+                    loginForm.globalErrors.map(error => ErrorLink(content = Text(Messages(error.message))))
+                ).flatten
+            ))
+        }
 
-            <div class="form-field-group @if(loginForm.hasErrors) {form-field-group--error soft--ends}">
-                @loginForm.errors("userId").map { error =>
-                    <span class="error-notification username">Invalid Username: @Messages(error.message)</span>
-                }
-                @loginForm.errors("planetId").map { error =>
-                    <span class="error-notification password">Invalid Planet: @Messages(error.message)</span>
-                }
-                @loginForm.globalErrors.map { error =>
-                    <span class="error-notification password">@Messages(error.message)</span>
-                }
+        <p>@Html(Messages("login.sa.description"))</p>
 
-                <div class="form-group">
-                    <label class="govuk-label" style="font-weight: bold;" for="userId">@Html(Messages("login.username"))</label>
-                    <div id="username-hint" class="govuk-hint form-hint">
-                        @Messages("login.username.placeholder")
-                    </div>
-                    <input class="govuk-input form-control" type="text" id="userId" name="userId" required aria-describedby="username-hint" pattern="[A-Za-z0-9-_]{6,64}" />
-                </div>
+        @govukInput(Input(
+            label = Label(content = Text(Messages("login.username"))),
+            hint = Some(Hint(id = Some("username-hint"), content = Text(Messages("login.username.placeholder")))),
+            pattern = Some("[A-Za-z0-9-_]{6,64}"),
+            classes = "govuk-input govuk-input--width-10"
+        ).withFormField(loginForm("userId")))
 
-                <p class="govuk-body">@Messages("login.planetId.hint")</p>
+        <p class="govuk-body">@Messages("login.planetId.hint")</p>
 
-                <div class="form-group">
-                    <label class="govuk-label" style="font-weight: bold;" for="planetId">@Messages("login.planetId")</label>
-                    <div id="planet-hint" class="govuk-hint form-hint">
-                        @Messages("login.planetId.placeholder")
-                    </div>
-                    <input class="form-control" type="text" id="planetId" name="planetId" required aria-describedby="planet-hint"/>
-                </div>
+        @govukInput(Input(
+            label = Label(content = Text(Messages("login.planetId"))),
+            hint = Some(Hint(id = Some("planet-hint"), content = Text(Messages("login.planetId.placeholder")))),
+            classes = "govuk-input govuk-input--width-10"
+        ).withFormField(loginForm("planetId")))
 
-                <div class="form-group">
-                    <button class="button" type="submit" id="signIn">@Messages("login.submit")</button>
-                </div>
-            </div>
-        </fieldset>
+        @govukButton(Button(
+            content = Text(Messages("login.submit")),
+            attributes = Map("id" -> "signIn")
+        ))
     }
 
-    <div class="form-group">
-        <details role="group">
-            <summary role="button" aria-controls="details-content-0" aria-expanded="false">
-                <span class="summary">Why do I see this page?</span>
-            </summary>
-            <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="true">
-                This page provides fake 'Sign In' form served by Agents Stubs.
-                After sign-in you will have the opportunity to configure your test user further and continue to the service.
+    @govukDetails(Details(
+        summary = Text("Why do I see this page?"),
+        content = HtmlContent(
+            """<p>This page provides fake 'Sign In' form served by Agents Stubs.</p>
+              |<p>After sign-in you will have the opportunity to configure your test user further and continue to the service.</p>
+              |<div class="govuk-hint">Check Confluence documentation to see how your QA possibly can benefit from using Agents Stubs.</div>
+            |""".stripMargin)
+    ))
 
-                <div class="form-hint" style="margin-top: 0.5em;">
-                    Check Confluence documentation to see how your QA possibly can benefit from using Agents Stubs.
-                </div>
-            </div>
-        </details>
-    </div>
-
-    <a href="@routes.HelpController.showHelpPage("agent-authorisation-api")">Show me how to test Agent Authorisation API in Sandbox</a>
+    <a class="govuk-body govuk-link" href="@routes.HelpController.showHelpPage("agent-authorisation-api")">Show me how to test Agent Authorisation API in Sandbox</a>
 }

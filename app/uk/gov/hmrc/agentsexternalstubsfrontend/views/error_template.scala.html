@@ -14,19 +14,13 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.govuk_wrapper
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 
-@this(govUkWrapper: govuk_wrapper)
+@this(mainTemplate: main_template)
 
-@(pageTitle: String, heading: String, message: String)(implicit messages: Messages, configuration: Configuration, request: RequestHeader)
+@(pageTitleMsgKey: String, headingMsgKey: String, messageMsgKey: String)(implicit messages: Messages, request: Request[_])
 
-@contentHeader = {
-    <h1 class="heading-xlarge">@heading</h1>
+@mainTemplate(title = Messages(pageTitleMsgKey)) {
+ <h1 class="govuk-heading-xl">@Messages(headingMsgKey)</h1>
+ <p>@Messages(messageMsgKey)</p>
 }
-
-@mainContent = {
-    <p>@message</p>
-}
-
-@govUkWrapper(title = pageTitle, contentHeader = Some(contentHeader), mainContent = mainContent)

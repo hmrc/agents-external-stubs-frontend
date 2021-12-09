@@ -17,41 +17,49 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
-@import uk.gov.hmrc.play.views.html.helpers.FormWithCSRF
-
-@import uk.gov.hmrc.play.binders.ContinueUrl
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 @import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 @import play.api.libs.json.{Json,JsObject,JsValue,JsString,JsArray,JsBoolean}
+@import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
 
-@this(mainTemplate: main_template, navigationBar: navigationBar, form: FormWithCSRF)
+@this(
+        mainTemplate: main_template,
+        navigationBar: navigationBar,
+        form: FormWithCSRF,
+        govukTable: GovukTable
+)
 
+@(records: Records, showId: Option[String], context: PageContext)(implicit request: Request[_], messages: Messages)
 
-@(records: Records, showId: Option[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
-
-@mainTemplate(title = Messages("records.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+@mainTemplate(title = Messages("records.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="heading-xlarge">@Messages("records.show.header", context.planetId)</h1>
+    <h1 class="govuk-heading-xl">@Messages("records.show.header", context.planetId)</h1>
 
     <p>
         @Messages("records.show.description")
     </p>
 
-    <table id="business-partner-records" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Business Partner Records
+    <table id="business-partner-records" class="govuk-table">
+        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Business Partner Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
-            href="/agents-external-stubs/records/add?type=business-partner-record&seed=@{records.BusinessPartnerRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">Create new business partner</a></caption>
+            href="/agents-external-stubs/records/add?type=business-partner-record&seed=@{records.BusinessPartnerRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">Create new business partner</a>
+        </caption>
         <col style="width: 90%">
         <col style="width: 10%">
-        <tbody>
+        <tbody class="govuk-table__body">
         @recordRows(records.BusinessPartnerRecord,
             ViewHelper.excerpt(_, "agentReferenceNumber", "utr", "nino", "eori", "addressDetails","isAnASAgent"))
         </tbody>
     </table>
 
-    <table id="business-details" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Business Details Records
+    <table id="business-details" style="margin:1em 0;" class="govuk-table">
+        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Business Details Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=business-details&seed=@{records.BusinessDetailsRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">
                 Create new business details
@@ -59,14 +67,14 @@
         </caption>
         <col style="width: 90%">
         <col style="width: 10%">
-        <tbody>
+        <tbody class="govuk-table__body">
         @recordRows(records.BusinessDetailsRecord,
             ViewHelper.excerpt(_,"nino","mtdbsa","businessData.0.tradingName", "businessData.0.businessAddressDetails", "businessData.0.cessationDate"))
         </tbody>
     </table>
 
-    <table id="vat-customer-informations" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">VAT Customer Information Records
+    <table id="vat-customer-informations" style="margin:1em 0;" class="govuk-table">
+        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">VAT Customer Information Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=vat-customer-information&seed=@{records.VatCustomerInformationRecord.map(o => (o.last \ "vrn").as[String]).getOrElse("1234567890")}">
                 Create new VAT customer information
@@ -74,14 +82,14 @@
         </caption>
         <col style="width: 90%">
         <col style="width: 10%">
-        <tbody>
+        <tbody class="govuk-table__body">
         @recordRows(records.VatCustomerInformationRecord,
             ViewHelper.excerpt(_,"vrn","approvedInformation.customerDetails.organisationName","approvedInformation.customerDetails.individual", "approvedInformation.customerDetails.effectiveRegistrationDate"))
         </tbody>
     </table>
 
-    <table id="mtd-relationships" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">MTD Relationship Records
+    <table id="mtd-relationships" style="margin:1em 0;" class="govuk-table">
+        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">MTD Relationship Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=relationship&seed=@{records.RelationshipRecord.map(o => (o.last \ "arn").as[String]).getOrElse("1234567890")}">
                 Create new relationship
@@ -89,13 +97,13 @@
         </caption>
         <col style="width: 90%">
         <col style="width: 10%">
-        <tbody>
+        <tbody class="govuk-table__body">
         @recordRows(records.RelationshipRecord, identity)
         </tbody>
     </table>
 
-    <table id="legacy-relationships" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Legacy SA Agent Relationships
+    <table id="legacy-relationships" style="margin:1em 0;" class="govuk-table">
+        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Legacy SA Agent Relationships
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=legacy-relationship&seed=@{records.LegacyRelationshipRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
                 Create new SA agent relationship
@@ -103,13 +111,13 @@
         </caption>
         <col style="width: 90%">
         <col style="width: 10%">
-        <tbody>
+        <tbody class="govuk-table__body">
         @recordRows(records.LegacyRelationshipRecord, identity)
         </tbody>
     </table>
 
-    <table id="legacy-agents" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Legacy SA Agent
+    <table id="legacy-agents" style="margin:1em 0;" class="govuk-table">
+        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Legacy SA Agent
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=legacy-agent&seed=@{records.LegacyAgentRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
                 Create new SA agent
@@ -117,13 +125,13 @@
         </caption>
         <col style="width: 90%">
         <col style="width: 10%">
-        <tbody>
+        <tbody class="govuk-table__body">
         @recordRows(records.LegacyAgentRecord, identity)
         </tbody>
     </table>
 
-    <table id="employer-auths" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">Legacy PAYE Agent Informations
+    <table id="employer-auths" style="margin:1em 0;" class="govuk-table">
+        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Legacy PAYE Agent Informations
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=employer-auths&seed=@{records.EmployerAuths.map(o => (o.last \ "agentCode").as[String]).getOrElse("ABC123456789")}">
                 Create new PAYE agent information
@@ -131,13 +139,13 @@
         </caption>
         <col style="width: 90%">
         <col style="width: 10%">
-        <tbody>
+        <tbody class="govuk-table__body">
         @recordRows(records.EmployerAuths, identity)
         </tbody>
     </table>
 
-    <table id="ppt-subscription-display-records" style="margin:1em 0;">
-        <caption id="tableSubHeader" class="normal-text">PPT Subscription Display Records
+    <table id="ppt-subscription-display-records" style="margin:1em 0;" class="govuk-table">
+        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">PPT Subscription Display Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=ppt-subscription&seed=@{records.PPTSubscriptionDisplayRecord.map(o => (o.last \ "pptReference").as[String]).getOrElse("XAPPT1234567890")}">
                 Create new PPT Subscription Display
@@ -145,7 +153,7 @@
         </caption>
         <col style="width: 90%">
         <col style="width: 10%">
-        <tbody>
+        <tbody class="govuk-table__body">
         @recordRows(records.PPTSubscriptionDisplayRecord, identity)
         </tbody>
     </table>
@@ -153,8 +161,8 @@
 }
 
 @recordRows(records: Option[Seq[JsObject]], excerpt: JsValue => JsValue) = {
-  @if(records.isEmpty){ <tr>
-                          <td>
+  @if(records.isEmpty){ <tr class="govuk-table__row">
+                          <td class="govuk-table__cell">
                               <div style="font-size:0.8em;">No records found.</div>
                           </td>
                       </tr>
@@ -164,15 +172,15 @@
 }
 
 @recordRow(json: JsValue, id: Option[String], excerpt: JsValue => JsValue) = {
-    <tr>
+    <tr class="govuk-table__row">
         @if(showId.isDefined && id.contains(showId.get)) {
             <a name="e"></a>
             <a name="@id"></a>
-            <td><div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(json)</div></td>
+            <td class="govuk-table__cell"><div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(json)</div></td>
         } else {
-            <td><div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrintFlat(excerpt(json))</div></td>
+            <td class="govuk-table__cell"><div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrintFlat(excerpt(json))</div></td>
         }
-        <td style="font-size:0.8em;vertical-align: top;">
+        <td class="govuk-table__cell" style="font-size:0.8em;vertical-align: top;">
             @if(id.isDefined) {
                 @if(excerpt!=(identity _)){
                     @if(showId.isDefined && id.contains(showId.get)) {

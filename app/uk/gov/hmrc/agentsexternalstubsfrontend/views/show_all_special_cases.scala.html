@@ -14,21 +14,20 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
-@import uk.gov.hmrc.play.binders.ContinueUrl
-@import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 
 @this(mainTemplate: main_template, navigationBar: navigationBar)
 
-@(specialCases: Seq[SpecialCase], caseId: Option[String], viewUrl: String=>Call, editUrl: String=>Call, removeUrl: String=>Call, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(specialCases: Seq[SpecialCase], caseId: Option[String], viewUrl: String=>Call, editUrl: String=>Call, removeUrl: String=>Call, context: PageContext)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = Messages("specialCase.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+@mainTemplate(title = Messages("specialCase.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="heading-xlarge">@Messages("specialCase.show.all.header", context.planetId)</h1>
+    <h1 class="govuk-heading-xl">@Messages("specialCase.show.all.header", context.planetId)</h1>
 
     <p>
         @Messages("specialCase.show.all.description")
@@ -48,7 +47,7 @@
           <a id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@Messages("specialCase.link.add")</a>
       </div>
 
-    <table id="special-cases" style="margin:1em 0;">
+    <table class="govuk-table" id="special-cases" style="margin:1em 0;">
         <colgroup>
             <col style="width: 10%">
             <col style="width: 55%">
@@ -58,35 +57,35 @@
             <col style="width: 5%">
         </colgroup>
         <col style="width: 20%">
-        <thead>
-            <tr>
-                <th scope="colgroup" colspan="2">Request</th>
-                <th scope="colgroup" colspan="2">Response</th>
-                <th scope="col" rowspan="2" style="text-align: center; vertical-align: top;">Action</th>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header" scope="colgroup" colspan="2">Request</th>
+                <th class="govuk-table__header" scope="colgroup" colspan="2">Response</th>
+                <th class="govuk-table__header" scope="col" rowspan="2" style="text-align: center; vertical-align: top;">Action</th>
             </tr>
-            <tr>
-                <th scope="col" style="font-size: 85%;">Method</th>
-                <th scope="col" style="font-size: 85%;">Path</th>
-                <th scope="col" style="font-size: 85%;">Status</th>
-                <th scope="col" style="font-size: 85%;">Type</th>
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header" scope="col" style="font-size: 85%;">Method</th>
+                <th class="govuk-table__header" scope="col" style="font-size: 85%;">Path</th>
+                <th class="govuk-table__header" scope="col" style="font-size: 85%;">Status</th>
+                <th class="govuk-table__header" scope="col" style="font-size: 85%;">Type</th>
             </tr>
         </thead>
 
         @for(sc <- specialCases.sortBy(s => s.requestMatch.method+" "+s.requestMatch.path)) {
-            <tr>
-                <td style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell" style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
                     <div>@sc.requestMatch.method</div>
                 </td>
-                <td style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
+                <td class="govuk-table__cell" style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
                     <div>@sc.requestMatch.path</div>
                 </td>
-                <td style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
+                <td class="govuk-table__cell" style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
                     <div>@sc.response.status</div>
                 </td>
-                <td style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
+                <td class="govuk-table__cell" style="@if(sc.id == caseId){border-bottom-style: none; font-weight: bold;}">
                     <div>@sc.response.body.flatMap(_ => sc.response.headers.flatMap(_.find(_.name == "Content-Type")).map(_.value)).getOrElse("")</div>
                 </td>
-                <td style="@if(sc.id == caseId){border-bottom-style: none;}">
+                <td class="govuk-table__cell" style="@if(sc.id == caseId){border-bottom-style: none;}">
                     <div>
                     @if(sc.response.body.isDefined && sc.id != caseId){
                        <a href="@viewUrl(sc.id.get)">View</a> |
@@ -97,9 +96,9 @@
                 </td>
             </tr>
             @if(sc.id == caseId){
-                <tr>
-                    <td></td>
-                    <td colspan="4" style="padding-top:0;">
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell"></td>
+                    <td class="govuk-table__cell" colspan="4" style="padding-top:0;">
                         @if(sc.requestMatch.body.isDefined) {
                             <h4 style="font-size: 85%;">Expected request body</h4>
                             <div>@sc.requestMatch.contentType.getOrElse("Undefined content type!")</div>

@@ -14,44 +14,45 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.binders.ContinueUrl
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 
 @this(mainTemplate: main_template, navigationBar: navigationBar)
 
-@(services:Services, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(services:Services, context: PageContext)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = Messages("knownFacts.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+@mainTemplate(title = Messages("knownFacts.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="heading-xlarge">@Messages("services.show.header")</h1>
+    <h1 class="govuk-heading-xl">@Messages("services.show.header")</h1>
 
-    <p class="form-hint">
+    <p class="govuk-hint">
         @Messages("services.show.description")
     </p>
 
-    <table id="services" class="margin-bottom-30">
+    <table id="services" class="govuk-table govuk-!-margin-bottom-6">
         <col style="width: 3%">
         <col style="width: 27%">
         <col style="width: 40%">
         <col style="width: 30%">
         <thead>
-            <tr>
-                <th scope="col">Type</th>
-                <th scope="col">Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">Pattern</th>
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header">Type</th>
+                <th class="govuk-table__header">Name</th>
+                <th class="govuk-table__header">Description</th>
+                <th class="govuk-table__header">Pattern</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="govuk-table__body">
         @for((service,si) <- services.services.sortBy(_.name).zipWithIndex){
-            <tr>
-                <td colspan="4">
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell govuk-!-padding-top-6" colspan="4">
                     <a name="@service.name"> </a>
                     <h2>@{si+1}. @service.name</h2>
-                    <p class="form-hint">
+                    <p class="govuk-hint">
                         <span style="color:black;">@service.description</span>
 
                     <span>
@@ -67,39 +68,39 @@
                     </span>
                     </p>
                 </td>
-            <tr>
+            </tr>
             @for((identifier,ii) <- service.identifiers.zipWithIndex){
-                <tr>
+                <tr class="govuk-table__row">
                     @if(ii==0){
-                        <td rowspan="@{service.identifiers.size}">
-                            <div class="form-hint" style="font-size:0.8em;">Identifier@if(service.identifiers.size>1){<span>s</span>}else{}</div>
+                        <td class="govuk-table__cell" rowspan="@{service.identifiers.size}">
+                            <div class="govuk-hint" style="font-size:0.8em;">Identifier@if(service.identifiers.size>1){<span>s</span>}else{}</div>
                         </td>
                     }
-                    <td>
+                    <td class="govuk-table__cell">
                         <div style="font-weight: bold;">@identifier.name</div>
                     </td>
-                    <td>
+                    <td class="govuk-table__cell">
                         <div>@identifier.description</div>
                     </td>
-                    <td>
+                    <td class="govuk-table__cell">
                         <div style="font-size:0.8em;font-family: monospace;">@identifier.regex</div>
                     </td>
                 </tr>
             }
             @for((verifier,ii) <- service.knownFacts.zipWithIndex){
-                <tr>
+                <tr class="govuk-table__row">
                     @if(ii==0){
-                        <td rowspan="@{service.knownFacts.size}">
-                            <div class="form-hint" style="font-size:0.8em;">Verifier@if(service.knownFacts.size>1){<span>s</span>}else{}</div>
+                        <td class="govuk-table__cell" rowspan="@{service.knownFacts.size}">
+                            <div class="govuk-hint" style="font-size:0.8em;">Verifier@if(service.knownFacts.size>1){<span>s</span>}else{}</div>
                         </td>
                     }
-                    <td>
+                    <td class="govuk-table__cell">
                         <div>@verifier.name</div>
                     </td>
-                    <td>
+                    <td class="govuk-table__cell">
                         <div>@verifier.description</div>
                     </td>
-                    <td>
+                    <td class="govuk-table__cell">
                         <div style="font-size:0.8em;font-family: monospace;">@verifier.regex</div>
                     </td>
                 </tr>

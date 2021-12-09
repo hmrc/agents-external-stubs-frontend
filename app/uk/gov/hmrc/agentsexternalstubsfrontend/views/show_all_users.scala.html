@@ -14,95 +14,108 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.binders.ContinueUrl
 @import views.html.helper.CSRF
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 
-@this(mainTemplate: main_template, navigationBar: navigationBar)
+@this(
+        mainTemplate: main_template,
+        navigationBar: navigationBar,
+        form: FormWithCSRF,
+        govukInput: GovukInput,
+        govukButton: GovukButton,
+        govukTable: GovukTable,
+)
 
-@(users: Users, authToken: Option[String], showCurrentUserUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(users: Users, authToken: Option[String], showCurrentUserUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = Messages("users.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
+@mainTemplate(title = Messages("users.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="heading-xlarge">@Messages("users.show.header", context.planetId)</h1>
+    <h1 class="govuk-heading-xl">@Messages("users.show.header", context.planetId)</h1>
 
     <div style="float: right; margin-bottom: 1em;position: relative; top:-3em;right: -3em;">
-        <h3 class="cya-question">
-        @Messages("users.link.create")
-        </h3>
-        <form action="/agents-external-stubs/user/create">
-            @{
-                play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
-            }
-            <div style="vertical-align: middle;">
-                <label for="userId" style="font-size: 0.7em; color: gray;">Expected ID pattern [A-Za-z0-9-_]{3,64}</label>
-                <input type="text" name="userId" pattern="[A-Za-z0-9-_]{3,64}" required>
-                <button class="button">@Messages("user.show.create")</button>
+        <h3 class="govuk-!-margin-bottom-1">@Messages("users.link.create")</h3>
+        <span class="govuk-hint govuk-!-font-size-14 govuk-!-margin-bottom-1" >Expected ID pattern [A-Za-z0-9-_]{3,64}</span>
+        @form(action = Call("GET", "/agents-external-stubs/user/create")) {
+            @{play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) }}
+            <div style="vertical-align: bottom;">
+                @govukInput(Input(
+                    id = "userId",
+                    name = "userId",
+                    pattern = Some("[A-Za-z0-9-_]{3,64}"),
+                    classes = "govuk-input govuk-input--width-10",
+                    formGroupClasses = "govuk-!-display-inline-block",
+                ))
+                @govukButton(Button(
+                    content = Text(Messages("user.show.create")),
+                    classes = "govuk-!-display-inline"
+                ))
             </div>
-        </form>
+        }
     </div>
 
     <p>
     @Messages("users.show.description")
     </p>
 
-    <table id="users" class="margin-bottom-30">
-        <col style="width: 25%">
-        <col style="width: 10%">
-        <col style="width: 35%">
-        <col style="width: 30%">
-        <thead>
-            <tr>
-                <th scope="col">UserID</th>
-                <th scope="col" style="text-align: center;">Affinity</th>
-                <th scope="col" style="text-align: center;">Services</th>
-                <th scope="col">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-        @for(user <- users.users.sortBy(_.userId)){
-                <tr>
-                    <td>
-                        <div style="overflow-wrap: break-word;">@if(user.userId==context.authorisedUserId){
-                            <span style="font-weight: bold;">@user.userId</span>
-                        }else{
-                            @user.userId
-                        }</div>
-                        <div style="font-size:70%;">group: @{user.groupId.getOrElse("none")}</div>
-                    </td>
-                    <td style="text-align: center;">
-                        <span class="badge badge-@{user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">@user.affinityGroup.getOrElse("none")</span>
-                    </td>
-                    <td style="text-align: left; font-size: 0.9em;">
-                      @for(enrolments <- user.principalEnrolments) {
-                        @if(enrolments.nonEmpty) {
-                            @for(e <- enrolments) {
-                                <div><span style="display: inline-block;
-                                margin: 0.1em 0;">@e.key</span> <span>@{e.identifiersValues.mkString("(","/",")")}</span></div>
-                            }
-                        }
-                      }
-                    </td>
-                    <td>@if(user.userId==context.authorisedUserId){
-                        <div>
-                            <a id="@{user.userId}-view" href="/agents-external-stubs/user?userId=@user.userId">View</a> |
-                            <a id="@{user.userId}-edit" href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a> |
-                            <span style="color: black; font-weight: bold;">Current user </span>
-                        </div>
-                    }else{
-                        <div>
-                            <a id="@{user.userId}-view" href="/agents-external-stubs/user?userId=@user.userId">View</a> |
-                            <a id="@{user.userId}-edit" href="/agents-external-stubs/user/edit?userId=@user.userId">Edit</a> |
-                            <a id="@{user.userId}-remove" href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a> |
-                            <a id="@{user.userId}-sign-in" href="/agents-external-stubs/sign-in?userId=@user.userId&continue=/agents-external-stubs/users&providerType=@user.defaultProviderType">Sign-in</a>
-                        </div>
-                    }</td>
-                </tr>
+    @govukTable(Table(
+        head = Some(Seq(
+            HeadCell(content = Text("UserID")),
+            HeadCell(content = Text("Affinity")),
+            HeadCell(content = Text("Services")),
+            HeadCell(content = Text("Action"))
+        )),
+        rows = users.users.sortBy(_.userId).map { user =>
+            Seq(
+                TableRow(content = HtmlContent(s"""<div ${if (user.userId==context.authorisedUserId) """class="govuk-!-font-weight-bold"""" else ""}>${user.userId}</div>
+                                                  |<div style="font-size:70%;">group: ${user.groupId.getOrElse("none")}</div>
+                                                  |""".stripMargin)),
+                TableRow(content = HtmlContent(
+                    s"""<span class="badge badge-${user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">
+                       |    ${user.affinityGroup.getOrElse("none")}
+                       |</span>""".stripMargin)
+                ),
+                TableRow(content = HtmlContent(
+                    (for {
+                        enrolments <- user.principalEnrolments.toSeq
+                        e <- enrolments
+                    } yield s"""<div><span style="display: inline-block;">${e.key}</span> <span>${e.identifiersValues.mkString("(","/",")")}</span></div>""").mkString("\n")
+                )),
+                TableRow(content =
+                        if (user.userId==context.authorisedUserId) HtmlContent(
+                            s"""<div>
+                               |    <a id="${user.userId}-view" href="/agents-external-stubs/user?userId=${user.userId}">View</a> |
+                               |    <a id="${user.userId}-edit" href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a> |
+                               |    <span style="color: black; font-weight: bold;">Current user </span>
+                               |</div>
+                               |""".stripMargin
+                        ) else HtmlContent(
+                            s"""<div>
+                               |    <a id="${user.userId}-view" href="/agents-external-stubs/user?userId=${user.userId}">View</a> |
+                               |    <a id="${user.userId}-edit" href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a> |
+                               |    <a id="${user.userId}-remove" href="/agents-external-stubs/user/remove?userId=${user.userId}">Remove</a> |
+                               |    <a id="${user.userId}-sign-in" href="/agents-external-stubs/sign-in?userId=${user.userId}&continue=/agents-external-stubs/users&providerType=${user.defaultProviderType}">Sign-in</a>
+                               |</div>
+                               |""".stripMargin
+                        )
+                )
+            )
         }
-        </tbody>
-    </table>
-
+    ))
 }

@@ -14,23 +14,26 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import play.api.libs.json.JsObject
-@import uk.gov.hmrc.play.views.html.helpers.{FormWithCSRF, TextArea}
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichTextarea
 
-@this(mainTemplate: main_template, form: FormWithCSRF, textArea: TextArea, navigationBar: navigationBar)
+@this(mainTemplate: main_template, form: FormWithCSRF, govukTextarea: GovukTextarea, navigationBar: navigationBar)
 
-@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, shakeUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, shakeUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = Messages("records.title"), bodyClasses = Some("full-width")) {
+@mainTemplate(title = Messages("records.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("records.create.header")</h1>
+    <h1 class="govuk-heading-xl" style="margin-bottom: 0.5em;">@Messages("records.create.header")</h1>
 
-    <div class="form-hint">
+    <div class="govuk-hint">
     @Messages("records.create.description")
     </div>
 
@@ -38,29 +41,19 @@
         <a style="display: inline-block; margin-top:0.5em;" href="@{shakeUrl.url}">@Messages("records.create.shake")</a>
     </div>
 
-    <div>
-        @form(action = postUrl, 'id -> "recordForm", 'novalidate -> "novalidate") {
-            <fieldset>
-                <div class="form-field-group">
+    @form(action = postUrl, 'id -> "recordForm", 'novalidate -> "novalidate") {
+        @govukTextarea(Textarea(
+            rows = 20,
+            classes = "textarea-large"
+        ).withFormField(recordForm("json")))
 
-                 @textArea(
-                     recordForm("json"),
-                     '_inputClass -> "textarea-large"
-                 )
+        <div class="govuk-button-group">
+            <button class="govuk-button" type="submit" id="update">
+                @Messages("records.create.submit")
+            </button>
 
-                </div>
-                <div class="form-group" style="vertical-align: middle;">
-
-                    <button class="button" type="submit" id="update">
-                        @Messages("records.create.submit")
-                    </button>
-
-                    <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("records.create.cancel")</a>
-
-                </div>
-            </fieldset>
-
-        }
-    </div>
+            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("records.create.cancel")</a>
+        </div>
+    }
 
 }

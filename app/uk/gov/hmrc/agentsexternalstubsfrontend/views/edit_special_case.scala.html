@@ -14,143 +14,129 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
-@import uk.gov.hmrc.play.views.html.helpers.{FormWithCSRF, TextArea, ErrorSummary, Dropdown, Input}
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukFieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichTextarea
 
-@this(mainTemplate: main_template, form: FormWithCSRF, input: Input, textArea: TextArea, errorSummary: ErrorSummary, navigationBar: navigationBar, dropdown: Dropdown)
+@this(
+        mainTemplate: main_template,
+        form: FormWithCSRF,
+        govukInput: GovukInput,
+        govukTextarea: GovukTextarea,
+        govukErrorSummary: GovukErrorSummary,
+        navigationBar: navigationBar,
+        govukSelect: GovukSelect,
+        govukFieldset: GovukFieldset,
+        govukButton: GovukButton)
 
-@(specialCaseForm: Form[SpecialCase], caseId: Option[String], postUrl: Call, resetUrl: Call, cancelUrl: Call , context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(specialCaseForm: Form[SpecialCase], caseId: Option[String], postUrl: Call, resetUrl: Call, cancelUrl: Call , context: PageContext)(implicit request: Request[_], messages: Messages)
 
 @headers = @{
     ViewHelper.buildTree("",specialCaseForm.data)("response.headers")
 }
 
-@mainTemplate(title = Messages("specialCase.title"), bodyClasses = Some("full-width"), sidebarLinks = None) {
-
-    <style>
-        .label--inline {
-            display: inline;
-        }
-    </style>
+@mainTemplate(title = Messages("specialCase.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="heading-xlarge">@Messages("specialCase.edit.header", context.planetId)</h1>
+    <h1 class="govuk-heading-xl">@Messages("specialCase.edit.header", context.planetId)</h1>
 
     @if(specialCaseForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), specialCaseForm, Seq.empty, None)
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(specialCaseForm))
     }
 
     <p>
         @Messages("specialCase.edit.description")
     </p>
 
-    <div>
     @form(action = postUrl, 'id -> "specialCaseForm", 'novalidate -> "novalidate") {
-        <fieldset>
-
-            <div class="form-group soft--ends">
-            @dropdown(
-                specialCaseForm("requestMatch.method"),
-                Seq("GET"->"GET", "POST"->"POST", "PUT"->"PUT", "DELETE"->"DELETE"),
-                false,
-                '_label -> Html("""<span class="h2-heading">"""+ Messages("specialCase.form.requestMatch.method") + """</span>"""),
-                '_selectClass -> Html("""input--medium input--cleared""")
+        @govukSelect(Select(
+            label = Label(content = Text(Messages("specialCase.form.requestMatch.method"))),
+            items = Seq(
+                SelectItem(value = Some("GET"), text = "GET"),
+                SelectItem(value = Some("POST"), text = "POST"),
+                SelectItem(value = Some("PUT"), text = "PUT"),
+                SelectItem(value = Some("DELETE"), text = "DELETE"),
             )
+        ).withFormField(specialCaseForm("requestMatch.method")))
+
+        @govukInput(Input(
+            label = Label(content = Text(Messages("specialCase.form.requestMatch.path"))),
+            hint = Some(Hint(content = Text(Messages("specialCase.form.requestMatch.path.hint"))))
+        ).withFormField(specialCaseForm("requestMatch.path")))
+
+        <h2>@Messages("specialCase.form.response.headers")</h2>
+
+        @for(header <- headers) {
+            <div>
+                @govukInput(Input(
+                    formGroupClasses = "govuk-!-display-inline-block",
+                ).withFormField(specialCaseForm(s"${header.key}.name")))
+                :
+                @govukInput(Input(
+                    formGroupClasses = "govuk-!-display-inline-block",
+                ).withFormField(specialCaseForm(s"${header.key}.value")))
             </div>
+        }
+        <div>
+            @govukInput(Input(
+                formGroupClasses = "govuk-!-display-inline-block",
+            ).withFormField(specialCaseForm(s"response.headers[${headers.size}].name")))
+            :
+            @govukInput(Input(
+                formGroupClasses = "govuk-!-display-inline-block",
+            ).withFormField(specialCaseForm(s"response.headers[${headers.size}].value")))
+        </div>
 
-            <div class="form-group">
-            @input(
-                specialCaseForm("requestMatch.path"),
-                '_label -> Html("""<span class="h2-heading">"""+ Messages("specialCase.form.requestMatch.path") + """</span><span class="form-hint">""" + Messages("specialCase.form.requestMatch.path.hint") + """</span>"""),
-                '_inputClass -> "input--cleared input--fullwidth-important",
-                '_labelTextClass -> "h2-heading",
-                '_labelClass -> "soft--ends"
-            )
-            </div>
+        @govukSelect(Select(
+            label = Label(content = Text(Messages("specialCase.form.response.status"))),
+            items = SpecialCase.httpStatusCodeOptions.map(opt => SelectItem(value = Some(opt._1), text = opt._2))
+        ).withFormField(specialCaseForm("response.status")))
 
-            <h2>@Messages("specialCase.form.response.headers")</h2>
+        <div class="govuk-button-group">
+            @govukButton(Button(
+                content = if (caseId.isEmpty) Text(Messages("specialCase.form.create")) else Text(Messages("specialCase.form.update")),
+                attributes = Map("id" -> "submit")
+            ))
+            <a class="govuk-body govuk-link" href="@{resetUrl.url}">@Messages("specialCase.form.reset")</a>
+            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("specialCase.form.cancel")</a>
+        </div>
 
-            @for(header <- headers) {
-                <div class="form-group soft--ends">
-                    @input(
-                        specialCaseForm(s"${header.key}.name"),
-                        '_labelClass -> "label--inline",
-                        '_dataAttributes -> "style=width:49%;"
-                    ):
-                    @input(
-                        specialCaseForm(s"${header.key}.value"),
-                        '_labelClass -> "label--inline",
-                        '_dataAttributes -> "style=width:49%;"
-                    )
-                </div>
-            }
-            <div class="form-group soft--ends">
-                @input(
-                    specialCaseForm(s"response.headers[${headers.size}].name"),
-                    '_labelClass -> "label--inline",
-                    '_dataAttributes -> "style=width:49%;"
-                ):
-                @input(
-                    specialCaseForm(s"response.headers[${headers.size}].value"),
-                    '_labelClass -> "label--inline",
-                    '_dataAttributes -> "style=width:49%;"
-                )
-            </div>
+        @govukTextarea(Textarea(
+            label = Label(content = Text(Messages("specialCase.form.response.body"))),
+            rows = 20,
+            attributes = Map("style" -> "font-family: monospace;")
+        ).withFormField(specialCaseForm("response.body")))
 
-            <div class="form-group soft--ends">
-            @dropdown(
-                specialCaseForm("response.status"),
-                SpecialCase.httpStatusCodeOptions,
-                false,
-                '_label -> Html("""<span class="h2-heading">"""+ Messages("specialCase.form.response.status") + """</span>"""),
-                '_selectClass -> Html("""input--medium input--cleared""")
-            )
-            </div>
-
-            <div class="form-group" style="vertical-align: middle;">
-
-                <button class="button" type="submit" id="submit">
-                    @if(caseId.isEmpty){
-                        @Messages("specialCase.form.create")
-                    } else {
-                        @Messages("specialCase.form.update")
-                    }
-                </button>
-
-                <a style="display: inline-block;
-                    margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("specialCase.form.reset")</a> |
-                <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("specialCase.form.cancel")</a>
-
-            </div>
-
-            <div class="form-field-group">
-            @textArea(
-                specialCaseForm("response.body"),
-                '_label -> Html("""<span class="h2-heading">"""+ Messages("specialCase.form.response.body") + """</span>"""),
-                '_inputClass -> "textarea-large"
-            )
-            </div>
-
-            <div class="form-group" style="vertical-align: middle;">
-
-                <button class="button" type="submit" id="submit">
-                    @if(caseId.isEmpty){
-                        @Messages("specialCase.form.create")
-                    } else {
-                        @Messages("specialCase.form.update")
-                    }
-                </button>
-
-                <a style="display: inline-block;
-                    margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("specialCase.form.reset")</a> |
-                <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("specialCase.form.cancel")</a>
-
-            </div>
-        </fieldset>
+        <div class="govuk-button-group">
+            @govukButton(Button(
+                content = if (caseId.isEmpty) Text(Messages("specialCase.form.create")) else Text(Messages("specialCase.form.update")),
+                attributes = Map("id" -> "submit")
+            ))
+            <a class="govuk-body govuk-link" href="@{resetUrl.url}">@Messages("specialCase.form.reset")</a>
+            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("specialCase.form.cancel")</a>
+        </div>
     }
-    </div>
-
 }
