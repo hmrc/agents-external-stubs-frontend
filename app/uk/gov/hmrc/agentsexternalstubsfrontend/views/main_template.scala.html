@@ -17,9 +17,8 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukLayout, GovukBackLink}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{BackLink, Text}
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcBanner, Banner}
-@import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.{header, head}
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardFooter, HmrcScripts, HmrcReportTechnicalIssueHelper}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardFooter, HmrcScripts}
 @import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsMainContent
 @import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsOneThirdMainContent
 
@@ -31,7 +30,6 @@
         hmrcStandardFooter: HmrcStandardFooter,
         hmrcScripts: HmrcScripts,
         hmrcBanner : HmrcBanner,
-        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
         twoThirdsLayout: TwoThirdsMainContent,
         twoThirdsOneThirdLayout: TwoThirdsOneThirdMainContent
 )
@@ -53,13 +51,6 @@
 }
 }
 
-@mainContentWithHelpLink = {
-@mainContent
-    <div>
-    @hmrcReportTechnicalIssueHelper()
-    </div>
-}
-
 @additionalScripts = {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 }
@@ -76,4 +67,4 @@
         case None => if (wide) None else Some(twoThirdsLayout(_))
     },
     assetPath = None
-)(mainContentWithHelpLink)
+)(mainContent)
