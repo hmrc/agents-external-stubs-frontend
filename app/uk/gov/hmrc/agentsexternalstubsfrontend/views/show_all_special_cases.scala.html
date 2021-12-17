@@ -35,16 +35,11 @@
   @if(specialCases.isEmpty){
     <p>
         But ... no special case of response has been defined yet.
-
-          <div style="padding-top: .5em;">
-              <a id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@Messages("specialCase.link.add")</a>
-          </div>
+        <a class="govuk-body govuk-link" id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@Messages("specialCase.link.add")</a>
     </p>
   } else {
 
-      <div>
-          <a id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@Messages("specialCase.link.add")</a>
-      </div>
+    <a class="govuk-body govuk-link" id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@Messages("specialCase.link.add")</a>
 
     <table class="govuk-table" id="special-cases" style="margin:1em 0;">
         <colgroup>

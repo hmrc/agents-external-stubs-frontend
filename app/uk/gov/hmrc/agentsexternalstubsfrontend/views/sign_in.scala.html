@@ -61,8 +61,14 @@
             @govukErrorSummary(ErrorSummary(
                 title = Text(Messages("error.summary.heading")),
                 errorList = Seq(
-                    loginForm.errors("userId").map(error => ErrorLink(content = Text(s"Invalid Username: ${Messages(error.message)}"))),
-                    loginForm.errors("planetId").map(error => ErrorLink(content = Text(s"Invalid Planet: ${Messages(error.message)}"))),
+                    loginForm.errors("userId").map(error => ErrorLink(
+                        content = Text(s"Invalid Username: ${Messages(error.message)}"),
+                        href = Some("#userId")
+                    )),
+                    loginForm.errors("planetId").map(error => ErrorLink(
+                        content = Text(s"Invalid Planet: ${Messages(error.message)}"),
+                        href = Some("#planetId")
+                    )),
                     loginForm.globalErrors.map(error => ErrorLink(content = Text(Messages(error.message))))
                 ).flatten
             ))
