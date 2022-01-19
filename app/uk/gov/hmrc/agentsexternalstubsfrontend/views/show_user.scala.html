@@ -87,7 +87,7 @@
         <li><a class="govuk-link" id="link_special_cases" href="/agents-external-stubs/special-cases">@Messages("specialCase.link.all")</a></li>
     </ul>
 
-    <h3 class="govuk-!-margin-bottom-1">@Messages("users.link.create")</h3>
+    <h3 class="govuk-!-margin-bottom-1" id="create-user-label">@Messages("users.link.create")</h3>
 
     @form(action = Call("GET", "/agents-external-stubs/user/create")) {
         @{play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) }}
@@ -99,6 +99,7 @@
                 pattern = Some("[A-Za-z0-9-_]{3,64}"),
                 classes = "govuk-input govuk-input--width-5",
                 formGroupClasses = "govuk-!-display-inline-block",
+                attributes = Map("aria-labelledby" -> "create-user-label")
             ))
             @govukButton(Button(
                 content = Text(Messages("user.show.create")),
@@ -232,7 +233,7 @@
 
     <div class="govuk-button-group">
 
-        <a class="govuk-button" id="update" href="@editUrl.url">
+        <a class="govuk-button" id="update-0" href="@editUrl.url">
             @Messages("user.show.edit")
         </a>
 
@@ -380,7 +381,7 @@
     @if(user.affinityGroup.nonEmpty || (user.affinityGroup.isEmpty && user.strideRoles.nonEmpty)) {
         <div class="govuk-button-group">
 
-            <a class="govuk-button" href="@editUrl.url" id="update">
+            <a class="govuk-button" href="@editUrl.url" id="update-1">
                 @Messages("user.show.edit")
             </a>
 
@@ -418,7 +419,8 @@
                 @govukSelect(Select(
                     id = "principalEnrolment",
                     name = "principalEnrolment",
-                    items = enrolments.map(enrolment => SelectItem(value = Some(enrolment), text = enrolment, attributes = Map("id" -> s"enrolment-$enrolment")))
+                    items = enrolments.map(enrolment => SelectItem(value = Some(enrolment), text = enrolment, attributes = Map("id" -> s"enrolment-$enrolment"))),
+                    attributes = Map("aria-label" -> "Principal enrolment")
                 ))
                 <input type="hidden" name="userId" value="@user.userId"/>
                 <a style="text-decoration: underline;margin-left: 0.5em; cursor: pointer;" onclick="document.getElementById('add_enrolment').submit()">Add enrolment</a>

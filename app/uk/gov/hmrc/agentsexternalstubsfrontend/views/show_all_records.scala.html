@@ -42,7 +42,7 @@
     </p>
 
     <table id="business-partner-records" class="govuk-table">
-        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Business Partner Records
+        <caption id="tableSubHeader-bpr" class="govuk-table__caption govuk-table__caption--s">Business Partner Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=business-partner-record&seed=@{records.BusinessPartnerRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">Create new business partner</a>
         </caption>
@@ -55,7 +55,7 @@
     </table>
 
     <table id="business-details" style="margin:1em 0;" class="govuk-table">
-        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Business Details Records
+        <caption id="tableSubHeader-bdr" class="govuk-table__caption govuk-table__caption--s">Business Details Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=business-details&seed=@{records.BusinessDetailsRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">
                 Create new business details
@@ -70,7 +70,7 @@
     </table>
 
     <table id="vat-customer-informations" style="margin:1em 0;" class="govuk-table">
-        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">VAT Customer Information Records
+        <caption id="tableSubHeader-vat" class="govuk-table__caption govuk-table__caption--s">VAT Customer Information Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=vat-customer-information&seed=@{records.VatCustomerInformationRecord.map(o => (o.last \ "vrn").as[String]).getOrElse("1234567890")}">
                 Create new VAT customer information
@@ -85,7 +85,7 @@
     </table>
 
     <table id="mtd-relationships" style="margin:1em 0;" class="govuk-table">
-        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">MTD Relationship Records
+        <caption id="tableSubHeader-mtd" class="govuk-table__caption govuk-table__caption--s">MTD Relationship Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=relationship&seed=@{records.RelationshipRecord.map(o => (o.last \ "arn").as[String]).getOrElse("1234567890")}">
                 Create new relationship
@@ -99,7 +99,7 @@
     </table>
 
     <table id="legacy-relationships" style="margin:1em 0;" class="govuk-table">
-        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Legacy SA Agent Relationships
+        <caption id="tableSubHeader-lsr" class="govuk-table__caption govuk-table__caption--s">Legacy SA Agent Relationships
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=legacy-relationship&seed=@{records.LegacyRelationshipRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
                 Create new SA agent relationship
@@ -113,7 +113,7 @@
     </table>
 
     <table id="legacy-agents" style="margin:1em 0;" class="govuk-table">
-        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Legacy SA Agent
+        <caption id="tableSubHeader-lsa" class="govuk-table__caption govuk-table__caption--s">Legacy SA Agent
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=legacy-agent&seed=@{records.LegacyAgentRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
                 Create new SA agent
@@ -127,7 +127,7 @@
     </table>
 
     <table id="employer-auths" style="margin:1em 0;" class="govuk-table">
-        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">Legacy PAYE Agent Informations
+        <caption id="tableSubHeader-paye" class="govuk-table__caption govuk-table__caption--s">Legacy PAYE Agent Informations
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=employer-auths&seed=@{records.EmployerAuths.map(o => (o.last \ "agentCode").as[String]).getOrElse("ABC123456789")}">
                 Create new PAYE agent information
@@ -141,7 +141,7 @@
     </table>
 
     <table id="ppt-subscription-display-records" style="margin:1em 0;" class="govuk-table">
-        <caption id="tableSubHeader" class="govuk-table__caption govuk-table__caption--s">PPT Subscription Display Records
+        <caption id="tableSubHeader-ppt" class="govuk-table__caption govuk-table__caption--s">PPT Subscription Display Records
             <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
             href="/agents-external-stubs/records/add?type=ppt-subscription&seed=@{records.PPTSubscriptionDisplayRecord.map(o => (o.last \ "pptReference").as[String]).getOrElse("XAPPT1234567890")}">
                 Create new PPT Subscription Display

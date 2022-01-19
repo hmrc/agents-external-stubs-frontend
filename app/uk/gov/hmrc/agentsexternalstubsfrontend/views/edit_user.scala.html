@@ -330,7 +330,7 @@
                             @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
                                 <tr id="delegatedEnrolment-@i-row">
                                     @if(i == 0) {
-                                        <td rowspan="@{
+                                        <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
                                             @govukInput(Input(
