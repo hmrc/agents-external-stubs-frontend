@@ -1,0 +1,52 @@
+$govuk-assets-path: "/assets/lib/govuk-frontend/govuk/assets/";
+$hmrc-assets-path: "/assets/lib/hmrc-frontend/hmrc/";
+
+@import "lib/govuk-frontend/govuk/all";
+@import "lib/hmrc-frontend/hmrc/all";
+
+$govuk-global-styles: true;
+
+a {
+    @extend .govuk-link;
+}
+
+p {
+    @extend .govuk-body;
+}
+
+h2 {
+    @extend .govuk-heading-m;
+}
+
+h3 {
+    @extend .govuk-heading-s;
+}
+
+// Badges
+
+.badge {
+    @extend .govuk-tag;
+    font-size: 0.7em;
+}
+.badge-gray {
+    @extend .govuk-tag--grey;
+}
+.badge-organisation {
+    @extend .govuk-tag--orange;
+}
+.badge-individual {
+    @extend .govuk-tag--blue;
+}
+.badge-agent {
+    @extend .govuk-tag--pink;
+}
+.badge-none {
+    @extend .govuk-tag--inactive;
+}
+
+.textarea-large {
+    width: 100%;
+    height: 500px;
+    font-size: 0.9em;
+    font-family: monospace;
+}

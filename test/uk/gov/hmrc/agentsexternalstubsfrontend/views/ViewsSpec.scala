@@ -58,7 +58,6 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
   val signInForm = app.injector.instanceOf[sign_in]
   val errorTemplateView = app.injector.instanceOf[error_template]
   val upLiftView = app.injector.instanceOf[iv_uplift]
-  val govUkWrapper = app.injector.instanceOf[govuk_wrapper]
   val mainTemplateView = app.injector.instanceOf[main_template]
   val appMessages = messagesApi.preferred(Seq())
 
@@ -69,8 +68,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
           loginForm = filledForm,
           postUrl = routes.SignInController.signIn(None, Some("foo"), None, AuthProvider.GovernmentGateway),
           request = FakeRequest(),
-          messages = appMessages,
-          config = app.configuration
+          messages = appMessages
         )
       val content = contentAsString(html)
       content should include(messagesApi("start.title"))
@@ -86,8 +84,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       val html2 =
         signInForm.f(filledForm, routes.SignInController.signIn(None, None, None, AuthProvider.GovernmentGateway))(
           FakeRequest(),
-          appMessages,
-          app.configuration
+          appMessages
         )
       contentAsString(html2) shouldBe content
     }
@@ -132,24 +129,24 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   "error_template view" should {
     "render title, heading and message" in new App {
-      val pageTitle = "My custom page title"
-      val heading = "My custom heading"
-      val message = "My custom message"
+      val pageTitle = "my.custom.page.title"
+      val heading = "my.custom.heading"
+      val message = "my.custom.message"
       val html = errorTemplateView.render(
-        pageTitle = pageTitle,
-        heading = heading,
-        message = message,
-        messages = appMessages,
-        configuration = app.configuration,
-        request = requestHeader
+        pageTitleMsgKey = pageTitle,
+        headingMsgKey = heading,
+        messageMsgKey = message,
+        appMessages,
+        FakeRequest()
       )
+
       val content = contentAsString(html)
       content should include(pageTitle)
       content should include(heading)
       content should include(message)
 
       val html2 =
-        errorTemplateView.f(pageTitle, heading, message)(appMessages, app.configuration, requestHeader)
+        errorTemplateView.f(pageTitle, heading, message)(appMessages, FakeRequest())
       contentAsString(html2) shouldBe content
     }
   }
@@ -159,80 +156,26 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       val view = mainTemplateView
       val html = view.render(
         title = "My custom page title",
-        sidebarLinks = Some(Html("My custom sidebar links")),
-        contentHeader = Some(Html("My custom content header")),
-        bodyClasses = Some("my-custom-body-class"),
-        mainClass = Some("my-custom-main-class"),
-        scriptElem = Some(Html("My custom script")),
+        backLinkHref = Some("My custom backlink"),
+        wide = false,
+        sidebar = Some(Html("My custom sidebar links")),
         mainContent = Html("My custom main content HTML"),
-        messages = appMessages,
         request = FakeRequest(),
-        configuration = app.configuration
+        messages = appMessages
       )
 
       val content = contentAsString(html)
       content should include("My custom page title")
       content should include("My custom sidebar links")
-      content should include("My custom content header")
-      content should include("my-custom-body-class")
-      content should include("my-custom-main-class")
-      content should include("My custom script")
+      content should include("My custom backlink")
       content should include("My custom main content HTML")
 
       val html2 = view.f(
         "My custom page title",
-        Some(Html("My custom sidebar links")),
-        Some(Html("My custom content header")),
-        Some("my-custom-body-class"),
-        Some("my-custom-main-class"),
-        Some(Html("My custom script"))
-      )(Html("My custom main content HTML"))(appMessages, FakeRequest(), app.configuration)
-      contentAsString(html2) shouldBe content
-    }
-  }
-
-  "govuk wrapper view" should {
-    "render all of the supplied arguments" in new App {
-
-      val html = govUkWrapper.render(
-        title = "My custom page title",
-        mainClass = Some("my-custom-main-class"),
-        mainDataAttributes = Some(Html("myCustom=\"attributes\"")),
-        bodyClasses = Some("my-custom-body-class"),
-        sidebar = Html("My custom sidebar"),
-        contentHeader = Some(Html("My custom content header")),
-        mainContent = Html("My custom main content"),
-        serviceInfoContent = Html("My custom service info content"),
-        scriptElem = Some(Html("My custom script")),
-        gaCode = Seq("My custom GA code"),
-        messages = appMessages,
-        configuration = app.configuration,
-        request = requestHeader
-      )
-
-      val content = contentAsString(html)
-      content should include("My custom page title")
-      content should include("my-custom-main-class")
-      content should include("myCustom=\"attributes\"")
-      content should include("my-custom-body-class")
-      content should include("My custom sidebar")
-      content should include("My custom content header")
-      content should include("My custom main content")
-      content should include("My custom service info content")
-      content should include("My custom script")
-
-      val html2 = govUkWrapper.f(
-        "My custom page title",
-        Some("my-custom-main-class"),
-        Some(Html("myCustom=\"attributes\"")),
-        Some("my-custom-body-class"),
-        Html("My custom sidebar"),
-        Some(Html("My custom content header")),
-        Html("My custom main content"),
-        Html("My custom service info content"),
-        Some(Html("My custom script")),
-        Seq("My custom GA code")
-      )(appMessages, app.configuration, requestHeader)
+        Some("My custom backlink"),
+        false,
+        Some(Html("My custom sidebar links"))
+      )(Html("My custom main content HTML"))(FakeRequest(), appMessages)
       contentAsString(html2) shouldBe content
     }
   }

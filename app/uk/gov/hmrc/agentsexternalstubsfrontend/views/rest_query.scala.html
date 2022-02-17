@@ -14,34 +14,59 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import play.api.libs.json.JsObject
-@import uk.gov.hmrc.play.views.html.helpers.{FormWithCSRF, Input, Dropdown, ErrorSummary, TextArea}
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.RestQuery
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
 @import play.api.libs.ws.WSResponse
 @import play.mvc.Http.HeaderNames
 @import play.api.libs.json.Json
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.Aliases.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichTextarea
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 
-@this(mainTemplate: main_template, navigationBar: navigationBar, form: FormWithCSRF, input: Input, dropdown: Dropdown, textArea: TextArea, errorSummary: ErrorSummary)
+@this(
+        mainTemplate: main_template,
+        navigationBar: navigationBar,
+        form: FormWithCSRF,
+        govukInput: GovukInput,
+        govukSelect: GovukSelect,
+        govukButton: GovukButton,
+        govukTextarea: GovukTextarea,
+        govukErrorSummary: GovukErrorSummary)
 
-@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, resetUrl: Call, response: Option[WSResponse], curlCommand: Option[String], context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, resetUrl: Call, response: Option[WSResponse], curlCommand: Option[String], context: PageContext)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = Messages("rest.query.title"), bodyClasses = Some("full-width")) {
+@mainTemplate(title = Messages("rest.query.title"), wide = true) {
 
     @navigationBar(context)
 
     @if(response.isDefined){
     @for(r <- response){
-        <h1 class="heading-xlarge">
+        <h1 class="govuk-heading-xl">
             @r.status @r.statusText
         </h1>
 
         @if(restQueryForm.hasErrors) {
-            @errorSummary(Messages("error.summary.heading"), restQueryForm, Seq.empty, None)
+            @govukErrorSummary(ErrorSummary().withFormErrorsAsText(restQueryForm))
         }
 
-        <div class="form-hint" style="color:black;">
+        <div class="govuk-hint" style="color:black;">
             @{restQueryForm.data("method")} @{restQueryForm.data("url")}
         </div>
 
@@ -65,103 +90,86 @@
             }
         </div>
     }} else {
-        <h1 class="heading-xlarge" style="margin-bottom: 0.5em;">@Messages("rest.query.header", (if(Set('a','e','o','u','y').contains(context.authorisedUserId.head.toLower)) "an " else "a ")+context.authorisedUserId)</h1>
+        <h1 class="govuk-heading-xl" style="margin-bottom: 0.5em;">@Messages("rest.query.header", (if(Set('a','e','o','u','y').contains(context.authorisedUserId.head.toLower)) "an " else "a ")+context.authorisedUserId)</h1>
 
         @if(restQueryForm.hasErrors) {
-            @errorSummary(Messages("error.summary.heading"), restQueryForm, Seq.empty, None)
+            @govukErrorSummary(ErrorSummary().withFormErrorsAsText(restQueryForm))
         }
 
-        <p class="form-hint">
+        <p class="govuk-hint">
         @Messages("rest.query.description", context.authorisedUserId)
         </p>
     }
 
-    <div>
-        @form(action = postUrl, 'id -> "restQueryForm", 'novalidate -> "novalidate") {
-            <fieldset>
+    @form(action = postUrl, 'id -> "restQueryForm", 'novalidate -> "novalidate") {
+        @if(response.isDefined) {
+            <div class="govuk-button-group">
+                @govukButton(Button(
+                    content = Text(restQueryForm("method").value.getOrElse(Messages("rest.query.submit"))),
+                    attributes = Map("id" -> "update", "name" -> "update")
+                ))
 
-                @if(response.isDefined) {
-                    <div class="form-group" style="vertical-align: middle;">
-
-                        <button class="button" type="submit" id="update">
-                            @restQueryForm("method").value.getOrElse(Messages("rest.query.submit"))
-                        </button>
-
-                        <a style="display: inline-block;
-                            margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("rest.query.reset")</a> |
-                        <a style="display: inline-block;
-                            margin-top: 0.5em;" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
-
-                    </div>
-                }
-
-                <div class="form-group soft--ends">
-                    @dropdown(
-                        restQueryForm("method"),
-                        Seq("GET"->"GET", "POST"->"POST", "PUT"->"PUT", "DELETE"->"DELETE"),
-                        false,
-                        '_label -> Html("""<span class="h2-heading">"""+ Messages("rest.query.form.method") + """</span>"""),
-                        '_selectClass -> Html("""input--medium input--cleared""")
-                    )
-                </div>
-
-                <div class="form-group">
-                    @input(
-                        restQueryForm("url"),
-                        '_label -> Messages("rest.query.form.url"),
-                        '_inputClass -> "input--cleared input--fullwidth-important",
-                        '_labelTextClass -> "h2-heading",
-                        '_labelClass -> "soft--ends"
-                    )
-                </div>
-
-                <div class="form-group" style="vertical-align: middle;">
-
-                    <button class="button" type="submit" id="update-top">
-                        @restQueryForm("method").value.getOrElse(Messages("rest.query.submit"))
-                    </button>
-
-                    <a style="display: inline-block;
-                        margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("rest.query.reset")</a> |
-                    <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
-
-                </div>
-
-                <div class="form-field-group">
-                    @textArea(
-                        restQueryForm("headers"),
-                        '_label -> Html("""<span class="h2-heading">"""+ Messages("rest.query.form.headers") + """</span>"""),
-                        '_inputClass -> "textarea-small"
-                    )
-                </div>
-
-                <div class="form-field-group">
-                    @textArea(
-                        restQueryForm("payload"),
-                        '_label -> Html("""<span class="h2-heading">"""+ Messages("rest.query.form.payload") + """</span>"""),
-                        '_inputClass -> "textarea-large"
-                    )
-                </div>
-
-                <div class="form-group" style="vertical-align: middle;">
-
-                    <button class="button" type="submit" id="update-bottom">
-                        @restQueryForm("method").value.getOrElse(Messages("rest.query.submit"))
-                    </button>
-
-                    <a style="display: inline-block;
-                        margin-top: 0.5em;" href="@{resetUrl.url}">@Messages("rest.query.reset")</a> |
-                    <a style="display: inline-block; margin-top:0.5em;" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
-
-                </div>
-            </fieldset>
+                <a class="govuk-body govuk-link" href="@{resetUrl.url}">@Messages("rest.query.reset")</a>
+                <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
+            </div>
         }
-    </div>
+
+        <div class="form-group soft--ends">
+            @govukSelect(Select(
+                label = Label(
+                    content = Text(Messages("rest.query.form.method")),
+                ),
+                items = Seq(
+                    SelectItem(value = Some("GET"), text = "GET"),
+                    SelectItem(value = Some("POST"), text = "POST"),
+                    SelectItem(value = Some("PUT"), text = "PUT"),
+                    SelectItem(value = Some("DELETE"), text = "DELETE"),
+                ),
+                name = "method"
+            ).withFormField(restQueryForm("method")))
+        </div>
+
+        @govukInput(Input(
+            label = Label(content = Text(Messages("rest.query.form.url")))
+        ).withFormField(restQueryForm("url")))
+
+        <div class="govuk-button-group">
+            @govukButton(Button(
+                content = Text(restQueryForm("method").value.getOrElse(Messages("rest.query.submit"))),
+                attributes = Map("id" -> "update-top")
+            ))
+            <a class="govuk-body govuk-link" href="@{resetUrl.url}">@Messages("rest.query.reset")</a>
+            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
+        </div>
+
+        @govukTextarea(Textarea(
+            label = Label(content = Text(Messages("rest.query.form.headers"))),
+            rows = 4,
+            attributes = Map("style" -> "font-family: monospace;")
+        ).withFormField(restQueryForm("headers")))
+
+        @govukTextarea(Textarea(
+            label = Label(content = Text(Messages("rest.query.form.payload"))),
+            rows = 20,
+            attributes = Map("style" -> "font-family: monospace;")
+        ).withFormField(restQueryForm("payload")))
+
+        <div class="govuk-button-group">
+            @govukButton(Button(
+                content = Text(restQueryForm("method").value.getOrElse(Messages("rest.query.submit"))),
+                attributes = Map("id" -> "update-bottom")
+            ))
+            <a class="govuk-body govuk-link" href="@{resetUrl.url}">@Messages("rest.query.reset")</a>
+            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("rest.query.cancel")</a>
+        </div>
+    }
+
   <script>
       document.addEventListener('DOMContentLoaded',function() {
           document.querySelector('select[name="method"]').onchange = function (event) {
               if(event.target.value){
-                  document.getElementById("update").textContent = event.target.value;
+                  if (document.getElementById("update"))
+                      document.getElementById("update").textContent = event.target.value;
                   document.getElementById("update-top").textContent = event.target.value;
                   document.getElementById("update-bottom").textContent = event.target.value;
               }

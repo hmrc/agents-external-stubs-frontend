@@ -14,14 +14,52 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.views.html.helpers.{FormWithCSRF, Input, TextArea, ErrorSummary, Dropdown, SingleCheckbox, DateFieldsFreeInlineLegend}
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukDateInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.DateInput
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.Checkboxes
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 
-@this(mainTemplate: main_template, form: FormWithCSRF, textArea: TextArea, input: Input, dropdown: Dropdown, navigationBar: navigationBar, errorSummary: ErrorSummary, singleCheckbox: SingleCheckbox, dateFieldsFreeInlineLegend: DateFieldsFreeInlineLegend)
+@this(
+        mainTemplate: main_template,
+        form: FormWithCSRF,
+        govukTextarea: GovukTextarea,
+        govukInput: GovukInput,
+        govukSelect: GovukSelect,
+        navigationBar: navigationBar,
+        govukErrorSummary: GovukErrorSummary,
+        govukCheckboxes: GovukCheckboxes,
+        govukRadios: GovukRadios,
+        govukDateInput: GovukDateInput,
+        govukButton: GovukButton)
 
-@(userForm: Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(userForm: Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], messages: Messages)
 
 @principalEnrolments = @{
     ViewHelper.buildTree("", userForm.data)("principalEnrolments")
@@ -35,17 +73,17 @@
     ViewHelper.buildTree("", userForm.data)("suspendedRegimes")
 }
 
-@mainTemplate(title = Messages("user.title", userId), bodyClasses = Some("full-width")) {
+@mainTemplate(title = Messages("user.title", userId), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="heading-xlarge">@Messages("user.edit.header", userId)</h1>
+    <h1 class="govuk-heading-xl">@Messages("user.edit.header", userId)</h1>
 
     @if(userForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), userForm, Seq.empty, None)
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(userForm))
     }
 
-    <p class="form-hint">
+    <p class="govuk-hint">
     @Messages("user.edit.description")
     </p>
 
@@ -54,191 +92,140 @@
         <div>
             <div class="form-field-group">
 
-                <div class="form-group soft--ends">
-                @dropdown(
-                    userForm("affinityGroup"),
-                    AffinityGroup.values.map(i => (i, i)),
-                    false,
-                    '_label -> Html("""<span class="h2-heading">""" + Messages("user.form.affinityGroup") + """</span>"""),
-                    '_selectClass -> Html("""input--medium input--cleared""")
-                )
+                @govukSelect(Select(
+                    label = Label(content = Text(Messages("user.form.affinityGroup"))),
+                    hint = Some(Hint(content = Text("If the user is an Admin of its group, then you might not be able to change this without changing groupId as well."))),
+                    items = AffinityGroup.values.map(ag => SelectItem(value = Some(ag), text = ag))
+                ).withFormField(userForm("affinityGroup")))
+
+                @govukInput(Input(
+                    label = Label(
+                        content = Text(Messages("user.form.name")),
+                    ),
+                    classes = "govuk-input govuk-input--width-20"
+                ).withFormField(userForm("name")))
+
+                <div class="govuk-button-group">
+                    @govukButton(Button(
+                        content = if(hasContinue) Text(Messages("user.edit.update_and_continue")) else Text(Messages("user.edit.update")),
+                        attributes = Map("id" -> "update")
+                    ))
+
+                    <a class="govuk-body govuk-link" href="@{cancelCall.url}">
+                        @Messages("user.edit.cancel")
+                    </a>
                 </div>
 
-                <div class="form-group">
-                @input(
-                    userForm("name"),
-                    '_label -> Messages("user.form.name"),
-                    '_inputClass -> "input--medium input--cleared",
-                    '_labelTextClass -> "h2-heading",
-                    '_labelClass -> "soft--ends"
-                )
-                </div>
+                @govukSelect(Select(
+                    label = Label(content = Text(Messages("user.form.credentialRole"))),
+                    hint = Some(Hint(content = Text("If the user is an Admin of its group, then you might not be able to change this without changing groupId as well."))),
+                    items = CredentialRole.values.map(role => SelectItem(value = Some(role), text = role))
+                ).withFormField(userForm("credentialRole")))
 
-                <div class="form-group">
-
-                    <button class="button" type="submit" id="update">
-                    @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
-                    </button>
-
-                    <a class="button-secondary" href="@{
-                        cancelCall.url
-                    }">@Messages("user.edit.cancel")</a>
-
-                </div>
-
-                <div class="form-group soft--ends">
-                    <span class="form-hint">
-                        If the user is an Admin of its group, then you might not be able to change this without changing groupId as well.
-                    </span>
-                    @dropdown(
-                        userForm("credentialRole"),
-                        CredentialRole.values.map(i => (i, i)),
-                        false,
-                        '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.credentialRole") + """</span>"""),
-                        '_selectClass -> Html("""input--medium input--cleared""")
-                    )
-
-                </div>
-
-                <div class="form-group soft--ends">
-                @dropdown(
-                    userForm("credentialStrength"),
-                    CredStrength.values.map(i => (i, i)),
-                    false,
-                    '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.credentialStrength") + """</span>"""),
-                    '_selectClass -> Html("""input--medium input--cleared""")
-                )
-                </div>
+                @govukSelect(Select(
+                    label = Label(content = Text(Messages("user.form.credentialStrength"))),
+                    items = CredStrength.values.map(strength => SelectItem(value = Some(strength), text = strength))
+                ).withFormField(userForm("credentialStrength")))
 
                 @if(userForm.data.get("affinityGroup").contains("Individual")) {
-                    <div class="form-group soft--ends">
-                    @dropdown(
-                        userForm("confidenceLevel"),
-                        ConfidenceLevel.values,
-                        false,
-                        '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.confidenceLevel") + """</span>"""),
-                        '_selectClass -> Html("""input--medium input--cleared""")
-                    )
-                    </div>
+                    @govukSelect(Select(
+                        label = Label(content = Text(Messages("user.form.confidenceLevel"))),
+                        items = ConfidenceLevel.values.map(lvl => SelectItem(value = Some(lvl._1), text = lvl._2))
+                    ).withFormField(userForm("confidenceLevel")))
 
-                    <div class="form-group">
-                    @input(
-                        userForm("nino"),
-                        '_label -> Messages("user.form.nino"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_labelTextClass -> "h2-heading",
-                        '_labelClass -> "soft--ends"
-                    )
-                    </div>
+                    @govukInput(Input(
+                        label = Label(
+                            content = Text(Messages("user.form.nino")),
+                        ),
+                        classes = "govuk-input govuk-input--width-10"
+                    ).withFormField(userForm("nino")))
 
-                    <div class="form-group">
-                    @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
+                    @govukDateInput(DateInput(
+                        fieldset = Some(Fieldset(
+                            legend = Some(Legend(
+                                content = Text(Messages("user.form.dateOfBirth")),
+                            ))
+                        ))
+                    ).withFormField(userForm("dateOfBirth")))
+@*                    @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
                         '_legend -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.dateOfBirth") + """</span>"""),
                         '_labelClass -> "soft--ends"
-                    )
-                    </div>
+                    ) *@
                 }
 
-                <div class="form-group">
-                @input(
-                    userForm("groupId"),
-                    '_label -> Messages("user.form.groupIdentifier"),
-                    '_inputClass -> "input--medium input--cleared",
-                    '_labelTextClass -> "h2-heading",
-                    '_labelClass -> "soft--ends"
-                )
-                </div>
+                @govukInput(Input(
+                    label = Label(
+                        content = Text(Messages("user.form.groupIdentifier")),
+                    ),
+                    classes = "govuk-input govuk-input--width-20"
+                ).withFormField(userForm("groupId")))
 
                 @if(userForm.data.get("affinityGroup").contains("Agent")) {
-                    <div class="form-group">
-                    @input(
-                        userForm("agentCode"),
-                        '_label -> Messages("user.form.agentCode"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_labelTextClass -> "h2-heading",
-                        '_labelClass -> "soft--ends"
-                    )
-                    </div>
+                    @govukInput(Input(
+                        label = Label(
+                            content = Text(Messages("user.form.agentCode")),
+                        ),
+                        classes = "govuk-input govuk-input--width-20"
+                    ).withFormField(userForm("agentCode")))
 
-                    <div class="form-group">
-                    @input(
-                        userForm("agentFriendlyName"),
-                        '_label -> Messages("user.form.agentFriendlyName"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_labelTextClass -> "h2-heading",
-                        '_labelClass -> "soft--ends"
-                    )
-                    </div>
+                    @govukInput(Input(
+                        label = Label(
+                            content = Text(Messages("user.form.agentFriendlyName")),
+                        ),
+                        classes = "govuk-input govuk-input--width-20"
+                    ).withFormField(userForm("agentFriendlyName")))
                 }
 
                 <a name="address"></a>
 
-                <div class="form-group" style="margin-bottom: 0.5em;">
-                    <span class="h2-heading">@Messages("user.form.address")</span>
-                    @input(
-                        userForm("address.line1"),
-                        '_inputClass -> "input--medium input--cleared",
-                        '_maxlength -> 35
-                    )
-                </div>
+                @govukInput(Input(
+                    label = Label(content = Text(Messages("user.form.address"))),
+                    attributes = Map("maxlength" -> "35"),
+                    classes = "govuk-input govuk-input--width-20",
+                    formGroupClasses = "govuk-!-margin-bottom-1"
+                ).withFormField(userForm("address.line1")))
 
-                <div class="form-group" style="margin-bottom: 0.5em;">
-                @input(
-                    userForm("address.line2"),
-                    '_inputClass -> "input--medium input--cleared",
-                    '_maxlength -> 35
-                )
-                </div>
+                @govukInput(Input(
+                    attributes = Map("maxlength" -> "35"),
+                    classes = "govuk-input govuk-input--width-20",
+                    formGroupClasses = "govuk-!-margin-bottom-1"
+                ).withFormField(userForm("address.line2")))
 
-                <div class="form-group" style="margin-bottom: 0.5em;">
-                @input(
-                    userForm("address.line3"),
-                    '_inputClass -> "input--medium input--cleared",
-                    '_maxlength -> 35
-                )
-                </div>
+                @govukInput(Input(
+                    attributes = Map("maxlength" -> "35"),
+                    classes = "govuk-input govuk-input--width-20",
+                    formGroupClasses = "govuk-!-margin-bottom-1"
+                ).withFormField(userForm("address.line3")))
 
-                <div class="form-group">
-                @input(
-                    userForm("address.line4"),
-                    '_inputClass -> "input--medium input--cleared",
-                    '_maxlength -> 35
-                )
-                </div>
+                @govukInput(Input(
+                    attributes = Map("maxlength" -> "35"),
+                    classes = "govuk-input govuk-input--width-20",
+                ).withFormField(userForm("address.line4")))
 
-                <div class="form-group">
-                @input(
-                    userForm("address.postcode"),
-                    '_label -> Messages("user.form.address.postcode"),
-                    '_inputClass -> "input--medium input--cleared",
-                    '_labelTextClass -> "h2-heading",
-                    '_labelClass -> "soft--ends",
-                    '_maxlength -> 10
-                )
-                </div>
+                @govukInput(Input(
+                    label = Label(
+                        content = Text(Messages("user.form.address.postcode"))
+                    ),
+                    attributes = Map("maxlength" -> "10"),
+                    classes = "govuk-input govuk-input--width-10"
+                ).withFormField(userForm("address.postcode")))
 
-                <div class="form-group">
-                @dropdown(
-                    userForm("address.countryCode"),
-                    CountryCodes.values,
-                    false,
-                    '_label -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.address.countryCode") + """</span>"""),
-                    '_selectClass -> Html("""input--medium input--cleared""")
-                )
-                </div>
+                @govukSelect(Select(
+                    label = Label(content = Text(Messages("user.form.address.countryCode"))),
+                    items = CountryCodes.values.map(cc => SelectItem(value = Some(cc._1), text = cc._2))
+                ).withFormField(userForm("address.countryCode")))
 
             </div>
 
-            <div class="form-group">
+            <div class="govuk-button-group">
+                @govukButton(Button(
+                    content = if(hasContinue) Text(Messages("user.edit.update_and_continue")) else Text(Messages("user.edit.update")),
+                    attributes = Map("id" -> "update")
+                ))
 
-                <button class="button" type="submit" id="update">
-                @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
-                </button>
-
-                <a class="button-secondary" href="@{
-                    cancelCall.url
-                }">@Messages("user.edit.cancel")</a>
-
+                <a class="govuk-body govuk-link" href="@{cancelCall.url}">
+                    @Messages("user.edit.cancel")
+                </a>
             </div>
 
             @if(userForm.data.get("affinityGroup").nonEmpty && !userForm.data.get("affinityGroup").contains("none")) {
@@ -246,46 +233,44 @@
                 <h2>Principal enrolments</h2>
 
                 <div id="principalEnrolments" class="form-group" style="text-align: right">
-                    <table style="width: 100%">
+                    <table style="width: 100%" class="govuk-table">
                         <colgroup>
                             <col width="30%">
                             <col width="30%">
                             <col width="30%">
                             <col width="10%">
                         </colgroup>
-                        <tr>
-                            <th>Service key</th>
-                            <th>Identifier Name</th>
-                            <th>Identifier Value</th>
-                            <th></th>
-                        </tr>
+                        <thead class="govuk-table__head">
+                            <th class="govuk-table__header">Service key</th>
+                            <th class="govuk-table__header">Identifier Name</th>
+                            <th class="govuk-table__header">Identifier Value</th>
+                            <th class="govuk-table__header"></th>
+                        </thead>
 
                         @for(enrolment <- principalEnrolments) {
                             @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
-                                <tr id="principalEnrolment-@i-row">
+                                <tr id="principalEnrolment-@i-row" class="govuk-table__row">
                                     @if(i == 0) {
-                                        <td rowspan="@{
+                                        <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
-                                        @input(
-                                            userForm(s"${enrolment.key}.key"),
-                                            '_dataAttributes -> "style=width:100%;"
-                                        )
+                                            @govukInput(Input(
+                                                formGroupClasses = "govuk-!-margin-bottom-0"
+                                            ).withFormField(userForm(s"${enrolment.key}.key")))
                                         </td>
                                     }
 
-                                <td>
-                                    @input(
-                                        userForm(s"${identifier.key}.key"),
-                                        '_dataAttributes -> "style=width:100%;"
-                                    )
-                                <td>
-                                @input(
-                                    userForm(s"${identifier.key}.value"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
+                                <td class="govuk-table__cell">
+                                    @govukInput(Input(
+                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                    ).withFormField(userForm(s"${identifier.key}.key")))
                                 </td>
-                                <td>
+                                <td class="govuk-table__cell">
+                                    @govukInput(Input(
+                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                    ).withFormField(userForm(s"${identifier.key}.value")))
+                                </td>
+                                <td class="govuk-table__cell">
                                     <a style="text-decoration: underline;
                                         cursor: pointer;" onclick="document.getElementById('principalEnrolment-@i-row').remove()">
                                                 Remove
@@ -295,25 +280,24 @@
                             }
                         }
 
-                        <tr>
-                            <td>
-                            @input(
-                                userForm(s"principalEnrolments[${principalEnrolments.size}].key"),
-                                '_dataAttributes -> "style=width:100%;"
-                            )
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(userForm(s"principalEnrolments[${principalEnrolments.size}].key")))
                             </td>
-                            <td>
-                            @input(
-                                userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key"),
-                                '_dataAttributes -> "style=width:100%;"
-                            )
-                            <td>
-                            @input(
-                                userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value"),
-                                '_dataAttributes -> "style=width:100%;"
-                            )
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key")))
                             </td>
-                            <td></td>
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value")))
+                            </td>
+                            <td class="govuk-table__cell">
+                            </td>
                         </tr>
 
                     </table>
@@ -325,49 +309,47 @@
                 <a name="delegated"></a>
                 <h2>Delegated enrolments</h2>
 
-                <span class="form-hint">Only Agents can have delegated enrolments.</span>
+                <span class="govuk-hint">Only Agents can have delegated enrolments.</span>
 
                 <div id="delegatedEnrolments" class="form-group" style="text-align: right">
-                    <table style="width: 100%">
+                    <table class="govuk-table" style="width: 100%">
                         <colgroup>
                             <col width="30%">
                             <col width="30%">
                             <col width="30%">
                             <col width="10%">
                         </colgroup>
-                        <tr>
-                            <th>Service key</th>
-                            <th>Identifier Name</th>
-                            <th>Identifier Value</th>
-                            <th></th>
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Service key</th>
+                            <th class="govuk-table__header">Identifier Name</th>
+                            <th class="govuk-table__header">Identifier Value</th>
+                            <th class="govuk-table__header"></th>
                         </tr>
 
                         @for(enrolment <- delegatedEnrolments) {
                             @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
                                 <tr id="delegatedEnrolment-@i-row">
                                     @if(i == 0) {
-                                        <td rowspan="@{
+                                        <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
-                                        @input(
-                                            userForm(s"${enrolment.key}.key"),
-                                            '_dataAttributes -> "style=width:100%;"
-                                        )
+                                            @govukInput(Input(
+                                                formGroupClasses = "govuk-!-margin-bottom-0"
+                                            ).withFormField(userForm(s"${enrolment.key}.key")))
                                         </td>
                                     }
 
-                                <td>
-                                    @input(
-                                        userForm(s"${identifier.key}.key"),
-                                        '_dataAttributes -> "style=width:100%;"
-                                    )
-                                <td>
-                                @input(
-                                    userForm(s"${identifier.key}.value"),
-                                    '_dataAttributes -> "style=width:100%;"
-                                )
+                                <td class="govuk-table__cell">
+                                    @govukInput(Input(
+                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                    ).withFormField(userForm(s"${identifier.key}.key")))
                                 </td>
-                                <td>
+                                <td class="govuk-table__cell">
+                                    @govukInput(Input(
+                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                    ).withFormField(userForm(s"${identifier.key}.value")))
+                                </td>
+                                <td class="govuk-table__cell">
                                     <a style="text-decoration: underline;
                                         cursor: pointer;" onclick="document.getElementById('delegatedEnrolment-@i-row').remove()">
                                             Remove
@@ -377,25 +359,23 @@
                             }
                         }
 
-                        <tr>
-                            <td>
-                            @input(
-                                userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].key"),
-                                '_dataAttributes -> "style=width:100%;"
-                            )
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].key")))
                             </td>
-                            <td>
-                            @input(
-                                userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].key"),
-                                '_dataAttributes -> "style=width:100%;"
-                            )
-                            <td>
-                            @input(
-                                userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].value"),
-                                '_dataAttributes -> "style=width:100%;"
-                            )
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].key")))
                             </td>
-                            <td>
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].value")))
+                            </td>
+                            <td class="govuk-table__cell">
 
                             </td>
                         </tr>
@@ -409,42 +389,38 @@
                 <a name="stride"></a>
                 <h2>Stride roles</h2>
 
-                <span class="form-hint">
+                <span class="govuk-hint">
                     Only HMRC internal staff can have STRIDE roles. Provide role names comma separated.</span>
 
-                <div class="form-group" style="margin-bottom: 0.5em;">
-                @input(
-                    userForm("strideRoles"),
-                    '_inputClass -> "input--medium input--cleared",
-                    '_maxlength -> 60
-                )
-                </div>
+                @govukInput(Input(
+                    attributes = Map("maxlength" -> "60")
+                ).withFormField(userForm("strideRoles")))
             }
 
             @if(userForm.data.get("affinityGroup").contains("Agent")) {
                 <a name = "suspendedRegimes"></a>
                 <h2>Suspended Regimes</h2>
-                <span class="form-hint">Only Agents can be suspended. Valid Regimes: ITSA, VATC, TRS, CGT, ALL</span>
+                <span class="govuk-hint">Only Agents can be suspended. Valid Regimes: ITSA, VATC, TRS, CGT, ALL</span>
 
                 <div id="suspendedRegimes" class="form-group" style="text-align: right">
-                    <table style="width: 100%">
+                    <table class="govuk-table" style="width: 100%">
                         <colgroup>
                             <col width="30%">
                             <col width="10%">
                         </colgroup>
-                        <tr>
-                            <th>Regime</th>
-                            <th></th>
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Regime</th>
+                            <th class="govuk-table__header"></th>
                         </tr>
                         @for((suspendedService, index) <- suspendedRegimes.zipWithIndex) {
                             <tr id="suspendedRegimes-@index-row">
                                 <td style="vertical-align: top;">
-                                @input(
-                                    userForm(s"suspendedRegimes[$index]"),
-                                    '_dataAttributes -> "style=width:38%;"
-                                )
+                                    @govukInput(Input(
+                                        classes = "govuk-input--width-10",
+                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                    ).withFormField(userForm(s"suspendedRegimes[$index]")))
                                 </td>
-                                <td>
+                                <td class="govuk-table__cell">
                                     <a style="text-decoration: underline;
                                         cursor: pointer;" onclick="document.getElementById('suspendedRegimes-@index-row').remove()">
                                             Remove
@@ -452,14 +428,14 @@
                                 </td>
                             </tr>
                         }
-                        <tr>
-                            <td>
-                            @input(
-                                userForm(s"suspendedRegimes[${suspendedRegimes.size}]"),
-                                '_dataAttributes -> "style=width:38%;"
-                            )
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    classes = "govuk-input--width-10",
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(userForm(s"suspendedRegimes[${suspendedRegimes.size}]")))
                             </td>
-                            <td></td>
+                            <td class="govuk-table__cell"></td>
                         </tr>
                     </table>
                 </div>
@@ -469,29 +445,23 @@
 
             <h2>Specials</h2>
 
-            <span class="form-hint">@Messages("user.form.isNonCompliant.hint")</span>
+            @govukCheckboxes(Checkboxes(
+                items = Seq(CheckboxItem(
+                    content = Text(Messages("user.form.isNonCompliant")),
+                    hint = Some(Hint(content = Text(Messages("user.form.isNonCompliant.hint"))))
+                ))
+            ).withFormField(userForm("isNonCompliant")))
 
-            <div class="form-group">
-            @singleCheckbox(userForm("isNonCompliant"),
-                '_label -> Messages("user.form.isNonCompliant"),
-                '_inputClass -> "input--medium input--cleared",
-                '_labelTextClass -> "h2-heading",
-                '_labelClass -> "soft--ends"
-            )
+            <div class="govuk-button-group">
+                @govukButton(Button(
+                    content = if(hasContinue) Text(Messages("user.edit.update_and_continue")) else Text(Messages("user.edit.update")),
+                    attributes = Map("id" -> "update")
+                ))
+
+                <a class="govuk-body govuk-link" href="@{cancelCall.url}">
+                    @Messages("user.edit.cancel")
+                </a>
             </div>
-
-            <div class="form-group">
-
-                <button class="button" type="submit" id="update">
-                @Messages(if(hasContinue) "user.edit.update_and_continue" else "user.edit.update")
-                </button>
-
-                <a class="button-secondary" href="@{
-                    cancelCall.url
-                }">@Messages("user.edit.cancel")</a>
-
-            </div>
-
 
             </fieldset>
 

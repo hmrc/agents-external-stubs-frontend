@@ -15,17 +15,34 @@
  *@
 
 @import play.api.Configuration
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.UpliftRequest
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 
-@this(mainTemplate: main_template, form: FormWithCSRF, input: Input, inputRadioGroup: InputRadioGroup, errorSummary: ErrorSummary)
+@this(
+        mainTemplate: main_template,
+        form: FormWithCSRF, govukInput: GovukInput,
+        govukRadios: GovukRadios,
+        govukErrorSummary: GovukErrorSummary)
 
 @(pageForm: Form[UpliftRequest], options: Seq[(String, String)], formAction: Call)(implicit request: Request[_], messages: Messages, configuration: Configuration)
 
-@mainTemplate(title = Messages("login.title"), bodyClasses = None) {
+@mainTemplate(title = Messages("login.title")) {
 
 <h1 class="form-title heading-large push--top">@Messages("configure_journey.header")</h1>
 
@@ -33,35 +50,33 @@
 
 @form(action = formAction) {
     @{if(pageForm.hasErrors) {
-        errorSummary(
-            heading = Messages("error-summary.heading"),
-            form = pageForm
-        )
+        govukErrorSummary(ErrorSummary().withFormErrorsAsText(pageForm))
     }
 }
 
-<div class="form-group client-validated">
+<div class="client-validated">
     <label for="confidenceLevel" class="form-label">
         <span>@Messages("configure_journey.requiredConfidenceLevel.label")</span>
         <strong>&nbsp;@{pageForm.data.get("confidenceLevel")}</strong>
     </label>
 </div>
-<div class="form-group client-validated">
-    @input(
-    pageForm("nino"),
-    '_label -> Messages("configure_journey.forNino.label"),
-    '_labelTextClass -> "form-label-bold"
-    )
+<div class="client-validated">
+    @govukInput(Input(
+        label = Label(content = Text(Messages("configure_journey.forNino.label")))
+    ).withFormField(pageForm("nino")))
 </div>
-<div class="form-group client-validated">
-    @inputRadioGroup(
-    pageForm("option"),
-    radioOptions = options,
-    '_groupClass -> "form-group",
-    '_labelClass -> "block-label",
-    '_legend -> s"${Messages("configure_journey.requiredResult.label")}",
-    '_legendClass -> "form-label-bold",
-    '_error -> pageForm("option").error.map(_.withMessage(s"${Messages("configure_journey.requiredResult.required")}")))
+<div class="client-validated">
+    @govukRadios(Radios(
+        fieldset = Some(Fieldset(
+            legend = Some(Legend(
+                content = Text(Messages("configure_journey.requiredResult.label"))
+            ))
+        )),
+        items = options.map { case (id, text) =>
+            RadioItem(value = Some(id), content = Text(text))
+        },
+        errorMessage = pageForm("option").error.map(_ => ErrorMessage(content = Text(Messages("configure_journey.requiredResult.required"))))
+    ).withFormField(pageForm("option")))
 </div>
 <div class="form-group">
     <button class="button" type="submit">Submit</button>
