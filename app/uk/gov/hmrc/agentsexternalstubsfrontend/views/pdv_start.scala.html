@@ -16,34 +16,46 @@
 
 @import play.api.Configuration
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.PdvRequest
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.Checkboxes
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 
-@this(mainTemplate: main_template, form: FormWithCSRF, singleCheckbox: SingleCheckbox, errorSummary: ErrorSummary)
+@this(
+        mainTemplate: main_template,
+        form: FormWithCSRF,
+        govukCheckboxes: GovukCheckboxes,
+        govukButton: GovukButton,
+        govukErrorSummary: GovukErrorSummary
+)
 
 @(pageForm: Form[PdvRequest], formAction: Call)(implicit request: Request[_], messages: Messages, configuration: Configuration)
 
-@mainTemplate(title = Messages("login.title"), bodyClasses = None) {
+@mainTemplate(title = Messages("login.title")) {
 
     <h1 class="form-title heading-large push--top">@Messages("pdv.header")</h1>
 
     @form(action = formAction) {
         @{if(pageForm.hasErrors) {
-            errorSummary(
-                heading = Messages("error-summary.heading"),
-                form = pageForm
-            )
+            govukErrorSummary(ErrorSummary().withFormErrorsAsText(pageForm))
         }}
 
-        <div class="form-group client-validated">
-        @singleCheckbox(
-            pageForm("success"),
-            '_label -> Messages("pdv.success.label"),
-            '_labelTextClass -> "form-label-bold"
-        )
-        </div>
+        @govukCheckboxes(Checkboxes(
+            items = Seq(CheckboxItem(
+                content = Text(Messages("pdv.success.label"))
+            ))
+            ).withFormField(pageForm("success")))
 
-        <div class="form-group">
-            <button class="button" type="submit">Submit</button>
-        </div>
+        @govukButton(Button(
+            content = Text("Submit")
+        ))
     }
 }
