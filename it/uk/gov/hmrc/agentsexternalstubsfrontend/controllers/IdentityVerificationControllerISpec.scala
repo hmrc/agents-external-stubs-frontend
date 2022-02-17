@@ -31,7 +31,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
         val result =
           callEndpointWith(
-            FakeRequest(GET, "/mdtp/uplift?confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=aif")
+            FakeRequest(GET, "/mdtp/uplift?confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=aif")
           )
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("uplift.header"))
@@ -45,12 +45,12 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
         "the completionUrl query parameter is missing" in new Setup {
 
-          val result = callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=200&failureURL=/bad"))
+          val result = callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=250&failureURL=/bad"))
           status(result) shouldBe 400
         }
 
         "the failureUrl query parameter is missing" in new Setup {
-          val result = callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=200&completionURL=/good"))
+          val result = callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=250&completionURL=/good"))
           status(result) shouldBe 400
         }
       }
@@ -61,7 +61,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val succeedRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai"
+            "/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
           )
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "Success~1234")
         )
@@ -78,7 +78,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val failRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai"
+            "/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
           )
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
@@ -96,7 +96,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
       "display the identity verification uplift page" in new Setup {
 
         val result = callEndpointWith(
-          FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=200&completionURL=/good&failureURL=/bad")
+          FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=250&completionURL=/good&failureURL=/bad")
         )
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("uplift.header"))
@@ -113,14 +113,14 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         "the completionUrl query parameter is missing" in new Setup {
 
           val result =
-            callEndpointWith(FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=200&failureURL=/bad"))
+            callEndpointWith(FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=250&failureURL=/bad"))
           status(result) shouldBe 400
         }
 
         "the failureUrl query parameter is missing" in new Setup {
 
           val result = callEndpointWith(
-            FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=200&completionURL=/good")
+            FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=250&completionURL=/good")
           )
           status(result) shouldBe 400
         }
@@ -132,7 +132,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val succeedRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai"
+            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
           )
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "Success~1234")
         )
@@ -150,7 +150,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val failRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai"
+            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
           )
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
@@ -170,7 +170,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val failRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai"
+            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
           )
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
@@ -199,7 +199,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val failRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=200&completionURL=/good&failureURL=/bad&origin=ai"
+            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
           )
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )

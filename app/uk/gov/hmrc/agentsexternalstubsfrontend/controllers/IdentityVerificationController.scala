@@ -143,7 +143,7 @@ class IdentityVerificationController @Inject() (
                     ivUpliftView(
                       formWithErrors,
                       options(journeyId),
-                      upliftUrl(200, completionURL, failureURL, origin, doProxy)
+                      upliftUrl(250, completionURL, failureURL, origin, doProxy)
                     )
                   )
                 ),
@@ -153,7 +153,7 @@ class IdentityVerificationController @Inject() (
                 if (journeyIdMatches && isSuccessful) {
                   for {
                     currentUser <- agentsExternalStubsConnector.getUser(credentials.providerId)
-                    modifiedUser = currentUser.copy(confidenceLevel = Some(200))
+                    modifiedUser = currentUser.copy(confidenceLevel = Some(250))
                     _ <- agentsExternalStubsConnector.updateUser(modifiedUser)
                   } yield redirectWithJourneyId(completionURL.unsafeValue, journeyId, upliftRequest.option)
                 } else {
