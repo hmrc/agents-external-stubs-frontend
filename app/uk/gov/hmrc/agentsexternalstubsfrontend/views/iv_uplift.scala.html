@@ -55,11 +55,12 @@
 }
 
 <div class="client-validated">
-    <label for="confidenceLevel" class="form-label">
+    <p class="govuk-body">
         <span>@Messages("configure_journey.requiredConfidenceLevel.label")</span>
         <strong>&nbsp;@{pageForm.data.get("confidenceLevel")}</strong>
-    </label>
+    </p>
 </div>
+
 <div class="client-validated">
     @govukInput(Input(
         label = Label(content = Text(Messages("configure_journey.forNino.label")))
