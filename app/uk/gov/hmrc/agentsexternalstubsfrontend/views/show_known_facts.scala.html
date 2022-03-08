@@ -30,16 +30,16 @@
         navigationBar: navigationBar,
         govukSummaryList: GovukSummaryList)
 
-@(enrolmentInfo:EnrolmentInfo, service: Service, context: PageContext)(implicit request: Request[_], messages: Messages)
+@(enrolmentInfo:EnrolmentInfo, service: Service, context: PageContext)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = Messages("knownFacts.title"), wide = true) {
+@mainTemplate(title = msgs("knownFacts.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl">@Messages("knownFacts.show.header", service.description)</h1>
+    <h1 class="govuk-heading-l">@msgs("knownFacts.show.header", service.description)</h1>
 
     <p class="govuk-hint">
-        @Messages("knownFacts.show.description")
+        @msgs("knownFacts.show.description")
     </p>
 
     @govukSummaryList(SummaryList(
@@ -68,7 +68,7 @@
                 ++ (if (user.userId != context.authorisedUserId)
                     s"""<span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=${user.userId}&continue=${request.uri}&providerType=${user.defaultProviderType}">Sign-in</a></span>"""
                 else
-                    """<span style="color: black; font-weight: bold;">Current user </span>""")
+                    """<span class="current-user">Current user</span>""")
             )))
         ) ++ enrolmentInfo.agents.map(agent =>
             SummaryListRow(key = Key(Text("Delegated User (Agent)")), value = Value(HtmlContent(

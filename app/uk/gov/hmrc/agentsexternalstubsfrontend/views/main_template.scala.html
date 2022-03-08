@@ -21,50 +21,46 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardFooter, HmrcScripts}
 @import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsMainContent
 @import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsOneThirdMainContent
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTrackingConsentSnippet
+@import views.html.helper.CSPNonce
 
 @this(
-        head: head,
-        header: header,
-        govukLayout: GovukLayout,
-        govukBackLink: GovukBackLink,
-        hmrcStandardFooter: HmrcStandardFooter,
-        hmrcScripts: HmrcScripts,
-        hmrcBanner : HmrcBanner,
-        twoThirdsLayout: TwoThirdsMainContent,
-        twoThirdsOneThirdLayout: TwoThirdsOneThirdMainContent
+    header: header,
+    head: head,
+    hmrcLayout: HmrcLayout,
+    govukBackLink: GovukBackLink,
+    hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
+    twoThirdsLayout: TwoThirdsMainContent,
+    twoThirdsOneThirdLayout: TwoThirdsOneThirdMainContent
 )
 
 @(title: String,
-        backLinkHref: Option[String] = None,
-        wide: Boolean = false,
-        sidebar: Option[Html] = None // overrides the 'wide' option if present
-)(mainContent: Html)(implicit request : Request[_], messages: Messages)
+    backLinkHref: Option[String] = None,
+    wide: Boolean = false,
+    sidebar: Option[Html] = None // overrides the 'wide' option if present
+)(mainContent: Html)(implicit request : Request[_], msgs: Messages)
 
-@beforeContent = {
-@hmrcBanner(Banner())
-@if(backLinkHref.nonEmpty){
-    <nav aria-label="Back Link">
-    @backLinkHref.map(url =>
-        govukBackLink(BackLink(href = url, content = Text(messages("button.back"))))
-    )
-    </nav>
-}
-}
 
 @additionalScripts = {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+    crossorigin="anonymous" @{CSPNonce.attr}></script>
 }
 
-@govukLayout(
+
+@hmrcLayout(
     pageTitle = Some(title),
-    headBlock = Some(head()),
-    headerBlock = Some(header()),
-    scriptsBlock = Some(hmrcScripts(scriptsBlock = Some(additionalScripts))),
-    beforeContentBlock = Some(beforeContent),
-    footerBlock = Some(hmrcStandardFooter()),
-    mainContentLayout = sidebar match {
+    isWelshTranslationAvailable = false,
+    displayHmrcBanner = true,
+    serviceUrl = None,
+    additionalHeadBlock = Some(head()),
+    additionalScriptsBlock = Some(additionalScripts),
+    backLinkUrl = backLinkHref,
+    mainContentLayout =  sidebar match {
         case Some(sidebarContent) => Some(twoThirdsOneThirdLayout(sidebarContent)(_))
         case None => if (wide) None else Some(twoThirdsLayout(_))
     },
-    assetPath = None
+    nonce = CSPNonce.get
 )(mainContent)
+

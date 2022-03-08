@@ -39,16 +39,16 @@
         govukTable: GovukTable,
 )
 
-@(users: Users, authToken: Option[String], showCurrentUserUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages)
+@(users: Users, authToken: Option[String], showCurrentUserUrl: Call, context: PageContext)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = Messages("users.title"), wide = true) {
+@mainTemplate(title = msgs("users.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl">@Messages("users.show.header", context.planetId)</h1>
+    <h1 class="govuk-heading-l">@msgs("users.show.header", context.planetId)</h1>
 
     <div style="float: right; margin-bottom: 1em;position: relative; top:-3em;right: -3em;">
-        <h3 class="govuk-!-margin-bottom-1" id="create-user-label">@Messages("users.link.create")</h3>
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1" id="create-user-label">@msgs("users.link.create")</h3>
         <span class="govuk-hint govuk-!-font-size-14 govuk-!-margin-bottom-1" >Expected ID pattern [A-Za-z0-9-_]{3,64}</span>
         @form(action = Call("GET", "/agents-external-stubs/user/create")) {
             @{play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) }}
@@ -62,15 +62,15 @@
                     attributes = Map("aria-labelledby" -> "create-user-label")
                 ))
                 @govukButton(Button(
-                    content = Text(Messages("user.show.create")),
+                    content = Text(msgs("user.show.create")),
                     classes = "govuk-!-display-inline"
                 ))
             </div>
         }
     </div>
 
-    <p>
-    @Messages("users.show.description")
+    <p class="govuk-body">
+    @msgs("users.show.description")
     </p>
 
     @govukTable(Table(
@@ -98,18 +98,24 @@
                 )),
                 TableRow(content =
                         if (user.userId==context.authorisedUserId) HtmlContent(
-                            s"""<div>
-                               |    <a id="${user.userId}-view" href="/agents-external-stubs/user?userId=${user.userId}">View</a> |
-                               |    <a id="${user.userId}-edit" href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a> |
-                               |    <span style="color: black; font-weight: bold;">Current user </span>
+                            s"""<div class="test-user-action">
+                               |    <a id="${user.userId}-view" class="govuk-body govuk-link"
+                               |        href="/agents-external-stubs/user?userId=${user.userId}">View</a>
+                               |    <a id="${user.userId}-edit" class="govuk-body govuk-link"
+                               |    href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a>
+                               |    <span class="current-user">Current user </span>
                                |</div>
                                |""".stripMargin
                         ) else HtmlContent(
-                            s"""<div>
-                               |    <a id="${user.userId}-view" href="/agents-external-stubs/user?userId=${user.userId}">View</a> |
-                               |    <a id="${user.userId}-edit" href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a> |
-                               |    <a id="${user.userId}-remove" href="/agents-external-stubs/user/remove?userId=${user.userId}">Remove</a> |
-                               |    <a id="${user.userId}-sign-in" href="/agents-external-stubs/sign-in?userId=${user.userId}&continue=/agents-external-stubs/users&providerType=${user.defaultProviderType}">Sign-in</a>
+                            s"""<div class="test-user-action">
+                               |    <a id="${user.userId}-view" class="govuk-body govuk-link"
+                               |    href="/agents-external-stubs/user?userId=${user.userId}">View</a>
+                               |    <a id="${user.userId}-edit" class="govuk-body govuk-link"
+                               |    href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a>
+                               |    <a id="${user.userId}-remove" class="govuk-body govuk-link"
+                               |    href="/agents-external-stubs/user/remove?userId=${user.userId}">Remove</a>
+                               |    <a id="${user.userId}-sign-in" class="govuk-body govuk-link"
+                               |    href="/agents-external-stubs/sign-in?userId=${user.userId}&continue=/agents-external-stubs/users&providerType=${user.defaultProviderType}">Sign-in</a>
                                |</div>
                                |""".stripMargin
                         )

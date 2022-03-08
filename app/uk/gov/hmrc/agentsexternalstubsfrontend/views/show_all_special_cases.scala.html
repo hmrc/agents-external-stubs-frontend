@@ -20,26 +20,26 @@
 
 @this(mainTemplate: main_template, navigationBar: navigationBar)
 
-@(specialCases: Seq[SpecialCase], caseId: Option[String], viewUrl: String=>Call, editUrl: String=>Call, removeUrl: String=>Call, context: PageContext)(implicit request: Request[_], messages: Messages)
+@(specialCases: Seq[SpecialCase], caseId: Option[String], viewUrl: String=>Call, editUrl: String=>Call, removeUrl: String=>Call, context: PageContext)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = Messages("specialCase.title"), wide = true) {
+@mainTemplate(title = msgs("specialCase.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl">@Messages("specialCase.show.all.header", context.planetId)</h1>
+    <h1 class="govuk-heading-l">@msgs("specialCase.show.all.header", context.planetId)</h1>
 
-    <p>
-        @Messages("specialCase.show.all.description")
+    <p class="govuk-body">
+        @msgs("specialCase.show.all.description")
     </p>
 
   @if(specialCases.isEmpty){
-    <p>
+    <p class="govuk-body">
         But ... no special case of response has been defined yet.
-        <a class="govuk-body govuk-link" id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@Messages("specialCase.link.add")</a>
+        <a class="govuk-body govuk-link" id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@msgs("specialCase.link.add")</a>
     </p>
   } else {
 
-    <a class="govuk-body govuk-link" id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@Messages("specialCase.link.add")</a>
+    <a class="govuk-body govuk-link" id="link_add_special_case" href="/agents-external-stubs/special-cases/edit">@msgs("specialCase.link.add")</a>
 
     <table class="govuk-table" id="special-cases" style="margin:1em 0;">
         <colgroup>
@@ -82,10 +82,10 @@
                 <td class="govuk-table__cell" style="@if(sc.id == caseId){border-bottom-style: none;}">
                     <div>
                     @if(sc.response.body.isDefined && sc.id != caseId){
-                       <a href="@viewUrl(sc.id.get)">View</a> |
+                       <a class="govuk-body govuk-link" href="@viewUrl(sc.id.get)">View</a> |
                     } else {<span style="display:inline-block;width:2.5em;"></span>}
-                    <a href="@editUrl(sc.id.get)">Edit</a> |
-                    <a href="@removeUrl(sc.id.get)">Remove</a>
+                    <a class="govuk-body govuk-link" href="@editUrl(sc.id.get)">Edit</a> |
+                    <a class="govuk-body govuk-link" href="@removeUrl(sc.id.get)">Remove</a>
                     </div>
                 </td>
             </tr>

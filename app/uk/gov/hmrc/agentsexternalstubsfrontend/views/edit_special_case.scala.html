@@ -50,29 +50,29 @@
         govukFieldset: GovukFieldset,
         govukButton: GovukButton)
 
-@(specialCaseForm: Form[SpecialCase], caseId: Option[String], postUrl: Call, resetUrl: Call, cancelUrl: Call , context: PageContext)(implicit request: Request[_], messages: Messages)
+@(specialCaseForm: Form[SpecialCase], caseId: Option[String], postUrl: Call, resetUrl: Call, cancelUrl: Call , context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @headers = @{
     ViewHelper.buildTree("",specialCaseForm.data)("response.headers")
 }
 
-@mainTemplate(title = Messages("specialCase.title"), wide = true) {
+@mainTemplate(title = msgs("specialCase.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl">@Messages("specialCase.edit.header", context.planetId)</h1>
+    <h1 class="govuk-heading-l">@msgs("specialCase.edit.header", context.planetId)</h1>
 
     @if(specialCaseForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(specialCaseForm))
     }
 
-    <p>
-        @Messages("specialCase.edit.description")
+    <p class="govuk-body">
+        @msgs("specialCase.edit.description")
     </p>
 
     @form(action = postUrl, 'id -> "specialCaseForm", 'novalidate -> "novalidate") {
         @govukSelect(Select(
-            label = Label(content = Text(Messages("specialCase.form.requestMatch.method"))),
+            label = Label(content = Text(msgs("specialCase.form.requestMatch.method"))),
             items = Seq(
                 SelectItem(value = Some("GET"), text = "GET"),
                 SelectItem(value = Some("POST"), text = "POST"),
@@ -82,11 +82,11 @@
         ).withFormField(specialCaseForm("requestMatch.method")))
 
         @govukInput(Input(
-            label = Label(content = Text(Messages("specialCase.form.requestMatch.path"))),
-            hint = Some(Hint(content = Text(Messages("specialCase.form.requestMatch.path.hint"))))
+            label = Label(content = Text(msgs("specialCase.form.requestMatch.path"))),
+            hint = Some(Hint(content = Text(msgs("specialCase.form.requestMatch.path.hint"))))
         ).withFormField(specialCaseForm("requestMatch.path")))
 
-        <h2>@Messages("specialCase.form.response.headers")</h2>
+        <h2>@msgs("specialCase.form.response.headers")</h2>
 
         @for(header <- headers) {
             <div>
@@ -110,32 +110,32 @@
         </div>
 
         @govukSelect(Select(
-            label = Label(content = Text(Messages("specialCase.form.response.status"))),
+            label = Label(content = Text(msgs("specialCase.form.response.status"))),
             items = SpecialCase.httpStatusCodeOptions.map(opt => SelectItem(value = Some(opt._1), text = opt._2))
         ).withFormField(specialCaseForm("response.status")))
 
         <div class="govuk-button-group">
             @govukButton(Button(
-                content = if (caseId.isEmpty) Text(Messages("specialCase.form.create")) else Text(Messages("specialCase.form.update")),
+                content = if (caseId.isEmpty) Text(msgs("specialCase.form.create")) else Text(msgs("specialCase.form.update")),
                 attributes = Map("id" -> "submit")
             ))
-            <a class="govuk-body govuk-link" href="@{resetUrl.url}">@Messages("specialCase.form.reset")</a>
-            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("specialCase.form.cancel")</a>
+            <a class="govuk-body govuk-link" href="@{resetUrl.url}">@msgs("specialCase.form.reset")</a>
+            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@msgs("specialCase.form.cancel")</a>
         </div>
 
         @govukTextarea(Textarea(
-            label = Label(content = Text(Messages("specialCase.form.response.body"))),
+            label = Label(content = Text(msgs("specialCase.form.response.body"))),
             rows = 20,
             attributes = Map("style" -> "font-family: monospace;")
         ).withFormField(specialCaseForm("response.body")))
 
         <div class="govuk-button-group">
             @govukButton(Button(
-                content = if (caseId.isEmpty) Text(Messages("specialCase.form.create")) else Text(Messages("specialCase.form.update")),
+                content = if (caseId.isEmpty) Text(msgs("specialCase.form.create")) else Text(msgs("specialCase.form.update")),
                 attributes = Map("id" -> "submit")
             ))
-            <a class="govuk-body govuk-link" href="@{resetUrl.url}">@Messages("specialCase.form.reset")</a>
-            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("specialCase.form.cancel")</a>
+            <a class="govuk-body govuk-link" href="@{resetUrl.url}">@msgs("specialCase.form.reset")</a>
+            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@msgs("specialCase.form.cancel")</a>
         </div>
     }
 }

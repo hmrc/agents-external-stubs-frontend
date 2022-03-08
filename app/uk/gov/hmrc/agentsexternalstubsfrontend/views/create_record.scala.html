@@ -25,20 +25,21 @@
 
 @this(mainTemplate: main_template, form: FormWithCSRF, govukTextarea: GovukTextarea, navigationBar: navigationBar)
 
-@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, shakeUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages)
+@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, shakeUrl: Call, context: PageContext)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = Messages("records.title"), wide = true) {
+@mainTemplate(title = msgs("records.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl" style="margin-bottom: 0.5em;">@Messages("records.create.header")</h1>
+    <h1 class="govuk-heading-l" style="margin-bottom: 0.5em;">@msgs("records.create.header")</h1>
 
     <div class="govuk-hint">
-    @Messages("records.create.description")
+    @msgs("records.create.description")
     </div>
 
     <div style="margin-bottom: 0.5em; float: right;">
-        <a style="display: inline-block; margin-top:0.5em;" href="@{shakeUrl.url}">@Messages("records.create.shake")</a>
+        <a class="govuk-body govuk-link" style="display: inline-block; margin-top:0.5em;"
+            href="@{shakeUrl.url}">@msgs("records.create.shake")</a>
     </div>
 
     @form(action = postUrl, 'id -> "recordForm", 'novalidate -> "novalidate") {
@@ -49,10 +50,10 @@
 
         <div class="govuk-button-group">
             <button class="govuk-button" type="submit" id="update">
-                @Messages("records.create.submit")
+                @msgs("records.create.submit")
             </button>
 
-            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("records.create.cancel")</a>
+            <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@msgs("records.create.cancel")</a>
         </div>
     }
 

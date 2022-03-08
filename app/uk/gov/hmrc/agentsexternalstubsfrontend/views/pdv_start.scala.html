@@ -37,11 +37,11 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(pageForm: Form[PdvRequest], formAction: Call)(implicit request: Request[_], messages: Messages, configuration: Configuration)
+@(pageForm: Form[PdvRequest], formAction: Call)(implicit request: Request[_], msgs: Messages, configuration: Configuration)
 
-@mainTemplate(title = Messages("login.title")) {
+@mainTemplate(title = msgs("login.title")) {
 
-    <h1 class="form-title heading-large push--top">@Messages("pdv.header")</h1>
+    <h1 class="govuk-heading-l form-title heading-large push--top">@msgs("pdv.header")</h1>
 
     @form(action = formAction) {
         @{if(pageForm.hasErrors) {
@@ -50,7 +50,7 @@
 
         @govukCheckboxes(Checkboxes(
             items = Seq(CheckboxItem(
-                content = Text(Messages("pdv.success.label"))
+                content = Text(msgs("pdv.success.label"))
             ))
             ).withFormField(pageForm("success")))
 

@@ -35,16 +35,16 @@
         navigationBar: navigationBar
 )
 
-@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, context: PageContext)(implicit request: Request[_], messages: Messages, config: Configuration)
+@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, context: PageContext)(implicit request: Request[_], msgs: Messages, config: Configuration)
 
-@mainTemplate(title = Messages("records.title"), wide = true) {
+@mainTemplate(title = msgs("records.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl">@Messages("records.edit.header")</h1>
+    <h1 class="govuk-heading-l">@msgs("records.edit.header")</h1>
 
     <p class="govuk-hint">
-        @Messages("records.edit.description")
+        @msgs("records.edit.description")
     </p>
 
     <div>
@@ -55,10 +55,10 @@
             ).withFormField(recordForm("json")))
             <div class="govuk-button-group">
                 @govukButton(Button(
-                    content = Text(Messages("records.edit.submit")),
+                    content = Text(msgs("records.edit.submit")),
                     attributes = Map("type" -> "submit", "id" -> "update")
                 ))
-                <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@Messages("records.edit.cancel")</a>
+                <a class="govuk-body govuk-link" href="@{cancelUrl.url}">@msgs("records.edit.cancel")</a>
             </div>
         }
     </div>

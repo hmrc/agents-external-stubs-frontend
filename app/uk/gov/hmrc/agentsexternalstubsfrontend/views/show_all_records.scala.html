@@ -29,21 +29,21 @@
         govukTable: GovukTable
 )
 
-@(records: Records, showId: Option[String], context: PageContext)(implicit request: Request[_], messages: Messages)
+@(records: Records, showId: Option[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = Messages("records.title"), wide = true) {
+@mainTemplate(title = msgs("records.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl">@Messages("records.show.header", context.planetId)</h1>
+    <h1 class="govuk-heading-l">@msgs("records.show.header", context.planetId)</h1>
 
-    <p>
-        @Messages("records.show.description")
+    <p class="govuk-body">
+        @msgs("records.show.description")
     </p>
 
     <table id="business-partner-records" class="govuk-table">
         <caption id="tableSubHeader-bpr" class="govuk-table__caption govuk-table__caption--s">Business Partner Records
-            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            <a role="button" class="govuk-button"
             href="/agents-external-stubs/records/add?type=business-partner-record&seed=@{records.BusinessPartnerRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">Create new business partner</a>
         </caption>
         <col style="width: 90%">
@@ -56,7 +56,7 @@
 
     <table id="business-details" style="margin:1em 0;" class="govuk-table">
         <caption id="tableSubHeader-bdr" class="govuk-table__caption govuk-table__caption--s">Business Details Records
-            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            <a role="button" class="govuk-button"
             href="/agents-external-stubs/records/add?type=business-details&seed=@{records.BusinessDetailsRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">
                 Create new business details
             </a>
@@ -71,7 +71,7 @@
 
     <table id="vat-customer-informations" style="margin:1em 0;" class="govuk-table">
         <caption id="tableSubHeader-vat" class="govuk-table__caption govuk-table__caption--s">VAT Customer Information Records
-            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            <a role="button" class="govuk-button"
             href="/agents-external-stubs/records/add?type=vat-customer-information&seed=@{records.VatCustomerInformationRecord.map(o => (o.last \ "vrn").as[String]).getOrElse("1234567890")}">
                 Create new VAT customer information
             </a>
@@ -86,7 +86,7 @@
 
     <table id="mtd-relationships" style="margin:1em 0;" class="govuk-table">
         <caption id="tableSubHeader-mtd" class="govuk-table__caption govuk-table__caption--s">MTD Relationship Records
-            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            <a role="button" class="govuk-button"
             href="/agents-external-stubs/records/add?type=relationship&seed=@{records.RelationshipRecord.map(o => (o.last \ "arn").as[String]).getOrElse("1234567890")}">
                 Create new relationship
             </a>
@@ -100,7 +100,7 @@
 
     <table id="legacy-relationships" style="margin:1em 0;" class="govuk-table">
         <caption id="tableSubHeader-lsr" class="govuk-table__caption govuk-table__caption--s">Legacy SA Agent Relationships
-            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            <a role="button" class="govuk-button"
             href="/agents-external-stubs/records/add?type=legacy-relationship&seed=@{records.LegacyRelationshipRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
                 Create new SA agent relationship
             </a>
@@ -114,7 +114,7 @@
 
     <table id="legacy-agents" style="margin:1em 0;" class="govuk-table">
         <caption id="tableSubHeader-lsa" class="govuk-table__caption govuk-table__caption--s">Legacy SA Agent
-            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            <a role="button" class="govuk-button"
             href="/agents-external-stubs/records/add?type=legacy-agent&seed=@{records.LegacyAgentRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
                 Create new SA agent
             </a>
@@ -128,7 +128,7 @@
 
     <table id="employer-auths" style="margin:1em 0;" class="govuk-table">
         <caption id="tableSubHeader-paye" class="govuk-table__caption govuk-table__caption--s">Legacy PAYE Agent Informations
-            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            <a role="button" class="govuk-button"
             href="/agents-external-stubs/records/add?type=employer-auths&seed=@{records.EmployerAuths.map(o => (o.last \ "agentCode").as[String]).getOrElse("ABC123456789")}">
                 Create new PAYE agent information
             </a>
@@ -142,7 +142,7 @@
 
     <table id="ppt-subscription-display-records" style="margin:1em 0;" class="govuk-table">
         <caption id="tableSubHeader-ppt" class="govuk-table__caption govuk-table__caption--s">PPT Subscription Display Records
-            <a role="button" style="display:inline-block; font-weight: normal; font-size: 0.8em; margin-left: 1em;"
+            <a role="button" class="govuk-button"
             href="/agents-external-stubs/records/add?type=ppt-subscription&seed=@{records.PPTSubscriptionDisplayRecord.map(o => (o.last \ "pptReference").as[String]).getOrElse("XAPPT1234567890")}">
                 Create new PPT Subscription Display
             </a>
@@ -180,9 +180,15 @@
             @if(id.isDefined) {
                 @if(excerpt!=(identity _)){
                     @if(showId.isDefined && id.contains(showId.get)) {
-                        <div><a role="button" href="/agents-external-stubs/records">Fold ...</a></div>
+                        <div>
+                            <a role="button" class="govuk-button"
+                            href="/agents-external-stubs/records">Fold ...</a>
+                        </div>
                     } else {
-                        <div><a role="button" href="/agents-external-stubs/records?showId=@{id.get}#e">Expand ...</a></div>
+                        <div>
+                            <a role="button" class="govuk-button"
+                                href="/agents-external-stubs/records?showId=@{id.get}#e">Expand ...</a>
+                        </div>
                     }
                 }
                 <div><a role="button" href="/agents-external-stubs/records/edit?id=@{id.get}">Edit</a></div>

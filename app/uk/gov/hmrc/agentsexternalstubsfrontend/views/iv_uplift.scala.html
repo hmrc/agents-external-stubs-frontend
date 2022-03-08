@@ -35,18 +35,19 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 
 @this(
-        mainTemplate: main_template,
-        form: FormWithCSRF, govukInput: GovukInput,
-        govukRadios: GovukRadios,
-        govukErrorSummary: GovukErrorSummary)
+    mainTemplate: main_template,
+    form: FormWithCSRF, govukInput: GovukInput,
+    govukRadios: GovukRadios,
+    govukErrorSummary: GovukErrorSummary
+)
 
-@(pageForm: Form[UpliftRequest], options: Seq[(String, String)], formAction: Call)(implicit request: Request[_], messages: Messages, configuration: Configuration)
+@(pageForm: Form[UpliftRequest], options: Seq[(String, String)], formAction: Call)(implicit request: Request[_], msgs: Messages, configuration: Configuration)
 
-@mainTemplate(title = Messages("login.title")) {
+@mainTemplate(title = msgs("login.title")) {
 
-<h1 class="form-title heading-large push--top">@Messages("configure_journey.header")</h1>
+<h1 class="govuk-heading-l form-title heading-large push--top">@msgs("configure_journey.header")</h1>
 
-<h1 class="form-title heading-medium">@Messages("configure_journey.header.uplift")</h1>
+<h1 class="govuk-heading-l form-title heading-medium">@msgs("configure_journey.header.uplift")</h1>
 
 @form(action = formAction) {
     @{if(pageForm.hasErrors) {
@@ -56,31 +57,31 @@
 
 <div class="client-validated">
     <p class="govuk-body">
-        <span>@Messages("configure_journey.requiredConfidenceLevel.label")</span>
+        <span>@msgs("configure_journey.requiredConfidenceLevel.label")</span>
         <strong>&nbsp;@{pageForm.data.get("confidenceLevel")}</strong>
     </p>
 </div>
 
 <div class="client-validated">
     @govukInput(Input(
-        label = Label(content = Text(Messages("configure_journey.forNino.label")))
+        label = Label(content = Text(msgs("configure_journey.forNino.label")))
     ).withFormField(pageForm("nino")))
 </div>
 <div class="client-validated">
     @govukRadios(Radios(
         fieldset = Some(Fieldset(
             legend = Some(Legend(
-                content = Text(Messages("configure_journey.requiredResult.label"))
+                content = Text(msgs("configure_journey.requiredResult.label"))
             ))
         )),
         items = options.map { case (id, text) =>
             RadioItem(value = Some(id), content = Text(text))
         },
-        errorMessage = pageForm("option").error.map(_ => ErrorMessage(content = Text(Messages("configure_journey.requiredResult.required"))))
+        errorMessage = pageForm("option").error.map(_ => ErrorMessage(content = Text(msgs("configure_journey.requiredResult.required"))))
     ).withFormField(pageForm("option")))
 </div>
 <div class="form-group">
-    <button class="button" type="submit">Submit</button>
+    <button class="govuk-button" type="submit">Submit</button>
 </div>
 }
 }
