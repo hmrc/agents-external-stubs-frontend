@@ -10,16 +10,16 @@ lazy val scoverageSettings = {
     ScoverageKeys.coverageMinimum := 80.00,
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true,
-    parallelExecution in Test := false
+    Test / parallelExecution := false
   )
 }
 
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "5.16.0",
-  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "1.22.0-play-28",
-  "uk.gov.hmrc"       %% "agent-mtd-identifiers"      % "0.25.0-play-27",
-  "uk.gov.hmrc"       %% "play-partials"              % "8.2.0-play-28",
+  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "5.20.0",
+  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "3.5.0-play-28",
+  "uk.gov.hmrc"       %% "agent-mtd-identifiers"      % "0.34.0-play-28",
+  "uk.gov.hmrc"       %% "play-partials"              % "8.3.0-play-28",
   "uk.gov.hmrc"       %% "agent-kenshoo-monitoring"   % "4.8.0-play-28",
   "com.typesafe.play" %% "play-json-joda"             % "2.9.2"
 )
@@ -59,17 +59,16 @@ lazy val root = (project in file("."))
     routesImport += "uk.gov.hmrc.play.bootstrap.binders._",
     publishingSettings,
     scoverageSettings,
-    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
-    scalafmtOnCompile in Compile := true,
-    scalafmtOnCompile in Test := true
+    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
+    Compile / scalafmtOnCompile := true,
+    Test / scalafmtOnCompile := true
   )
   .configs(IntegrationTest)
   .settings(
-    Keys.fork in IntegrationTest := false,
+    IntegrationTest / Keys.fork := false,
     Defaults.itSettings,
-    unmanagedSourceDirectories in IntegrationTest += baseDirectory(_ / "it").value,
-    parallelExecution in IntegrationTest := false,
-    scalafmtOnCompile in IntegrationTest := true
+    IntegrationTest / unmanagedSourceDirectories += baseDirectory(_ / "it").value,
+    IntegrationTest / parallelExecution := false
   )
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
 
