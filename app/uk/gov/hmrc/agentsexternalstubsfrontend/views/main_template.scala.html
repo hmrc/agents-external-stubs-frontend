@@ -14,19 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukLayout, GovukBackLink}
-@import uk.gov.hmrc.govukfrontend.views.html.components.{BackLink, Text}
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcBanner, Banner}
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.{header, head}
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardFooter, HmrcScripts}
-@import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsMainContent
-@import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsOneThirdMainContent
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcTrackingConsentSnippet
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.head
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, TwoThirdsMainContent, TwoThirdsOneThirdMainContent}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcLayout, HmrcTrackingConsentSnippet}
 @import views.html.helper.CSPNonce
 
 @this(
-    header: header,
     head: head,
     hmrcLayout: HmrcLayout,
     govukBackLink: GovukBackLink,
@@ -51,6 +44,7 @@
 
 @hmrcLayout(
     pageTitle = Some(title),
+    serviceName = Some(msgs("app.name")),
     isWelshTranslationAvailable = false,
     displayHmrcBanner = true,
     serviceUrl = None,

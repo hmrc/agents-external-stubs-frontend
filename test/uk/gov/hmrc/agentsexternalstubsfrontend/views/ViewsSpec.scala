@@ -68,7 +68,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
           loginForm = filledForm,
           postUrl = routes.SignInController.signIn(None, Some("foo"), None, AuthProvider.GovernmentGateway),
           request = FakeRequest(),
-          messages = appMessages
+          msgs = appMessages
         )
       val content = contentAsString(html)
       content should include(messagesApi("start.title"))
@@ -161,7 +161,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         sidebar = Some(Html("My custom sidebar links")),
         mainContent = Html("My custom main content HTML"),
         request = FakeRequest(),
-        messages = appMessages
+        msgs = appMessages
       )
 
       val content = contentAsString(html)
