@@ -59,7 +59,7 @@
         govukDateInput: GovukDateInput,
         govukButton: GovukButton)
 
-@(userForm: Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], messages: Messages)
+@(userForm: Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @principalEnrolments = @{
     ViewHelper.buildTree("", userForm.data)("principalEnrolments")
@@ -73,18 +73,18 @@
     ViewHelper.buildTree("", userForm.data)("suspendedRegimes")
 }
 
-@mainTemplate(title = Messages("user.title", userId), wide = true) {
+@mainTemplate(title = msgs("user.title", userId), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl">@Messages("user.edit.header", userId)</h1>
+    <h1 class="govuk-heading-l">@msgs("user.edit.header", userId)</h1>
 
     @if(userForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(userForm))
     }
 
     <p class="govuk-hint">
-    @Messages("user.edit.description")
+    @msgs("user.edit.description")
     </p>
 
     <div>
@@ -93,49 +93,49 @@
             <div class="form-field-group">
 
                 @govukSelect(Select(
-                    label = Label(content = Text(Messages("user.form.affinityGroup"))),
+                    label = Label(content = Text(msgs("user.form.affinityGroup"))),
                     hint = Some(Hint(content = Text("If the user is an Admin of its group, then you might not be able to change this without changing groupId as well."))),
                     items = AffinityGroup.values.map(ag => SelectItem(value = Some(ag), text = ag))
                 ).withFormField(userForm("affinityGroup")))
 
                 @govukInput(Input(
                     label = Label(
-                        content = Text(Messages("user.form.name")),
+                        content = Text(msgs("user.form.name")),
                     ),
                     classes = "govuk-input govuk-input--width-20"
                 ).withFormField(userForm("name")))
 
                 <div class="govuk-button-group">
                     @govukButton(Button(
-                        content = if(hasContinue) Text(Messages("user.edit.update_and_continue")) else Text(Messages("user.edit.update")),
+                        content = if(hasContinue) Text(msgs("user.edit.update_and_continue")) else Text(msgs("user.edit.update")),
                         attributes = Map("id" -> "update")
                     ))
 
                     <a class="govuk-body govuk-link" href="@{cancelCall.url}">
-                        @Messages("user.edit.cancel")
+                        @msgs("user.edit.cancel")
                     </a>
                 </div>
 
                 @govukSelect(Select(
-                    label = Label(content = Text(Messages("user.form.credentialRole"))),
+                    label = Label(content = Text(msgs("user.form.credentialRole"))),
                     hint = Some(Hint(content = Text("If the user is an Admin of its group, then you might not be able to change this without changing groupId as well."))),
                     items = CredentialRole.values.map(role => SelectItem(value = Some(role), text = role))
                 ).withFormField(userForm("credentialRole")))
 
                 @govukSelect(Select(
-                    label = Label(content = Text(Messages("user.form.credentialStrength"))),
+                    label = Label(content = Text(msgs("user.form.credentialStrength"))),
                     items = CredStrength.values.map(strength => SelectItem(value = Some(strength), text = strength))
                 ).withFormField(userForm("credentialStrength")))
 
                 @if(userForm.data.get("affinityGroup").contains("Individual")) {
                     @govukSelect(Select(
-                        label = Label(content = Text(Messages("user.form.confidenceLevel"))),
+                        label = Label(content = Text(msgs("user.form.confidenceLevel"))),
                         items = ConfidenceLevel.values.map(lvl => SelectItem(value = Some(lvl._1), text = lvl._2))
                     ).withFormField(userForm("confidenceLevel")))
 
                     @govukInput(Input(
                         label = Label(
-                            content = Text(Messages("user.form.nino")),
+                            content = Text(msgs("user.form.nino")),
                         ),
                         classes = "govuk-input govuk-input--width-10"
                     ).withFormField(userForm("nino")))
@@ -143,19 +143,19 @@
                     @govukDateInput(DateInput(
                         fieldset = Some(Fieldset(
                             legend = Some(Legend(
-                                content = Text(Messages("user.form.dateOfBirth")),
+                                content = Text(msgs("user.form.dateOfBirth")),
                             ))
                         ))
                     ).withFormField(userForm("dateOfBirth")))
 @*                    @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
-                        '_legend -> Html("""<span class="h2-heading soft--ends">""" + Messages("user.form.dateOfBirth") + """</span>"""),
+                        '_legend -> Html("""<span class="h2-heading soft--ends">""" + msgs("user.form.dateOfBirth") + """</span>"""),
                         '_labelClass -> "soft--ends"
                     ) *@
                 }
 
                 @govukInput(Input(
                     label = Label(
-                        content = Text(Messages("user.form.groupIdentifier")),
+                        content = Text(msgs("user.form.groupIdentifier")),
                     ),
                     classes = "govuk-input govuk-input--width-20"
                 ).withFormField(userForm("groupId")))
@@ -163,23 +163,23 @@
                 @if(userForm.data.get("affinityGroup").contains("Agent")) {
                     @govukInput(Input(
                         label = Label(
-                            content = Text(Messages("user.form.agentCode")),
+                            content = Text(msgs("user.form.agentCode")),
                         ),
                         classes = "govuk-input govuk-input--width-20"
                     ).withFormField(userForm("agentCode")))
 
                     @govukInput(Input(
                         label = Label(
-                            content = Text(Messages("user.form.agentFriendlyName")),
+                            content = Text(msgs("user.form.agentFriendlyName")),
                         ),
                         classes = "govuk-input govuk-input--width-20"
                     ).withFormField(userForm("agentFriendlyName")))
                 }
 
-                <a name="address"></a>
+                <a class="govuk-body govuk-link" name="address"></a>
 
                 @govukInput(Input(
-                    label = Label(content = Text(Messages("user.form.address"))),
+                    label = Label(content = Text(msgs("user.form.address"))),
                     attributes = Map("maxlength" -> "35"),
                     classes = "govuk-input govuk-input--width-20",
                     formGroupClasses = "govuk-!-margin-bottom-1"
@@ -204,14 +204,14 @@
 
                 @govukInput(Input(
                     label = Label(
-                        content = Text(Messages("user.form.address.postcode"))
+                        content = Text(msgs("user.form.address.postcode"))
                     ),
                     attributes = Map("maxlength" -> "10"),
                     classes = "govuk-input govuk-input--width-10"
                 ).withFormField(userForm("address.postcode")))
 
                 @govukSelect(Select(
-                    label = Label(content = Text(Messages("user.form.address.countryCode"))),
+                    label = Label(content = Text(msgs("user.form.address.countryCode"))),
                     items = CountryCodes.values.map(cc => SelectItem(value = Some(cc._1), text = cc._2))
                 ).withFormField(userForm("address.countryCode")))
 
@@ -219,17 +219,17 @@
 
             <div class="govuk-button-group">
                 @govukButton(Button(
-                    content = if(hasContinue) Text(Messages("user.edit.update_and_continue")) else Text(Messages("user.edit.update")),
+                    content = if(hasContinue) Text(msgs("user.edit.update_and_continue")) else Text(msgs("user.edit.update")),
                     attributes = Map("id" -> "update")
                 ))
 
                 <a class="govuk-body govuk-link" href="@{cancelCall.url}">
-                    @Messages("user.edit.cancel")
+                    @msgs("user.edit.cancel")
                 </a>
             </div>
 
             @if(userForm.data.get("affinityGroup").nonEmpty && !userForm.data.get("affinityGroup").contains("none")) {
-                <a name="enrolments"></a>
+                <a class="govuk-body govuk-link" name="enrolments"></a>
                 <h2>Principal enrolments</h2>
 
                 <div id="principalEnrolments" class="form-group" style="text-align: right">
@@ -271,8 +271,7 @@
                                     ).withFormField(userForm(s"${identifier.key}.value")))
                                 </td>
                                 <td class="govuk-table__cell">
-                                    <a style="text-decoration: underline;
-                                        cursor: pointer;" onclick="document.getElementById('principalEnrolment-@i-row').remove()">
+                                    <a class="govuk-body govuk-link" onclick="document.getElementById('principalEnrolment-@i-row').remove()">
                                                 Remove
                                     </a>
                                 </td>
@@ -306,7 +305,7 @@
             }
 
             @if(userForm.data.get("affinityGroup").contains("Agent")) {
-                <a name="delegated"></a>
+                <a class="govuk-body govuk-link" name="delegated"></a>
                 <h2>Delegated enrolments</h2>
 
                 <span class="govuk-hint">Only Agents can have delegated enrolments.</span>
@@ -350,10 +349,8 @@
                                     ).withFormField(userForm(s"${identifier.key}.value")))
                                 </td>
                                 <td class="govuk-table__cell">
-                                    <a style="text-decoration: underline;
-                                        cursor: pointer;" onclick="document.getElementById('delegatedEnrolment-@i-row').remove()">
-                                            Remove
-                                    </a>
+                                    <a class="govuk-body govuk-link"
+                                        onclick="document.getElementById('delegatedEnrolment-@i-row').remove()">Remove</a>
                                 </td>
                                 </tr>
                             }
@@ -386,7 +383,7 @@
             }
 
             @if(userForm.data.get("affinityGroup").isEmpty || userForm.data.get("affinityGroup").contains("none")) {
-                <a name="stride"></a>
+                <a name="stride" class="govuk-body govuk-link"></a>
                 <h2>Stride roles</h2>
 
                 <span class="govuk-hint">
@@ -398,7 +395,7 @@
             }
 
             @if(userForm.data.get("affinityGroup").contains("Agent")) {
-                <a name = "suspendedRegimes"></a>
+                <a class="govuk-body govuk-link" name = "suspendedRegimes"></a>
                 <h2>Suspended Regimes</h2>
                 <span class="govuk-hint">Only Agents can be suspended. Valid Regimes: ITSA, VATC, TRS, CGT, PPT, IRV, ALL, AGSV</span>
 
@@ -421,8 +418,7 @@
                                     ).withFormField(userForm(s"suspendedRegimes[$index]")))
                                 </td>
                                 <td class="govuk-table__cell">
-                                    <a style="text-decoration: underline;
-                                        cursor: pointer;" onclick="document.getElementById('suspendedRegimes-@index-row').remove()">
+                                    <a class="govuk-body govuk-link" onclick="document.getElementById('suspendedRegimes-@index-row').remove()">
                                             Remove
                                     </a>
                                 </td>
@@ -447,19 +443,19 @@
 
             @govukCheckboxes(Checkboxes(
                 items = Seq(CheckboxItem(
-                    content = Text(Messages("user.form.isNonCompliant")),
-                    hint = Some(Hint(content = Text(Messages("user.form.isNonCompliant.hint"))))
+                    content = Text(msgs("user.form.isNonCompliant")),
+                    hint = Some(Hint(content = Text(msgs("user.form.isNonCompliant.hint"))))
                 ))
             ).withFormField(userForm("isNonCompliant")))
 
             <div class="govuk-button-group">
                 @govukButton(Button(
-                    content = if(hasContinue) Text(Messages("user.edit.update_and_continue")) else Text(Messages("user.edit.update")),
+                    content = if(hasContinue) Text(msgs("user.edit.update_and_continue")) else Text(msgs("user.edit.update")),
                     attributes = Map("id" -> "update")
                 ))
 
                 <a class="govuk-body govuk-link" href="@{cancelCall.url}">
-                    @Messages("user.edit.cancel")
+                    @msgs("user.edit.cancel")
                 </a>
             </div>
 

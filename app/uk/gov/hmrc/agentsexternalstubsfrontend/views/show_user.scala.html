@@ -48,32 +48,32 @@
         govukButton: GovukButton
 )
 
-@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[RedirectUrl], userId: String,enrolments: Seq[String], context: PageContext)(implicit request: Request[_], messages: Messages)
+@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[RedirectUrl], userId: String,enrolments: Seq[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @sidebarLinks = {
     <nav id="secondary-nav" class="govuk-!-margin-bottom-3" role="navigation">
-        <a class="govuk-body govuk-link" href="/agents-external-stubs/gg/sign-out">@Messages("common.sign-out")</a>
+        <a class="govuk-body govuk-link" href="/agents-external-stubs/gg/sign-out">@msgs("common.sign-out")</a>
     </nav>
     <div>
-        <h3 class="govuk-!-margin-bottom-1">@Messages("user.show.planetId")</h3>
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">@msgs("user.show.planetId")</h3>
         <div id="planetId" class="govuk-body" style="overflow-wrap: break-word;">@context.planetId</div>
     </div>
     <div>
     @if(userId!=context.authorisedUserId){
-        <h3 class="govuk-!-margin-bottom-1">Authenticated user</h3>
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Authenticated user</h3>
         <div class="govuk-body">
             <a id="link_users_current" href="/agents-external-stubs/user">@context.authorisedUserId</a>
         </div>
     }
     </div>
     <div>
-        <h3 class="govuk-!-margin-bottom-1">@Messages("user.show.authToken")</h3>
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">@msgs("user.show.authToken")</h3>
         <div class="govuk-body" id="authToken" style="overflow-wrap: break-word;">
             @{authToken.getOrElse("none")}
         </div>
     </div>
     <div>
-        <h3 class="govuk-!-margin-bottom-1">@Messages("user.show.sessionId")</h3>
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">@msgs("user.show.sessionId")</h3>
         <div class="govuk-body" id="sessionId">
             @{sessionId.getOrElse("none")}
         </div>
@@ -82,12 +82,13 @@
         curl -v -H 'Authorization: @{authToken.getOrElse("")}' -H 'X-Session-ID: @{sessionId.getOrElse("")}'
     </div>
     <ul class="govuk-list">
-        <li><a id="link_users_all" href="/agents-external-stubs/users">@Messages("users.link.all")</a></li>
-        <li><a class="govuk-link" id="link_records_all" href="/agents-external-stubs/records">@Messages("records.link.all") (DES)</a></li>
-        <li><a class="govuk-link" id="link_special_cases" href="/agents-external-stubs/special-cases">@Messages("specialCase.link.all")</a></li>
+        <li><a class="govuk-body govuk-link" id="link_users_all"
+        href="/agents-external-stubs/users">@msgs("users.link.all")</a></li>
+        <li><a class="govuk-link" id="link_records_all" href="/agents-external-stubs/records">@msgs("records.link.all") (DES)</a></li>
+        <li><a class="govuk-link" id="link_special_cases" href="/agents-external-stubs/special-cases">@msgs("specialCase.link.all")</a></li>
     </ul>
 
-    <h3 class="govuk-!-margin-bottom-1" id="create-user-label">@Messages("users.link.create")</h3>
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1" id="create-user-label">@msgs("users.link.create")</h3>
 
     @form(action = Call("GET", "/agents-external-stubs/user/create")) {
         @{play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) }}
@@ -102,7 +103,7 @@
                 attributes = Map("aria-labelledby" -> "create-user-label")
             ))
             @govukButton(Button(
-                content = Text(Messages("user.show.create")),
+                content = Text(msgs("user.show.create")),
                 classes = "govuk-!-display-inline"
             ))
         </div>
@@ -111,14 +112,16 @@
     <ul class="govuk-list">
         @if(context.features.mayShowRestQuery(context.planetId)) {
             <li>
-                <a id="link_rest_query" href="/agents-external-stubs/rest-query">
-                    @Messages("rest.query.link", (if(Set('a', 'e', 'o', 'u', 'y').contains(context.authorisedUserId.head.toLower)) "an " else "a ") + context.authorisedUserId)
+                <a id="link_rest_query" class="govuk-body govuk-link" href="/agents-external-stubs/rest-query">
+                    @msgs("rest.query.link", (if(Set('a', 'e', 'o', 'u', 'y').contains(context.authorisedUserId.head.toLower)) "an " else "a ") + context.authorisedUserId)
                 </a>
             </li>
         }
         @if(context.features.showEnrolments) {
             <li>
-                <a id="link_help_enrolments" href="/agents-external-stubs/services">@Messages("services.link.guide")</a>
+                <a id="link_help_enrolments"
+                    class="govuk-body govuk-link"
+                    href="/agents-external-stubs/services">@msgs("services.link.guide")</a>
             </li>
         }
     </ul>
@@ -128,14 +131,14 @@
             play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
         }
         <a id="link_planet_destroy" class="govuk-body govuk-link" onclick="if(confirm('Please confirm you wish to destroy current planet and lost the associated data?')){document.forms.namedItem('destroyPlanet').submit()};">
-            @Messages("planet.link.destroy")
+            @msgs("planet.link.destroy")
         </a>
     }
 }
 
 @showField(value: Option[_], name: String, id: String) = @{
     value.map(x =>
-        SummaryListRow(key = Key(Text(Messages(name))), value = Value(Text(value.get.toString)))
+        SummaryListRow(key = Key(Text(msgs(name))), value = Value(Text(value.get.toString)))
     )
 }
 
@@ -160,26 +163,26 @@
     }
 }
 
-@mainTemplate(title = Messages("user.title", user.userId), sidebar = Some(sidebarLinks)) {
+@mainTemplate(title = msgs("user.title", user.userId), sidebar = Some(sidebarLinks)) {
 
-    <h1 class="govuk-heading-xl">
-    @if(userId==context.authorisedUserId){ @Messages("user.current.show.header", userId) }else{ @Messages("user.show.header", userId) }
+    <h1 class="govuk-heading-l">
+    @if(userId==context.authorisedUserId){ @msgs("user.current.show.header", userId) }else{ @msgs("user.show.header", userId) }
     </h1>
 
-    <p>
-    @if(userId==context.authorisedUserId){ @Messages("user.current.show.description") } else { @Messages("user.show.description") }
+    <p class="govuk-body">
+    @if(userId==context.authorisedUserId){ @msgs("user.current.show.description") } else { @msgs("user.show.description") }
     </p>
 
     @if(user.isPermanent.contains(true)){
         <p class="govuk-hint">
-        @Messages("user.show.isPermanent")
+        @msgs("user.show.isPermanent")
         </p>
     }
     @if(user.isNonCompliant.contains(true)){
         <div class="form-group">
             <details role="group">
                 <summary role="button" aria-controls="details-content-0" aria-expanded="false">
-                    <span class="summary">@Messages("user.show.isNonCompliant")</span>
+                    <span class="summary">@msgs("user.show.isNonCompliant")</span>
                 </summary>
                 <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="true">
                     @for(issue <- user.complianceIssues){
@@ -193,25 +196,25 @@
     @govukSummaryList(SummaryList(
         rows = Seq(
             SummaryListRow(
-                key = Key(Text(Messages("user.form.userId"))),
+                key = Key(Text(msgs("user.form.userId"))),
                 value = Value(Text(user.userId))
             ),
             SummaryListRow(
-                key = Key(Text(Messages("user.form.affinityGroup"))),
+                key = Key(Text(msgs("user.form.affinityGroup"))),
                 value = Value(HtmlContent(s"""<span class="badge badge-${user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">
                                              |    ${user.affinityGroup.getOrElse("none")}
                                              |</span>""".stripMargin))
             ),
             SummaryListRow(
-                key = Key(Text(Messages("user.form.name"))),
+                key = Key(Text(msgs("user.form.name"))),
                 value = Value(Text(user.name.getOrElse("none")))
             ),
             SummaryListRow(
-                key = Key(Text(Messages("user.form.groupIdentifier"))),
+                key = Key(Text(msgs("user.form.groupIdentifier"))),
                 value = Value(Text(user.groupId.getOrElse("none")))
             ),
             SummaryListRow(
-                key = Key(Text(Messages("user.form.name"))),
+                key = Key(Text(msgs("user.form.name"))),
                 value = Value(Text(user.name.getOrElse("none")))
             )
         ) ++ List(
@@ -224,7 +227,7 @@
             showField(user.agentFriendlyName,"user.form.agentFriendlyName","agentFriendlyName"),
             user.address.map ( address =>
                 SummaryListRow(
-                    key = Key(Text(Messages("user.form.address"))),
+                    key = Key(Text(msgs("user.form.address"))),
                     value = Value(HtmlContent(showAddress(address)))
                 )
             )
@@ -233,14 +236,10 @@
 
     <div class="govuk-button-group">
 
-        <a class="govuk-button" id="update-0" href="@editUrl.url">
-            @Messages("user.show.edit")
-        </a>
+        <a class="govuk-button" id="update-0" href="@editUrl.url">@msgs("user.show.edit")</a>
 
         @if(continue.isDefined) {
-            <a href="@{continue.get.unsafeValue}">
-            @Messages("user.show.continue")
-            </a>
+            <a class="govuk-body govuk-link" href="@{continue.get.unsafeValue}">@msgs("user.show.continue")</a>
         }
         @if(userId!=context.authorisedUserId) {
             <a class="govuk-body govuk-link" href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a>
@@ -250,7 +249,7 @@
     </div>
 
     @if(user.affinityGroup.nonEmpty) {
-        <h3>Principal enrolments</h3>
+        <h3 class="govuk-heading-s"Principal enrolments</h3>
 
         @if(user.principalEnrolments.nonEmpty && user.principalEnrolments.get.nonEmpty) {
             @govukTable(Table(
@@ -298,7 +297,7 @@
 
     @if(user.affinityGroup.contains("Agent")) {
 
-        <h3>Delegated enrolments</h3>
+        <h3 class="govuk-heading-s"Delegated enrolments</h3>
 
         @if(user.delegatedEnrolments.nonEmpty && user.delegatedEnrolments.get.nonEmpty) {
             @govukTable(Table(
@@ -341,13 +340,14 @@
             <span class="govuk-hint">This agent has no delegated enrolments.</span>
         }
       <div style="margin-top: 0.5em;width: 100%;text-align: right;">
-          <a href="/agents-external-stubs/user/edit?userId=@user.userId#delegated">Add delegated enrolment</a>
+          <a class="govuk-link" href="/agents-external-stubs/user/edit?userId=@user.userId#delegated">Add delegated
+              enrolment</a>
       </div>
     }
 
     @if(user.affinityGroup.contains("Agent")) {
 
-        <h3>Suspended Regimes</h3>
+        <h3 class="govuk-heading-s"Suspended Regimes</h3>
 
         @if(user.suspendedRegimes.nonEmpty) {
             @govukTable(Table(
@@ -373,7 +373,7 @@
       <span class="govuk-hint">This user is an internal HMRC staff eligible for STRIDE authentication.</span>
         @govukSummaryList(SummaryList(
             rows = Seq(
-                SummaryListRow(key = Key(Text(Messages("user.show.strideRoles"))), value = Value(Text(user.strideRoles.mkString(", "))))
+                SummaryListRow(key = Key(Text(msgs("user.show.strideRoles"))), value = Value(Text(user.strideRoles.mkString(", "))))
             )
         ))
     }
@@ -382,13 +382,11 @@
         <div class="govuk-button-group">
 
             <a class="govuk-button" href="@editUrl.url" id="update-1">
-                @Messages("user.show.edit")
+                @msgs("user.show.edit")
             </a>
 
             @if(continue.isDefined) {
-                <a href="@{continue.get.unsafeValue}">
-                    @Messages("user.show.continue")
-                </a>
+                <a class="govuk-body govuk-link" href="@{continue.get.unsafeValue}">@msgs("user.show.continue")</a>
             }
             @if(userId != context.authorisedUserId) {
                 <a class="govuk-body govuk-link" href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a>
@@ -400,11 +398,12 @@
 
     @if(user.recordIds.nonEmpty && user.recordIds.get.nonEmpty) {
 
-        <h3>Associated master records (DES)</h3>
+        <h3 class="govuk-heading-s"Associated master records (DES)</h3>
 
         <ul class="govuk-list govuk-list--bullet">
           @for(recordId <- user.recordIds.get){
-            <li><a href="/agents-external-stubs/records?showId=@recordId">@recordId</a></li>
+            <li><a class="govuk-body govuk-link"
+                    href="/agents-external-stubs/records?showId=@recordId">@recordId</a></li>
           }
         </ul>
     }
@@ -423,7 +422,8 @@
                     attributes = Map("aria-label" -> "Principal enrolment")
                 ))
                 <input type="hidden" name="userId" value="@user.userId"/>
-                <a style="text-decoration: underline;margin-left: 0.5em; cursor: pointer;" onclick="document.getElementById('add_enrolment').submit()">Add enrolment</a>
+                <a class="govuk-body govuk-link"
+                    onclick="document.getElementById('add_enrolment').submit()">Add enrolment</a>
             </form>
         </div>
     }

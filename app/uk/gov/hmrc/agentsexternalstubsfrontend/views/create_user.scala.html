@@ -37,6 +37,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukFieldset
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
+@import views.html.helper.CSPNonce
 
 @this(
         mainTemplate: main_template,
@@ -49,23 +50,23 @@
         navigationBar: navigationBar
 )
 
-@(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, hasContinue: Boolean, services: Seq[(String,String)], context: PageContext)(implicit request: Request[_], messages: Messages)
+@(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, hasContinue: Boolean, services: Seq[(String,String)], context: PageContext)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = Messages("user.title", userId), wide = true) {
+@mainTemplate(title = msgs("user.title", userId), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl" style="margin-bottom: 1em;">@Messages("user.create.header", userId)</h1>
+    <h1 class="govuk-heading-l" style="margin-bottom: 1em;">@msgs("user.create.header", userId)</h1>
 
     @if(userForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(userForm))
     }
 
     <p class="govuk-hint">
-        @Messages("user.create.description")
+        @msgs("user.create.description")
     </p>
 
-  <script>
+  <script @{CSPNonce.attr} >
       function filterServices(keyword){
           var selectId = "principalEnrolments[0].key";
           var select = document.getElementById(selectId);
@@ -90,7 +91,7 @@
                 name = "affinityGroup",
                 fieldset = Some(Fieldset(
                     legend = Some(Legend(
-                        content = Text(Messages("user.form.affinityGroup")),
+                        content = Text(msgs("user.form.affinityGroup")),
                         classes = "govuk-fieldset__legend govuk-fieldset__legend--m"
                     ))
                 )),
@@ -106,7 +107,7 @@
 
             @govukSelect(Select(
                 label = Label(
-                    content = Text(Messages("user.form.principalEnrolment")),
+                    content = Text(msgs("user.form.principalEnrolment")),
                     classes = Seq("govuk-label", "govuk-label--m", if (userForm(s"principalEnrolments[0].key").hasErrors) "error" else "").mkString(" ")
                 ),
                 attributes = Map("id" -> "principalEnrolments[0].key", "name" -> "principalEnrolments[0].key"),
@@ -124,11 +125,11 @@
 
             <div class="govuk-button-group">
                 @govukButton(Button(
-                    content = if (hasContinue) Text(Messages("user.create.update_and_continue")) else Text(Messages("user.create.update")),
+                    content = if (hasContinue) Text(msgs("user.create.update_and_continue")) else Text(msgs("user.create.update")),
                     attributes = Map("id" -> "update")
                 ))
-                <a class="govuk-body govuk-link" href="@{editCall.url}">@Messages("user.create.edit")</a>
-                <a class="govuk-body govuk-link" href="@{cancelCall.url}">@Messages("user.create.cancel")</a>
+                <a class="govuk-body govuk-link" href="@{editCall.url}">@msgs("user.create.edit")</a>
+                <a class="govuk-body govuk-link" href="@{cancelCall.url}">@msgs("user.create.cancel")</a>
             </div>
         }
     </div>

@@ -18,9 +18,9 @@
 
 @this(mainTemplate: main_template)
 
-@(pageTitleMsgKey: String, headingMsgKey: String, messageMsgKey: String)(implicit messages: Messages, request: Request[_])
+@(pageTitleMsgKey: String, headingMsgKey: String, messageMsgKey: String)(implicit msgs: Messages, request: Request[_])
 
-@mainTemplate(title = Messages(pageTitleMsgKey)) {
- <h1 class="govuk-heading-xl">@Messages(headingMsgKey)</h1>
- <p>@Messages(messageMsgKey)</p>
+@mainTemplate(title = msgs(pageTitleMsgKey)) {
+ <h1 class="govuk-heading-l">@msgs(headingMsgKey)</h1>
+ <p class="govuk-body">@msgs(messageMsgKey)</p>
 }

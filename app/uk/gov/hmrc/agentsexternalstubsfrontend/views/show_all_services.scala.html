@@ -20,16 +20,16 @@
 
 @this(mainTemplate: main_template, navigationBar: navigationBar)
 
-@(services:Services, context: PageContext)(implicit request: Request[_], messages: Messages)
+@(services:Services, context: PageContext)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = Messages("knownFacts.title"), wide = true) {
+@mainTemplate(title = msgs("knownFacts.title"), wide = true) {
 
     @navigationBar(context)
 
-    <h1 class="govuk-heading-xl">@Messages("services.show.header")</h1>
+    <h1 class="govuk-heading-l">@msgs("services.show.header")</h1>
 
     <p class="govuk-hint">
-        @Messages("services.show.description")
+        @msgs("services.show.description")
     </p>
 
     <table id="services" class="govuk-table govuk-!-margin-bottom-6">

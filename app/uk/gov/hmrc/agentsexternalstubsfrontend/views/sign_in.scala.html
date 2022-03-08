@@ -44,14 +44,14 @@
         govukFieldset: GovukFieldset,
         govukDetails: GovukDetails)
 
-@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest], postUrl: Call)(implicit request: Request[_], messages: Messages)
+@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest], postUrl: Call)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = Messages("login.title")) {
+@mainTemplate(title = msgs("login.title")) {
 
     @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
         @govukFieldset(Fieldset(
             legend = Some(Legend(
-                content = Text(Messages("login.sa.header")),
+                content = Text(msgs("login.sa.header")),
                 isPageHeading = true,
                 classes = "govuk-fieldset__legend--xl"
             ))
@@ -59,40 +59,40 @@
 
         @if(loginForm.hasErrors) {
             @govukErrorSummary(ErrorSummary(
-                title = Text(Messages("error.summary.heading")),
+                title = Text(msgs("error.summary.heading")),
                 errorList = Seq(
                     loginForm.errors("userId").map(error => ErrorLink(
-                        content = Text(s"Invalid Username: ${Messages(error.message)}"),
+                        content = Text(s"Invalid Username: ${msgs(error.message)}"),
                         href = Some("#userId")
                     )),
                     loginForm.errors("planetId").map(error => ErrorLink(
-                        content = Text(s"Invalid Planet: ${Messages(error.message)}"),
+                        content = Text(s"Invalid Planet: ${msgs(error.message)}"),
                         href = Some("#planetId")
                     )),
-                    loginForm.globalErrors.map(error => ErrorLink(content = Text(Messages(error.message))))
+                    loginForm.globalErrors.map(error => ErrorLink(content = Text(msgs(error.message))))
                 ).flatten
             ))
         }
 
-        <p>@Html(Messages("login.sa.description"))</p>
+        <p class="govuk-body">@Html(msgs("login.sa.description"))</p>
 
         @govukInput(Input(
-            label = Label(content = Text(Messages("login.username"))),
-            hint = Some(Hint(id = Some("username-hint"), content = Text(Messages("login.username.placeholder")))),
+            label = Label(content = Text(msgs("login.username"))),
+            hint = Some(Hint(id = Some("username-hint"), content = Text(msgs("login.username.placeholder")))),
             pattern = Some("[A-Za-z0-9-_]{6,64}"),
             classes = "govuk-input govuk-input--width-10"
         ).withFormField(loginForm("userId")))
 
-        <p class="govuk-body">@Messages("login.planetId.hint")</p>
+        <p class="govuk-body">@msgs("login.planetId.hint")</p>
 
         @govukInput(Input(
-            label = Label(content = Text(Messages("login.planetId"))),
-            hint = Some(Hint(id = Some("planet-hint"), content = Text(Messages("login.planetId.placeholder")))),
+            label = Label(content = Text(msgs("login.planetId"))),
+            hint = Some(Hint(id = Some("planet-hint"), content = Text(msgs("login.planetId.placeholder")))),
             classes = "govuk-input govuk-input--width-10"
         ).withFormField(loginForm("planetId")))
 
         @govukButton(Button(
-            content = Text(Messages("login.submit")),
+            content = Text(msgs("login.submit")),
             attributes = Map("id" -> "signIn")
         ))
     }
@@ -100,8 +100,8 @@
     @govukDetails(Details(
         summary = Text("Why do I see this page?"),
         content = HtmlContent(
-            """<p>This page provides fake 'Sign In' form served by Agents Stubs.</p>
-              |<p>After sign-in you will have the opportunity to configure your test user further and continue to the service.</p>
+            """<p class="govuk-body">This page provides fake 'Sign In' form served by Agents Stubs.</p>
+              |<p class="govuk-body">After sign-in you will have the opportunity to configure your test user further and continue to the service.</p>
               |<div class="govuk-hint">Check Confluence documentation to see how your QA possibly can benefit from using Agents Stubs.</div>
             |""".stripMargin)
     ))
