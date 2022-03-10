@@ -181,13 +181,11 @@
                 @if(excerpt!=(identity _)){
                     @if(showId.isDefined && id.contains(showId.get)) {
                         <div>
-                            <a role="button" class="govuk-button"
-                            href="/agents-external-stubs/records">Fold ...</a>
+                            <a href="/agents-external-stubs/records">Fold ...</a>
                         </div>
                     } else {
                         <div>
-                            <a role="button" class="govuk-button"
-                                href="/agents-external-stubs/records?showId=@{id.get}#e">Expand ...</a>
+                            <a href="/agents-external-stubs/records?showId=@{id.get}#e">Expand ...</a>
                         </div>
                     }
                 }
