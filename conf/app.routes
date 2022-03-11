@@ -1,8 +1,6 @@
 # microservice specific routes
-
+->          /agents-external-stubs/hmrc-frontend                                   hmrcfrontend.Routes
 GET         /assets/*file                                                          controllers.Assets.versioned(path = "/public", file: Asset)
-
-->          /hmrc-frontend                                                         hmrcfrontend.Routes
 
 # bas-gateway-frontend stubs
 GET         /bas-gateway/sign-in                                                   @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPageSCP(continue_url: Option[RedirectUrl], origin: Option[String])
