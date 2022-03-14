@@ -1,7 +1,6 @@
-->         /                           app.Routes
-->         /agents-external-stubs      stubs.Routes
-->         /bas-gateway                bas.Routes
-->         /                           health.Routes
+->         /                     app.Routes
 
-GET        /admin/metrics              @com.kenshoo.play.metrics.MetricsController.metrics
+->         /                     health.Routes
+
+GET        /admin/metrics        @com.kenshoo.play.metrics.MetricsController.metrics
 
