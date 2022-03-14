@@ -1,6 +1,4 @@
 # microservice specific routes
-GET         /assets/*file                                                          controllers.Assets.versioned(path = "/public", file: Asset)
-->          /hmrc-frontend                                                         hmrcfrontend.Routes
 
 # deprecated company-auth-frontend stubs
 GET         /gg/sign-in                                                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
