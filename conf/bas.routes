@@ -1,0 +1,11 @@
+# microservice specific routes
+GET         /assets/*file                                                          controllers.Assets.versioned(path = "/public", file: Asset)
+->          /hmrc-frontend                                                         hmrcfrontend.Routes
+
+# bas-gateway-frontend stubs
+GET         /sign-in                                                   @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPageSCP(continue_url: Option[RedirectUrl], origin: Option[String])
+GET         /sso-sign-in                                               @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInSsoSCP(continue_url: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
+GET         /sign-out-without-state                                    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutSCP(continue: Option[RedirectUrl] ?= None)
+GET         /sign-out-with-state                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutSCP(continue: Option[RedirectUrl] ?= None)
+GET         /register                                                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.register(continueUrl: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
+
