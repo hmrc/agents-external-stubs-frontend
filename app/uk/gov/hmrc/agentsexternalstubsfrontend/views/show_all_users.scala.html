@@ -73,11 +73,11 @@
     @msgs("users.show.description")
     </p>
 
-    @form(action = Call("POST", "/agents-external-stubs/planet/destroy"), 'name -> "destroyPlanet", 'id -> "destroyPlanet") {
+    @form(action = Call("GET", "/agents-external-stubs/planet/destroy"), 'name -> "destroyPlanet", 'id -> "destroyPlanet") {
         @{
             play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
         }
-    <a id="link_planet_destroy" class="govuk-body govuk-link" onclick="if(confirm('Please confirm you wish to destroy current planet and lost the associated data?')){document.forms.namedItem('destroyPlanet').submit()};">
+    <a id="link_planet_destroy" class="govuk-body govuk-link" onclick="if(confirm('Please confirm you wish to destroy current planet and lose the associated data?')){document.getElementById('destroyPlanet').submit()};">
         @msgs("planet.link.destroy")
     </a>
     }
