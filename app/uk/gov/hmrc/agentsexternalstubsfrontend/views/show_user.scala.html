@@ -126,7 +126,7 @@
         }
     </ul>
 
-    @form(action = Call("POST", "/agents-external-stubs/planet/destroy")) {
+    @form(action = Call("POST", "/agents-external-stubs/planet/destroy"), 'name -> "destroyPlanet", 'id -> "destroyPlanet") {
         @{
             play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
         }
