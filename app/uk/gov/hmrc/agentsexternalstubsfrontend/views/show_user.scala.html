@@ -126,11 +126,11 @@
         }
     </ul>
 
-    @form(action = Call("POST", "/agents-external-stubs/planet/destroy")) {
+    @form(action = Call("GET", "/agents-external-stubs/planet/destroy"), 'name -> "destroyPlanet", 'id -> "destroyPlanet") {
         @{
             play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
         }
-        <a id="link_planet_destroy" class="govuk-body govuk-link" onclick="if(confirm('Please confirm you wish to destroy current planet and lost the associated data?')){document.forms.namedItem('destroyPlanet').submit()};">
+        <a id="link_planet_destroy" class="govuk-body govuk-link" onclick="if(confirm('Please confirm you wish to destroy current planet and lose the associated data?')){document.getElementById('destroyPlanet').submit()};">
             @msgs("planet.link.destroy")
         </a>
     }
@@ -249,7 +249,7 @@
     </div>
 
     @if(user.affinityGroup.nonEmpty) {
-        <h3 class="govuk-heading-s"Principal enrolments</h3>
+        <h3 class="govuk-heading-s">Principal enrolments</h3>
 
         @if(user.principalEnrolments.nonEmpty && user.principalEnrolments.get.nonEmpty) {
             @govukTable(Table(
@@ -265,12 +265,12 @@
                                 Seq(TableRow(
                                   rowspan = Some(e.identifiers.get.size),
                                   content = if (context.features.showEnrolments)
-                                    HtmlContent(s"""<a href="/agents-external-stubs/services#${e.key}">${e.key}</a>""")
+                                    HtmlContent(s"""<a class="govuk-body govuk-link" href="/agents-external-stubs/services#${e.key}">${e.key}</a>""")
                                      else Text(e.key)
                                 ))
                             else Seq.empty[TableRow]) ++ Seq(
                                 TableRow(Text(i.key)),
-                                TableRow(HtmlContent(s"""<a href="/agents-external-stubs/known-facts${e.toEnrolmentKey.map(ek => "?enrolmentKey=" + ek.tag).getOrElse("")}">
+                                TableRow(HtmlContent(s"""<a class="govuk-body govuk-link" href="/agents-external-stubs/known-facts${e.toEnrolmentKey.map(ek => "?enrolmentKey=" + ek.tag).getOrElse("")}">
                                                         |    ${i.value}
                                                         |</a>""".stripMargin))
                             )
@@ -297,7 +297,7 @@
 
     @if(user.affinityGroup.contains("Agent")) {
 
-        <h3 class="govuk-heading-s"Delegated enrolments</h3>
+        <h3 class="govuk-heading-s">Delegated enrolments</h3>
 
         @if(user.delegatedEnrolments.nonEmpty && user.delegatedEnrolments.get.nonEmpty) {
             @govukTable(Table(
@@ -340,14 +340,14 @@
             <span class="govuk-hint">This agent has no delegated enrolments.</span>
         }
       <div style="margin-top: 0.5em;width: 100%;text-align: right;">
-          <a class="govuk-link" href="/agents-external-stubs/user/edit?userId=@user.userId#delegated">Add delegated
+          <a class="govuk-body govuk-link" href="/agents-external-stubs/user/edit?userId=@user.userId#delegated">Add delegated
               enrolment</a>
       </div>
     }
 
     @if(user.affinityGroup.contains("Agent")) {
 
-        <h3 class="govuk-heading-s"Suspended Regimes</h3>
+        <h3 class="govuk-heading-s">Suspended Regimes</h3>
 
         @if(user.suspendedRegimes.nonEmpty) {
             @govukTable(Table(
@@ -356,7 +356,7 @@
                 )),
                 rows = user.suspendedRegimes.get.toSeq.zipWithIndex.map { case (suspendedRegime, index) =>
                     Seq(TableRow(
-                        if (context.features.showEnrolments) HtmlContent(s"""<a href="/agents-external-stubs/services#$suspendedRegime">$suspendedRegime</a>""")
+                        if (context.features.showEnrolments) HtmlContent(s"""<a class="govuk-body govuk-link" href="/agents-external-stubs/services#$suspendedRegime">$suspendedRegime</a>""")
                         else Text(suspendedRegime)
                     ))
                 }
@@ -365,7 +365,7 @@
             <span class="govuk-hint">This agent is not suspended.</span>
         }
         <div style="margin-top: 0.5em;width: 100%;text-align: right;">
-            <a href="/agents-external-stubs/user/edit?userId=@user.userId#suspendedRegimes">Add suspension</a>
+            <a class="govuk-body govuk-link" href="/agents-external-stubs/user/edit?userId=@user.userId#suspendedRegimes">Add suspension</a>
         </div>
     }
 
@@ -398,7 +398,7 @@
 
     @if(user.recordIds.nonEmpty && user.recordIds.get.nonEmpty) {
 
-        <h3 class="govuk-heading-s"Associated master records (DES)</h3>
+        <h3 class="govuk-heading-s">Associated master records (DES)</h3>
 
         <ul class="govuk-list govuk-list--bullet">
           @for(recordId <- user.recordIds.get){
