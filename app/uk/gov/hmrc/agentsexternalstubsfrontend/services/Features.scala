@@ -22,7 +22,7 @@ import play.api.Configuration
 class Features @Inject() (configuration: Configuration) {
 
   def mayShowRestQuery(planetId: String): Boolean =
-    showRestQuery || whitelistedPlanetPrefix.exists(planetId.startsWith)
+    showRestQuery || allowlistedPlanetPrefix.exists(planetId.startsWith)
 
   private lazy val showRestQuery: Boolean = configuration
     .getOptional[Boolean]("features.show-rest-query")
@@ -32,6 +32,6 @@ class Features @Inject() (configuration: Configuration) {
     .getOptional[Boolean]("features.show-enrolments")
     .getOrElse(true)
 
-  private lazy val whitelistedPlanetPrefix: Option[String] = configuration
-    .getOptional[String]("whitelisted-planet-prefix")
+  private lazy val allowlistedPlanetPrefix: Option[String] = configuration
+    .getOptional[String]("allowlisted-planet-prefix")
 }
