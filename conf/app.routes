@@ -63,6 +63,10 @@ GET         /agents-external-stubs/user/amend                                   
 GET         /agents-external-stubs/user/remove                                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.removeUser(continue: Option[RedirectUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/users                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
 
+#Granular permissions test URLs
+GET         /agents-external-stubs/test/gran-perms/generate-users-form             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showGranPermsCreateUsers
+POST        /agents-external-stubs/test/gran-perms/generate-users-form             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.submitGranPermsCreateUsers
+
 GET         /agents-external-stubs/records                                         @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showAllRecordsPage(showId: Option[String] ?= None)
 GET         /agents-external-stubs/records/edit                                    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.showEditRecordPage(id: String)
 POST        /agents-external-stubs/records/update                                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RecordsController.updateRecord(id: String)

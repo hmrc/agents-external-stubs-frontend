@@ -23,9 +23,10 @@ import play.api.Configuration
 import play.api.data.Forms.{boolean, ignored, mapping, nonEmptyText, number, optional, seq, text}
 import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Address, Enrolment, Identifier, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Address, Enrolment, GranPermsGenRequest, GranPermsGenRequestForm, Identifier, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -48,6 +49,7 @@ class UserController @Inject() (
   editUserView: edit_user,
   errorTemplateView: error_template,
   showAllUsersView: show_all_users,
+  granPermsUserGenView: gran_perms_user_gen,
   val features: Features,
   ecp: Provider[ExecutionContext]
 )(implicit val configuration: Configuration, cc: MessagesControllerComponents)
@@ -313,6 +315,33 @@ class UserController @Inject() (
                 case None         => Future.successful(())
               }).map(_ => Redirect(routes.UserController.showUserPage(continue, userId)))
             }
+        }
+    }
+
+  def showGranPermsCreateUsers: Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          Future.successful(Ok(granPermsUserGenView(GranPermsGenRequestForm.form)))
+        }
+    }
+
+  def submitGranPermsCreateUsers: Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          GranPermsGenRequestForm.form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(formWithErrors.errors.toString)),
+              genRequest =>
+                agentsExternalStubsConnector
+                  .massCreateAssistantsAndUsers(genRequest)
+                  .map(genResponse => Ok(genResponse.toString))
+                  .recover { case e =>
+                    InternalServerError(e.getMessage)
+                  }
+            )
         }
     }
 
