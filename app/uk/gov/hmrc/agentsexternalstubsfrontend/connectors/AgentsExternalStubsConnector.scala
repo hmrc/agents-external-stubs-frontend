@@ -110,6 +110,18 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
       .map(_ => ())
 
+  def massCreateAssistantsAndUsers(
+    request: GranPermsGenRequest
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[GranPermsGenResponse] =
+    http
+      .POST[GranPermsGenRequest, GranPermsGenResponse](
+        new URL(
+          s"$baseUrl/agents-external-stubs/test/gran-perms/generate-users"
+        ).toExternalForm,
+        request
+      )
+      .recover(handleNotFound)
+
   def getRecords(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Records] =
     http.GET[Records](new URL(s"$baseUrl/agents-external-stubs/records").toExternalForm).recover(handleNotFound)
 
