@@ -108,7 +108,7 @@
                 <div class="govuk-button-group">
                     @govukButton(Button(
                         content = if(hasContinue) Text(msgs("user.edit.update_and_continue")) else Text(msgs("user.edit.update")),
-                        attributes = Map("id" -> "update")
+                        attributes = Map("id" -> "update1")
                     ))
 
                     <a class="govuk-body govuk-link" href="@{cancelCall.url}">
@@ -220,7 +220,7 @@
             <div class="govuk-button-group">
                 @govukButton(Button(
                     content = if(hasContinue) Text(msgs("user.edit.update_and_continue")) else Text(msgs("user.edit.update")),
-                    attributes = Map("id" -> "update")
+                    attributes = Map("id" -> "update2")
                 ))
 
                 <a class="govuk-body govuk-link" href="@{cancelCall.url}">
@@ -451,7 +451,7 @@
             <div class="govuk-button-group">
                 @govukButton(Button(
                     content = if(hasContinue) Text(msgs("user.edit.update_and_continue")) else Text(msgs("user.edit.update")),
-                    attributes = Map("id" -> "update")
+                    attributes = Map("id" -> "update3")
                 ))
 
                 <a class="govuk-body govuk-link" href="@{cancelCall.url}">
