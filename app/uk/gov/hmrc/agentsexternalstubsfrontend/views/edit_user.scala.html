@@ -127,7 +127,7 @@
                     items = CredStrength.values.map(strength => SelectItem(value = Some(strength), text = strength))
                 ).withFormField(userForm("credentialStrength")))
 
-                @if(userForm.data.get("affinityGroup").contains("Individual")) {
+                @if(userForm.data.get("affinityGroup").contains("Individual") || userForm.data.get("affinityGroup").contains("Organisation")) {
                     @govukSelect(Select(
                         label = Label(content = Text(msgs("user.form.confidenceLevel"))),
                         items = ConfidenceLevel.values.map(lvl => SelectItem(value = Some(lvl._1), text = lvl._2))
