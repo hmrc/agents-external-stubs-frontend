@@ -17,16 +17,14 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
-
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Forms.{boolean, ignored, mapping, nonEmptyText, number, optional, seq, text}
 import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Address, Enrolment, GranPermsGenRequest, GranPermsGenRequestForm, Identifier, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -35,6 +33,7 @@ import uk.gov.hmrc.http.{NotFoundException, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
@@ -337,7 +336,7 @@ class UserController @Inject() (
               genRequest =>
                 agentsExternalStubsConnector
                   .massCreateAssistantsAndUsers(genRequest)
-                  .map(genResponse => Ok(genResponse.toString))
+                  .map(genResponse => Ok(Json.toJson(genResponse)))
                   .recover { case e =>
                     InternalServerError(e.getMessage)
                   }
