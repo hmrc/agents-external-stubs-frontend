@@ -101,8 +101,7 @@
                 ),
                 TableRow(content = HtmlContent(
                     (for {
-                        enrolments <- user.principalEnrolments.toSeq
-                        e <- enrolments
+                        e <- user.enrolments.toSeq.flatMap(_.principal)
                     } yield s"""<div><span style="display: inline-block;">${e.key}</span> <span>${e.identifiersValues.mkString("(","/",")")}</span></div>""").mkString("\n")
                 )),
                 TableRow(content =

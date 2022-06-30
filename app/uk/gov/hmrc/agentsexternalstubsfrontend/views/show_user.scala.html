@@ -252,14 +252,14 @@
     @if(user.affinityGroup.nonEmpty) {
         <h3 class="govuk-heading-s">Principal enrolments</h3>
 
-        @if(user.principalEnrolments.nonEmpty && user.principalEnrolments.get.nonEmpty) {
+        @if(user.enrolments.exists(_.principal.nonEmpty)) {
             @govukTable(Table(
                 head = Some(List(
                     HeadCell(Text("Service key")),
                     HeadCell(Text("Identifier Name")),
                     HeadCell(Text("Identifier Value"))
                 )),
-                rows = user.principalEnrolments.get.flatMap( e =>
+                rows = user.enrolments.get.principal.flatMap( e =>
                     if (e.identifiers.nonEmpty) {
                         e.identifiers.get.zipWithIndex.map { case (i, j) =>
                             (if (j == 0)
@@ -300,14 +300,14 @@
 
         <h3 class="govuk-heading-s">Delegated enrolments</h3>
 
-        @if(user.delegatedEnrolments.nonEmpty && user.delegatedEnrolments.get.nonEmpty) {
+        @if(user.enrolments.exists(_.delegated.nonEmpty)) {
             @govukTable(Table(
                 head = Some(List(
                     HeadCell(Text("Service key")),
                     HeadCell(Text("Identifier Name")),
                     HeadCell(Text("Identifier Value"))
                 )),
-                rows = user.delegatedEnrolments.get.flatMap( e =>
+                rows = user.enrolments.get.delegated.flatMap( e =>
                     if (e.identifiers.nonEmpty) {
                         e.identifiers.get.zipWithIndex.map { case (i, j) =>
                             (if (j == 0)
@@ -344,6 +344,53 @@
           <a class="govuk-body govuk-link" href="/agents-external-stubs/user/edit?userId=@user.userId#delegated">Add delegated
               enrolment</a>
       </div>
+
+        <h3 class="govuk-heading-s">Assigned enrolments</h3>
+        <div class="govuk-hint govuk-!-font-size-16">Used when the user is opted in to Granular Permissions. These are the enrolments that a user within an agent group has the right to act upon. Note: The group must have the corresponding delegated enrolments.</div>
+
+        @if(user.enrolments.exists(_.assigned.nonEmpty)) {
+            @govukTable(Table(
+                head = Some(List(
+                    HeadCell(Text("Service key")),
+                    HeadCell(Text("Identifier Name")),
+                    HeadCell(Text("Identifier Value"))
+                )),
+                rows = user.enrolments.get.assigned.flatMap( e =>
+                    if (e.identifiers.nonEmpty) {
+                        e.identifiers.zipWithIndex.map { case (i, j) =>
+                            (if (j == 0)
+                                Seq(TableRow(
+                                    rowspan = Some(e.identifiers.size),
+                                    content = if (context.features.showEnrolments)
+                                        HtmlContent(s"""<a href="/agents-external-stubs/services#${e.service}">${e.service}</a>""")
+                                    else Text(e.service)
+                                ))
+                            else Seq.empty[TableRow]) ++ Seq(
+                                TableRow(Text(i.key)),
+                                TableRow(HtmlContent(s"""<a href="/agents-external-stubs/known-facts?enrolmentKey=${e.tag}">
+                                                        |    ${i.value}
+                                                        |</a>""".stripMargin))
+                            )
+                        }
+                    } else {
+                        Seq(Seq(TableRow(
+                            colspan = Some(3),
+                            content = if (context.features.showEnrolments)
+                                HtmlContent(s"""<a href="/agents-external-stubs/services#${e.service}">${e.service}</a>""")
+                            else {
+                                Text(e.service)
+                            }
+                        )))
+                    }
+                )
+
+            ))
+        } else {
+            <span class="govuk-hint">This agent has no assigned enrolments.</span>
+        }
+        <div style="margin-top: 0.5em;width: 100%;text-align: right;">
+            &nbsp;
+        </div>
     }
 
     @if(user.affinityGroup.contains("Agent")) {

@@ -304,11 +304,8 @@ class UserController @Inject() (
           agentsExternalStubsConnector
             .getUser(id)
             .flatMap { user =>
-              val maybeUpdate = principalEnrolment.map(newEnrolment =>
-                user.copy(
-                  principalEnrolments = Some(user.principalEnrolments.getOrElse(Seq.empty) :+ Enrolment(newEnrolment))
-                )
-              )
+              val maybeUpdate =
+                principalEnrolment.map(newEnrolment => user.updatePrincipalEnrolments(_ :+ Enrolment(newEnrolment)))
               (maybeUpdate match {
                 case Some(update) => agentsExternalStubsConnector.updateUser(update)
                 case None         => Future.successful(())
@@ -379,6 +376,23 @@ object UserController {
     )(Enrolment.apply)(Enrolment.unapply)
   )
 
+  val enrolmentKeyMapping: Mapping[Option[EnrolmentKey]] = optional(
+    mapping(
+      "key"         -> nonEmptyText,
+      "identifiers" -> seq(identifierMapping)
+    )(EnrolmentKey.apply)(EnrolmentKey.unapply)
+  )
+
+  val enrolmentsMapping: Mapping[Enrolments] =
+    mapping(
+      "principal" -> optional(seq(enrolmentMapping))
+        .transform[Seq[Enrolment]](_.toSeq.flatten.flatten, es => Some(es.map(Some(_)))),
+      "delegated" -> optional(seq(enrolmentMapping))
+        .transform[Seq[Enrolment]](_.toSeq.flatten.flatten, es => Some(es.map(Some(_)))),
+      "assigned" -> optional(seq(enrolmentKeyMapping))
+        .transform[Seq[EnrolmentKey]](_.toSeq.flatten.flatten, es => Some(es.map(Some(_))))
+    )(Enrolments.apply)(Enrolments.unapply)
+
   val addressMapping: Mapping[Address] = mapping(
     "line1"       -> optional(nonEmptyText),
     "line2"       -> optional(nonEmptyText),
@@ -399,10 +413,7 @@ object UserController {
       "nino" -> optional(text)
         .verifying("user.form.nino.error", _.forall(Nino.isValid))
         .transform[Option[Nino]](_.map(Nino.apply), _.map(_.toString)),
-      "principalEnrolments" -> optional(seq(enrolmentMapping))
-        .transform[Option[Seq[Enrolment]]](_.map(_.collect { case Some(x) => x }), _.map(_.map(Option.apply))),
-      "delegatedEnrolments" -> optional(seq(enrolmentMapping))
-        .transform[Option[Seq[Enrolment]]](_.map(_.collect { case Some(x) => x }), _.map(_.map(Option.apply))),
+      "enrolments"        -> optional(enrolmentsMapping),
       "name"              -> optional(nonEmptyText),
       "dateOfBirth"       -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat)),
       "agentCode"         -> optional(nonEmptyText),

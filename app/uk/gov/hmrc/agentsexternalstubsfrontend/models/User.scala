@@ -17,10 +17,11 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.models
 
 import org.joda.time.LocalDate
-import play.api.libs.json.{Format, Json, Reads}
+import play.api.libs.json.{Format, JsPath, Json, Reads, Writes}
 import uk.gov.hmrc.domain.Nino
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
+
 import scala.io.{BufferedSource, Source}
 
 case class User(
@@ -31,8 +32,7 @@ case class User(
   credentialStrength: Option[String] = None,
   credentialRole: Option[String] = None,
   nino: Option[Nino] = None,
-  principalEnrolments: Option[Seq[Enrolment]] = None,
-  delegatedEnrolments: Option[Seq[Enrolment]] = None,
+  enrolments: Option[Enrolments] = None,
   name: Option[String] = None,
   dateOfBirth: Option[LocalDate] = None,
   agentCode: Option[String] = None,
@@ -47,10 +47,36 @@ case class User(
 ) {
 
   def isEnrolledFor(service: String): Boolean =
-    principalEnrolments.exists(_.exists(_.key == service))
+    enrolments.exists(_.principal.exists(_.key == service))
 
   val defaultProviderType: String =
     if (strideRoles.nonEmpty) AuthProvider.PrivilegedApplication else AuthProvider.GovernmentGateway
+
+  def updatePrincipalEnrolments(f: Seq[Enrolment] => Seq[Enrolment]): User =
+    this.copy(enrolments =
+      Some(
+        this.enrolments
+          .getOrElse(Enrolments.none)
+          .copy(principal = f(this.enrolments.getOrElse(Enrolments.none).principal))
+      )
+    )
+  def updateDelegatedEnrolments(f: Seq[Enrolment] => Seq[Enrolment]): User =
+    this.copy(enrolments =
+      Some(
+        this.enrolments
+          .getOrElse(Enrolments.none)
+          .copy(delegated = f(this.enrolments.getOrElse(Enrolments.none).delegated))
+      )
+    )
+  def updateAssignedEnrolments(f: Seq[EnrolmentKey] => Seq[EnrolmentKey]): User =
+    this.copy(enrolments =
+      Some(
+        this.enrolments
+          .getOrElse(Enrolments.none)
+          .copy(assigned = f(this.enrolments.getOrElse(Enrolments.none).assigned))
+      )
+    )
+
 }
 
 object User {
@@ -130,4 +156,22 @@ object CountryCodes {
 
   lazy val values: Seq[(String, String)] = Country.countries.map(c => c.code -> c.name)
 
+}
+
+case class Enrolments(
+  principal: Seq[Enrolment] = Seq.empty,
+  delegated: Seq[Enrolment] = Seq.empty,
+  assigned: Seq[EnrolmentKey] = Seq.empty
+)
+
+object Enrolments {
+  import play.api.libs.functional.syntax._
+  implicit val reads: Reads[Enrolments] = (
+    (JsPath \ "principal").readNullable[Seq[Enrolment]].map(_.getOrElse(Seq.empty)) and
+      (JsPath \ "delegated").readNullable[Seq[Enrolment]].map(_.getOrElse(Seq.empty)) and
+      (JsPath \ "assigned").readNullable[Seq[EnrolmentKey]].map(_.getOrElse(Seq.empty))
+  )(Enrolments.apply _)
+  implicit val writes: Writes[Enrolments] = Json.writes[Enrolments]
+
+  val none = Enrolments(Seq.empty, Seq.empty, Seq.empty)
 }
