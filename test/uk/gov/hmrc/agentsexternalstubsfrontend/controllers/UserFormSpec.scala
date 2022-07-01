@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, Identifier, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, EnrolmentKey, Enrolments, Identifier, User}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
 
@@ -79,28 +79,36 @@ class UserFormSpec extends UnitSpec {
           credentialStrength = Some("strong"),
           affinityGroup = Some("Agent"),
           credentialRole = Some("Admin"),
-          principalEnrolments = Some(Seq(Enrolment("FOO"), Enrolment("BAR", Some(Seq(Identifier("ABC", "123")))))),
-          delegatedEnrolments = Some(Seq(Enrolment("TAR", Some(Seq(Identifier("XYZ", "987")))), Enrolment("ZOO"))),
+          enrolments = Some(
+            Enrolments(
+              principal = Seq(Enrolment("FOO"), Enrolment("BAR", Some(Seq(Identifier("ABC", "123"))))),
+              delegated = Seq(Enrolment("TAR", Some(Seq(Identifier("XYZ", "987")))), Enrolment("ZOO")),
+              assigned = Seq(EnrolmentKey("FOO", Seq(Identifier("BAR", "BAZ"))))
+            )
+          ),
           suspendedRegimes = Some(Set("ITSA"))
         )
 
       val fieldValues = Map(
-        "principalEnrolments[1].identifiers[0].key"   -> "ABC",
-        "affinityGroup"                               -> "Agent",
-        "credentialStrength"                          -> "strong",
-        "strideRoles"                                 -> "",
-        "delegatedEnrolments[0].key"                  -> "TAR",
-        "principalEnrolments[1].key"                  -> "BAR",
-        "delegatedEnrolments[0].identifiers[0].key"   -> "XYZ",
-        "principalEnrolments[1].identifiers[0].value" -> "123",
-        "confidenceLevel"                             -> "0",
-        "principalEnrolments[0].key"                  -> "FOO",
-        "delegatedEnrolments[1].key"                  -> "ZOO",
-        "delegatedEnrolments[0].identifiers[0].value" -> "987",
-        "userId"                                      -> "foo",
-        "groupId"                                     -> "ABA-712-878-NHG",
-        "credentialRole"                              -> "Admin",
-        "suspendedRegimes[0]"                         -> "ITSA"
+        "affinityGroup"                                -> "Agent",
+        "credentialStrength"                           -> "strong",
+        "strideRoles"                                  -> "",
+        "enrolments.delegated[0].key"                  -> "TAR",
+        "enrolments.delegated[0].identifiers[0].key"   -> "XYZ",
+        "enrolments.delegated[0].identifiers[0].value" -> "987",
+        "enrolments.delegated[1].key"                  -> "ZOO",
+        "enrolments.principal[0].key"                  -> "FOO",
+        "enrolments.principal[1].key"                  -> "BAR",
+        "enrolments.principal[1].identifiers[0].key"   -> "ABC",
+        "enrolments.principal[1].identifiers[0].value" -> "123",
+        "enrolments.assigned[0].key"                   -> "FOO",
+        "enrolments.assigned[0].identifiers[0].key"    -> "BAR",
+        "enrolments.assigned[0].identifiers[0].value"  -> "BAZ",
+        "confidenceLevel"                              -> "0",
+        "userId"                                       -> "foo",
+        "groupId"                                      -> "ABA-712-878-NHG",
+        "credentialRole"                               -> "Admin",
+        "suspendedRegimes[0]"                          -> "ITSA"
       )
 
       form.fill(value).data shouldBe fieldValues.-("userId")
