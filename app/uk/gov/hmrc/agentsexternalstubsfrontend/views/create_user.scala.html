@@ -68,7 +68,7 @@
 
   <script @{CSPNonce.attr} >
       function filterServices(keyword){
-          var selectId = "principalEnrolments[0].key";
+          var selectId = "enrolments.principal[0].key";
           var select = document.getElementById(selectId);
           var selectedIndex = 0
           for (var i = 0; i < select.length; i++) {
@@ -108,20 +108,20 @@
             @govukSelect(Select(
                 label = Label(
                     content = Text(msgs("user.form.principalEnrolment")),
-                    classes = Seq("govuk-label", "govuk-label--m", if (userForm(s"principalEnrolments[0].key").hasErrors) "error" else "").mkString(" ")
+                    classes = Seq("govuk-label", "govuk-label--m", if (userForm(s"enrolments.principal[0].key").hasErrors) "error" else "").mkString(" ")
                 ),
-                attributes = Map("id" -> "principalEnrolments[0].key", "name" -> "principalEnrolments[0].key"),
+                attributes = Map("id" -> "enrolments.principal[0].key", "name" -> "enrolments.principal[0].key"),
                 items = (("none", "none") +: services).map(option =>
                     SelectItem(
                         text = option._1,
                         value = Some(option._1),
                         attributes = Map(
-                            "id" -> s"principalEnrolments[0].key-${option._1}",
+                            "id" -> s"enrolments.principal[0].key-${option._1}",
                             "data-affinity" -> option._2
                         )
                     )
                 )
-            ).withFormField(userForm("principalEnrolments[0].key")))
+            ).withFormField(userForm("enrolments.principal[0].key")))
 
             <div class="govuk-button-group">
                 @govukButton(Button(
