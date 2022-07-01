@@ -20,6 +20,7 @@ import play.api.libs.json._
 case class EnrolmentKey(service: String, identifiers: Seq[Identifier]) {
   def isSingle: Boolean = identifiers.size == 1
   lazy val tag = s"$service~${identifiers.sorted.mkString("~")}"
+  override def toString: String = tag
 }
 
 object EnrolmentKey {
@@ -31,6 +32,10 @@ object EnrolmentKey {
       val identifiers = parts.tail.sliding(2, 2).map(a => Identifier(a(0), a(1))).toSeq
       Right(EnrolmentKey(service, identifiers))
     } else Left("INVALID_ENROLMENT_KEY")
+  }
+
+  implicit val writes: Writes[EnrolmentKey] = new Writes[EnrolmentKey] {
+    override def writes(ek: EnrolmentKey): JsValue = JsString(ek.tag)
   }
 
   implicit val reads: Reads[EnrolmentKey] = new Reads[EnrolmentKey] {

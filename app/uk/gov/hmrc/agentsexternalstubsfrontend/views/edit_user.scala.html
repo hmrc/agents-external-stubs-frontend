@@ -62,11 +62,15 @@
 @(userForm: Form[User], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @principalEnrolments = @{
-    ViewHelper.buildTree("", userForm.data)("principalEnrolments")
+    ViewHelper.buildTree("", userForm.data)("enrolments.principal")
 }
 
 @delegatedEnrolments = @{
-    ViewHelper.buildTree("", userForm.data)("delegatedEnrolments")
+    ViewHelper.buildTree("", userForm.data)("enrolments.delegated")
+}
+
+@assignedEnrolments = @{
+    ViewHelper.buildTree("", userForm.data)("enrolments.assigned")
 }
 
 @suspendedRegimes = @{
@@ -232,7 +236,7 @@
                 <a class="govuk-body govuk-link" name="enrolments"></a>
                 <h2>Principal enrolments</h2>
 
-                <div id="principalEnrolments" class="form-group" style="text-align: right">
+                <div id="enrolments.principal" class="form-group" style="text-align: right">
                     <table style="width: 100%" class="govuk-table">
                         <colgroup>
                             <col width="30%">
@@ -249,7 +253,7 @@
 
                         @for(enrolment <- principalEnrolments) {
                             @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
-                                <tr id="principalEnrolment-@i-row" class="govuk-table__row">
+                                <tr id="enrolments.principal-@i-row" class="govuk-table__row">
                                     @if(i == 0) {
                                         <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
@@ -271,7 +275,7 @@
                                     ).withFormField(userForm(s"${identifier.key}.value")))
                                 </td>
                                 <td class="govuk-table__cell">
-                                    <a class="govuk-body govuk-link" onclick="document.getElementById('principalEnrolment-@i-row').remove()">
+                                    <a class="govuk-body govuk-link" onclick="document.getElementById('enrolments.principal-@i-row').remove()">
                                                 Remove
                                     </a>
                                 </td>
@@ -283,17 +287,17 @@
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
                                     formGroupClasses = "govuk-!-margin-bottom-0"
-                                ).withFormField(userForm(s"principalEnrolments[${principalEnrolments.size}].key")))
+                                ).withFormField(userForm(s"enrolments.principal[${principalEnrolments.size}].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
                                     formGroupClasses = "govuk-!-margin-bottom-0"
-                                ).withFormField(userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key")))
+                                ).withFormField(userForm(s"enrolments.principal[${principalEnrolments.size}].identifiers[0].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
                                     formGroupClasses = "govuk-!-margin-bottom-0"
-                                ).withFormField(userForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value")))
+                                ).withFormField(userForm(s"enrolments.principal[${principalEnrolments.size}].identifiers[0].value")))
                             </td>
                             <td class="govuk-table__cell">
                             </td>
@@ -310,7 +314,7 @@
 
                 <span class="govuk-hint">Only Agents can have delegated enrolments.</span>
 
-                <div id="delegatedEnrolments" class="form-group" style="text-align: right">
+                <div id="enrolments.delegated" class="form-group" style="text-align: right">
                     <table class="govuk-table" style="width: 100%">
                         <colgroup>
                             <col width="30%">
@@ -327,7 +331,7 @@
 
                         @for(enrolment <- delegatedEnrolments) {
                             @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
-                                <tr id="delegatedEnrolment-@i-row">
+                                <tr id="enrolments.delegated-@i-row">
                                     @if(i == 0) {
                                         <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
@@ -350,7 +354,7 @@
                                 </td>
                                 <td class="govuk-table__cell">
                                     <a class="govuk-body govuk-link"
-                                        onclick="document.getElementById('delegatedEnrolment-@i-row').remove()">Remove</a>
+                                        onclick="document.getElementById('enrolments.delegated-@i-row').remove()">Remove</a>
                                 </td>
                                 </tr>
                             }
@@ -360,17 +364,17 @@
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
                                     formGroupClasses = "govuk-!-margin-bottom-0"
-                                ).withFormField(userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].key")))
+                                ).withFormField(userForm(s"enrolments.delegated[${delegatedEnrolments.size}].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
                                     formGroupClasses = "govuk-!-margin-bottom-0"
-                                ).withFormField(userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].key")))
+                                ).withFormField(userForm(s"enrolments.delegated[${delegatedEnrolments.size}].identifiers[0].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
                                     formGroupClasses = "govuk-!-margin-bottom-0"
-                                ).withFormField(userForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].value")))
+                                ).withFormField(userForm(s"enrolments.delegated[${delegatedEnrolments.size}].identifiers[0].value")))
                             </td>
                             <td class="govuk-table__cell">
 
@@ -382,6 +386,84 @@
                 </div>
             }
 
+            @if(userForm.data.get("affinityGroup").contains("Agent")) {
+                <a class="govuk-body govuk-link" name="assigned"></a>
+                <h2>Assigned enrolments</h2>
+
+                <span class="govuk-hint">Only Agents can have assigned enrolments.</span>
+
+                <div id="enrolments.assigned" class="form-group" style="text-align: right">
+                    <table class="govuk-table" style="width: 100%">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="10%">
+                        </colgroup>
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Service key</th>
+                            <th class="govuk-table__header">Identifier Name</th>
+                            <th class="govuk-table__header">Identifier Value</th>
+                            <th class="govuk-table__header"></th>
+                        </tr>
+
+                        @for(enrolment <- assignedEnrolments) {
+                            @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
+                                <tr id="enrolments.assigned-@i-row">
+                                    @if(i == 0) {
+                                        <td class="govuk-table__cell" rowspan="@{
+                                            enrolment(".identifier").size
+                                        }" style="vertical-align: top;">
+                                        @govukInput(Input(
+                                            formGroupClasses = "govuk-!-margin-bottom-0"
+                                        ).withFormField(userForm(s"${enrolment.key}.key")))
+                                        </td>
+                                    }
+
+                                <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(userForm(s"${identifier.key}.key")))
+                                </td>
+                                <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(userForm(s"${identifier.key}.value")))
+                                </td>
+                                <td class="govuk-table__cell">
+                                    <a class="govuk-body govuk-link"
+                                    onclick="document.getElementById('enrolments.assigned-@i-row').remove()">Remove</a>
+                                </td>
+                                </tr>
+                            }
+                        }
+
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                            @govukInput(Input(
+                                formGroupClasses = "govuk-!-margin-bottom-0"
+                            ).withFormField(userForm(s"enrolments.assigned[${assignedEnrolments.size}].key")))
+                            </td>
+                            <td class="govuk-table__cell">
+                            @govukInput(Input(
+                                formGroupClasses = "govuk-!-margin-bottom-0"
+                            ).withFormField(userForm(s"enrolments.assigned[${assignedEnrolments.size}].identifiers[0].key")))
+                            </td>
+                            <td class="govuk-table__cell">
+                            @govukInput(Input(
+                                formGroupClasses = "govuk-!-margin-bottom-0"
+                            ).withFormField(userForm(s"enrolments.assigned[${assignedEnrolments.size}].identifiers[0].value")))
+                            </td>
+                            <td class="govuk-table__cell">
+
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+            }
+            
             @if(userForm.data.get("affinityGroup").isEmpty || userForm.data.get("affinityGroup").contains("none")) {
                 <a name="stride" class="govuk-body govuk-link"></a>
                 <h2>Stride roles</h2>
