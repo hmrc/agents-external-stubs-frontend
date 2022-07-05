@@ -114,7 +114,7 @@ object Enrolment {
 }
 
 case class Identifier(key: String, value: String) {
-  override def toString: String = s"${key.toUpperCase}~$value"
+  override def toString: String = s"$key~$value"
 }
 
 object Identifier {
