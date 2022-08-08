@@ -24,7 +24,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.Aliases.Input
+@import uk.gov.hmrc.govukfrontend.views.Aliases.{Input, Checkboxes, CheckboxItem}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
@@ -32,14 +32,18 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import views.html.helper.CSPNonce
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
+
 
 @this(
         mainTemplate: main_template,
         navigationBar: navigationBar,
         form: FormWithCSRF,
         govukInput: GovukInput,
+        govukCheckboxes : GovukCheckboxes,
         govukButton: GovukButton,
         govukErrorSummary: GovukErrorSummary)
+
 
 @(reqForm: Form[GranPermsGenRequest])(implicit request: Request[_], msgs: Messages)
 
@@ -63,6 +67,12 @@
             hint = Some(Hint(content = Text("The number of clients to generate. They will have a random mixture of enrolments."))),
             classes = "govuk-input govuk-input--width-10"
         ).withFormField(reqForm("numberOfClients")))
+        @govukCheckboxes(Checkboxes(
+            name = "fillFriendlyNames",
+                items = Seq(CheckboxItem(content = Text("Fill friendly names"), value = "true"))
+        )
+
+        )
 
         <div class="govuk-button-group">
             @govukButton(Button(
