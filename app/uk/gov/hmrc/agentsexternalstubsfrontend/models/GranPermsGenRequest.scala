@@ -42,6 +42,7 @@ case class GranPermsGenRequest(
   idPrefix: String,
   numberOfAgents: Int,
   numberOfClients: Int,
+  fillFriendlyNames: Boolean = false,
   clientTypeDistribution: Option[Map[String, Double]] = None,
   individualServiceDistribution: Option[Map[String, Double]] = None,
   organisationServiceDistribution: Option[Map[String, Double]] = None
@@ -63,15 +64,21 @@ object GranPermsGenResponse {
 object GranPermsGenRequestForm {
   val form: Form[GranPermsGenRequest] = Form[GranPermsGenRequest](
     mapping(
-      "idPrefix"        -> nonEmptyText,
-      "numberOfAgents"  -> number,
-      "numberOfClients" -> number
+      "idPrefix"          -> nonEmptyText,
+      "numberOfAgents"    -> number,
+      "numberOfClients"   -> number,
+      "fillFriendlyNames" -> optional(boolean).transform[Boolean](_.isDefined, x => if (x) Some(x) else None)
     )(formApply)(formUnapply)
   )
 
-  private def formApply(idPrefix: String, nAgents: Int, nClients: Int) =
-    GranPermsGenRequest(idPrefix = idPrefix, numberOfAgents = nAgents, numberOfClients = nClients)
+  private def formApply(idPrefix: String, nAgents: Int, nClients: Int, fillFriendly: Boolean) =
+    GranPermsGenRequest(
+      idPrefix = idPrefix,
+      numberOfAgents = nAgents,
+      numberOfClients = nClients,
+      fillFriendlyNames = fillFriendly
+    )
 
-  private def formUnapply(genRequest: GranPermsGenRequest): Option[(String, Int, Int)] =
-    Some((genRequest.idPrefix, genRequest.numberOfAgents, genRequest.numberOfClients))
+  private def formUnapply(genRequest: GranPermsGenRequest): Option[(String, Int, Int, Boolean)] =
+    Some((genRequest.idPrefix, genRequest.numberOfAgents, genRequest.numberOfClients, genRequest.fillFriendlyNames))
 }
