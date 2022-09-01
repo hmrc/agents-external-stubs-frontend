@@ -67,7 +67,7 @@ class RestQueryController @Inject() (
                 Ok(
                   restQueryView(
                     RestQueryForm.fill(RestQuery("GET", "https://", None, None)),
-                    routes.RestQueryController.runQuery(),
+                    routes.RestQueryController.runQuery,
                     routes.UserController.showUserPage(),
                     routes.RestQueryController.showRestQueryPage(None),
                     None,
@@ -87,7 +87,7 @@ class RestQueryController @Inject() (
                         Ok(
                           restQueryView(
                             RestQueryForm.fill(rq),
-                            routes.RestQueryController.runQuery(),
+                            routes.RestQueryController.runQuery,
                             routes.UserController.showUserPage(),
                             routes.RestQueryController.showRestQueryPage(None),
                             Option(response),
@@ -100,7 +100,7 @@ class RestQueryController @Inject() (
                         Ok(
                           restQueryView(
                             RestQueryForm.fill(rq).withGlobalError(e.getMessage),
-                            routes.RestQueryController.runQuery(),
+                            routes.RestQueryController.runQuery,
                             routes.UserController.showUserPage(),
                             routes.RestQueryController.showRestQueryPage(None),
                             None,
@@ -129,7 +129,7 @@ class RestQueryController @Inject() (
                   Ok(
                     restQueryView(
                       formWithErrors,
-                      routes.RestQueryController.runQuery(),
+                      routes.RestQueryController.runQuery,
                       routes.UserController.showUserPage(),
                       routes.RestQueryController.showRestQueryPage(None),
                       None,

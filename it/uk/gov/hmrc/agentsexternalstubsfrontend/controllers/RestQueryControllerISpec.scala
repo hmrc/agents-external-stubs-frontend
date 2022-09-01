@@ -17,7 +17,8 @@ class RestQueryControllerISpec extends BaseISpec with AgentsExternalStubsStubs w
       "render rest-query page" in {
         givenAuthorised()
 
-        val request = FakeRequest(GET, "/agents-external-stubs/rest-query")
+        val request =
+          FakeRequest(GET, "/agents-external-stubs/rest-query").withSession("authToken" -> "Bearer XYZ")
 
         val result = callEndpointWith(request)
         status(result) shouldBe 200

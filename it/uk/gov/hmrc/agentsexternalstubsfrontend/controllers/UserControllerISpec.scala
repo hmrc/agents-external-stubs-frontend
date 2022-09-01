@@ -19,7 +19,7 @@ class UserControllerISpec extends BaseISpec with AgentsExternalStubsStubs with A
         givenAuthorised("Test123")
         givenUser(User("Test123"))
 
-        val request = FakeRequest(GET, "/agents-external-stubs/user")
+        val request = FakeRequest(GET, "/agents-external-stubs/user").withSession("authToken" -> "Bearer XYZ")
 
         val result = callEndpointWith(request)
         status(result) shouldBe 200

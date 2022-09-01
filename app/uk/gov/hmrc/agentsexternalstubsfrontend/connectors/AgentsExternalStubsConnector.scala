@@ -27,7 +27,9 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.Sign
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.client.HttpClientV2
 
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
 case class AuthenticatedSession(
@@ -44,7 +46,7 @@ object AuthenticatedSession {
 }
 
 @Singleton
-class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: HttpClient) {
+class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: HttpClient, httpV2: HttpClientV2) {
 
   import uk.gov.hmrc.http.HttpReads.Implicits._
 
@@ -113,13 +115,11 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
   def massCreateAssistantsAndUsers(
     request: GranPermsGenRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[GranPermsGenResponse] =
-    http
-      .POST[GranPermsGenRequest, GranPermsGenResponse](
-        new URL(
-          s"$baseUrl/agents-external-stubs/test/gran-perms/generate-users"
-        ).toExternalForm,
-        request
-      )
+    httpV2
+      .post(new URL(s"$baseUrl/agents-external-stubs/test/gran-perms/generate-users"))
+      .withBody(Json.toJson(request))
+      .transform(ws => ws.withRequestTimeout(1.minute))
+      .execute[GranPermsGenResponse]
       .recover(handleNotFound)
 
   def getRecords(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Records] =

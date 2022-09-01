@@ -45,9 +45,9 @@ trait WithPageContext {
 object Menus {
 
   val item1 = MenuItem("link_records_all", "records.link.all", routes.RecordsController.showAllRecordsPage())
-  val item2 = MenuItem("link_users_all", "users.link.all", routes.UserController.showAllUsersPage())
+  val item2 = MenuItem("link_users_all", "users.link.all", routes.UserController.showAllUsersPage)
   val item3 = MenuItem("link_users_current", "users.link.current", routes.UserController.showUserPage())
-  val item4 = MenuItem("link_help_enrolments", "services.link.short", routes.KnownFactsController.showEnrolmentsPage())
+  val item4 = MenuItem("link_help_enrolments", "services.link.short", routes.KnownFactsController.showEnrolmentsPage)
   val item7 =
     MenuItem("link_special_cases", "specialCase.link.short", routes.SpecialCasesController.showAllSpecialCasesPage())
   val item5 =

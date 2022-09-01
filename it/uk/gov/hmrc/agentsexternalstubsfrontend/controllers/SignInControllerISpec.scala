@@ -89,7 +89,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "redirect to continue URL if provided" in {
         val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
         val result = controller.signIn(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
-          FakeRequest()
+          FakeRequest("POST", "/gg/sign-in")
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper")
         )
         status(result) shouldBe 303
@@ -101,7 +101,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "redirect to edit user with if new one created" in {
         val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
         val result = controller.signIn(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
-          FakeRequest()
+          FakeRequest("POST", "/gg/sign-in")
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")
         )
         status(result) shouldBe 303
@@ -161,7 +161,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "redirect to continue URL if provided" in {
         val authToken = givenUserCanSignIn("foo", "juniper", newUser = false)
         val result = controller.signInInternal(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
-          FakeRequest()
+          FakeRequest("POST", "/agents-external-stubs/gg/sign-in")
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "juniper")
         )
         status(result) shouldBe 303
@@ -173,7 +173,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       "redirect to edit user with if new one created" in {
         val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
         val result = controller.signInInternal(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
-          FakeRequest()
+          FakeRequest("POST", "/agents-external-stubs/gg/sign-in")
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")
         )
         status(result) shouldBe 303

@@ -41,7 +41,7 @@ class PlanetController @Inject() (
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         agentsExternalStubsConnector
           .destroyPlanet(credentials.planetId)
-          .map(_ => Redirect(routes.UserController.start()).withNewSession)
+          .map(_ => Redirect(routes.UserController.start).withNewSession)
       }
   }
 
