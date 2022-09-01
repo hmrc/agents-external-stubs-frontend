@@ -28,7 +28,7 @@ class KnownFactsControllerISpec extends BaseISpec with AgentsExternalStubsStubs 
             )
         )
         givenUser(User("Test123"))
-        val request = FakeRequest(GET, "/agents-external-stubs/services")
+        val request = FakeRequest(GET, "/agents-external-stubs/services").withSession("authToken" -> "Bearer XYZ")
         val result = callEndpointWith(request)
         status(result) shouldBe 200
       }

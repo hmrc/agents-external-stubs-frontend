@@ -285,7 +285,7 @@ class UserController @Inject() (
           val id = userId.getOrElse(credentials.providerId)
           (if (id == credentials.providerId) Future.successful(())
            else agentsExternalStubsConnector.removeUser(id))
-            .map(_ => Redirect(routes.UserController.showAllUsersPage()))
+            .map(_ => Redirect(routes.UserController.showAllUsersPage))
             .recover { case NonFatal(e) =>
               Ok(errorTemplateView("error.title", s"Error while removing $id", e.getMessage))
             }

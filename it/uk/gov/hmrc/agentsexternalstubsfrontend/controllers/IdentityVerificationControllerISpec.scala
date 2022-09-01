@@ -32,6 +32,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val result =
           callEndpointWith(
             FakeRequest(GET, "/mdtp/uplift?confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=aif")
+              .withSession("authToken" -> "Bearer XYZ")
           )
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("uplift.header"))
@@ -62,7 +63,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
           FakeRequest(
             POST,
             "/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
-          )
+          ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "Success~1234")
         )
 
@@ -79,7 +80,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
           FakeRequest(
             POST,
             "/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
-          )
+          ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
 
@@ -97,6 +98,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
         val result = callEndpointWith(
           FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=250&completionURL=/good&failureURL=/bad")
+            .withSession("authToken" -> "Bearer XYZ")
         )
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("uplift.header"))
@@ -133,7 +135,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
           FakeRequest(
             POST,
             "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
-          )
+          ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "Success~1234")
         )
 
@@ -151,7 +153,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
           FakeRequest(
             POST,
             "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
-          )
+          ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
 
@@ -171,7 +173,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
           FakeRequest(
             POST,
             "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
-          )
+          ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
 
@@ -200,7 +202,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
           FakeRequest(
             POST,
             "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
-          )
+          ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
 

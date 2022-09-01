@@ -25,7 +25,7 @@ class PlanetControllerISpec extends BaseISpec with AgentsExternalStubsStubs with
             )
         )
 
-        val request = FakeRequest(GET, "/agents-external-stubs/planet/destroy")
+        val request = FakeRequest(GET, "/agents-external-stubs/planet/destroy").withSession("authToken" -> "Bearer XYZ")
 
         val result = callEndpointWith(request)
         status(result) shouldBe 303
