@@ -52,10 +52,7 @@ object GranPermsGenRequest {
   implicit val format = Json.format[GranPermsGenRequest]
 }
 
-case class GranPermsGenResponse(
-  createdAgents: Seq[User],
-  createdClients: Seq[User]
-)
+case class GranPermsGenResponse(createdAgentsCount: Int, createdClientsCount: Int)
 
 object GranPermsGenResponse {
   implicit val format = Json.format[GranPermsGenResponse]
