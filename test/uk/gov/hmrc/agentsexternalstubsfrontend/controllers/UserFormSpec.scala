@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, EnrolmentKey, Enrolments, Identifier, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{EnrolmentKey, Identifier, User}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
 
@@ -29,7 +29,6 @@ class UserFormSpec extends UnitSpec {
 
       val value = User(
         userId = "bar",
-        affinityGroup = Some(User.Individual),
         confidenceLevel = Some(50),
         nino = Some(Nino("HW827856C"))
       )
@@ -37,7 +36,6 @@ class UserFormSpec extends UnitSpec {
       val fieldValues = Map(
         "userId"             -> "bar",
         "confidenceLevel"    -> "50",
-        "affinityGroup"      -> "Individual",
         "credentialStrength" -> "none",
         "strideRoles"        -> "",
         "credentialRole"     -> "none",
@@ -56,7 +54,6 @@ class UserFormSpec extends UnitSpec {
       val fieldValues =
         Map(
           "userId"             -> "bar",
-          "affinityGroup"      -> "none",
           "confidenceLevel"    -> "0",
           "credentialStrength" -> "none",
           "strideRoles"        -> "",
@@ -77,38 +74,28 @@ class UserFormSpec extends UnitSpec {
           confidenceLevel = None,
           nino = None,
           credentialStrength = Some("strong"),
-          affinityGroup = Some("Agent"),
           credentialRole = Some("Admin"),
-          enrolments = Some(
-            Enrolments(
-              principal = Seq(Enrolment("FOO"), Enrolment("BAR", Some(Seq(Identifier("ABC", "123"))))),
-              delegated = Seq(Enrolment("TAR", Some(Seq(Identifier("XYZ", "987")))), Enrolment("ZOO")),
-              assigned = Seq(EnrolmentKey("FOO", Seq(Identifier("BAR", "BAZ"))))
-            )
-          ),
-          suspendedRegimes = Some(Set("ITSA"))
+          assignedPrincipalEnrolments =
+            Seq(EnrolmentKey("FOO", Seq.empty), EnrolmentKey("BAR", Seq(Identifier("ABC", "123")))),
+          assignedDelegatedEnrolments =
+            Seq(EnrolmentKey("TAR", Seq(Identifier("XYZ", "987"))), EnrolmentKey("ZOO", Seq.empty))
         )
 
       val fieldValues = Map(
-        "affinityGroup"                                -> "Agent",
-        "credentialStrength"                           -> "strong",
-        "strideRoles"                                  -> "",
-        "enrolments.delegated[0].key"                  -> "TAR",
-        "enrolments.delegated[0].identifiers[0].key"   -> "XYZ",
-        "enrolments.delegated[0].identifiers[0].value" -> "987",
-        "enrolments.delegated[1].key"                  -> "ZOO",
-        "enrolments.principal[0].key"                  -> "FOO",
-        "enrolments.principal[1].key"                  -> "BAR",
-        "enrolments.principal[1].identifiers[0].key"   -> "ABC",
-        "enrolments.principal[1].identifiers[0].value" -> "123",
-        "enrolments.assigned[0].key"                   -> "FOO",
-        "enrolments.assigned[0].identifiers[0].key"    -> "BAR",
-        "enrolments.assigned[0].identifiers[0].value"  -> "BAZ",
-        "confidenceLevel"                              -> "0",
-        "userId"                                       -> "foo",
-        "groupId"                                      -> "ABA-712-878-NHG",
-        "credentialRole"                               -> "Admin",
-        "suspendedRegimes[0]"                          -> "ITSA"
+        "credentialStrength"                                  -> "strong",
+        "strideRoles"                                         -> "",
+        "assignedDelegatedEnrolments[0].key"                  -> "TAR",
+        "assignedDelegatedEnrolments[0].identifiers[0].key"   -> "XYZ",
+        "assignedDelegatedEnrolments[0].identifiers[0].value" -> "987",
+        "assignedDelegatedEnrolments[1].key"                  -> "ZOO",
+        "assignedPrincipalEnrolments[0].key"                  -> "FOO",
+        "assignedPrincipalEnrolments[1].key"                  -> "BAR",
+        "assignedPrincipalEnrolments[1].identifiers[0].key"   -> "ABC",
+        "assignedPrincipalEnrolments[1].identifiers[0].value" -> "123",
+        "confidenceLevel"                                     -> "0",
+        "userId"                                              -> "foo",
+        "groupId"                                             -> "ABA-712-878-NHG",
+        "credentialRole"                                      -> "Admin"
       )
 
       form.fill(value).data shouldBe fieldValues.-("userId")
@@ -126,12 +113,10 @@ class UserFormSpec extends UnitSpec {
           nino = None,
           strideRoles = Seq("A", "BB", "cac"),
           credentialStrength = Some("strong"),
-          affinityGroup = Some("Agent"),
           credentialRole = Some("Admin")
         )
 
       val fieldValues = Map(
-        "affinityGroup"      -> "Agent",
         "credentialStrength" -> "strong",
         "strideRoles"        -> "A,BB,cac",
         "confidenceLevel"    -> "0",

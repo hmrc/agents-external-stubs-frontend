@@ -143,11 +143,28 @@ user.form.address.countryCode=Country
 
 user.show.create=Create
 
-users.link.all=Manage test users
+users.link.all=Test users
 users.link.current=Show current user
 users.link.create=Create a new user
 
-records.link.all=Manage master records
+group.edit.header=Configure group {0}
+group.edit.description=Here you can change the configuration of the group.
+group.edit.update_and_continue=Update and continue
+group.edit.update=Update
+group.edit.cancel=Cancel
+
+group.form.groupIdentifier=Group Identifier
+group.form.affinityGroup=Affinity Group
+group.form.agentCode=Agent Code
+group.form.agentFriendlyName=Agent Friendly Name
+group.form.principalEnrolment=Principal enrolment
+
+groups.link.all=EACD groups
+groups.title=Your EACD groups
+groups.show.header=Your EACD groups on {0}
+groups.show.description=Here you can see and manage all the EACD groups on the planet.
+
+records.link.all=Master records
 
 records.title=Your master records
 records.show.header=Your master records on {0}

@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 @import views.html.helper.CSRF
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.group_data
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -40,6 +41,7 @@
 
 @this(
         mainTemplate: main_template,
+        groupData: group_data,
         form: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         govukTable: GovukTable,
@@ -47,8 +49,7 @@
         govukInput: GovukInput,
         govukButton: GovukButton
 )
-
-@(user:User, authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[RedirectUrl], userId: String,enrolments: Seq[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(user: User, maybeGroup: Option[Group], authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[RedirectUrl], userId: String,enrolments: Seq[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @sidebarLinks = {
     <nav id="secondary-nav" class="govuk-!-margin-bottom-3" role="navigation">
@@ -201,18 +202,17 @@
                 value = Value(Text(user.userId))
             ),
             SummaryListRow(
-                key = Key(Text(msgs("user.form.affinityGroup"))),
-                value = Value(HtmlContent(s"""<span class="badge badge-${user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">
-                                             |    ${user.affinityGroup.getOrElse("none")}
-                                             |</span>""".stripMargin))
-            ),
-            SummaryListRow(
                 key = Key(Text(msgs("user.form.name"))),
                 value = Value(Text(user.name.getOrElse("none")))
             ),
             SummaryListRow(
                 key = Key(Text(msgs("user.form.groupIdentifier"))),
-                value = Value(Text(user.groupId.getOrElse("none")))
+                value = if (user.groupId.isEmpty) Value(Text(user.groupId.getOrElse("none")))
+                else {
+                        val groupId = user.groupId.get
+                        val badge = maybeGroup.fold("")(group => s"""<span class="badge badge-${group.affinityGroup.toLowerCase}">${group.affinityGroup}</span>""")
+                        Value(HtmlContent(s"$groupId $badge"))
+                    }
             ),
             SummaryListRow(
                 key = Key(Text(msgs("user.form.name"))),
@@ -224,8 +224,6 @@
             showField(user.confidenceLevel,"user.form.confidenceLevel","confidenceLevel"),
             showField(user.nino,"user.form.nino","nino"),
             showField(user.dateOfBirth,"user.form.dateOfBirth","dateOfBirth"),
-            showField(user.agentCode,"user.form.agentCode","agentCode"),
-            showField(user.agentFriendlyName,"user.form.agentFriendlyName","agentFriendlyName"),
             user.address.map ( address =>
                 SummaryListRow(
                     key = Key(Text(msgs("user.form.address"))),
@@ -235,91 +233,55 @@
         ).flatten
     ))
 
-    <div class="govuk-button-group">
+    @for(group <- maybeGroup) {
 
-        <a class="govuk-button" id="update-0" href="@editUrl.url">@msgs("user.show.edit")</a>
+        <p class="govuk-body">
+            This user is linked to an <strong>EACD group</strong>.
+        </p>
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  View group details
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                @groupData(group, context)
+                <a class="govuk-button" href="/agents-external-stubs/group?groupId=@{group.groupId}" id="view-group">
+                    View group
+                </a>
+            <a class="govuk-button" href="/agents-external-stubs/group/edit?groupId=@{group.groupId}" id="edit-group">
+                    Edit group
+                </a>
+            </div>
+        </details>
 
-        @if(continue.isDefined) {
-            <a class="govuk-body govuk-link" href="@{continue.get.unsafeValue}">@msgs("user.show.continue")</a>
-        }
-        @if(userId!=context.authorisedUserId) {
-            <a class="govuk-body govuk-link" href="/agents-external-stubs/user/remove?userId=@user.userId">Remove</a>
-            <a class="govuk-body govuk-link" href="/agents-external-stubs/sign-in?userId=@user.userId&providerType=@user.defaultProviderType">Sign-in</a>
-        }
-
-    </div>
-
-    @if(user.affinityGroup.nonEmpty) {
-        <h3 class="govuk-heading-s">Principal enrolments</h3>
-
-        @if(user.enrolments.exists(_.principal.nonEmpty)) {
-            @govukTable(Table(
-                head = Some(List(
-                    HeadCell(Text("Service key")),
-                    HeadCell(Text("Identifier Name")),
-                    HeadCell(Text("Identifier Value"))
-                )),
-                rows = user.enrolments.get.principal.flatMap( e =>
-                    if (e.identifiers.nonEmpty) {
-                        e.identifiers.get.zipWithIndex.map { case (i, j) =>
-                            (if (j == 0)
-                                Seq(TableRow(
-                                  rowspan = Some(e.identifiers.get.size),
-                                  content = if (context.features.showEnrolments)
-                                    HtmlContent(s"""<a class="govuk-body govuk-link" href="/agents-external-stubs/services#${e.key}">${e.key}</a>""")
-                                     else Text(e.key)
-                                ))
-                            else Seq.empty[TableRow]) ++ Seq(
-                                TableRow(Text(i.key)),
-                                TableRow(HtmlContent(s"""<a class="govuk-body govuk-link" href="/agents-external-stubs/known-facts${e.toEnrolmentKey.map(ek => "?enrolmentKey=" + ek.tag).getOrElse("")}">
-                                                        |    ${i.value}
-                                                        |</a>""".stripMargin))
-                            )
-                        }
-                    } else {
-                        Seq(Seq(TableRow(
-                            colspan = Some(3),
-                            content = if (context.features.showEnrolments)
-                                HtmlContent(s"""<a href="/agents-external-stubs/services#${e.key}">${e.key}</a>""")
-                            else {
-                                Text(e.key)
-                            }
-                        )))
-                    }
-                )
-            ))
-        } else {
-            <span class="govuk-hint">This @{
-                user.affinityGroup.map(_.toLowerCase).getOrElse("user")
-            } has not been enrolled yet.</span>
-        }
-        @addEnrolment(enrolments, user)
     }
 
-    @if(user.affinityGroup.contains("Agent")) {
+    @if(maybeGroup.nonEmpty) {
 
-        <h3 class="govuk-heading-s">Delegated enrolments</h3>
+        <h3 class="govuk-heading-s">Principal enrolments assigned to this user</h3>
+        <div class="govuk-hint govuk-!-font-size-16">These are the enrolments that this user has the right to act upon. Note: The group must have the corresponding delegated enrolments.</div>
 
-        @if(user.enrolments.exists(_.delegated.nonEmpty)) {
+        @if(user.assignedPrincipalEnrolments.nonEmpty) {
             @govukTable(Table(
                 head = Some(List(
                     HeadCell(Text("Service key")),
                     HeadCell(Text("Identifier Name")),
                     HeadCell(Text("Identifier Value"))
                 )),
-                rows = user.enrolments.get.delegated.flatMap( e =>
+                rows = user.assignedPrincipalEnrolments.flatMap( e =>
                     if (e.identifiers.nonEmpty) {
-                        e.identifiers.get.zipWithIndex.map { case (i, j) =>
+                        e.identifiers.zipWithIndex.map { case (i, j) =>
                             (if (j == 0)
                                 Seq(TableRow(
-                                    rowspan = Some(e.identifiers.get.size),
+                                    rowspan = Some(e.identifiers.size),
                                     content = if (context.features.showEnrolments)
-                                        HtmlContent(s"""<a href="/agents-external-stubs/services#${e.key}">${e.key}</a>""")
-                                    else Text(e.key)
+                                        HtmlContent(s"""<a href="/agents-external-stubs/services#${e.service}">${e.service}</a>""")
+                                    else Text(e.service)
                                 ))
                             else Seq.empty[TableRow]) ++ Seq(
                                 TableRow(Text(i.key)),
-                                TableRow(HtmlContent(s"""<a href="/agents-external-stubs/known-facts${e.toEnrolmentKey.map(ek => "?enrolmentKey=" + ek.tag).getOrElse("")}">
+                                TableRow(HtmlContent(s"""<a href="/agents-external-stubs/known-facts?enrolmentKey=${e.tag}">
                                                         |    ${i.value}
                                                         |</a>""".stripMargin))
                             )
@@ -328,9 +290,9 @@
                         Seq(Seq(TableRow(
                             colspan = Some(3),
                             content = if (context.features.showEnrolments)
-                                HtmlContent(s"""<a href="/agents-external-stubs/services#${e.key}">${e.key}</a>""")
+                                HtmlContent(s"""<a href="/agents-external-stubs/services#${e.service}">${e.service}</a>""")
                             else {
-                                Text(e.key)
+                                Text(e.service)
                             }
                         )))
                     }
@@ -338,24 +300,27 @@
 
             ))
         } else {
-            <span class="govuk-hint">This agent has no delegated enrolments.</span>
+            <span class="govuk-hint">This agent has no assigned enrolments.</span>
         }
-      <div style="margin-top: 0.5em;width: 100%;text-align: right;">
-          <a class="govuk-body govuk-link" href="/agents-external-stubs/user/edit?userId=@user.userId#delegated">Add delegated
-              enrolment</a>
-      </div>
+        @addAssignedEnrolment(enrolments, user)
+        <div style="margin-top: 0.5em;width: 100%;text-align: right;">
+                &nbsp;
+        </div>
+    }
 
-        <h3 class="govuk-heading-s">Assigned enrolments</h3>
-        <div class="govuk-hint govuk-!-font-size-16">Used when the user is opted in to Granular Permissions. These are the enrolments that a user within an agent group has the right to act upon. Note: The group must have the corresponding delegated enrolments.</div>
+    @if(maybeGroup.exists(_.affinityGroup == "Agent")) {
 
-        @if(user.enrolments.exists(_.assigned.nonEmpty)) {
+        <h3 class="govuk-heading-s">Delegated enrolments assigned to this user</h3>
+        <div class="govuk-hint govuk-!-font-size-16">These are the enrolments that this user within an agent group has the right to act upon on behalf of another user. Note: The group must have the corresponding delegated enrolments.</div>
+
+        @if(user.assignedDelegatedEnrolments.nonEmpty) {
             @govukTable(Table(
                 head = Some(List(
                     HeadCell(Text("Service key")),
                     HeadCell(Text("Identifier Name")),
                     HeadCell(Text("Identifier Value"))
                 )),
-                rows = user.enrolments.get.assigned.flatMap( e =>
+                rows = user.assignedDelegatedEnrolments.flatMap( e =>
                     if (e.identifiers.nonEmpty) {
                         e.identifiers.zipWithIndex.map { case (i, j) =>
                             (if (j == 0)
@@ -393,31 +358,7 @@
         </div>
     }
 
-    @if(user.affinityGroup.contains("Agent")) {
-
-        <h3 class="govuk-heading-s">Suspended Regimes</h3>
-
-        @if(user.suspendedRegimes.nonEmpty) {
-            @govukTable(Table(
-                head = Some(List(
-                    HeadCell(Text("Regime")),
-                )),
-                rows = user.suspendedRegimes.get.toSeq.zipWithIndex.map { case (suspendedRegime, index) =>
-                    Seq(TableRow(
-                        if (context.features.showEnrolments) HtmlContent(s"""<a class="govuk-body govuk-link" href="/agents-external-stubs/services#$suspendedRegime">$suspendedRegime</a>""")
-                        else Text(suspendedRegime)
-                    ))
-                }
-            ))
-        } else {
-            <span class="govuk-hint">This agent is not suspended.</span>
-        }
-        <div style="margin-top: 0.5em;width: 100%;text-align: right;">
-            <a class="govuk-body govuk-link" href="/agents-external-stubs/user/edit?userId=@user.userId#suspendedRegimes">Add suspension</a>
-        </div>
-    }
-
-    @if(user.affinityGroup.isEmpty && user.strideRoles.nonEmpty) {
+    @if(maybeGroup.isEmpty && user.strideRoles.nonEmpty) {
       <span class="govuk-hint">This user is an internal HMRC staff eligible for STRIDE authentication.</span>
         @govukSummaryList(SummaryList(
             rows = Seq(
@@ -426,7 +367,7 @@
         ))
     }
 
-    @if(user.affinityGroup.nonEmpty || (user.affinityGroup.isEmpty && user.strideRoles.nonEmpty)) {
+    @if(maybeGroup.nonEmpty || (maybeGroup.isEmpty && user.strideRoles.nonEmpty)) {
         <div class="govuk-button-group">
 
             <a class="govuk-button" href="@editUrl.url" id="update-1">
@@ -444,12 +385,12 @@
         </div>
     }
 
-    @if(user.recordIds.nonEmpty && user.recordIds.get.nonEmpty) {
+    @if(user.recordIds.exists(_.nonEmpty)) {
 
         <h3 class="govuk-heading-s">Associated master records (DES)</h3>
 
         <ul class="govuk-list govuk-list--bullet">
-          @for(recordId <- user.recordIds.get){
+          @for(recordId <- user.recordIds){
             <li><a class="govuk-body govuk-link"
                     href="/agents-external-stubs/records?showId=@recordId">@recordId</a></li>
           }
@@ -458,20 +399,20 @@
 
 }
 
-@addEnrolment(enrolments: Seq[String], user: User) = {
+@addAssignedEnrolment(enrolments: Seq[String], user: User) = {
     @if(enrolments.nonEmpty) {
         <div style="margin-top: 0.5em;width: 100%;text-align: right;">
-            <form id="add_enrolment" action="/agents-external-stubs/user/amend">
+            <form id="add_assigned_enrolment" action="/agents-external-stubs/user/amend">
                 @{play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}}
                 @govukSelect(Select(
-                    id = "principalEnrolment",
-                    name = "principalEnrolment",
-                    items = enrolments.map(enrolment => SelectItem(value = Some(enrolment), text = enrolment, attributes = Map("id" -> s"enrolment-$enrolment"))),
-                    attributes = Map("aria-label" -> "Principal enrolment")
+                    id = "assignedPrincipalEnrolment",
+                    name = "assignedPrincipalEnrolment",
+                    items = enrolments.map(enrolment => SelectItem(value = Some(enrolment), text = enrolment, attributes = Map("id" -> s"assigned-enrolment-$enrolment"))),
+                    attributes = Map("aria-label" -> "Assigned principal enrolment")
                 ))
                 <input type="hidden" name="userId" value="@user.userId"/>
                 <a class="govuk-body govuk-link"
-                    onclick="document.getElementById('add_enrolment').submit()">Add enrolment</a>
+                    onclick="document.getElementById('add_assigned_enrolment').submit()">Assign new enrolment</a>
             </form>
         </div>
     }

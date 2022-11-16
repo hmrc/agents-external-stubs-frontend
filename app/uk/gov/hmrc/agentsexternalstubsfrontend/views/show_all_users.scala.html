@@ -85,24 +85,21 @@
     @govukTable(Table(
         head = Some(Seq(
             HeadCell(content = Text("UserID")),
-            HeadCell(content = Text("Affinity")),
             HeadCell(content = Text("Services")),
             HeadCell(content = Text("Action"))
         )),
         rows = users.users.sortBy(_.userId).map { user =>
             Seq(
-                TableRow(content = HtmlContent(s"""<div ${if (user.userId==context.authorisedUserId) """class="govuk-!-font-weight-bold"""" else ""}>${user.userId}</div>
-                                                  |<div style="font-size:70%;">group: ${user.groupId.getOrElse("none")}</div>
-                                                  |""".stripMargin)),
-                TableRow(content = HtmlContent(
-                    s"""<span class="badge badge-${user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">
-                       |    ${user.affinityGroup.getOrElse("none")}
-                       |</span>""".stripMargin)
-                ),
+                TableRow(content = {
+                    val linkToGroupView: Option[String] = user.groupId.map(groupId => s"""<a href="/agents-external-stubs/group?groupId=$groupId">$groupId</a>""")
+                    HtmlContent(s"""<div ${if (user.userId==context.authorisedUserId) """class="govuk-!-font-weight-bold"""" else ""}>${user.userId}</div>
+                                                  |<div style="font-size:70%;">group: ${linkToGroupView.getOrElse("none")}</div>
+                                                  |""".stripMargin)
+                }),
                 TableRow(content = HtmlContent(
                     (for {
-                        e <- user.enrolments.toSeq.flatMap(_.principal)
-                    } yield s"""<div><span style="display: inline-block;">${e.key}</span> <span>${e.identifiersValues.mkString("(","/",")")}</span></div>""").mkString("\n")
+                        e <- user.assignedPrincipalEnrolments
+                    } yield s"""<div><span style="display: inline-block;">${e.service}</span> <span>${e.identifiers.map(_.value).mkString("(","/",")")}</span></div>""").mkString("\n")
                 )),
                 TableRow(content =
                         if (user.userId==context.authorisedUserId) HtmlContent(

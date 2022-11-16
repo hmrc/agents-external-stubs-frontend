@@ -1,0 +1,353 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukDateInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+
+@this(
+        mainTemplate: main_template,
+        form: FormWithCSRF,
+        govukTextarea: GovukTextarea,
+        govukInput: GovukInput,
+        govukSelect: GovukSelect,
+        navigationBar: navigationBar,
+        govukErrorSummary: GovukErrorSummary,
+        govukCheckboxes: GovukCheckboxes,
+        govukRadios: GovukRadios,
+        govukDateInput: GovukDateInput,
+        govukButton: GovukButton)
+
+@(groupForm: Form[Group], postUrl: Call, cancelCall: Call, groupId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], msgs: Messages)
+
+@principalEnrolments = @{
+    ViewHelper.buildTree("", groupForm.data)("principalEnrolments")
+}
+
+@delegatedEnrolments = @{
+    ViewHelper.buildTree("", groupForm.data)("delegatedEnrolments")
+}
+
+@suspendedRegimes = @{
+    ViewHelper.buildTree("", groupForm.data)("suspendedRegimes")
+}
+
+@mainTemplate(title = msgs("group.title", groupId), wide = true) {
+
+    @navigationBar(context)
+
+    <h1 class="govuk-heading-l">@msgs("group.edit.header", groupId)</h1>
+
+    @if(groupForm.hasErrors) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(groupForm))
+    }
+
+    <p class="govuk-hint">
+    @msgs("group.edit.description")
+    </p>
+
+    <div>
+    @form(action = postUrl, 'id -> "groupForm", 'novalidate -> "novalidate") {
+        <div>
+            <div class="form-field-group">
+
+                @govukSelect(Select(
+                    label = Label(content = Text(msgs("group.form.affinityGroup"))),
+                    hint = Some(Hint(content = Text("Changing the affinity group of an existing group may cause problems. It is best to create a fresh group instead."))),
+                    items = AffinityGroup.definedValues.map(ag => SelectItem(value = Some(ag), text = ag))
+                ).withFormField(groupForm("affinityGroup")))
+
+                <div class="govuk-button-group">
+                    @govukButton(Button(
+                        content = if(hasContinue) Text(msgs("group.edit.update_and_continue")) else Text(msgs("group.edit.update")),
+                        attributes = Map("id" -> "update1")
+                    ))
+
+                    <a class="govuk-body govuk-link" href="@{cancelCall.url}">
+                        @msgs("group.edit.cancel")
+                    </a>
+                </div>
+                
+                @govukInput(Input(
+                    label = Label(
+                        content = Text(msgs("group.form.groupId")),
+                    ),
+                    classes = "govuk-input govuk-input--width-20"
+                ).withFormField(groupForm("groupId")))
+
+                @if(groupForm.data.get("affinityGroup").contains("Agent")) {
+                    @govukInput(Input(
+                        label = Label(
+                            content = Text(msgs("group.form.agentCode")),
+                        ),
+                        classes = "govuk-input govuk-input--width-20"
+                    ).withFormField(groupForm("agentCode")))
+
+                    @govukInput(Input(
+                        label = Label(
+                            content = Text(msgs("group.form.agentFriendlyName")),
+                        ),
+                        classes = "govuk-input govuk-input--width-20"
+                    ).withFormField(groupForm("agentFriendlyName")))
+                }
+                
+            </div>
+
+            <div class="govuk-button-group">
+                @govukButton(Button(
+                    content = if(hasContinue) Text(msgs("group.edit.update_and_continue")) else Text(msgs("group.edit.update")),
+                    attributes = Map("id" -> "update2")
+                ))
+
+                <a class="govuk-body govuk-link" href="@{cancelCall.url}">
+                    @msgs("group.edit.cancel")
+                </a>
+            </div>
+
+            <a class="govuk-body govuk-link" name="enrolments"></a>
+            <h2>Principal enrolments</h2>
+
+            <div id="principalEnrolments" class="form-group" style="text-align: right">
+                <table style="width: 100%" class="govuk-table">
+                    <colgroup>
+                        <col width="30%">
+                        <col width="30%">
+                        <col width="30%">
+                        <col width="10%">
+                    </colgroup>
+                    <thead class="govuk-table__head">
+                        <th class="govuk-table__header">Service key</th>
+                        <th class="govuk-table__header">Identifier Name</th>
+                        <th class="govuk-table__header">Identifier Value</th>
+                        <th class="govuk-table__header"></th>
+                    </thead>
+
+                    @for(enrolment <- principalEnrolments) {
+                        @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
+                            <tr id="principalEnrolments-@i-row" class="govuk-table__row">
+                                @if(i == 0) {
+                                    <td class="govuk-table__cell" rowspan="@{
+                                        enrolment(".identifier").size
+                                    }" style="vertical-align: top;">
+                                        @govukInput(Input(
+                                            formGroupClasses = "govuk-!-margin-bottom-0"
+                                        ).withFormField(groupForm(s"${enrolment.key}.key")))
+                                    </td>
+                                }
+
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(groupForm(s"${identifier.key}.key")))
+                            </td>
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(groupForm(s"${identifier.key}.value")))
+                            </td>
+                            <td class="govuk-table__cell">
+                                <a class="govuk-body govuk-link" onclick="document.getElementById('principalEnrolments-@i-row').remove()">
+                                            Remove
+                                </a>
+                            </td>
+                            </tr>
+                        }
+                    }
+
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">
+                            @govukInput(Input(
+                                formGroupClasses = "govuk-!-margin-bottom-0"
+                            ).withFormField(groupForm(s"principalEnrolments[${principalEnrolments.size}].key")))
+                        </td>
+                        <td class="govuk-table__cell">
+                            @govukInput(Input(
+                                formGroupClasses = "govuk-!-margin-bottom-0"
+                            ).withFormField(groupForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key")))
+                        </td>
+                        <td class="govuk-table__cell">
+                            @govukInput(Input(
+                                formGroupClasses = "govuk-!-margin-bottom-0"
+                            ).withFormField(groupForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value")))
+                        </td>
+                        <td class="govuk-table__cell">
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+            @if(groupForm.data.get("affinityGroup").contains("Agent")) {
+                <a class="govuk-body govuk-link" name="delegated"></a>
+                <h2>Delegated enrolments</h2>
+
+                <span class="govuk-hint">Only Agents can have delegated enrolments.</span>
+
+                <div id="delegatedEnrolments" class="form-group" style="text-align: right">
+                    <table class="govuk-table" style="width: 100%">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="30%">
+                            <col width="10%">
+                        </colgroup>
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Service key</th>
+                            <th class="govuk-table__header">Identifier Name</th>
+                            <th class="govuk-table__header">Identifier Value</th>
+                            <th class="govuk-table__header"></th>
+                        </tr>
+
+                        @for(enrolment <- delegatedEnrolments) {
+                            @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
+                                <tr id="delegatedEnrolments-@i-row">
+                                    @if(i == 0) {
+                                        <td class="govuk-table__cell" rowspan="@{
+                                            enrolment(".identifier").size
+                                        }" style="vertical-align: top;">
+                                            @govukInput(Input(
+                                                formGroupClasses = "govuk-!-margin-bottom-0"
+                                            ).withFormField(groupForm(s"${enrolment.key}.key")))
+                                        </td>
+                                    }
+
+                                <td class="govuk-table__cell">
+                                    @govukInput(Input(
+                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                    ).withFormField(groupForm(s"${identifier.key}.key")))
+                                </td>
+                                <td class="govuk-table__cell">
+                                    @govukInput(Input(
+                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                    ).withFormField(groupForm(s"${identifier.key}.value")))
+                                </td>
+                                <td class="govuk-table__cell">
+                                    <a class="govuk-body govuk-link"
+                                        onclick="document.getElementById('delegatedEnrolments-@i-row').remove()">Remove</a>
+                                </td>
+                                </tr>
+                            }
+                        }
+
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(groupForm(s"delegatedEnrolments[${delegatedEnrolments.size}].key")))
+                            </td>
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(groupForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].key")))
+                            </td>
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(groupForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].value")))
+                            </td>
+                            <td class="govuk-table__cell">
+
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+            }
+            
+            @if(groupForm.data.get("affinityGroup").contains("Agent")) {
+                <a class="govuk-body govuk-link" name = "suspendedRegimes"></a>
+                <h2>Suspended Regimes</h2>
+                <span class="govuk-hint">Only Agents can be suspended. Valid Regimes: ITSA, VATC, TRS, CGT, PPT, ALL, AGSV</span>
+
+                <div id="suspendedRegimes" class="form-group" style="text-align: right">
+                    <table class="govuk-table" style="width: 100%">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="10%">
+                        </colgroup>
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Regime</th>
+                            <th class="govuk-table__header"></th>
+                        </tr>
+                        @for((suspendedService, index) <- suspendedRegimes.zipWithIndex) {
+                            <tr id="suspendedRegimes-@index-row">
+                                <td style="vertical-align: top;">
+                                    @govukInput(Input(
+                                        classes = "govuk-input--width-10",
+                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                    ).withFormField(groupForm(s"suspendedRegimes[$index]")))
+                                </td>
+                                <td class="govuk-table__cell">
+                                    <a class="govuk-body govuk-link" onclick="document.getElementById('suspendedRegimes-@index-row').remove()">
+                                            Remove
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                @govukInput(Input(
+                                    classes = "govuk-input--width-10",
+                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                ).withFormField(groupForm(s"suspendedRegimes[${suspendedRegimes.size}]")))
+                            </td>
+                            <td class="govuk-table__cell"></td>
+                        </tr>
+                    </table>
+                </div>
+
+            }
+
+            <div class="govuk-button-group">
+                @govukButton(Button(
+                    content = if(hasContinue) Text(msgs("group.edit.update_and_continue")) else Text(msgs("group.edit.update")),
+                    attributes = Map("id" -> "update3")
+                ))
+
+                <a class="govuk-body govuk-link" href="@{cancelCall.url}">
+                    @msgs("group.edit.cancel")
+                </a>
+            </div>
+
+            </fieldset>
+
+            }
+    </div>
+
+}

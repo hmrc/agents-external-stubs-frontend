@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.models
 
 import org.joda.time.LocalDate
-import play.api.libs.json.{Format, JsPath, Json, Reads, Writes}
+import play.api.libs.json._
 import uk.gov.hmrc.domain.Nino
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
@@ -27,60 +27,45 @@ import scala.io.{BufferedSource, Source}
 case class User(
   userId: String,
   groupId: Option[String] = None,
-  affinityGroup: Option[String] = None,
   confidenceLevel: Option[Int] = None,
   credentialStrength: Option[String] = None,
   credentialRole: Option[String] = None,
   nino: Option[Nino] = None,
-  enrolments: Option[Enrolments] = None,
+  assignedPrincipalEnrolments: Seq[EnrolmentKey] = Seq.empty,
+  assignedDelegatedEnrolments: Seq[EnrolmentKey] = Seq.empty,
   name: Option[String] = None,
   dateOfBirth: Option[LocalDate] = None,
-  agentCode: Option[String] = None,
-  agentFriendlyName: Option[String] = None,
   isNonCompliant: Option[Boolean] = None,
   complianceIssues: Option[Seq[String]] = None,
   isPermanent: Option[Boolean] = None,
   recordIds: Option[Seq[String]] = None,
   address: Option[Address] = None,
-  strideRoles: Seq[String] = Seq.empty,
-  suspendedRegimes: Option[Set[String]] = None
+  strideRoles: Seq[String] = Seq.empty
 ) {
 
   def isEnrolledFor(service: String): Boolean =
-    enrolments.exists(_.principal.exists(_.key == service))
+    assignedPrincipalEnrolments.exists(_.service == service)
 
   val defaultProviderType: String =
     if (strideRoles.nonEmpty) AuthProvider.PrivilegedApplication else AuthProvider.GovernmentGateway
 
-  def updatePrincipalEnrolments(f: Seq[Enrolment] => Seq[Enrolment]): User =
-    this.copy(enrolments =
-      Some(
-        this.enrolments
-          .getOrElse(Enrolments.none)
-          .copy(principal = f(this.enrolments.getOrElse(Enrolments.none).principal))
-      )
-    )
-  def updateDelegatedEnrolments(f: Seq[Enrolment] => Seq[Enrolment]): User =
-    this.copy(enrolments =
-      Some(
-        this.enrolments
-          .getOrElse(Enrolments.none)
-          .copy(delegated = f(this.enrolments.getOrElse(Enrolments.none).delegated))
-      )
-    )
-  def updateAssignedEnrolments(f: Seq[EnrolmentKey] => Seq[EnrolmentKey]): User =
-    this.copy(enrolments =
-      Some(
-        this.enrolments
-          .getOrElse(Enrolments.none)
-          .copy(assigned = f(this.enrolments.getOrElse(Enrolments.none).assigned))
-      )
-    )
+  def updateAssignedPrincipalEnrolments(f: Seq[EnrolmentKey] => Seq[EnrolmentKey]): User =
+    this.copy(assignedPrincipalEnrolments = f(this.assignedPrincipalEnrolments))
 
+  def updateAssignedDelegatedEnrolments(f: Seq[EnrolmentKey] => Seq[EnrolmentKey]): User =
+    this.copy(assignedDelegatedEnrolments = f(this.assignedDelegatedEnrolments))
+
+  def lastName: Option[String] = name.map(_.split(" ").last)
+
+  def withRecordId(recordId: String): User = copy(recordIds = Some(recordIds.getOrElse(Seq.empty) :+ recordId))
+
+  final val facts: String => Option[String] = {
+    case n if n.toLowerCase.contains("postcode") => address.flatMap(_.postcode)
+    case _                                       => None
+  }
 }
 
 object User {
-
   val Individual = "Individual"
 
   implicit val formats: Format[User] = Json.format[User]
@@ -131,7 +116,8 @@ object CredStrength {
 }
 
 object AffinityGroup {
-  val values = Seq("none", "Individual", "Organisation", "Agent")
+  val definedValues: Seq[String] = Seq("Individual", "Organisation", "Agent")
+  val values: Seq[String] = "none" +: definedValues
 }
 
 object CredentialRole {
@@ -156,22 +142,4 @@ object CountryCodes {
 
   lazy val values: Seq[(String, String)] = Country.countries.map(c => c.code -> c.name)
 
-}
-
-case class Enrolments(
-  principal: Seq[Enrolment] = Seq.empty,
-  delegated: Seq[Enrolment] = Seq.empty,
-  assigned: Seq[EnrolmentKey] = Seq.empty
-)
-
-object Enrolments {
-  import play.api.libs.functional.syntax._
-  implicit val reads: Reads[Enrolments] = (
-    (JsPath \ "principal").readNullable[Seq[Enrolment]].map(_.getOrElse(Seq.empty)) and
-      (JsPath \ "delegated").readNullable[Seq[Enrolment]].map(_.getOrElse(Seq.empty)) and
-      (JsPath \ "assigned").readNullable[Seq[EnrolmentKey]].map(_.getOrElse(Seq.empty))
-  )(Enrolments.apply _)
-  implicit val writes: Writes[Enrolments] = Json.writes[Enrolments]
-
-  val none = Enrolments(Seq.empty, Seq.empty, Seq.empty)
 }

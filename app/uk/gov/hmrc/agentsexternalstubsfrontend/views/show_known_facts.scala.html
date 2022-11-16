@@ -61,8 +61,7 @@
             SummaryListRow(key = Key(Text("Verifier Value")), value = Value(Text(verifier.value))),
         )) ++ enrolmentInfo.user.map(user =>
             SummaryListRow(key = Key(Text("Principal User")), value = Value(HtmlContent(
-                s"""<span class="badge badge-${user.affinityGroup.map(_.toLowerCase).getOrElse("none")}">${user.affinityGroup.getOrElse("")}</span>&nbsp;&nbsp;
-                  |<a href="/agents-external-stubs/user?userId=${user.userId}">${user.userId}</a>
+                s"""<a href="/agents-external-stubs/user?userId=${user.userId}">${user.userId}</a>
                   |<span style="display:inline-block;margin-left:0.2em;">(${user.name.getOrElse("(no name)")})</span>
                   |""".stripMargin
                 ++ (if (user.userId != context.authorisedUserId)
@@ -73,7 +72,7 @@
         ) ++ enrolmentInfo.agents.map(agent =>
             SummaryListRow(key = Key(Text("Delegated User (Agent)")), value = Value(HtmlContent(
                 s"""<a href="/agents-external-stubs/user?userId=${agent.userId}">${agent.userId}</a>
-                   |    <span style="display:inline-block;margin-left:0.2em;">(${agent.agentFriendlyName.getOrElse("(no name)")})</span>
+                   |    <span style="display:inline-block;margin-left:0.2em;">(${agent.name.getOrElse("(no name)")})</span>
                    |""".stripMargin
                 ++ (if (agent.userId != context.authorisedUserId)
                     s"""<span style="display:inline-block;margin-left:0.2em;"><a href="/agents-external-stubs/sign-in?userId=${agent.userId}&providerType=${agent.defaultProviderType}">Sign-in</a></span>"""

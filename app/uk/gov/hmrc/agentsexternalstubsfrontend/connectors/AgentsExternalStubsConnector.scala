@@ -83,10 +83,15 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
   def getUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[User] =
     http.GET[User](new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm).recover(handleNotFound)
 
-  def createUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+  def createUser(user: User, affinityGroup: Option[String])(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Unit] =
     http
       .POST[User, HttpResponse](
-        new URL(s"$baseUrl/agents-external-stubs/users").toExternalForm,
+        new URL(
+          s"$baseUrl/agents-external-stubs/users" + affinityGroup.fold("")(ag => s"?affinityGroup=$ag")
+        ).toExternalForm,
         user
       )
       .recover(handleNotFound)
@@ -104,10 +109,28 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
   def getUsers(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] =
     http.GET[Users](new URL(s"$baseUrl/agents-external-stubs/users").toExternalForm)
 
+  def getUsersByGroupId(groupId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] =
+    http.GET[Users](new URL(s"$baseUrl/agents-external-stubs/users?groupId=$groupId").toExternalForm)
+
   def removeUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .DELETE[HttpResponse](
         new URL(s"$baseUrl/agents-external-stubs/users/$userId").toExternalForm
+      )
+      .recover(handleNotFound)
+      .map(_ => ())
+
+  def getGroup(groupId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Group] =
+    http.GET[Group](new URL(s"$baseUrl/agents-external-stubs/groups/$groupId").toExternalForm).recover(handleNotFound)
+
+  def getGroups(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Groups] =
+    http.GET[Groups](new URL(s"$baseUrl/agents-external-stubs/groups").toExternalForm)
+
+  def updateGroup(group: Group)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http
+      .PUT[Group, HttpResponse](
+        new URL(s"$baseUrl/agents-external-stubs/groups/${group.groupId}").toExternalForm,
+        group
       )
       .recover(handleNotFound)
       .map(_ => ())
