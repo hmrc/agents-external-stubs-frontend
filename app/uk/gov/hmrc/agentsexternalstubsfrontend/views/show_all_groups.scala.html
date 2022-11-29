@@ -1,0 +1,95 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import views.html.helper.CSRF
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+
+@this(
+        mainTemplate: main_template,
+        navigationBar: navigationBar,
+        form: FormWithCSRF,
+        govukInput: GovukInput,
+        govukButton: GovukButton,
+        govukTable: GovukTable,
+)
+
+@(groups: Groups, authToken: Option[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
+
+@mainTemplate(title = msgs("groups.title"), wide = true) {
+
+    @navigationBar(context)
+
+    <h1 class="govuk-heading-l">@msgs("groups.show.header", context.planetId)</h1>
+
+    <p class="govuk-body">
+    @msgs("groups.show.description")
+    </p>
+
+    @form(action = Call("GET", "/agents-external-stubs/planet/destroy"), 'name -> "destroyPlanet", 'id -> "destroyPlanet") {
+        @{
+            play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
+        }
+    <a id="link_planet_destroy" class="govuk-body govuk-link" onclick="if(confirm('Please confirm you wish to destroy current planet and lose the associated data?')){document.getElementById('destroyPlanet').submit()};">
+        @msgs("planet.link.destroy")
+    </a>
+    }
+
+    @govukTable(Table(
+        head = Some(Seq(
+            HeadCell(content = Text("GroupID")),
+            HeadCell(content = Text("Affinity")),
+            HeadCell(content = Text("Services")),
+            HeadCell(content = Text("Action"))
+        )),
+        rows = groups.groups.sortBy(_.groupId).map { group =>
+            Seq(
+                TableRow(content = HtmlContent(s"""<div>${group.groupId}</div>""".stripMargin)),
+                TableRow(content = HtmlContent(
+                    s"""<span class="badge badge-${group.affinityGroup.toLowerCase}">${group.affinityGroup}</span>"""
+                )),
+                TableRow(content = HtmlContent(
+                    (for {
+                        e <- group.principalEnrolments
+                    } yield s"""<div><span style="display: inline-block;">${e.key}</span> <span>${e.identifiers.getOrElse(Seq.empty).map(_.value).mkString("(","/",")")}</span></div>""").mkString("\n")
+                )),
+                TableRow(content =
+                    HtmlContent(
+                        s"""<div class="test-group-action">
+                           |    <a id="${group.groupId}-view" class="govuk-body govuk-link"
+                           |        href="/agents-external-stubs/group?groupId=${group.groupId}">View</a>
+                           |    <a id="${group.groupId}-edit" class="govuk-body govuk-link"
+                           |    href="/agents-external-stubs/group/edit?groupId=${group.groupId}">Edit</a>
+                           |</div>
+                           |""".stripMargin
+                    )
+                )
+            )
+        }
+    ))
+}

@@ -1,0 +1,105 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+@import views.html.helper.CSRF
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.group_data
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+
+@this(
+        mainTemplate: main_template,
+        groupData: group_data,
+        form: FormWithCSRF,
+        govukSummaryList: GovukSummaryList,
+        govukTable: GovukTable,
+        govukSelect: GovukSelect,
+        govukInput: GovukInput,
+        govukButton: GovukButton
+)
+@(group: Group, users: Users, authToken: Option[String], sessionId: Option[String], groupId: String, context: PageContext)(implicit request: Request[_], msgs: Messages)
+
+@showField(value: Option[_], name: String, id: String) = @{
+    value.map(x =>
+        SummaryListRow(key = Key(Text(msgs(name))), value = Value(Text(value.get.toString)))
+    )
+}
+
+@mainTemplate(title = s"Group ${group.groupId}") {
+
+    <h1 class="govuk-heading-l">
+        Details for EACD group @{group.groupId}
+    </h1>
+
+    <p class="govuk-body">
+        Here you can review this group's details.
+    </p>
+
+    @groupData(group, context)
+
+    <a class="govuk-button" href="/agents-external-stubs/group/edit?groupId=@{group.groupId}" id="edit-group">
+        Edit group
+    </a>
+
+    <h1 class="govuk-heading-l">
+        Users belonging to this group
+    </h1>
+
+    @govukTable(Table(
+        head = Some(Seq(
+            HeadCell(content = Text("User ID")),
+            HeadCell(content = Text("Name")),
+            HeadCell(content = Text("Action"))
+        )),
+        rows = users.users.sortBy(_.userId).map { user =>
+            Seq(
+                TableRow(content = Text(user.userId)),
+                TableRow(content = Text(user.name.getOrElse("(none)"))),
+                TableRow(content =
+                    HtmlContent(
+                        s"""<div class="test-group-action">
+                           |    <a id="${user.userId}-view" class="govuk-body govuk-link"
+                           |        href="/agents-external-stubs/user?userId=${user.userId}">View</a>
+                           |    <a id="${user.userId}-edit" class="govuk-body govuk-link"
+                           |    href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a>
+                           |</div>
+                           |""".stripMargin
+                    )
+                )
+            )
+        }
+    ))
+
+}

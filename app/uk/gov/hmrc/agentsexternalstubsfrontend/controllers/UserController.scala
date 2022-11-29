@@ -64,31 +64,34 @@ class UserController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          agentsExternalStubsConnector
-            .getUser(userId.getOrElse(credentials.providerId))
-            .map(user =>
-              Ok(
-                showUserView(
-                  user,
-                  request.session.get(SessionKeys.authToken),
-                  request.session.get(SessionKeys.sessionId),
-                  routes.UserController.showEditUserPage(continue, userId),
-                  continue,
-                  user.userId,
-                  user.affinityGroup
-                    .map(ag =>
-                      servicesDefinitionsService.servicesDefinitions
-                        .servicesFor(ag)
-                        .collect {
-                          case s if s.flags.multipleEnrolment   => s.name
-                          case s if !user.isEnrolledFor(s.name) => s.name
-                        }
-                    )
-                    .getOrElse(Seq.empty),
-                  pageContext(credentials)
+          for {
+            user <- agentsExternalStubsConnector.getUser(userId.getOrElse(credentials.providerId))
+            maybeGroup <- user.groupId match {
+                            case None          => Future.successful(None)
+                            case Some(groupId) => agentsExternalStubsConnector.getGroup(groupId).map(Some(_))
+                          }
+          } yield Ok(
+            showUserView(
+              user,
+              maybeGroup,
+              request.session.get(SessionKeys.authToken),
+              request.session.get(SessionKeys.sessionId),
+              routes.UserController.showEditUserPage(continue, userId),
+              continue,
+              user.userId,
+              maybeGroup
+                .map(group =>
+                  servicesDefinitionsService.servicesDefinitions
+                    .servicesFor(group.affinityGroup)
+                    .collect {
+                      case s if s.flags.multipleEnrolment   => s.name
+                      case s if !user.isEnrolledFor(s.name) => s.name
+                    }
                 )
-              )
+                .getOrElse(Seq.empty),
+              pageContext(credentials)
             )
+          )
         }
     }
 
@@ -101,40 +104,33 @@ class UserController @Inject() (
               agentsExternalStubsConnector
                 .getUser(uid)
                 .map(user =>
-                  if (user.affinityGroup.isDefined)
-                    Redirect(routes.UserController.showEditUserPage(continue, userId))
-                  else
-                    Ok(
-                      createUserView(
-                        UserForm.fill(user),
-                        routes.UserController
-                          .updateUser(
-                            Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
-                            userId,
-                            create = true
-                          ),
-                        routes.UserController.showEditUserPage(continue, userId),
-                        routes.UserController.showUserPage(continue, userId),
-                        user.userId,
-                        continue.isDefined,
-                        servicesDefinitionsService.servicesDefinitions.options,
-                        pageContext(credentials)
-                      )
+                  Ok(
+                    createUserView(
+                      InitialUserCreationData.form,
+                      routes.UserController
+                        .submitCreateUserPage(
+                          Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
+                          uid
+                        ),
+                      routes.UserController.showUserPage(continue, userId),
+                      user.userId,
+                      continue.isDefined,
+                      servicesDefinitionsService.servicesDefinitions.options,
+                      pageContext(credentials)
                     )
+                  )
                 )
                 .recover { case e: NotFoundException =>
                   userId match {
                     case Some(id) =>
                       Ok(
                         createUserView(
-                          UserForm.fill(User(id)),
+                          InitialUserCreationData.form,
                           routes.UserController
-                            .updateUser(
+                            .submitCreateUserPage(
                               Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
-                              userId,
-                              create = true
+                              uid
                             ),
-                          routes.UserController.showEditUserPage(continue, userId),
                           routes.UserController.showUserPage(continue, userId),
                           id,
                           continue.isDefined,
@@ -149,13 +145,12 @@ class UserController @Inject() (
               Future.successful(
                 Ok(
                   createUserView(
-                    UserForm.fill(User(credentials.providerId)),
+                    InitialUserCreationData.form,
                     routes.UserController
-                      .updateUser(
+                      .submitCreateUserPage(
                         Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
-                        create = true
+                        credentials.providerId
                       ),
-                    routes.UserController.showEditUserPage(continue),
                     routes.UserController.showUserPage(continue),
                     credentials.providerId,
                     continue.isDefined,
@@ -168,28 +163,93 @@ class UserController @Inject() (
         }
     }
 
+  def submitCreateUserPage(continue: Option[RedirectUrl], userId: String): Action[AnyContent] = Action.async {
+    implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          InitialUserCreationData.form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  Ok(
+                    createUserView(
+                      formWithErrors,
+                      routes.UserController
+                        .submitCreateUserPage(
+                          continue,
+                          userId
+                        ),
+                      routes.UserController.showUserPage(continue, Some(userId)),
+                      userId,
+                      continue.isDefined,
+                      servicesDefinitionsService.servicesDefinitions.options,
+                      pageContext(credentials)
+                    )
+                  )
+                ),
+              initialUserCreationData =>
+                for {
+                  // delete the old temp user (if any) before recreating one with the desired affinity group and enrolment
+                  _ <- agentsExternalStubsConnector.removeUser(userId).recover { case _ => () }
+                  _ <- agentsExternalStubsConnector.createUser(
+                         user = User(
+                           userId = userId,
+                           assignedPrincipalEnrolments = initialUserCreationData.principalEnrolmentService
+                             .filter(e => e.nonEmpty && e != "none")
+                             .map(EnrolmentKey(_, identifiers = Seq.empty))
+                             .toSeq
+                         ),
+                         affinityGroup = initialUserCreationData.affinityGroup.filter(e => e.nonEmpty && e != "none")
+                       )
+                } yield continue.fold(Redirect(routes.UserController.showUserPage(continue, Some(userId))))(
+                  continueUrl => Redirect(continueUrl.unsafeValue)
+                )
+            )
+        }
+  }
+
   def showEditUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          agentsExternalStubsConnector
-            .getUser(userId.getOrElse(credentials.providerId))
-            .map { user =>
-              Ok(
-                editUserView(
-                  UserForm.fill(user),
-                  routes.UserController.updateUser(continue, userId),
-                  routes.UserController.showUserPage(continue, userId),
-                  user.userId,
-                  continue.isDefined,
-                  pageContext(credentials)
-                )
-              )
-            }
+          for {
+            user <- agentsExternalStubsConnector.getUser(userId.getOrElse(credentials.providerId))
+            affinityGroup <- user.groupId match {
+                               case Some(gid) =>
+                                 agentsExternalStubsConnector.getGroup(gid).map(group => Some(group.affinityGroup))
+                               case None => Future.successful(None)
+                             }
+          } yield Ok(
+            editUserView(
+              UserForm.fill(user),
+              affinityGroup,
+              routes.UserController.updateUser(continue, userId),
+              routes.UserController.showUserPage(continue, userId),
+              user.userId,
+              continue.isDefined,
+              pageContext(credentials)
+            )
+          )
         }
     }
 
-  def updateUser(continue: Option[RedirectUrl], userId: Option[String], create: Boolean): Action[AnyContent] =
+  def updateUser(
+    continue: Option[RedirectUrl],
+    userId: Option[String],
+    create: Boolean,
+    affinityGroup: Option[String]
+  ): Action[AnyContent] =
+    if (create)
+      updateNewUser(continue, userId, affinityGroup)
+    else
+      updateExistingUser(continue, userId, affinityGroup)
+
+  def updateExistingUser(
+    continue: Option[RedirectUrl],
+    userId: Option[String],
+    affinityGroup: Option[String]
+  ): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
@@ -197,66 +257,22 @@ class UserController @Inject() (
             .bindFromRequest()
             .fold(
               formWithErrors =>
-                if (create)
-                  Future.successful(
-                    Ok(
-                      createUserView(
-                        UserForm.fill(User(userId.get)),
-                        routes.UserController
-                          .updateUser(
-                            Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
-                            userId,
-                            create = true
-                          ),
-                        routes.UserController.showEditUserPage(continue, userId),
-                        routes.UserController.showUserPage(continue, userId),
-                        userId.get,
-                        continue.isDefined,
-                        servicesDefinitionsService.servicesDefinitions.options,
-                        pageContext(credentials)
-                      )
+                Future.successful(
+                  Ok(
+                    editUserView(
+                      formWithErrors,
+                      affinityGroup,
+                      routes.UserController.updateUser(continue, userId),
+                      routes.UserController.showUserPage(continue, userId),
+                      userId = userId.getOrElse(credentials.providerId),
+                      continue.isDefined,
+                      pageContext(credentials)
                     )
                   )
-                else
-                  Future.successful(
-                    Ok(
-                      editUserView(
-                        formWithErrors,
-                        routes.UserController.updateUser(continue, userId),
-                        routes.UserController.showUserPage(continue, userId),
-                        userId = userId.getOrElse(credentials.providerId),
-                        continue.isDefined,
-                        pageContext(credentials)
-                      )
-                    )
-                  ),
+                ),
               user =>
-                (if (create && userId.isDefined)
-                   agentsExternalStubsConnector.createUser(
-                     user.copy(
-                       userId = userId.get,
-                       confidenceLevel =
-                         if (user.affinityGroup.contains(User.Individual)) Some(250) else user.confidenceLevel,
-                       credentialStrength =
-                         if (user.affinityGroup.contains(User.Individual)) Some("strong")
-                         else user.credentialStrength
-                     )
-                   )
-                 else if (create && userId.isEmpty)
-                   agentsExternalStubsConnector
-                     .updateUser(
-                       user.copy(
-                         userId = credentials.providerId,
-                         confidenceLevel =
-                           if (user.affinityGroup.contains(User.Individual)) Some(250) else user.confidenceLevel,
-                         credentialStrength =
-                           if (user.affinityGroup.contains(User.Individual)) Some("strong")
-                           else user.credentialStrength
-                       )
-                     )
-                 else
-                   agentsExternalStubsConnector
-                     .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId))))
+                (agentsExternalStubsConnector
+                  .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId))))
                   .map(_ =>
                     continue.fold(Redirect(routes.UserController.showUserPage(continue, userId)))(continueUrl =>
                       Redirect(continueUrl.unsafeValue)
@@ -266,6 +282,83 @@ class UserController @Inject() (
                     Ok(
                       editUserView(
                         UserForm.fill(user).withGlobalError(e.getMessage),
+                        affinityGroup,
+                        routes.UserController.updateUser(continue, userId),
+                        routes.UserController.showUserPage(continue, userId),
+                        userId = userId.getOrElse(credentials.providerId),
+                        continue.isDefined,
+                        pageContext(credentials)
+                      )
+                    )
+                  }
+            )
+        }
+    }
+
+  def updateNewUser(
+    continue: Option[RedirectUrl],
+    userId: Option[String],
+    affinityGroup: Option[String]
+  ): Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          UserForm
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  Ok(
+                    createUserView(
+                      InitialUserCreationData.form,
+                      routes.UserController
+                        .submitCreateUserPage(
+                          Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
+                          userId.get
+                        ),
+                      routes.UserController.showUserPage(continue, userId),
+                      userId.get,
+                      continue.isDefined,
+                      servicesDefinitionsService.servicesDefinitions.options,
+                      pageContext(credentials)
+                    )
+                  )
+                ),
+              user =>
+                (if (userId.isDefined)
+                   agentsExternalStubsConnector.createUser(
+                     user.copy(
+                       userId = userId.get,
+                       confidenceLevel =
+                         if (affinityGroup.contains(User.Individual)) Some(250) else user.confidenceLevel,
+                       credentialStrength =
+                         if (affinityGroup.contains(User.Individual)) Some("strong")
+                         else user.credentialStrength
+                     ),
+                     affinityGroup
+                   )
+                 else
+                   agentsExternalStubsConnector
+                     .updateUser(
+                       user.copy(
+                         userId = credentials.providerId,
+                         confidenceLevel =
+                           if (affinityGroup.contains(User.Individual)) Some(250) else user.confidenceLevel,
+                         credentialStrength =
+                           if (affinityGroup.contains(User.Individual)) Some("strong")
+                           else user.credentialStrength
+                       )
+                     ))
+                  .map(_ =>
+                    continue.fold(Redirect(routes.UserController.showUserPage(continue, userId)))(continueUrl =>
+                      Redirect(continueUrl.unsafeValue)
+                    )
+                  )
+                  .recover { case e: Exception =>
+                    Ok(
+                      editUserView(
+                        UserForm.fill(user).withGlobalError(e.getMessage),
+                        affinityGroup,
                         routes.UserController.updateUser(continue, userId),
                         routes.UserController.showUserPage(continue, userId),
                         userId = userId.getOrElse(credentials.providerId),
@@ -295,7 +388,7 @@ class UserController @Inject() (
   def amendUser(
     continue: Option[RedirectUrl],
     userId: Option[String],
-    principalEnrolment: Option[String]
+    assignedPrincipalEnrolment: Option[String]
   ): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
@@ -305,7 +398,16 @@ class UserController @Inject() (
             .getUser(id)
             .flatMap { user =>
               val maybeUpdate =
-                principalEnrolment.map(newEnrolment => user.updatePrincipalEnrolments(_ :+ Enrolment(newEnrolment)))
+                assignedPrincipalEnrolment.map { newEnrolment =>
+                  val enrolmentKey =
+                    if (newEnrolment.split("~").length == 1)
+                      // if only service key is provided (no identifiers), do not attempt to parse as a full enrolment key
+                      EnrolmentKey(newEnrolment, identifiers = Seq.empty)
+                    else
+                      // if it is a full enrolment key, parse normally
+                      Enrolment(newEnrolment).toEnrolmentKey.get
+                  user.updateAssignedPrincipalEnrolments(_ :+ enrolmentKey)
+                }
               (maybeUpdate match {
                 case Some(update) => agentsExternalStubsConnector.updateUser(update)
                 case None         => Future.successful(())
@@ -382,17 +484,6 @@ object UserController {
       "identifiers" -> seq(identifierMapping)
     )(EnrolmentKey.apply)(EnrolmentKey.unapply)
   )
-
-  val enrolmentsMapping: Mapping[Enrolments] =
-    mapping(
-      "principal" -> optional(seq(enrolmentMapping))
-        .transform[Seq[Enrolment]](_.toSeq.flatten.flatten, es => Some(es.map(Some(_)))),
-      "delegated" -> optional(seq(enrolmentMapping))
-        .transform[Seq[Enrolment]](_.toSeq.flatten.flatten, es => Some(es.map(Some(_)))),
-      "assigned" -> optional(seq(enrolmentKeyMapping))
-        .transform[Seq[EnrolmentKey]](_.toSeq.flatten.flatten, es => Some(es.map(Some(_))))
-    )(Enrolments.apply)(Enrolments.unapply)
-
   val addressMapping: Mapping[Address] = mapping(
     "line1"       -> optional(nonEmptyText),
     "line2"       -> optional(nonEmptyText),
@@ -406,31 +497,25 @@ object UserController {
     mapping(
       "userId"             -> ignored("ignored"),
       "groupId"            -> optional(text),
-      "affinityGroup"      -> optional(text).transform(fromNone(none), toNone(none)),
       "confidenceLevel"    -> optional(number).transform(fromNone(0), toNone(0)),
       "credentialStrength" -> optional(text).transform(fromNone(none), toNone(none)),
       "credentialRole"     -> optional(text).transform(fromNone(none), toNone(none)),
       "nino" -> optional(text)
         .verifying("user.form.nino.error", _.forall(Nino.isValid))
         .transform[Option[Nino]](_.map(Nino.apply), _.map(_.toString)),
-      "enrolments"        -> optional(enrolmentsMapping),
-      "name"              -> optional(nonEmptyText),
-      "dateOfBirth"       -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat)),
-      "agentCode"         -> optional(nonEmptyText),
-      "agentFriendlyName" -> optional(nonEmptyText),
-      "isNonCompliant"    -> optional(boolean),
-      "complianceIssues"  -> ignored[Option[Seq[String]]](None),
-      "isPermanent"       -> optional(boolean),
-      "recordIds"         -> ignored[Option[Seq[String]]](None),
-      "address"           -> optional(addressMapping),
+      "assignedPrincipalEnrolments" -> seq(enrolmentKeyMapping)
+        .transform[Seq[EnrolmentKey]](_.collect { case Some(ek) => ek }, _.map(Some(_))),
+      "assignedDelegatedEnrolments" -> seq(enrolmentKeyMapping)
+        .transform[Seq[EnrolmentKey]](_.collect { case Some(ek) => ek }, _.map(Some(_))),
+      "name"             -> optional(nonEmptyText),
+      "dateOfBirth"      -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat)),
+      "isNonCompliant"   -> optional(boolean),
+      "complianceIssues" -> ignored[Option[Seq[String]]](None),
+      "isPermanent"      -> optional(boolean),
+      "recordIds"        -> ignored[Option[Seq[String]]](None),
+      "address"          -> optional(addressMapping),
       "strideRoles" -> optional(nonEmptyText)
-        .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(","))),
-      "suspendedRegimes" -> optional(seq(optional(nonEmptyText))).transform[Option[Set[String]]](
-        _.map(_.collect { case Some(x) =>
-          x
-        }.toSet),
-        _.map(_.map(Option.apply).toSeq)
-      )
+        .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(",")))
     )(User.apply)(User.unapply)
   )
 
@@ -442,6 +527,21 @@ object UserController {
   def toNone[T](none: T): Option[T] => Option[T] = {
     case None => Some(none)
     case s    => s
+  }
+
+  case class InitialUserCreationData(
+    affinityGroup: Option[String],
+    principalEnrolmentService: Option[String]
+  )
+
+  object InitialUserCreationData {
+    val form: Form[InitialUserCreationData] =
+      Form[InitialUserCreationData](
+        mapping(
+          "affinityGroup"             -> optional(text),
+          "principalEnrolmentService" -> optional(text)
+        )(InitialUserCreationData.apply)(InitialUserCreationData.unapply)
+      )
   }
 
 }

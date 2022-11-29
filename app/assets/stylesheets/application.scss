@@ -33,3 +33,25 @@ div.test-user-action {
     font-weight: bold;
   }
 }
+
+// badges (custom style to make different affinity groups stand out)
+@import "lib/govuk-frontend/govuk/all";
+.badge {
+  @extend .govuk-tag;
+  font-size: 0.7em;
+}
+.badge-gray {
+  @extend .govuk-tag--grey;
+}
+.badge-organisation {
+  @extend .govuk-tag--orange;
+}
+.badge-individual {
+  @extend .govuk-tag--blue;
+}
+.badge-agent {
+  @extend .govuk-tag--pink;
+}
+.badge-none {
+  @extend .govuk-tag--red;
+}

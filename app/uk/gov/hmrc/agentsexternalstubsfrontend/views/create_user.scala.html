@@ -38,6 +38,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
 @import views.html.helper.CSPNonce
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.InitialUserCreationData
 
 @this(
         mainTemplate: main_template,
@@ -50,7 +51,7 @@
         navigationBar: navigationBar
 )
 
-@(userForm:Form[User], postUrl: Call, editCall: Call, cancelCall: Call, userId: String, hasContinue: Boolean, services: Seq[(String,String)], context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(initialUserDataForm: Form[InitialUserCreationData], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, services: Seq[(String,String)], context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @mainTemplate(title = msgs("user.title", userId), wide = true) {
 
@@ -58,8 +59,8 @@
 
     <h1 class="govuk-heading-l" style="margin-bottom: 1em;">@msgs("user.create.header", userId)</h1>
 
-    @if(userForm.hasErrors) {
-        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(userForm))
+    @if(initialUserDataForm.hasErrors) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(initialUserDataForm))
     }
 
     <p class="govuk-hint">
@@ -68,7 +69,7 @@
 
   <script @{CSPNonce.attr} >
       function filterServices(keyword){
-          var selectId = "enrolments.principal[0].key";
+          var selectId = "principalEnrolmentService";
           var select = document.getElementById(selectId);
           var selectedIndex = 0
           for (var i = 0; i < select.length; i++) {
@@ -86,7 +87,7 @@
   </script>
 
     <div style="width: 50%;">
-        @form(action = postUrl, 'id -> "userForm", 'novalidate -> "novalidate") {
+        @form(action = postUrl, 'id -> "initialUserDataForm", 'novalidate -> "novalidate") {
             @govukRadios(Radios(
                 name = "affinityGroup",
                 fieldset = Some(Fieldset(
@@ -103,32 +104,31 @@
                         attributes = Map("oninput" -> s"filterServices('$value')")
                     )
                 )
-            ).withFormField(userForm("affinityGroup")))
+            ).withFormField(initialUserDataForm("affinityGroup")))
 
             @govukSelect(Select(
                 label = Label(
                     content = Text(msgs("user.form.principalEnrolment")),
-                    classes = Seq("govuk-label", "govuk-label--m", if (userForm(s"enrolments.principal[0].key").hasErrors) "error" else "").mkString(" ")
+                    classes = Seq("govuk-label", "govuk-label--m", if (initialUserDataForm(s"principalEnrolmentService").hasErrors) "error" else "").mkString(" ")
                 ),
-                attributes = Map("id" -> "enrolments.principal[0].key", "name" -> "enrolments.principal[0].key"),
+                attributes = Map("id" -> "principalEnrolmentService", "name" -> "principalEnrolmentService"),
                 items = (("none", "none") +: services).map(option =>
                     SelectItem(
                         text = option._1,
                         value = Some(option._1),
                         attributes = Map(
-                            "id" -> s"enrolments.principal[0].key-${option._1}",
+                            "id" -> s"principalEnrolmentService-${option._1}",
                             "data-affinity" -> option._2
                         )
                     )
                 )
-            ).withFormField(userForm("enrolments.principal[0].key")))
+            ).withFormField(initialUserDataForm("principalEnrolmentService")))
 
             <div class="govuk-button-group">
                 @govukButton(Button(
                     content = if (hasContinue) Text(msgs("user.create.update_and_continue")) else Text(msgs("user.create.update")),
                     attributes = Map("id" -> "update")
                 ))
-                <a class="govuk-body govuk-link" href="@{editCall.url}">@msgs("user.create.edit")</a>
                 <a class="govuk-body govuk-link" href="@{cancelCall.url}">@msgs("user.create.cancel")</a>
             </div>
         }
