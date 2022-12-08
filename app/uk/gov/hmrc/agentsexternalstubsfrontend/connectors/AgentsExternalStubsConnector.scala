@@ -141,7 +141,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
     httpV2
       .post(new URL(s"$baseUrl/agents-external-stubs/test/gran-perms/generate-users"))
       .withBody(Json.toJson(request))
-      .transform(ws => ws.withRequestTimeout(1.minute))
+      .transform(ws => ws.withRequestTimeout(2.minute))
       .execute[GranPermsGenResponse]
       .recover(handleNotFound)
 
