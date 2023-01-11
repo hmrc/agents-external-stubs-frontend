@@ -237,10 +237,10 @@
                             <th class="govuk-table__header"></th>
                         </thead>
 
-                        @for(enrolment <- assignedPrincipalEnrolments) {
-                            @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
-                                <tr id="assignedPrincipalEnrolments-@i-row" class="govuk-table__row">
-                                    @if(i == 0) {
+                        @for((enrolment, enrIdx) <- assignedPrincipalEnrolments.zipWithIndex) {
+                            @for((identifier, identIdx) <- enrolment(".identifier").zipWithIndex) {
+                                <tr id="assignedPrincipalEnrolments-@enrIdx-row" class="govuk-table__row">
+                                    @if(identIdx == 0) {
                                         <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
@@ -261,7 +261,7 @@
                                     ).withFormField(userForm(s"${identifier.key}.value")))
                                 </td>
                                 <td class="govuk-table__cell">
-                                    <a class="govuk-body govuk-link" onclick="document.getElementById('assignedPrincipalEnrolments-@i-row').remove()">
+                                    <a class="govuk-body govuk-link" onclick="document.getElementById('assignedPrincipalEnrolments-@{enrIdx}-row').remove()">
                                                 Remove
                                     </a>
                                 </td>
@@ -313,10 +313,10 @@
                             <th class="govuk-table__header"></th>
                         </tr>
 
-                        @for(enrolment <- assignedDelegatedEnrolments) {
-                            @for((identifier, i) <- enrolment(".identifier").zipWithIndex) {
-                                <tr id="assignedDelegatedEnrolments-@i-row">
-                                    @if(i == 0) {
+                        @for((enrolment, enrIdx) <- assignedDelegatedEnrolments.zipWithIndex) {
+                            @for((identifier, identIdx) <- enrolment(".identifier").zipWithIndex) {
+                                <tr id="assignedDelegatedEnrolments-@{enrIdx}-row">
+                                    @if(identIdx == 0) {
                                         <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
@@ -338,7 +338,7 @@
                                 </td>
                                 <td class="govuk-table__cell">
                                     <a class="govuk-body govuk-link"
-                                        onclick="document.getElementById('assignedDelegatedEnrolments-@i-row').remove()">Remove</a>
+                                        onclick="document.getElementById('assignedDelegatedEnrolments-@{enrIdx}-row').remove()">Remove</a>
                                 </td>
                                 </tr>
                             }
