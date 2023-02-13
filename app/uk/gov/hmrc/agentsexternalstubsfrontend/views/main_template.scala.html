@@ -34,14 +34,6 @@
     sidebar: Option[Html] = None // overrides the 'wide' option if present
 )(mainContent: Html)(implicit request : Request[_], msgs: Messages)
 
-
-@additionalScripts = {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-    crossorigin="anonymous" @{CSPNonce.attr}></script>
-}
-
-
 @hmrcLayout(
     pageTitle = Some(title),
     serviceName = Some(msgs("app.name")),
@@ -49,7 +41,7 @@
     displayHmrcBanner = true,
     serviceUrl = None,
     additionalHeadBlock = Some(head()),
-    additionalScriptsBlock = Some(additionalScripts),
+    additionalScriptsBlock = None,
     backLinkUrl = backLinkHref,
     mainContentLayout =  sidebar match {
         case Some(sidebarContent) => Some(twoThirdsOneThirdLayout(sidebarContent)(_))
