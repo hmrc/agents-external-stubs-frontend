@@ -39,7 +39,6 @@ lazy val root = (project in file("."))
       "com.github.ghik" % "silencer-lib" % "1.7.0" % Provided cross CrossVersion.full
     ),
     routesImport += "uk.gov.hmrc.play.bootstrap.binders._",
-    publishingSettings,
     scoverageSettings,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     Compile / scalafmtOnCompile := true,
