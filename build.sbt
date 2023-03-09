@@ -14,24 +14,6 @@ lazy val scoverageSettings = {
   )
 }
 
-lazy val compileDeps = Seq(
-  ws,
-  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.12.0",
-  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "3.34.0-play-28",
-  "uk.gov.hmrc"       %% "agent-mtd-identifiers"      % "0.50.0-play-28",
-  "uk.gov.hmrc"       %% "play-partials"              % "8.3.0-play-28",
-  "uk.gov.hmrc"       %% "agent-kenshoo-monitoring"   % "4.8.0-play-28",
-  "com.typesafe.play" %% "play-json-joda"             % "2.9.2"
-)
-
-def testDeps(scope: String) =
-  Seq(
-    "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0"    % scope,
-    "org.scalatestplus"      %% "mockito-3-12"       % "3.2.10.0" % scope,
-    "com.github.tomakehurst"  % "wiremock-jre8"      % "2.26.1"   % scope,
-    "com.vladsch.flexmark"    % "flexmark-all"       % "0.35.10"  % scope
-  )
-
 lazy val root = (project in file("."))
   .settings(
     name := "agents-external-stubs-frontend",
@@ -51,13 +33,12 @@ lazy val root = (project in file("."))
     resolvers ++= Seq(
       Resolver.typesafeRepo("releases"),
     ),
-    libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     libraryDependencies ++= Seq(
       compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.0" cross CrossVersion.full),
       "com.github.ghik" % "silencer-lib" % "1.7.0" % Provided cross CrossVersion.full
     ),
     routesImport += "uk.gov.hmrc.play.bootstrap.binders._",
-    publishingSettings,
     scoverageSettings,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     Compile / scalafmtOnCompile := true,
