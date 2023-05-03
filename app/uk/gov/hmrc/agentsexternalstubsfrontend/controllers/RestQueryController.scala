@@ -249,7 +249,7 @@ object RestQueryController {
   def parseHeaders(headers: String): Map[String, String] =
     if (headers.isEmpty) Map.empty
     else
-      headers.lines
+      headers.linesIterator
         .map { line =>
           val key = line.takeWhile(_ != ':')
           if (key.nonEmpty) {

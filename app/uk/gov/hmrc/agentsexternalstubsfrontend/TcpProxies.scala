@@ -41,7 +41,7 @@ class TcpProxies @Inject() (appConfig: FrontendConfig)(implicit system: ActorSys
   private val httpPort = appConfig.httpPort
 
   if (startProxies) {
-    println("Starting TCP proxies ...")
+    Logger(getClass).info("Starting TCP proxies ...")
 
     implicit val ec: ExecutionContext = system.dispatcher
 
@@ -69,7 +69,7 @@ class TcpProxies @Inject() (appConfig: FrontendConfig)(implicit system: ActorSys
     startProxy(authLoginStubPort, "auth-login-stub")
 
   } else {
-    println("TCP proxies feature switched off")
+    Logger(getClass).info("TCP proxies feature switched off")
   }
 
 }
