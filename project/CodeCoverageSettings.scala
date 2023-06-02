@@ -12,7 +12,7 @@ object CodeCoverageSettings {
   )
 
   private val excludedFiles: Seq[String] = Seq(
-    "*.template",
+    ".*.template",
     "SpecialCasesController",
     "MicroserviceAuditConnector",
     "GraphiteStartUp"
