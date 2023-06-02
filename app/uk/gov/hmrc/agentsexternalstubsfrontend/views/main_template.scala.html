@@ -15,38 +15,44 @@
  *@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.head
-@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukBackLink, TwoThirdsMainContent, TwoThirdsOneThirdMainContent}
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcLayout, HmrcTrackingConsentSnippet}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{TwoThirdsOneThirdMainContent}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcTrackingConsentSnippet}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.helper.CSPNonce
 
 @this(
     head: head,
-    hmrcLayout: HmrcLayout,
-    govukBackLink: GovukBackLink,
+    hmrcStandardPage: HmrcStandardPage,
+    fullWidthMainContent: fullWidthMainContentLayout,
     hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
-    twoThirdsLayout: TwoThirdsMainContent,
     twoThirdsOneThirdLayout: TwoThirdsOneThirdMainContent
 )
 
-@(title: String,
+@(
+    title: String,
     backLinkHref: Option[String] = None,
     wide: Boolean = false,
     sidebar: Option[Html] = None // overrides the 'wide' option if present
 )(mainContent: Html)(implicit request : Request[_], msgs: Messages)
 
-@hmrcLayout(
+@hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(title),
     serviceName = Some(msgs("app.name")),
+    backLink = if(backLinkHref.isDefined) Some(BackLink(href = backLinkHref.get)) else None,
     isWelshTranslationAvailable = false,
-    displayHmrcBanner = true,
-    serviceUrl = None,
-    additionalHeadBlock = Some(head()),
-    additionalScriptsBlock = None,
-    backLinkUrl = backLinkHref,
-    mainContentLayout =  sidebar match {
-        case Some(sidebarContent) => Some(twoThirdsOneThirdLayout(sidebarContent)(_))
-        case None => if (wide) None else Some(twoThirdsLayout(_))
-    },
-    nonce = CSPNonce.get
-)(mainContent)
+    serviceURLs = ServiceURLs(
+        serviceUrl = None,
+        signOutUrl = None
+    ),
+    banners = Banners(displayHmrcBanner = true),
+    templateOverrides = TemplateOverrides(
+        additionalHeadBlock = Some(head()),
+        additionalScriptsBlock = None,
+        mainContentLayout = sidebar match {
+            case Some(sidebarContent) => Some(twoThirdsOneThirdLayout(sidebarContent)(_))
+            case None => if(wide) Some(fullWidthMainContent(_)) else None
+        }
+    )
+))(mainContent)
 
