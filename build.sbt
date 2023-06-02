@@ -1,24 +1,9 @@
-import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
-import uk.gov.hmrc.SbtAutoBuildPlugin
-
-lazy val scoverageSettings = {
-  import scoverage.ScoverageKeys
-  Seq(
-    // Semicolon-separated list of regexs matching classes to exclude
-    ScoverageKeys.coverageExcludedPackages := """uk\.gov\.hmrc\.BuildInfo;.*\.Routes;.*\.RoutesPrefix;.*Filters?;MicroserviceAuditConnector;Module;GraphiteStartUp;.*\.Reverse[^.]*""",
-    ScoverageKeys.coverageMinimum := 80.00,
-    ScoverageKeys.coverageFailOnMinimum := false,
-    ScoverageKeys.coverageHighlighting := true,
-    Test / parallelExecution := false
-  )
-}
 
 lazy val root = (project in file("."))
   .settings(
     name := "agents-external-stubs-frontend",
     organization := "uk.gov.hmrc",
-    scalaVersion := "2.12.12",
+    scalaVersion := "2.12.15",
     scalacOptions ++= Seq(
       "-Xlint:-missing-interpolator,_",
       "-Yno-adapted-args",
@@ -26,31 +11,31 @@ lazy val root = (project in file("."))
       "-deprecation",
       "-feature",
       "-unchecked",
-      "-language:implicitConversions",
-      "-P:silencer:pathFilters=views;routes"),
+      "-Wconf:src=target/.*:s", // silence warnings from compiled files
+      "-Wconf:src=routes/.*:s", // silence warnings from routes files
+      "-Wconf:src=*html:w", // silence html warnings as they are wrong
+      "-language:implicitConversions"
+    ),
     majorVersion := 0,
     PlayKeys.playDefaultPort := 9099,
     resolvers ++= Seq(
       Resolver.typesafeRepo("releases"),
     ),
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.0" cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % "1.7.0" % Provided cross CrossVersion.full
-    ),
     routesImport += "uk.gov.hmrc.play.bootstrap.binders._",
-    scoverageSettings,
+    CodeCoverageSettings.scoverageSettings,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     Compile / scalafmtOnCompile := true,
     Test / scalafmtOnCompile := true
   )
   .configs(IntegrationTest)
   .settings(
+    Test / parallelExecution := false,
     IntegrationTest / Keys.fork := false,
     Defaults.itSettings,
     IntegrationTest / unmanagedSourceDirectories += baseDirectory(_ / "it").value,
     IntegrationTest / parallelExecution := false
   )
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
 
 inConfig(IntegrationTest)(org.scalafmt.sbt.ScalafmtPlugin.scalafmtConfigSettings)
