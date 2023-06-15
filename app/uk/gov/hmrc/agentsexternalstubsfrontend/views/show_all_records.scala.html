@@ -156,6 +156,19 @@
         </tbody>
     </table>
 
+    <table id="cbc-subscription-records" style="margin:1em 0;" class="govuk-table">
+        <caption id="tableSubHeader-cbc" class="govuk-table__caption govuk-table__caption--s">
+            <span>Cbc Subscription Records</span>
+            <a role="button" class="govuk-button"
+               href="/agents-external-stubs/records/add?type=cbc-subscription&seed=@{records.CbcSubscriptionRecord.map(o => (o.last \ "cbcId").as[String]).getOrElse("XACBC1234567890")}">
+            Create another
+            </a>
+        </caption>
+        <tbody class="govuk-table__body">
+        @recordRows(records.CbcSubscriptionRecord, identity)
+        </tbody>
+    </table>
+
 }
 
 @recordRows(records: Option[Seq[JsObject]], excerpt: JsValue => JsValue) = {
