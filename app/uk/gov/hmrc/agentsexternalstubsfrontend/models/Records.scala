@@ -25,7 +25,8 @@ case class Records(
   LegacyRelationshipRecord: Option[Seq[JsObject]],
   RelationshipRecord: Option[Seq[JsObject]],
   EmployerAuths: Option[Seq[JsObject]],
-  PPTSubscriptionDisplayRecord: Option[Seq[JsObject]]
+  PPTSubscriptionDisplayRecord: Option[Seq[JsObject]],
+  CbcSubscriptionRecord: Option[Seq[JsObject]]
 )
 
 object Records {
