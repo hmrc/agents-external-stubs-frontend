@@ -36,6 +36,10 @@
     sidebar: Option[Html] = None // overrides the 'wide' option if present
 )(mainContent: Html)(implicit request : Request[_], msgs: Messages)
 
+@additionalScripts = {
+<script src="@controllers.routes.Assets.versioned("javascripts/application.js")" @{CSPNonce.attr}></script>
+}
+
 @hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(title),
     serviceName = Some(msgs("app.name")),
@@ -48,7 +52,7 @@
     banners = Banners(displayHmrcBanner = true),
     templateOverrides = TemplateOverrides(
         additionalHeadBlock = Some(head()),
-        additionalScriptsBlock = None,
+        additionalScriptsBlock = Some(additionalScripts),
         mainContentLayout = sidebar match {
             case Some(sidebarContent) => Some(twoThirdsOneThirdLayout(sidebarContent)(_))
             case None => if(wide) Some(fullWidthMainContent(_)) else None

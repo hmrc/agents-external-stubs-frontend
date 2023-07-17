@@ -132,7 +132,7 @@
         @{
             play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
         }
-        <a id="link_planet_destroy" class="govuk-body govuk-link" onclick="if(confirm('Please confirm you wish to destroy current planet and lose the associated data?')){document.getElementById('destroyPlanet').submit()};">
+        <a id="link_planet_destroy" class="govuk-body govuk-link">
             @msgs("planet.link.destroy")
         </a>
     }
@@ -411,8 +411,7 @@
                     attributes = Map("aria-label" -> "Assigned principal enrolment")
                 ))
                 <input type="hidden" name="userId" value="@user.userId"/>
-                <a class="govuk-body govuk-link"
-                    onclick="document.getElementById('add_assigned_enrolment').submit()">Assign new enrolment</a>
+                <button class="govuk-button govuk-button--secondary">Assign new enrolment</button>
             </form>
         </div>
     }
