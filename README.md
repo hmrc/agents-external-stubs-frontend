@@ -72,10 +72,10 @@ Submits amended user auth settings
 
 ## Running the app locally
 
-    sm --start AGENTS_EXTERNAL_STUBS_FRONTEND -f
+    sm2 --start AWESOME_STUBS -f
+    sm2 --start AWESOME_STUBS_FRONTEND -f
     
-or
-    
+or with AGENTS_EXTERNAL_STUBS also running
     sbt run
 
 It should then be listening on ports 9099 and 9025
