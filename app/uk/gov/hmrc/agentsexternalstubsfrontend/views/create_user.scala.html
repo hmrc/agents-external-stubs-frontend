@@ -67,25 +67,6 @@
         @msgs("user.create.description")
     </p>
 
-  <script @{CSPNonce.attr} >
-      function filterServices(keyword){
-          var selectId = "principalEnrolmentService";
-          var select = document.getElementById(selectId);
-          var selectedIndex = 0
-          for (var i = 0; i < select.length; i++) {
-              var txt = select.options[i].dataset.affinity;
-              var include = txt==='none' | txt.toLowerCase().indexOf(keyword.toLowerCase())>=0;
-              select.options[i].style.display = include ? 'list-item':'none';
-              select.options[i].checked = (keyword === "Agent" && select.options[i].value === "HMRC-AS-AGENT") ||
-                      (keyword === "Individual" && select.options[i].value === "HMRC-MTD-IT") ||
-                      (keyword === "Organisation" && select.options[i].value === "HMRC-MTD-VAT") ||
-                      false;
-              if(select.options[i].checked) selectedIndex = i;
-          }
-          select.selectedIndex = selectedIndex;
-      }
-  </script>
-
     <div style="width: 50%;">
         @form(action = postUrl, 'id -> "initialUserDataForm", 'novalidate -> "novalidate") {
             @govukRadios(Radios(
@@ -100,8 +81,7 @@
                     RadioItem(
                         value = Some(value),
                         label = Some(Label(content = Text(value))),
-                        content = Text(value),
-                        attributes = Map("oninput" -> s"filterServices('$value')")
+                        content = Text(value)
                     )
                 )
             ).withFormField(initialUserDataForm("affinityGroup")))

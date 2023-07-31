@@ -179,6 +179,7 @@
                                     formGroupClasses = "govuk-!-margin-bottom-0"
                                 ).withFormField(groupForm(s"${identifier.key}.value")))
                             </td>
+                                @* TODO does this just removes the table row, not the data? *@
                             <td class="govuk-table__cell">
                                 <a class="govuk-body govuk-link" onclick="document.getElementById('principalEnrolments-@{enrIdx}-row').remove()">
                                             Remove
@@ -351,3 +352,4 @@
     </div>
 
 }
+
