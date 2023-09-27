@@ -49,6 +49,7 @@ class UserController @Inject() (
   errorTemplateView: error_template,
   showAllUsersView: show_all_users,
   granPermsUserGenView: gran_perms_user_gen,
+  userGenComplete: access_group_user_gen_complete,
   val features: Features,
   ecp: Provider[ExecutionContext]
 )(implicit val configuration: Configuration, cc: MessagesControllerComponents)
@@ -271,8 +272,8 @@ class UserController @Inject() (
                   )
                 ),
               user =>
-                (agentsExternalStubsConnector
-                  .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId))))
+                agentsExternalStubsConnector
+                  .updateUser(user.copy(userId = userId.getOrElse(credentials.providerId)))
                   .map(_ =>
                     continue.fold(Redirect(routes.UserController.showUserPage(continue, userId)))(continueUrl =>
                       Redirect(continueUrl.unsafeValue)
@@ -435,7 +436,7 @@ class UserController @Inject() (
               genRequest =>
                 agentsExternalStubsConnector
                   .massCreateAssistantsAndUsers(genRequest)
-                  .map(genResponse => Ok(Json.toJson(genResponse)))
+                  .map(genResponse => Ok(userGenComplete(Json.toJson(genResponse))))
                   .recover { case e =>
                     InternalServerError(e.getMessage)
                   }

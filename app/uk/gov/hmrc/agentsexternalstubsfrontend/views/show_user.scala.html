@@ -18,30 +18,20 @@
 @import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 @import views.html.helper.CSRF
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.group_data
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.{group_data, a}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukSummaryList, GovukButton, GovukTable, GovukSelect, GovukInput}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow, Key}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Text, HtmlContent}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{Table, HeadCell, TableRow}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.{Select, SelectItem}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 
 @this(
         mainTemplate: main_template,
-        groupData: group_data,
+        groupData: group_data, a: a,
         form: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         govukTable: GovukTable,
@@ -87,6 +77,9 @@
         href="/agents-external-stubs/users">@msgs("users.link.all")</a></li>
         <li><a class="govuk-link" id="link_records_all" href="/agents-external-stubs/records">@msgs("records.link.all") (DES)</a></li>
         <li><a class="govuk-link" id="link_special_cases" href="/agents-external-stubs/special-cases">@msgs("specialCase.link.all")</a></li>
+        @if(maybeGroup.exists(_.affinityGroup == "Agent")) {
+        <li>@a(key = "Generate users for access groups", href= routes.UserController.showGranPermsCreateUsers.url)</li>
+        }
     </ul>
 
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1" id="create-user-label">@msgs("users.link.create")</h3>

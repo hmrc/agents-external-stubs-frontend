@@ -1,0 +1,50 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.helper.CSPNonce
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.RestQuery
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
+@import play.api.libs.json.{Json,JsObject,JsValue,JsString,JsArray,JsBoolean}
+
+@this(
+        mainTemplate: main_template,
+        a: a, navigationBar: navigationBar
+)
+
+@(genResponse: JsValue)(implicit request: Request[_], msgs: Messages)
+
+@* taken from show_all_records *@
+@prettyPrint(json:JsValue) = {@if(json.isInstanceOf[JsObject]){
+<span style="color:blue; font-weight: bold;">{</span><div style="position: relative; left: 2em;">@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintField(f)),{<span style="color:blue;">, <br/></span>})</div><span style="color:blue; font-weight: bold">}</span>} else {@if(json.isInstanceOf[JsArray]){
+<span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrint(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {@if(json.isInstanceOf[JsBoolean]){<span style="color:@if(json.as[Boolean]){green}else{red}">@json</span>} else {<span style="color:blue">@json</span>}}}}}
+
+@prettyPrintField(field:(String,JsValue)) = {"<span style="color:gray">@field._1</span>": @prettyPrint(field._2)}
+
+@mainTemplate(title = "Generate test users for Granular Permissions", wide = true) {
+
+    <h1 class="govuk-heading-l">Generated test users to use Access groups</h1>
+
+    <div id="genResponse" class="govuk-!-margin-bottom-6" style="font-family: monospace;">
+        @prettyPrint(genResponse)
+    </div>
+
+    @a(key = "See all users", href = routes.UserController.showAllUsersPage.url)
+
+}
