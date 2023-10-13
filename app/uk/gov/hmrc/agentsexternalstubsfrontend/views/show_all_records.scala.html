@@ -169,6 +169,18 @@
         </tbody>
     </table>
 
+    <table id="pillar2-subscription-records" style="margin:1em 0;" class="govuk-table">
+        <caption id="tableSubHeader-cbc" class="govuk-table__caption govuk-table__caption--s">
+            <span>Pillar2 Records</span>
+            <a role="button" class="govuk-button"
+            href="/agents-external-stubs/records/add?type=pillar2-subscription&seed=@{records.Pillar2Record.map(o => (o.last \ "plrReference").as[String]).getOrElse("XACBC1234567890")}">
+                Create another
+            </a>
+        </caption>
+        <tbody class="govuk-table__body">
+        @recordRows(records.Pillar2Record, identity)
+        </tbody>
+    </table>
 }
 
 @recordRows(records: Option[Seq[JsObject]], excerpt: JsValue => JsValue) = {
