@@ -157,6 +157,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       val html = view.render(
         title = "My custom page title",
         backLinkHref = Some("My custom backlink"),
+        showSignOut = true,
         wide = false,
         sidebar = Some(Html("My custom sidebar links")),
         mainContent = Html("My custom main content HTML"),
@@ -173,6 +174,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       val html2 = view.f(
         "My custom page title",
         Some("My custom backlink"),
+        true,
         false,
         Some(Html("My custom sidebar links"))
       )(Html("My custom main content HTML"))(FakeRequest(), appMessages)
