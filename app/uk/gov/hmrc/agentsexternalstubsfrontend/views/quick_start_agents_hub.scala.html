@@ -1,0 +1,62 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
+
+@this(
+mainTemplate: main_template,
+a: a, navigationBar: navigationBar
+)
+
+@()(implicit request: Request[_], msgs: Messages)
+
+@mainTemplate(title = "Quick start hub", wide = true) {
+
+<h1 class="govuk-heading-l">Quick start hub - localhost only</h1>
+
+<h2 class="govuk-heading-m">As agent</h2>
+<p> without HMRC-AS-AGENT enrolment </p>
+@a(key = "Agent subscription start", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9437/agent-subscription/task-list")
+
+@a(key = "Agent overseas sub start", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9414/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend")
+
+<p> need HMRC-AS-AGENT enrolment </p>
+@a(key = "Agent services account home", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9401/agent-services-account/home&origin=agent-services-account-frontend")
+
+@* keep it small to start? ASA home lets you navigate to mapping/invitations
+@a(key = "Mapping", href = routes.UserController.showAllUsersPage.url)
+
+@a(key = "Invitations", href = routes.UserController.showAllUsersPage.url)
+*@
+<h2 class="govuk-heading-m">As client (individual/org)</h2>
+
+@a(key = "Manage your tax agents (agent-client-management-frontend)", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9568/manage-your-tax-agents&origin=agent-client-management-frontend")
+
+
+<h2 class="govuk-heading-m">As hmrc helpdesk staff (STRIDE)</h2>
+
+@a(key = "Digitally excluded authorisations", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fmanage-agent-authorisation%2Fstart&origin=agent-helpdesk-frontend")
+
+@a(key = "Review overseas applications", href = "http://localhost:9451/agent-services/check-application/search-applications")
+
+@a(key = "Agent manually assured list - AMLS", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fagent-assurance%2Fagent-lists&origin=agent-helpdesk-frontend")
+
+@a(key = "Alt itsa screen", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fcheck-itsa-partial-agent-authorisation&origin=agent-helpdesk-frontend")
+
+
+}
