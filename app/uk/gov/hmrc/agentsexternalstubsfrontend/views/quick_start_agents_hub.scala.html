@@ -16,47 +16,82 @@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components._
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 
 @this(
 mainTemplate: main_template,
-a: a, navigationBar: navigationBar
+a: a
 )
 
-@()(implicit request: Request[_], msgs: Messages)
+@(isDev = true)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = "Quick start hub", wide = true) {
+@baseUrl = { if(isDev) request.host.concat(request.uri) else request.uri }
+
+@* don't need to be signed in to view this page *@
+@mainTemplate(title = "Quick start hub", wide = true, showSignOut = false) {
 
 <h1 class="govuk-heading-l">Quick start hub - localhost only</h1>
 
-<h2 class="govuk-heading-m">As agent</h2>
-<p> without HMRC-AS-AGENT enrolment </p>
-@a(key = "Agent subscription start", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9437/agent-subscription/task-list")
-
-@a(key = "Agent overseas sub start", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9414/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend")
-
-<p> need HMRC-AS-AGENT enrolment </p>
-@a(key = "Agent services account home", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9401/agent-services-account/home&origin=agent-services-account-frontend")
-
-@* keep it small to start? ASA home lets you navigate to mapping/invitations
-@a(key = "Mapping", href = routes.UserController.showAllUsersPage.url)
-
-@a(key = "Invitations", href = routes.UserController.showAllUsersPage.url)
-*@
-<h2 class="govuk-heading-m">As client (individual/org)</h2>
-
-@a(key = "Manage your tax agents (agent-client-management-frontend)", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9568/manage-your-tax-agents&origin=agent-client-management-frontend")
+<p class="govuk-body">Intended as a shortcut to the start of ASA journeys, must sign in with appropriate user type.</p>
+<p class="govuk-body">
+    @a(key = "See all existing users (opens in a new tab)", href =  routes.UserController.showAllUsersPage.url)
+</p>
 
 
-<h2 class="govuk-heading-m">As hmrc helpdesk staff (STRIDE)</h2>
+<div class="govuk-grid-row">
+    <h2 class="govuk-heading-m">As agent</h2>
+    <p class="govuk-body"> must NOT have HMRC-AS-AGENT enrolment</p>
+    <div class="govuk-grid-column-one-third">
+      @a(key = "Agent subscription start", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9437/agent-subscription/task-list")
+    </div>
+    <div class="govuk-grid-column-one-third">
+     @a(key = "Agent overseas sub start", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9414/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend")
+    </div>
+</div>
 
-@a(key = "Digitally excluded authorisations", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fmanage-agent-authorisation%2Fstart&origin=agent-helpdesk-frontend")
+<div class="govuk-grid-row">
+ <p class="govuk-body"> with HMRC-AS-AGENT enrolment </p>
+ @a(key = "Agent services account home", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9401/agent-services-account/home&origin=agent-services-account-frontend")
+ @* keep it small to start? ASA home lets you navigate to mapping/invitations
+ @a(key = "Mapping", href = routes.UserController.showAllUsersPage.url)
 
-@a(key = "Review overseas applications", href = "http://localhost:9451/agent-services/check-application/search-applications")
+ @a(key = "Invitations", href = routes.UserController.showAllUsersPage.url)
+ *@
+</div>
 
-@a(key = "Agent manually assured list - AMLS", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fagent-assurance%2Fagent-lists&origin=agent-helpdesk-frontend")
 
-@a(key = "Alt itsa screen", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fcheck-itsa-partial-agent-authorisation&origin=agent-helpdesk-frontend")
+<div class="govuk-grid-row">
+    <h2 class="govuk-heading-m">As client (individual/org)</h2>
+    <p class="govuk-body">If not using the agent invitation link... </p>
+ @a(key = "Manage your tax agents (agent-client-management-frontend)", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9568/manage-your-tax-agents&origin=agent-client-management-frontend")
+</div>
+
+
+<div class="govuk-grid-row">
+    <h2 class="govuk-heading-m">As hmrc helpdesk staff (affinity type None with STRIDE)</h2>
+    <div class="govuk-grid-column-one-quarter">
+     <p class="govuk-body"> with 'maintain_agent_relationships' stride role</p>
+     @a(key = "Digitally excluded authorisations", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fmanage-agent-authorisation%2Fstart&origin=agent-helpdesk-frontend")
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+     <p class="govuk-body"> with 'maintain_agent_overseas' stride role</p>
+     @a(key = "Review overseas applications", href = "http://localhost:9451/agent-services/check-application/search-applications")
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+     <p class="govuk-body"> with 'maintain_agent_manually_assure' stride role</p>
+     @a(key = "Agent manually assured list - AMLS", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fagent-assurance%2Fagent-lists&origin=agent-helpdesk-frontend")
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+     <p class="govuk-body"> with 'maintain_agent_manually_assure, maintain_agent_relationships' stride roles</p>
+     @a(key = "Alt itsa screen", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fcheck-itsa-partial-agent-authorisation&origin=agent-helpdesk-frontend")
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <br>
+    <a href="@baseUrl"> test link </a>
+</div>
+
 
 
 }
