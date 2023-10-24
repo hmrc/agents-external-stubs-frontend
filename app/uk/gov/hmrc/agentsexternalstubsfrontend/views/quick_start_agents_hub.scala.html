@@ -23,7 +23,7 @@ mainTemplate: main_template,
 a: a
 )
 
-@(isDev = true)(implicit request: Request[_], msgs: Messages)
+@(isDev: Boolean = true)(implicit request: Request[_], msgs: Messages)
 
 @baseUrl = { if(isDev) request.host.concat(request.uri) else request.uri }
 
