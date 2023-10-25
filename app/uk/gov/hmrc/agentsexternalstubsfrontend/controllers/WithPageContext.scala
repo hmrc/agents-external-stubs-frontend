@@ -53,7 +53,7 @@ object Menus {
     MenuItem("link_special_cases", "specialCase.link.short", routes.SpecialCasesController.showAllSpecialCasesPage())
   val item5 =
     MenuItem("link_rest_query", "rest.query.link.short", routes.RestQueryController.showRestQueryPage())
-  val item6 = MenuItem("link_sign_out", "common.sign-out", routes.SignInController.signOutInternal())
+  val item6 = MenuItem("link_quick_start", "ASA links", routes.SignInController.showQuickStart())
 
   val menu1 = Seq(item1, item2, item2b, item3, item7, item6)
   val menu2 = Seq(item1, item2, item2b, item3, item4, item7, item6)

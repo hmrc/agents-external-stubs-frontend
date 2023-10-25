@@ -46,7 +46,7 @@
 
 @(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest], postUrl: Call)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = msgs("login.title")) {
+@mainTemplate(title = msgs("login.title"), showSignOut = false) {
 
     @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
         @govukFieldset(Fieldset(

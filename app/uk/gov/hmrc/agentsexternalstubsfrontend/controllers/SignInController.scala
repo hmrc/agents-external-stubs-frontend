@@ -27,7 +27,7 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.sign_in
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{quick_start_agents_hub, sign_in}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -41,6 +41,7 @@ class SignInController @Inject() (
   override val messagesApi: MessagesApi,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   signInView: sign_in,
+  quickStartView: quick_start_agents_hub,
   val authConnector: AuthConnector,
   ecp: Provider[ExecutionContext],
   sessionCookieBaker: SessionCookieBaker
@@ -50,6 +51,10 @@ class SignInController @Inject() (
   implicit val ec: ExecutionContext = ecp.get
 
   import SignInController._
+
+  def showQuickStart(): Action[AnyContent] = Action { implicit request =>
+    Ok(quickStartView())
+  }
 
   def showSignInPage(
     continue: Option[RedirectUrl],
@@ -83,21 +88,21 @@ class SignInController @Inject() (
     continue: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
-  ) = showSignInPage(continue, origin, accountType)
+  ): Action[AnyContent] = showSignInPage(continue, origin, accountType)
 
   def signInSsoSCP(
     continue_url: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    signInSsoImpl(continue_url, origin, accountType, false)
+    signInSsoImpl(continue_url, origin, accountType, internal = false)
 
   def signInSsoInternalSCP(
     continue_url: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    signInSsoImpl(continue_url, origin, accountType, true)
+    signInSsoImpl(continue_url, origin, accountType, internal = true)
 
   private def signInSsoImpl(
     continue_url: Option[RedirectUrl],
@@ -265,7 +270,7 @@ class SignInController @Inject() (
     continue: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
-  ) = showSignInPageInternal(continue, origin, accountType)
+  ): Action[AnyContent] = showSignInPageInternal(continue, origin, accountType)
 
   def showSignInStridePageInternal(
     successURL: RedirectUrl,

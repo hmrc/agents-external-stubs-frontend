@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.head
 @import uk.gov.hmrc.govukfrontend.views.html.components.{TwoThirdsOneThirdMainContent}
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcTrackingConsentSnippet}
@@ -32,6 +33,7 @@
 @(
     title: String,
     backLinkHref: Option[String] = None,
+    showSignOut: Boolean = true,
     wide: Boolean = false,
     sidebar: Option[Html] = None // overrides the 'wide' option if present
 )(mainContent: Html)(implicit request : Request[_], msgs: Messages)
@@ -47,7 +49,7 @@
     isWelshTranslationAvailable = false,
     serviceURLs = ServiceURLs(
         serviceUrl = None,
-        signOutUrl = None
+        signOutUrl = if(showSignOut) Some(routes.SignInController.signOutInternal().url) else None
     ),
     banners = Banners(displayHmrcBanner = true),
     templateOverrides = TemplateOverrides(
