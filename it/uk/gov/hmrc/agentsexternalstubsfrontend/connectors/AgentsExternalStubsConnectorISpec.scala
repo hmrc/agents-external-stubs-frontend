@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.http.{HttpHeader, HttpHeaders}
 import play.api.http.Status
 import play.api.test.Helpers._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase.RequestMatch
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, SpecialCase, User, Users}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs

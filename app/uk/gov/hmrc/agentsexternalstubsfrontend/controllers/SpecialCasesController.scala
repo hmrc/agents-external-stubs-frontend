@@ -17,14 +17,13 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
+
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import play.api.data.Forms.{mapping, nonEmptyText, number, optional, seq, text}
-import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SpecialCaseForm
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{edit_special_case, show_all_special_cases}
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -45,8 +44,6 @@ class SpecialCasesController @Inject() (
     extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
 
   implicit val ec: ExecutionContext = ecp.get
-
-  import SpecialCasesController._
 
   def showAllSpecialCasesPage(caseId: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     authorised()
@@ -78,7 +75,7 @@ class SpecialCasesController @Inject() (
                 case Some(specialCase) =>
                   Ok(
                     editSpecialCaseView(
-                      SpecialCaseForm.fill(specialCase),
+                      SpecialCaseForm.form.fill(specialCase),
                       caseId,
                       routes.SpecialCasesController.upsertSpecialCase(caseId),
                       routes.SpecialCasesController.showEditSpecialCasePage(caseId),
@@ -89,7 +86,7 @@ class SpecialCasesController @Inject() (
                 case None =>
                   Ok(
                     editSpecialCaseView(
-                      SpecialCaseForm.withGlobalError(s"Special Case with id=$id has not been found."),
+                      SpecialCaseForm.form.withGlobalError(s"Special Case with id=$id has not been found."),
                       caseId,
                       routes.SpecialCasesController.upsertSpecialCase(None),
                       routes.SpecialCasesController.showEditSpecialCasePage(None),
@@ -102,7 +99,7 @@ class SpecialCasesController @Inject() (
             Future.successful(
               Ok(
                 editSpecialCaseView(
-                  SpecialCaseForm,
+                  SpecialCaseForm.form,
                   None,
                   routes.SpecialCasesController.upsertSpecialCase(caseId),
                   routes.SpecialCasesController.showEditSpecialCasePage(caseId),
@@ -118,7 +115,7 @@ class SpecialCasesController @Inject() (
   def upsertSpecialCase(caseId: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-        SpecialCaseForm
+        SpecialCaseForm.form
           .bindFromRequest()
           .fold(
             formWithErrors =>
@@ -153,39 +150,5 @@ class SpecialCasesController @Inject() (
           .map(_ => Redirect(routes.SpecialCasesController.showAllSpecialCasesPage(None)))
       }
   }
-
-}
-
-object SpecialCasesController {
-
-  val requestMatchMapping: Mapping[SpecialCase.RequestMatch] = mapping(
-    "path" -> nonEmptyText
-      .transform[String](path => if (!path.startsWith("/")) "/" + path else path, identity)
-      .verifying(path => path != "/")
-      .verifying(path => !(path.startsWith("/agents-external-stubs") || path.startsWith("/ping"))),
-    "method"      -> nonEmptyText,
-    "body"        -> optional(nonEmptyText),
-    "contentType" -> optional(nonEmptyText)
-  )(SpecialCase.RequestMatch.apply)(SpecialCase.RequestMatch.unapply)
-
-  val headerMapping: Mapping[SpecialCase.Header] = mapping(
-    "name"  -> nonEmptyText,
-    "value" -> nonEmptyText
-  )(SpecialCase.Header.apply)(SpecialCase.Header.unapply)
-
-  val responseMapping = mapping(
-    "status" -> number(200, 599),
-    "body"   -> optional(nonEmptyText),
-    "headers" -> optional(seq(optional(headerMapping)))
-      .transform[Option[Seq[SpecialCase.Header]]](_.map(_.collect { case Some(x) => x }), _.map(_.map(Option.apply)))
-  )(SpecialCase.Response.apply)(SpecialCase.Response.unapply)
-
-  val SpecialCaseForm: Form[SpecialCase] = Form[SpecialCase](
-    mapping(
-      "requestMatch" -> requestMatchMapping,
-      "response"     -> responseMapping,
-      "id"           -> optional(text)
-    )(SpecialCase.apply)(SpecialCase.unapply)
-  )
 
 }

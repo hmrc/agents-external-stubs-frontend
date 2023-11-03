@@ -16,24 +16,17 @@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukFieldset
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukFieldset}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Text, HtmlContent}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInput, GovukButton, GovukErrorSummary, GovukDetails}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.{ErrorSummary, ErrorLink}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorLink
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukDetails
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.details.Details
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
 @this(
         mainTemplate: main_template,
@@ -44,7 +37,7 @@
         govukFieldset: GovukFieldset,
         govukDetails: GovukDetails)
 
-@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest], postUrl: Call)(implicit request: Request[_], msgs: Messages)
+@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest], postUrl: Call)(implicit request: Request[_], msgs: Messages)
 
 @mainTemplate(title = msgs("login.title"), showSignOut = false) {
 

@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
+package uk.gov.hmrc.agentsexternalstubsfrontend.forms
 
+import play.api.data.Forms.{mapping, nonEmptyText, optional, seq, text}
+import play.api.data.Mapping
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, Identifier}
 
 object ValidateHelper {
 
@@ -24,8 +27,8 @@ object ValidateHelper {
     if (fieldValue.trim.isEmpty) Invalid(ValidationError(failure)) else Valid
   }
 
-  def validateField(emptyFailure: String, invalidFailure: String)(condition: String => Boolean) = Constraint[String] {
-    fieldValue: String =>
+  def validateField(emptyFailure: String, invalidFailure: String)(condition: String => Boolean): Constraint[String] =
+    Constraint[String] { fieldValue: String =>
       nonEmpty(emptyFailure)(fieldValue) match {
         case i: Invalid =>
           i
@@ -35,6 +38,18 @@ object ValidateHelper {
           else
             Invalid(ValidationError(invalidFailure))
       }
-  }
+    }
+
+  val identifierMapping: Mapping[Identifier] = mapping(
+    "key"   -> text,
+    "value" -> text
+  )(Identifier.apply)(Identifier.unapply)
+
+  val enrolmentMapping: Mapping[Option[Enrolment]] = optional(
+    mapping(
+      "key"         -> nonEmptyText,
+      "identifiers" -> optional(seq(identifierMapping))
+    )(Enrolment.apply)(Enrolment.unapply)
+  )
 
 }

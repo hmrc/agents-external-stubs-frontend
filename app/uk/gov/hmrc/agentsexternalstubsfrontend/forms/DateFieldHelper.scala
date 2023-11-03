@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
+package uk.gov.hmrc.agentsexternalstubsfrontend.forms
+
 import org.joda.time.LocalDate
-import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import play.api.data.Forms.{mapping, text}
 import play.api.data.Mapping
 import play.api.data.validation.Constraint
@@ -27,7 +28,7 @@ object DateFieldHelper {
 
   def validateDate(value: String): Boolean = if (parseDate(value)) true else false
 
-  val dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd")
+  val dateTimeFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
   def parseDate(date: String): Boolean =
     try {

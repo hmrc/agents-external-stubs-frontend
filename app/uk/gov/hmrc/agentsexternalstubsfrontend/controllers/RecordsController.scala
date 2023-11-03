@@ -17,22 +17,18 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
+
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import play.api.data.Form
-import play.api.data.Forms.{mapping, text}
-import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.RecordForm
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{create_record, edit_record, show_all_records}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.control.NonFatal
 
 @Singleton
 class RecordsController @Inject() (
@@ -48,8 +44,6 @@ class RecordsController @Inject() (
     extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
 
   implicit val ec: ExecutionContext = ecp.get
-
-  import RecordsController._
 
   def showAllRecordsPage(showId: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     authorised()
@@ -75,7 +69,7 @@ class RecordsController @Inject() (
           .map(record =>
             Ok(
               editRecordView(
-                RecordForm.fill(record.-("id").-("_links")),
+                RecordForm.form.fill(record.-("id").-("_links")),
                 routes.RecordsController.updateRecord(id),
                 routes.RecordsController.showAllRecordsPage(Some(id)),
                 pageContext(credentials)
@@ -88,7 +82,7 @@ class RecordsController @Inject() (
   def updateRecord(id: String): Action[AnyContent] = Action.async { implicit request =>
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-        RecordForm
+        RecordForm.form
           .bindFromRequest()
           .fold(
             formWithErrors =>
@@ -109,7 +103,7 @@ class RecordsController @Inject() (
                 .recover { case e =>
                   Ok(
                     editRecordView(
-                      RecordForm.fill(record).withError("json", e.getMessage),
+                      RecordForm.form.fill(record).withError("json", e.getMessage),
                       routes.RecordsController.updateRecord(id),
                       routes.RecordsController.showAllRecordsPage(Some(id)),
                       pageContext(credentials)
@@ -128,7 +122,7 @@ class RecordsController @Inject() (
           .map(record =>
             Ok(
               createRecordView(
-                RecordForm.fill(record.-("id").-("_links")),
+                RecordForm.form.fill(record.-("id").-("_links")),
                 routes.RecordsController.createRecord(`type`, seed),
                 routes.RecordsController.showAllRecordsPage(None),
                 routes.RecordsController.showAddRecordPage(`type`, shake(seed)),
@@ -142,7 +136,7 @@ class RecordsController @Inject() (
   def createRecord(`type`: String, seed: String): Action[AnyContent] = Action.async { implicit request =>
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-        RecordForm
+        RecordForm.form
           .bindFromRequest()
           .fold(
             formWithErrors =>
@@ -164,7 +158,7 @@ class RecordsController @Inject() (
                 .recover { case e =>
                   Ok(
                     createRecordView(
-                      RecordForm.fill(record).withError("json", e.getMessage),
+                      RecordForm.form.fill(record).withError("json", e.getMessage),
                       routes.RecordsController.createRecord(`type`, seed),
                       routes.RecordsController.showAllRecordsPage(None),
                       routes.RecordsController.showAddRecordPage(`type`, shake(seed)),
@@ -182,17 +176,4 @@ class RecordsController @Inject() (
     s.take(p).reverse + s.drop(p)
   }
 
-}
-
-object RecordsController {
-
-  val validJson: Constraint[String] = Constraint(json =>
-    try { Json.parse(json); Valid }
-    catch { case NonFatal(e) => Invalid(e.getMessage) }
-  )
-
-  val RecordForm: Form[JsObject] =
-    Form[JsObject](
-      mapping("json" -> text.verifying(validJson))(t => Json.parse(t).as[JsObject])(j => Some(Json.prettyPrint(j)))
-    )
 }

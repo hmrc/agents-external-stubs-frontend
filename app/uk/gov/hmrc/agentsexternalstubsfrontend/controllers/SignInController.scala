@@ -20,10 +20,7 @@ import com.google.inject.Provider
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import play.api.data.Form
-import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
@@ -31,10 +28,10 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{quick_start_agents_hu
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-
 import scala.concurrent.{ExecutionContext, Future}
 import org.joda.time.DateTime
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms._
 
 @Singleton
 class SignInController @Inject() (
@@ -50,8 +47,6 @@ class SignInController @Inject() (
 
   implicit val ec: ExecutionContext = ecp.get
 
-  import SignInController._
-
   def showQuickStart(): Action[AnyContent] = Action { implicit request =>
     Ok(quickStartView())
   }
@@ -64,7 +59,7 @@ class SignInController @Inject() (
     Action { implicit request =>
       Ok(
         signInView(
-          SignInRequestForm,
+          SignInRequestForm.form,
           routes.SignInController
             .signIn(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)
         )
@@ -136,7 +131,7 @@ class SignInController @Inject() (
     providerType: String
   ): Action[AnyContent] =
     Action.async { implicit request =>
-      SignInRequestForm
+      SignInRequestForm.form
         .bindFromRequest()
         .fold(
           formWithErrors =>
@@ -171,7 +166,7 @@ class SignInController @Inject() (
     Action { implicit request =>
       Ok(
         signInView(
-          SignInRequestForm,
+          SignInRequestForm.form,
           routes.SignInController
             .signIn(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)
         )
@@ -246,7 +241,7 @@ class SignInController @Inject() (
     Action { implicit request =>
       Ok(
         signInView(
-          SignInRequestForm,
+          SignInRequestForm.form,
           routes.SignInController
             .signInInternal(continue, origin, accountType, providerType = AuthProvider.GovernmentGateway)
         )
@@ -280,7 +275,7 @@ class SignInController @Inject() (
     Action { implicit request =>
       Ok(
         signInView(
-          SignInRequestForm,
+          SignInRequestForm.form,
           routes.SignInController
             .signInInternal(Some(successURL), origin, None, providerType = AuthProvider.PrivilegedApplication)
         )
@@ -319,29 +314,4 @@ class SignInController @Inject() (
         )
     }
 
-}
-
-object SignInController {
-
-  case class SignInRequest(
-    userId: String,
-    planetId: String,
-    plainTextPassword: String = "p@ssw0rd",
-    providerType: String = AuthProvider.GovernmentGateway,
-    syncToAuthLoginApi: Boolean = true
-  )
-
-  object SignInRequest {
-    implicit val writes: Writes[SignInRequest] = Json.writes[SignInRequest]
-  }
-
-  val SignInRequestForm: Form[SignInRequest] = Form[SignInRequest](
-    mapping(
-      "userId"             -> nonEmptyText,
-      "planetId"           -> nonEmptyText,
-      "password"           -> default(text, "p@ssw0rd"),
-      "providerType"       -> optional(nonEmptyText).transform[String](_.getOrElse(AuthProvider.GovernmentGateway), Some(_)),
-      "syncToAuthLoginApi" -> ignored(true)
-    )(SignInRequest.apply)(SignInRequest.unapply)
-  )
 }

@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
+package uk.gov.hmrc.agentsexternalstubsfrontend.forms
 
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{EnrolmentKey, Identifier, User}
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
+import uk.gov.hmrc.domain.Nino
 
 class UserFormSpec extends UnitSpec {
 
   "UserForm" should {
 
     "bind some input fields and return Individual user and fill it back" in {
-      val form = UserController.UserForm
+      val form = UserForm.form
 
       val value = User(
         userId = "bar",
@@ -47,7 +47,7 @@ class UserFormSpec extends UnitSpec {
     }
 
     "bind some input fields and return user and fill it back" in {
-      val form = UserController.UserForm
+      val form = UserForm.form
 
       val value = User(userId = "bar")
 
@@ -65,7 +65,7 @@ class UserFormSpec extends UnitSpec {
     }
 
     "bind all input fields and return User and fill it back" in {
-      val form = UserController.UserForm
+      val form = UserForm.form
 
       val value =
         User(
@@ -103,7 +103,7 @@ class UserFormSpec extends UnitSpec {
     }
 
     "bind all input fields and return User and fill it back when enrolments empty" in {
-      val form = UserController.UserForm
+      val form = UserForm.form
 
       val value =
         User(
