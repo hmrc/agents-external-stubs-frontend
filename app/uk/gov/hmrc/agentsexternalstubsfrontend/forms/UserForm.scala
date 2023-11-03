@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.forms
 import play.api.data.Forms.{boolean, ignored, mapping, nonEmptyText, number, optional, seq, text}
 import play.api.data.{Form, Mapping}
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.ValidateHelper.identifierMapping
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Address, Enrolment, EnrolmentKey, Identifier, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Address, EnrolmentKey, User}
 import uk.gov.hmrc.domain.Nino
 
 object UserForm {
