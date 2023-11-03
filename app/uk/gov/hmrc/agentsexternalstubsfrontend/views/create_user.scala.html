@@ -16,29 +16,21 @@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukErrorSummary}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, GovukSelect, GovukRadios, GovukFieldset}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.{Select, SelectItem}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{Radios, RadioItem}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukFieldset
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 @import views.html.helper.CSPNonce
-@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.InitialUserCreationData
+@import uk.gov.hmrc.agentsexternalstubsfrontend.forms.InitialUserCreationData
 
 @this(
         mainTemplate: main_template,

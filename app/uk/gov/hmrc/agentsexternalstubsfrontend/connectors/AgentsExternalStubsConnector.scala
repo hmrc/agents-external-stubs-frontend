@@ -23,7 +23,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.HttpClient
@@ -50,7 +50,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
 
   import uk.gov.hmrc.http.HttpReads.Implicits._
 
-  val baseUrl = appConfig.aesBaseUrl
+  val baseUrl: String = appConfig.aesBaseUrl
 
   def signIn(
     credentials: SignInRequest

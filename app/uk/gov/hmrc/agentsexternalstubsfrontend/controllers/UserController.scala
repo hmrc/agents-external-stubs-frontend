@@ -18,17 +18,15 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
 import play.api.Configuration
-import play.api.data.Forms.{boolean, ignored, mapping, nonEmptyText, number, optional, seq, text}
-import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{InitialUserCreationDataForm, UserForm}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{NotFoundException, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -56,8 +54,6 @@ class UserController @Inject() (
     extends FrontendController(cc) with AuthorisedFunctions with I18nSupport with WithPageContext {
 
   implicit val ec: ExecutionContext = ecp.get
-
-  import UserController._
 
   val start: Action[AnyContent] = showUserPage(None, None)
 
@@ -107,7 +103,7 @@ class UserController @Inject() (
                 .map(user =>
                   Ok(
                     createUserView(
-                      InitialUserCreationData.form,
+                      InitialUserCreationDataForm.form,
                       routes.UserController
                         .submitCreateUserPage(
                           Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
@@ -126,7 +122,7 @@ class UserController @Inject() (
                     case Some(id) =>
                       Ok(
                         createUserView(
-                          InitialUserCreationData.form,
+                          InitialUserCreationDataForm.form,
                           routes.UserController
                             .submitCreateUserPage(
                               Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
@@ -146,7 +142,7 @@ class UserController @Inject() (
               Future.successful(
                 Ok(
                   createUserView(
-                    InitialUserCreationData.form,
+                    InitialUserCreationDataForm.form,
                     routes.UserController
                       .submitCreateUserPage(
                         Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
@@ -168,7 +164,7 @@ class UserController @Inject() (
     implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          InitialUserCreationData.form
+          InitialUserCreationDataForm.form
             .bindFromRequest()
             .fold(
               formWithErrors =>
@@ -223,7 +219,7 @@ class UserController @Inject() (
                              }
           } yield Ok(
             editUserView(
-              UserForm.fill(user),
+              UserForm.form.fill(user),
               affinityGroup,
               routes.UserController.updateUser(continue, userId),
               routes.UserController.showUserPage(continue, userId),
@@ -254,7 +250,7 @@ class UserController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          UserForm
+          UserForm.form
             .bindFromRequest()
             .fold(
               formWithErrors =>
@@ -282,7 +278,7 @@ class UserController @Inject() (
                   .recover { case e: Exception =>
                     Ok(
                       editUserView(
-                        UserForm.fill(user).withGlobalError(e.getMessage),
+                        UserForm.form.fill(user).withGlobalError(e.getMessage),
                         affinityGroup,
                         routes.UserController.updateUser(continue, userId),
                         routes.UserController.showUserPage(continue, userId),
@@ -304,14 +300,14 @@ class UserController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          UserForm
+          UserForm.form
             .bindFromRequest()
             .fold(
               formWithErrors =>
                 Future.successful(
                   Ok(
                     createUserView(
-                      InitialUserCreationData.form,
+                      InitialUserCreationDataForm.form,
                       routes.UserController
                         .submitCreateUserPage(
                           Some(RedirectUrl(routes.UserController.showEditUserPage(continue, userId).url)),
@@ -358,7 +354,7 @@ class UserController @Inject() (
                   .recover { case e: Exception =>
                     Ok(
                       editUserView(
-                        UserForm.fill(user).withGlobalError(e.getMessage),
+                        UserForm.form.fill(user).withGlobalError(e.getMessage),
                         affinityGroup,
                         routes.UserController.updateUser(continue, userId),
                         routes.UserController.showUserPage(continue, userId),
@@ -461,88 +457,4 @@ class UserController @Inject() (
             )
         }
     }
-}
-
-object UserController {
-
-  val none = "none"
-
-  val identifierMapping: Mapping[Identifier] = mapping(
-    "key"   -> text,
-    "value" -> text
-  )(Identifier.apply)(Identifier.unapply)
-
-  val enrolmentMapping: Mapping[Option[Enrolment]] = optional(
-    mapping(
-      "key"         -> nonEmptyText,
-      "identifiers" -> optional(seq(identifierMapping))
-    )(Enrolment.apply)(Enrolment.unapply)
-  )
-
-  val enrolmentKeyMapping: Mapping[Option[EnrolmentKey]] = optional(
-    mapping(
-      "key"         -> nonEmptyText,
-      "identifiers" -> seq(identifierMapping)
-    )(EnrolmentKey.apply)(EnrolmentKey.unapply)
-  )
-  val addressMapping: Mapping[Address] = mapping(
-    "line1"       -> optional(nonEmptyText),
-    "line2"       -> optional(nonEmptyText),
-    "line3"       -> optional(nonEmptyText),
-    "line4"       -> optional(nonEmptyText),
-    "postcode"    -> optional(nonEmptyText),
-    "countryCode" -> optional(nonEmptyText)
-  )(Address.apply)(Address.unapply)
-
-  val UserForm: Form[User] = Form[User](
-    mapping(
-      "userId"             -> ignored("ignored"),
-      "groupId"            -> optional(text),
-      "confidenceLevel"    -> optional(number).transform(fromNone(0), toNone(0)),
-      "credentialStrength" -> optional(text).transform(fromNone(none), toNone(none)),
-      "credentialRole"     -> optional(text).transform(fromNone(none), toNone(none)),
-      "nino" -> optional(text)
-        .verifying("user.form.nino.error", _.forall(Nino.isValid))
-        .transform[Option[Nino]](_.map(Nino.apply), _.map(_.toString)),
-      "assignedPrincipalEnrolments" -> seq(enrolmentKeyMapping)
-        .transform[Seq[EnrolmentKey]](_.collect { case Some(ek) => ek }, _.map(Some(_))),
-      "assignedDelegatedEnrolments" -> seq(enrolmentKeyMapping)
-        .transform[Seq[EnrolmentKey]](_.collect { case Some(ek) => ek }, _.map(Some(_))),
-      "name"             -> optional(nonEmptyText),
-      "dateOfBirth"      -> optional(DateFieldHelper.dateFieldsMapping(DateFieldHelper.validDobDateFormat)),
-      "isNonCompliant"   -> optional(boolean),
-      "complianceIssues" -> ignored[Option[Seq[String]]](None),
-      "isPermanent"      -> optional(boolean),
-      "recordIds"        -> ignored[Option[Seq[String]]](None),
-      "address"          -> optional(addressMapping),
-      "strideRoles" -> optional(nonEmptyText)
-        .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(",")))
-    )(User.apply)(User.unapply)
-  )
-
-  def fromNone[T](none: T): Option[T] => Option[T] = {
-    case Some(`none`) => None
-    case s            => s
-  }
-
-  def toNone[T](none: T): Option[T] => Option[T] = {
-    case None => Some(none)
-    case s    => s
-  }
-
-  case class InitialUserCreationData(
-    affinityGroup: Option[String],
-    principalEnrolmentService: Option[String]
-  )
-
-  object InitialUserCreationData {
-    val form: Form[InitialUserCreationData] =
-      Form[InitialUserCreationData](
-        mapping(
-          "affinityGroup"             -> optional(text),
-          "principalEnrolmentService" -> optional(text)
-        )(InitialUserCreationData.apply)(InitialUserCreationData.unapply)
-      )
-  }
-
 }

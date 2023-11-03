@@ -24,8 +24,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.UpliftRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{IdentityVerificationController, SignInController, routes}
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{IdentityVerificationController, routes}
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{SignInRequest, SignInRequestForm}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
@@ -48,18 +48,18 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       s"failedIV~$journeyId"             -> "Failed IV"
     )
 
-  private val filledForm = SignInController.SignInRequestForm.fill(
+  private val filledForm = SignInRequestForm.form.fill(
     SignInRequest(userId = "My contact name", plainTextPassword = "AA1 1AA", planetId = "juniper")
   )
 
   implicit val lang: Lang = Lang("en")
   implicit val requestHeader: RequestHeader = FakeRequest()
   val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-  val signInForm = app.injector.instanceOf[sign_in]
-  val errorTemplateView = app.injector.instanceOf[error_template]
-  val upLiftView = app.injector.instanceOf[iv_uplift]
-  val mainTemplateView = app.injector.instanceOf[main_template]
-  val appMessages = messagesApi.preferred(Seq())
+  val signInForm: sign_in = app.injector.instanceOf[sign_in]
+  val errorTemplateView: error_template = app.injector.instanceOf[error_template]
+  val upLiftView: iv_uplift = app.injector.instanceOf[iv_uplift]
+  val mainTemplateView: main_template = app.injector.instanceOf[main_template]
+  val appMessages: Messages = messagesApi.preferred(Seq())
 
   "signIn view" should {
     "render title and messages" in new App {

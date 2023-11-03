@@ -18,12 +18,10 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
 import play.api.Configuration
-import play.api.data.Forms._
-import play.api.data.{Form, Mapping}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.GroupForm
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -51,8 +49,6 @@ class GroupController @Inject() (
   implicit val ec: ExecutionContext = ecp.get
 
   val start: Action[AnyContent] = showGroupPage(None, None)
-
-  import GroupController.GroupForm
 
   def showGroupPage(continue: Option[RedirectUrl], groupId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
@@ -83,7 +79,7 @@ class GroupController @Inject() (
             .map { group =>
               Ok(
                 editGroupView(
-                  GroupForm.fill(group),
+                  GroupForm.form.fill(group),
                   routes.GroupController.updateGroup(continue, groupId),
                   routes.GroupController.showGroupPage(continue, groupId),
                   group.groupId,
@@ -99,7 +95,7 @@ class GroupController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          GroupForm
+          GroupForm.form
             .bindFromRequest()
             .fold(
               formWithErrors =>
@@ -126,7 +122,7 @@ class GroupController @Inject() (
                   .recover { case e: Exception =>
                     Ok(
                       editGroupView(
-                        GroupForm.fill(group).withGlobalError(e.getMessage),
+                        GroupForm.form.fill(group).withGlobalError(e.getMessage),
                         routes.GroupController.updateGroup(continue, groupId),
                         routes.GroupController.showGroupPage(continue, groupId),
                         groupId = groupId.getOrElse(credentials.providerId),
@@ -155,49 +151,4 @@ class GroupController @Inject() (
             )
         }
     }
-}
-
-object GroupController {
-  val none = "none"
-
-  val identifierMapping: Mapping[Identifier] = mapping(
-    "key"   -> text,
-    "value" -> text
-  )(Identifier.apply)(Identifier.unapply)
-
-  val enrolmentMapping: Mapping[Option[Enrolment]] = optional(
-    mapping(
-      "key"         -> nonEmptyText,
-      "identifiers" -> optional(seq(identifierMapping))
-    )(Enrolment.apply)(Enrolment.unapply)
-  )
-
-  val GroupForm: Form[Group] = Form[Group](
-    mapping(
-      "planetId"          -> ignored("ignored"),
-      "groupId"           -> ignored("ignored"),
-      "affinityGroup"     -> text.verifying(ag => AffinityGroup.definedValues.contains(ag)),
-      "agentId"           -> optional(nonEmptyText),
-      "agentCode"         -> optional(nonEmptyText),
-      "agentFriendlyName" -> optional(nonEmptyText),
-      "principalEnrolments" -> seq(enrolmentMapping)
-        .transform[Seq[Enrolment]](_.collect { case Some(e) => e }, _.map(Some(_))),
-      "delegatedEnrolments" -> seq(enrolmentMapping)
-        .transform[Seq[Enrolment]](_.collect { case Some(e) => e }, _.map(Some(_))),
-      "suspendedRegimes" -> optional(seq(optional(nonEmptyText))).transform[Set[String]](
-        _.getOrElse(Seq.empty).collect { case Some(x) => x }.toSet,
-        set => Some(set.toSeq.map(Some(_)))
-      )
-    )(Group.apply)(Group.unapply)
-  )
-
-  def fromNone[T](none: T): Option[T] => Option[T] = {
-    case Some(`none`) => None
-    case s            => s
-  }
-
-  def toNone[T](none: T): Option[T] => Option[T] = {
-    case None => Some(none)
-    case s    => s
-  }
 }

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
+package uk.gov.hmrc.agentsexternalstubsfrontend.forms
 
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
 
@@ -25,7 +24,7 @@ class SignInFormSpec extends UnitSpec {
   "SignInRequestForm" should {
 
     "bind some input fields and return SignInRequest and fill it back" in {
-      val form = SignInController.SignInRequestForm
+      val form = SignInRequestForm.form
 
       val value = SignInRequest(userId = "bar", plainTextPassword = "foo", planetId = "juniper")
 
@@ -42,7 +41,7 @@ class SignInFormSpec extends UnitSpec {
     }
 
     "bind all input fields and return SignInRequest and fill it back" in {
-      val form = SignInController.SignInRequestForm
+      val form = SignInRequestForm.form
 
       val value = SignInRequest(userId = "foo", plainTextPassword = "bar", planetId = "juniper")
 
