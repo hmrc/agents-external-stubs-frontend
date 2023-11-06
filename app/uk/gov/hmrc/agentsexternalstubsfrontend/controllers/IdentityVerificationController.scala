@@ -102,7 +102,7 @@ class IdentityVerificationController @Inject() (
       }
     }
 
-  private def redirectWithJourneyId(targetUrl: String, journeyId: String, option: String): Result = {
+  private def redirectWithJourneyId(targetUrl: String, journeyId: String): Result = {
     val cleanUrl = URLDecoder.decode(targetUrl, "UTF-8")
     val tokenAppendChar = if (cleanUrl.contains("?")) "&" else "?"
     Redirect(s"$cleanUrl${tokenAppendChar}journeyId=$journeyId")
@@ -126,7 +126,6 @@ class IdentityVerificationController @Inject() (
 
   private def uplift(
     journeyId: String,
-    confidenceLevel: Int,
     completionURL: RedirectUrl,
     failureURL: RedirectUrl,
     origin: Option[String]
@@ -155,10 +154,10 @@ class IdentityVerificationController @Inject() (
                     currentUser <- agentsExternalStubsConnector.getUser(credentials.providerId)
                     modifiedUser = currentUser.copy(confidenceLevel = Some(250))
                     _ <- agentsExternalStubsConnector.updateUser(modifiedUser)
-                  } yield redirectWithJourneyId(completionURL.unsafeValue, journeyId, upliftRequest.option)
+                  } yield redirectWithJourneyId(completionURL.unsafeValue, journeyId)
                 } else {
                   storeResult((journeyId, upliftRequest.option.split('~').head))
-                  Future.successful(redirectWithJourneyId(failureURL.unsafeValue, journeyId, upliftRequest.option))
+                  Future.successful(redirectWithJourneyId(failureURL.unsafeValue, journeyId))
                 }
               }
             )
@@ -180,7 +179,7 @@ class IdentityVerificationController @Inject() (
     failureURL: RedirectUrl,
     origin: Option[String]
   ): Action[AnyContent] =
-    uplift(journeyId, confidenceLevel, completionURL, failureURL, origin)(true)
+    uplift(journeyId, completionURL, failureURL, origin)(true)
 
   def upliftInternal(
     journeyId: String,
@@ -189,7 +188,7 @@ class IdentityVerificationController @Inject() (
     failureURL: RedirectUrl,
     origin: Option[String]
   ): Action[AnyContent] =
-    uplift(journeyId, confidenceLevel, completionURL, failureURL, origin)(false)
+    uplift(journeyId, completionURL, failureURL, origin)(false)
 
   private def getIvResult(journeyId: String) = Action.async {
     if (journeyId.nonEmpty) {

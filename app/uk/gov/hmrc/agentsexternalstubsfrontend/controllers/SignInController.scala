@@ -90,24 +90,23 @@ class SignInController @Inject() (
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    signInSsoImpl(continue_url, origin, accountType, internal = false)
+    signInSsoImpl(continue_url, origin, internal = false)
 
   def signInSsoInternalSCP(
     continue_url: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    signInSsoImpl(continue_url, origin, accountType, internal = true)
+    signInSsoImpl(continue_url, origin, internal = true)
 
   private def signInSsoImpl(
     continue_url: Option[RedirectUrl],
     origin: Option[String],
-    accountType: Option[String],
     internal: Boolean
   ): Action[AnyContent] =
     Action.async { implicit request =>
       (for {
-        authenticatedSession <- agentsExternalStubsConnector.currentSession()
+        _ <- agentsExternalStubsConnector.currentSession()
         result <- Future(
                     continue_url.fold(
                       Redirect(routes.UserController.showUserPage(None))

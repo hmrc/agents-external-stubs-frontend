@@ -415,29 +415,27 @@ class UserController @Inject() (
 
   def showGranPermsCreateUsers: Action[AnyContent] =
     Action.async { implicit request =>
-      authorised()
-        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          Future.successful(Ok(granPermsUserGenView(GranPermsGenRequestForm.form)))
-        }
+      authorised() {
+        Future.successful(Ok(granPermsUserGenView(GranPermsGenRequestForm.form)))
+      }
     }
 
   def submitGranPermsCreateUsers: Action[AnyContent] =
     Action.async { implicit request =>
-      authorised()
-        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          GranPermsGenRequestForm.form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(formWithErrors.errors.toString)),
-              genRequest =>
-                agentsExternalStubsConnector
-                  .massCreateAssistantsAndUsers(genRequest)
-                  .map(genResponse => Ok(userGenComplete(Json.toJson(genResponse))))
-                  .recover { case e =>
-                    InternalServerError(e.getMessage)
-                  }
-            )
-        }
+      authorised() {
+        GranPermsGenRequestForm.form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(formWithErrors.errors.toString)),
+            genRequest =>
+              agentsExternalStubsConnector
+                .massCreateAssistantsAndUsers(genRequest)
+                .map(genResponse => Ok(userGenComplete(Json.toJson(genResponse))))
+                .recover { case e =>
+                  InternalServerError(e.getMessage)
+                }
+          )
+      }
     }
 
   val showAllUsersPage: Action[AnyContent] =

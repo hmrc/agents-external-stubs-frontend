@@ -44,7 +44,7 @@ class PersonalDetailsValidationController @Inject() (
 
   def start(completionUrl: RedirectUrl): Action[AnyContent] = Action.async { implicit request =>
     authorised().retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-      agentsExternalStubsConnector.getUser(credentials.providerId).map { currentUser =>
+      agentsExternalStubsConnector.getUser(credentials.providerId).map { _ =>
         Ok(
           pdvStartView(
             PersonalDetailsValidationController.PdvRequestForm.fill(PdvRequest(success = true)),
