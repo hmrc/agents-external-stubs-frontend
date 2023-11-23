@@ -12,7 +12,7 @@ Sends the user to register a new SCP account
 
 ### [Company Auth Frontend](https://github.com/hmrc/company-auth-frontend/blob/master/README.md)
 #### GET /gg/sign-in?continue=:continueUrl&accountType=:accountType&origin=:origin
-Shows login page.
+Shows login page. Company auth frontend was decommissioned in 2020 and replaced with bas-gateway URLs
 
 #### POST /gg/sign-in?continue=:continueUrl&accountType=:accountType&origin=:origin
 Submits user's credentials, creates session and redirects to the provided continue URL
