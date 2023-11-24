@@ -3,10 +3,9 @@ lazy val root = (project in file("."))
   .settings(
     name := "agents-external-stubs-frontend",
     organization := "uk.gov.hmrc",
-    scalaVersion := "2.12.15",
+    scalaVersion := "2.13.10",
     scalacOptions ++= Seq(
       "-Xlint:-missing-interpolator,_",
-      "-Yno-adapted-args",
       "-Ywarn-dead-code",
       "-deprecation",
       "-feature",
@@ -35,6 +34,10 @@ lazy val root = (project in file("."))
     Defaults.itSettings,
     IntegrationTest / unmanagedSourceDirectories += baseDirectory(_ / "it").value,
     IntegrationTest / parallelExecution := false
+  )
+  .settings(
+    //fix for scoverage compile errors for scala 2.13.10
+    libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
   )
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
 

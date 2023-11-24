@@ -26,20 +26,55 @@
 )
 
 @(genResponse: JsValue)(implicit request: Request[_], msgs: Messages)
-
 @* taken from show_all_records *@
-@prettyPrint(json:JsValue) = {@if(json.isInstanceOf[JsObject]){
-<span style="color:blue; font-weight: bold;">{</span><div style="position: relative; left: 2em;">@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintField(f)),{<span style="color:blue;">, <br/></span>})</div><span style="color:blue; font-weight: bold">}</span>} else {@if(json.isInstanceOf[JsArray]){
-<span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrint(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {@if(json.isInstanceOf[JsBoolean]){<span style="color:@if(json.as[Boolean]){green}else{red}">@json</span>} else {<span style="color:blue">@json</span>}}}}}
+@prettyPrint(json: JsValue) = {
+  @if(json.isInstanceOf[JsObject]) {
+    <span style="color: blue;
+      font-weight: bold;">{</span>
+    <div style="position: relative;
+      left: 2em;">
+    @ViewHelper.intersperse(
+      json.as[JsObject].fields.map(f => prettyPrintField(f)).toSeq, {
+        <span style="color:blue;">,<br/></span>
+      }
+    )
+    </div>
+    <span style="color: blue;
+      font-weight: bold">}</span>
+  } else {
+    @if(json.isInstanceOf[JsArray]) {
+      <span style="color: green;
+            font-weight: bold;">[</span>
+      @ViewHelper.intersperse(
+        json.as[JsArray].value.map(f => prettyPrint(f)).toSeq, {
+          <span style="color:green;">,</span>
+        }
+      )
+      <span style="color: green;
+            font-weight: bold">]</span>
+    } else {
+      @if(json.isInstanceOf[JsString]) {
+        <span>"</span>
+        <span style="color: black">@json.as[JsString].value</span>"
+      } else {
+        @if(json.isInstanceOf[JsBoolean]) {
+          <span style="color: @if(json.as[Boolean]){green}else{red}">@json</span>
+        } else {
+          <span style="color: blue">@json</span>
+        }
+      }
+    }
+  }
+}
 
-@prettyPrintField(field:(String,JsValue)) = {"<span style="color:gray">@field._1</span>": @prettyPrint(field._2)}
+@prettyPrintField(field: (String, JsValue)) = {"<span style="color: gray">@field._1</span>": @prettyPrint(field._2)}
 
 @mainTemplate(title = "Generate test users for Granular Permissions", wide = true) {
 
     <h1 class="govuk-heading-l">Generated test users to use Access groups</h1>
 
     <div id="genResponse" class="govuk-!-margin-bottom-6" style="font-family: monospace;">
-        @prettyPrint(genResponse)
+    @prettyPrint(genResponse)
     </div>
 
     @a(key = "See all users", href = routes.UserController.showAllUsersPage.url)

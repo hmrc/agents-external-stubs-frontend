@@ -181,4 +181,5 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       contentAsString(html2) shouldBe content
     }
   }
+
 }
