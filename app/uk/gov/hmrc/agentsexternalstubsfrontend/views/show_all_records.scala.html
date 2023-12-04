@@ -32,136 +32,154 @@
 @(records: Records, showId: Option[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @mainTemplate(title = msgs("records.title"), wide = true) {
-<style>
-        .govuk-table__caption span{
-            line-height: 38px;
-            height: 38px;
-            display: block;
-            float: left;
-            margin-right: 30px;
-        }
-</style>
+    <style>
+            .govuk-table__caption span {
+                line-height: 38px;
+                height: 38px;
+                display: block;
+                float: left;
+                margin-right: 30px;
+            }
+    </style>
     @navigationBar(context)
 
     <h1 class="govuk-heading-l">@msgs("records.show.header", context.planetId)</h1>
 
     <p class="govuk-body">
-        @msgs("records.show.description")
+    @msgs("records.show.description")
     </p>
 
     <table id="business-partner-records" class="govuk-table">
         <caption id="tableSubHeader-bpr" class="govuk-table__caption govuk-table__caption--s">
             <span>Business Partner Records</span>
             <a class="govuk-button"
-            href="/agents-external-stubs/records/add?type=business-partner-record&seed=@{records
-                    .BusinessPartnerRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">Create another
+            href="/agents-external-stubs/records/add?type=business-partner-record&seed=@{
+                records
+                        .BusinessPartnerRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")
+            }">Create another
             </a>
         </caption>
-                        <tbody class="govuk-table__body">
+        <tbody class="govuk-table__body">
         @recordRows(records.BusinessPartnerRecord,
-            ViewHelper.excerpt(_, "agentReferenceNumber", "utr", "nino", "eori", "addressDetails","isAnASAgent"))
+            ViewHelper.excerpt(_, "agentReferenceNumber", "utr", "nino", "eori", "addressDetails", "isAnASAgent"))
         </tbody>
     </table>
 
-    <table id="business-details" style="margin:1em 0;" class="govuk-table">
+    <table id="business-details" style="margin: 1em 0;" class="govuk-table">
         <caption id="tableSubHeader-bdr" class="govuk-table__caption govuk-table__caption--s">
             <span>Business Details Records</span>
             <a role="button" class="govuk-button"
-            href="/agents-external-stubs/records/add?type=business-details&seed=@{records.BusinessDetailsRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")}">
+            href="/agents-external-stubs/records/add?type=business-details&seed=@{
+                records.BusinessDetailsRecord.map(o => (o.last \ "safeId").as[String]).getOrElse("1234567890")
+            }">
                 Create another
             </a>
         </caption>
-                        <tbody class="govuk-table__body">
+        <tbody class="govuk-table__body">
         @recordRows(records.BusinessDetailsRecord,
-            ViewHelper.excerpt(_,"nino","mtdbsa","businessData.0.tradingName", "businessData.0.businessAddressDetails", "businessData.0.cessationDate"))
+            ViewHelper.excerpt(_, "nino", "mtdbsa", "businessData.0.tradingName", "businessData.0.businessAddressDetails", "businessData.0.cessationDate"))
         </tbody>
     </table>
 
-    <table id="vat-customer-informations" style="margin:1em 0;" class="govuk-table">
+    <table id="vat-customer-informations" style="margin: 1em 0;" class="govuk-table">
         <caption id="tableSubHeader-vat" class="govuk-table__caption govuk-table__caption--s">
             <span>VAT Customer Information Records</span>
             <a role="button" class="govuk-button"
-            href="/agents-external-stubs/records/add?type=vat-customer-information&seed=@{records.VatCustomerInformationRecord.map(o => (o.last \ "vrn").as[String]).getOrElse("1234567890")}">
+            href="/agents-external-stubs/records/add?type=vat-customer-information&seed=@{
+                records.VatCustomerInformationRecord.map(o => (o.last \ "vrn").as[String]).getOrElse("1234567890")
+            }">
                 Create another
             </a>
         </caption>
-                        <tbody class="govuk-table__body">
+        <tbody class="govuk-table__body">
         @recordRows(records.VatCustomerInformationRecord,
-            ViewHelper.excerpt(_,"vrn","approvedInformation.customerDetails.organisationName","approvedInformation.customerDetails.individual", "approvedInformation.customerDetails.effectiveRegistrationDate"))
+            ViewHelper.excerpt(_, "vrn", "approvedInformation.customerDetails.organisationName", "approvedInformation.customerDetails.individual", "approvedInformation.customerDetails.effectiveRegistrationDate"))
         </tbody>
     </table>
 
-    <table id="mtd-relationships" style="margin:1em 0;" class="govuk-table">
+    <table id="mtd-relationships" style="margin: 1em 0;" class="govuk-table">
         <caption id="tableSubHeader-mtd" class="govuk-table__caption govuk-table__caption--s">
             <span>MTD Relationship Records</span>
             <a role="button" class="govuk-button"
-            href="/agents-external-stubs/records/add?type=relationship&seed=@{records.RelationshipRecord.map(o => (o.last \ "arn").as[String]).getOrElse("1234567890")}">
+            href="/agents-external-stubs/records/add?type=relationship&seed=@{
+                records.RelationshipRecord.map(o => (o.last \ "arn").as[String]).getOrElse("1234567890")
+            }">
                 Create another
             </a>
         </caption>
-                        <tbody class="govuk-table__body">
+        <tbody class="govuk-table__body">
         @recordRows(records.RelationshipRecord, identity)
         </tbody>
     </table>
 
-    <table id="legacy-relationships" style="margin:1em 0;" class="govuk-table">
+    <table id="legacy-relationships" style="margin: 1em 0;" class="govuk-table">
         <caption id="tableSubHeader-lsr" class="govuk-table__caption govuk-table__caption--s">
             <span>Legacy SA Agent Relationships</span>
             <a role="button" class="govuk-button"
-            href="/agents-external-stubs/records/add?type=legacy-relationship&seed=@{records.LegacyRelationshipRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
+            href="/agents-external-stubs/records/add?type=legacy-relationship&seed=@{
+                records.LegacyRelationshipRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")
+            }">
                 Create another
             </a>
         </caption>
-                        <tbody class="govuk-table__body">
+        <tbody class="govuk-table__body">
         @recordRows(records.LegacyRelationshipRecord, identity)
         </tbody>
     </table>
 
-    <table id="legacy-agents" style="margin:1em 0;" class="govuk-table">
+    <table id="legacy-agents" style="margin: 1em 0;" class="govuk-table">
         <caption id="tableSubHeader-lsa" class="govuk-table__caption govuk-table__caption--s">
             <span>Legacy SA Agent</span>
             <a role="button" class="govuk-button"
-            href="/agents-external-stubs/records/add?type=legacy-agent&seed=@{records.LegacyAgentRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")}">
+            href="/agents-external-stubs/records/add?type=legacy-agent&seed=@{
+                records.LegacyAgentRecord.map(o => (o.last \ "agentId").as[String]).getOrElse("1234567890")
+            }">
                 Create another
             </a>
         </caption>
-                        <tbody class="govuk-table__body">
+        <tbody class="govuk-table__body">
         @recordRows(records.LegacyAgentRecord, identity)
         </tbody>
     </table>
 
-    <table id="employer-auths" style="margin:1em 0;" class="govuk-table">
+    <table id="employer-auths" style="margin: 1em 0;" class="govuk-table">
         <caption id="tableSubHeader-paye" class="govuk-table__caption govuk-table__caption--s">
             <span>Legacy PAYE Agent Informations</span>
             <a role="button" class="govuk-button"
-            href="/agents-external-stubs/records/add?type=employer-auths&seed=@{records.EmployerAuths.map(o => (o.last \ "agentCode").as[String]).getOrElse("ABC123456789")}">
+            href="/agents-external-stubs/records/add?type=employer-auths&seed=@{
+                records.EmployerAuths.map(o => (o.last \ "agentCode").as[String]).getOrElse("ABC123456789")
+            }">
                 Create another
             </a>
         </caption>
-                        <tbody class="govuk-table__body">
+        <tbody class="govuk-table__body">
         @recordRows(records.EmployerAuths, identity)
         </tbody>
     </table>
 
-    <table id="ppt-subscription-display-records" style="margin:1em 0;" class="govuk-table">
+    <table id="ppt-subscription-display-records" style="margin: 1em 0;" class="govuk-table">
         <caption id="tableSubHeader-ppt" class="govuk-table__caption govuk-table__caption--s">
             <span>PPT Subscription Display Records</span>
             <a role="button" class="govuk-button"
-            href="/agents-external-stubs/records/add?type=ppt-subscription&seed=@{records.PPTSubscriptionDisplayRecord.map(o => (o.last \ "pptReference").as[String]).getOrElse("XAPPT1234567890")}">
+            href="/agents-external-stubs/records/add?type=ppt-subscription&seed=@{
+                records.PPTSubscriptionDisplayRecord.map(o => (o.last \ "pptReference").as[String]).getOrElse("XAPPT1234567890")
+            }">
                 Create another
             </a>
         </caption>
-                        <tbody class="govuk-table__body">
+        <tbody class="govuk-table__body">
         @recordRows(records.PPTSubscriptionDisplayRecord, identity)
         </tbody>
     </table>
 
-    <table id="cbc-subscription-records" style="margin:1em 0;" class="govuk-table">
+    <table id="cbc-subscription-records" style="margin: 1em 0;" class="govuk-table">
         <caption id="tableSubHeader-cbc" class="govuk-table__caption govuk-table__caption--s">
             <span>Cbc Subscription Records</span>
             <a role="button" class="govuk-button"
-               href="/agents-external-stubs/records/add?type=cbc-subscription&seed=@{records.CbcSubscriptionRecord.map(o => (o.last \ "cbcId").as[String]).getOrElse("XACBC1234567890")}">
-            Create another
+            href="/agents-external-stubs/records/add?type=cbc-subscription&seed=@{
+                records.CbcSubscriptionRecord.map(o => (o.last \ "cbcId").as[String]).getOrElse("XACBC1234567890")
+            }">
+                Create another
             </a>
         </caption>
         <tbody class="govuk-table__body">
@@ -169,11 +187,13 @@
         </tbody>
     </table>
 
-    <table id="pillar2-subscription-records" style="margin:1em 0;" class="govuk-table">
+    <table id="pillar2-subscription-records" style="margin: 1em 0;" class="govuk-table">
         <caption id="tableSubHeader-cbc" class="govuk-table__caption govuk-table__caption--s">
             <span>Pillar2 Records</span>
             <a role="button" class="govuk-button"
-            href="/agents-external-stubs/records/add?type=pillar2-subscription&seed=@{records.Pillar2Record.map(o => (o.last \ "plrReference").as[String]).getOrElse("XACBC1234567890")}">
+            href="/agents-external-stubs/records/add?type=pillar2-subscription&seed=@{
+                records.Pillar2Record.map(o => (o.last \ "plrReference").as[String]).getOrElse("XACBC1234567890")
+            }">
                 Create another
             </a>
         </caption>
@@ -184,14 +204,15 @@
 }
 
 @recordRows(records: Option[Seq[JsObject]], excerpt: JsValue => JsValue) = {
-  @if(records.isEmpty){ <tr class="govuk-table__row">
-                          <td class="govuk-table__cell">
-                              <div style="font-size:0.8em;">No records found.</div>
-                          </td>
-                      </tr>
-  } else {
-    @records.get.map{json => @recordRow(json, (json \ "id").asOpt[String], excerpt)}
-  }
+@if(records.isEmpty) {
+    <tr class="govuk-table__row">
+        <td class="govuk-table__cell">
+            <div style="font-size: 0.8em;">No records found.</div>
+        </td>
+    </tr>
+} else {
+    @records.get.map { json => @recordRow(json, (json \ "id").asOpt[String], excerpt) }
+}
 }
 
 @recordRow(json: JsValue, id: Option[String], excerpt: JsValue => JsValue) = {
@@ -200,38 +221,113 @@
             <a name="e"></a>
             <a name="@id"></a>
             <td class="govuk-table__cell">
-                <div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrint(json)</div>
+                <div style="font-family: monospace;
+                    font-size: 0.75em;
+                    color: lightgray;
+                    overflow-wrap: break-word">@prettyPrint(json)</div>
             </td>
         } else {
             <td class="govuk-table__cell">
-                <div style="font-family: monospace; font-size: 0.75em; color:lightgray; overflow-wrap: break-word">@prettyPrintFlat(excerpt(json))</div>
+                <div style="font-family: monospace;
+                    font-size: 0.75em;
+                    color: lightgray;
+                    overflow-wrap: break-word">@prettyPrintFlat(excerpt(json))</div>
             </td>
         }
-        <td class="govuk-table__cell" style="white-space: nowrap; vertical-align: top; text-align: right;">
-            @if(id.isDefined) {
-                @if(excerpt!=(identity _)){
-                    @if(showId.isDefined && id.contains(showId.get)) {
-                            <a href="/agents-external-stubs/records" class="govuk-link govuk-body-s">Fold...</a>
-                    } else {
-                            <a href="/agents-external-stubs/records?showId=@{id.get}#e" class="govuk-link
+        <td class="govuk-table__cell" style="white-space: nowrap;
+            vertical-align: top;
+            text-align: right;">
+        @if(id.isDefined) {
+            @if(excerpt != identity(excerpt)){
+                @if(showId.isDefined && id.contains(showId.get)) {
+                    <a href="/agents-external-stubs/records" class="govuk-link govuk-body-s">Fold...</a>
+                } else {
+                    <a href="/agents-external-stubs/records?showId=@{
+                        id.get
+                    }#e" class="govuk-link
                             govuk-body-s">Expand...</a>
-                    }
                 }
-                <a class="govuk-link govuk-body-s" href="/agents-external-stubs/records/edit?id=@{id.get}">Edit</a>
-                <a class="govuk-link govuk-body-s" href="/agents-external-stubs/records/delete?id=@{id.get}">Remove</a>
             }
+            <a class="govuk-link govuk-body-s" href="/agents-external-stubs/records/edit?id=@{
+                id.get
+            }">Edit</a>
+            <a class="govuk-link govuk-body-s" href="/agents-external-stubs/records/delete?id=@{
+                id.get
+            }">Remove</a>
+        }
         </td>
     </tr>
 }
 
-@prettyPrintFlat(json:JsValue) = {@if(json.isInstanceOf[JsObject]){
-<span style="color:blue; font-weight: bold;">{</span>@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintFieldFlat(f)),{<span style="color:blue;">, </span>})<span style="color:blue; font-weight: bold">}</span>} else {@if(json.isInstanceOf[JsArray]){
-<span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrintFlat(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {@if(json.isInstanceOf[JsBoolean]){<span style="color:@if(json.as[Boolean]){green}else{red}">@json</span>} else {<span style="color:blue">@json</span>}}}}}
+@prettyPrintFlat(json: JsValue) = {
+@if(json.isInstanceOf[JsObject]) {
+    <span style="color: blue;
+        font-weight: bold;">{</span>
+    @ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintFieldFlat(f)).toSeq, {
+            <span style="color:blue;">,</span>
+    }) <span style="color: blue;
+        font-weight: bold">}</span>
+} else {
+    @if(json.isInstanceOf[JsArray]) {
+        <span style="color: green;
+            font-weight: bold;">[</span>
+        @ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrintFlat(f)).toSeq, {
+                <span style="color:green;">,</span>
+        }) <span style="color: green;
+            font-weight: bold">]</span>
+    } else {
+        @if(json.isInstanceOf[JsString]) {
+            <span>"</span>
+            <span style="color: black">@json.as[JsString].value</span>
+            "</span>
+        } else {
+            @if(json.isInstanceOf[JsBoolean]) {
+                <span style="color: @if(json.as[Boolean]){green}else{red}">@json</span>
+            } else {
+                <span style="color: blue">@json</span>
+            }
+        }
+    }
+}
+}
 
-@prettyPrintFieldFlat(field:(String,JsValue)) = {"<span style="color:gray">@field._1</span>": @prettyPrintFlat(field._2)}
+@prettyPrintFieldFlat(field: (String, JsValue)) = {"<span style="color: gray">@field._1</span>": @prettyPrintFlat(field._2)}
 
-@prettyPrint(json:JsValue) = {@if(json.isInstanceOf[JsObject]){
-    <span style="color:blue; font-weight: bold;">{</span><div style="position: relative; left: 2em;">@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintField(f)),{<span style="color:blue;">, <br/></span>})</div><span style="color:blue; font-weight: bold">}</span>} else {@if(json.isInstanceOf[JsArray]){
-    <span style="color:green; font-weight: bold;">[</span>@ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrint(f)),{<span style="color:green;">, </span>})<span style="color:green; font-weight: bold">]</span>} else {@if(json.isInstanceOf[JsString]){<span>"</span><span style="color:black">@json.as[JsString].value</span>"</span>} else {@if(json.isInstanceOf[JsBoolean]){<span style="color:@if(json.as[Boolean]){green}else{red}">@json</span>} else {<span style="color:blue">@json</span>}}}}}
+@prettyPrint(json: JsValue) = {
+@if(json.isInstanceOf[JsObject]) {
+    <span style="color: blue;
+        font-weight: bold;">{</span>
+    <div style="position: relative;
+        left: 2em;">@ViewHelper.intersperse(json.as[JsObject].fields.map(f => prettyPrintField(f)).toSeq, {
+            <span style="color:blue;">
+            ,
+                <br/>
+            </span>
+    })</div>
+    <span style="color: blue;
+        font-weight: bold">}</span>
+} else {
+    @if(json.isInstanceOf[JsArray]) {
+        <span style="color: green;
+            font-weight: bold;">[</span>
+        @ViewHelper.intersperse(json.as[JsArray].value.map(f => prettyPrint(f)).toSeq, {
+                <span style="color:green;">,</span>
+        }) <span style="color: green;
+            font-weight: bold">]</span>
+    } else {
+        @if(json.isInstanceOf[JsString]) {
+            <span>"</span>
+            <span style="color: black">@json.as[JsString].value</span>
+            "</span>
+        } else {
+            @if(json.isInstanceOf[JsBoolean]) {
+                <span style="color: @if(json.as[Boolean]){green}else{red}">@json</span>
+            } else {
+                <span style="color: blue">@json</span>
+            }
+        }
+    }
+}
+}
 
-@prettyPrintField(field:(String,JsValue)) = {"<span style="color:gray">@field._1</span>": @prettyPrint(field._2)}
+@prettyPrintField(field: (String, JsValue)) = {"<span style="color: gray">@field._1</span>": @prettyPrint(field._2)}

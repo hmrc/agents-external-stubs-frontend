@@ -276,7 +276,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
 
   private def handleNotFound[U]: PartialFunction[Throwable, U] = {
-    case Upstream4xxResponse(message, upstreamResponseCode, _, _) if upstreamResponseCode == Status.NOT_FOUND =>
+    case UpstreamErrorResponse(message, upstreamResponseCode, _, _) if upstreamResponseCode == Status.NOT_FOUND =>
       throw new NotFoundException(message)
     case e => throw e
   }

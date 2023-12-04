@@ -15,7 +15,7 @@
  */
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
-import uk.gov.hmrc.http.{HttpException, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HttpException, UpstreamErrorResponse}
 
 class Upstream4xxException(msg: String, code: Int) extends HttpException(msg, code)
 
@@ -32,9 +32,9 @@ object Upstream4xxException {
             if (s > 0) m.substring(s, m.length - 3) else m
           }
         )
-      case e: Upstream4xxResponse =>
+      case e: UpstreamErrorResponse =>
         (
-          e.upstreamResponseCode, {
+          e.statusCode, {
             val m = e.getMessage
             val p = "Response body: '"
             val s = m.indexOf(p) + p.length
