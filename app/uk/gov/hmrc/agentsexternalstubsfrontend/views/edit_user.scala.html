@@ -392,6 +392,20 @@
                 ))
             ).withFormField(userForm("isNonCompliant")))
 
+            @govukCheckboxes(Checkboxes(
+                items = Seq(CheckboxItem(
+                    content = Text(msgs("user.form.deceased")),
+                    hint = Some(Hint(content = Text(msgs("user.form.deceased.hint"))))
+                ))
+            ).withFormField(userForm("deceased")))
+
+            @govukInput(Input(
+                label = Label(
+                    content = Text("Agent entity UTR")
+                ),
+                hint = Some(Hint(content = Text("The UTR associated with the agent entity that is not an enrolment on these credentials")))
+            ).withFormField(userForm("utr")))
+
             <div class="govuk-button-group">
                 @govukButton(Button(
                     content = if(hasContinue) Text(msgs("user.edit.update_and_continue")) else Text(msgs("user.edit.update")),
