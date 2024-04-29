@@ -42,9 +42,8 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.Checkboxes
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+@import uk.gov.hmrc.govukfrontend.views.Aliases.{ Checkboxes, CheckboxItem}
 
 @this(
         mainTemplate: main_template,
@@ -386,18 +385,22 @@
             <h2>Specials</h2>
 
             @govukCheckboxes(Checkboxes(
+                name = "isNonCompliant",
                 items = Seq(CheckboxItem(
                     content = Text(msgs("user.form.isNonCompliant")),
-                    hint = Some(Hint(content = Text(msgs("user.form.isNonCompliant.hint"))))
+                    hint = Some(Hint(content = Text(msgs("user.form.isNonCompliant.hint")))),
+                    value = "true"
                 ))
-            ).withFormField(userForm("isNonCompliant")))
+            ))
 
             @govukCheckboxes(Checkboxes(
+                    name = "deceased",
                 items = Seq(CheckboxItem(
                     content = Text(msgs("user.form.deceased")),
-                    hint = Some(Hint(content = Text(msgs("user.form.deceased.hint"))))
+                    hint = Some(Hint(content = Text(msgs("user.form.deceased.hint")))),
+                    value = "true"
                 ))
-            ).withFormField(userForm("deceased")))
+            ))
 
             @govukInput(Input(
                 label = Label(

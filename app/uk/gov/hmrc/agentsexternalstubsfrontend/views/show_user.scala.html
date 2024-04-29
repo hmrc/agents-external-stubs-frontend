@@ -217,6 +217,8 @@
             showField(user.confidenceLevel,"user.form.confidenceLevel","confidenceLevel"),
             showField(user.nino,"user.form.nino","nino"),
             showField(user.dateOfBirth,"user.form.dateOfBirth","dateOfBirth"),
+            showField(user.utr, "user.form.utr", "Utr"),
+            showField(user.deceased, "user.form.deceased", "Deceased"),
             user.address.map ( address =>
                 SummaryListRow(
                     key = Key(Text(msgs("user.form.address"))),

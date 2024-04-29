@@ -64,8 +64,8 @@ object UserForm {
       "address"          -> optional(addressMapping),
       "strideRoles" -> optional(nonEmptyText)
         .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(","))),
-      "deceased"         -> optional(boolean),
-      "utr"              -> optional(nonEmptyText)
+      "deceased" -> optional(boolean),
+      "utr"      -> optional(nonEmptyText)
     )(User.apply)(User.unapply)
   )
 
