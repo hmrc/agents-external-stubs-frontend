@@ -40,7 +40,9 @@ case class User(
   isPermanent: Option[Boolean] = None,
   recordIds: Option[Seq[String]] = None,
   address: Option[Address] = None,
-  strideRoles: Seq[String] = Seq.empty
+  strideRoles: Seq[String] = Seq.empty,
+  deceased: Option[Boolean] = None,
+  utr: Option[String] = None
 ) {
 
   def isEnrolledFor(service: String): Boolean =

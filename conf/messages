@@ -140,6 +140,9 @@ user.form.address.line3=Line 2
 user.form.address.line4=Line 2
 user.form.address.postcode=Postcode
 user.form.address.countryCode=Country
+user.form.deceased=Deceased
+user.form.deceased.hint=Deceased citizen
+user.form.utr=Utr
 
 user.show.create=Create
 

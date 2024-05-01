@@ -63,7 +63,9 @@ object UserForm {
       "recordIds"        -> ignored[Option[Seq[String]]](None),
       "address"          -> optional(addressMapping),
       "strideRoles" -> optional(nonEmptyText)
-        .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(",")))
+        .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(","))),
+      "deceased" -> optional(boolean),
+      "utr"      -> optional(nonEmptyText)
     )(User.apply)(User.unapply)
   )
 
