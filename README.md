@@ -27,23 +27,24 @@ See [stubbed UIs](docs/stubbed-ui.md)
 
 ## Running the tests
 
-    sbt test it:test
+    sbt test it/test
 
 ## Running the tests with coverage
 
-    sbt clean coverageOn test it:test coverageReport
+    sbt clean coverage test it/test coverageReport
 
 ## Running the app locally
 
-    sm2 --start AWESOME_STUBS
-    sm2 --start AWESOME_STUBS_FRONTEND
-    
-or with AGENTS_EXTERNAL_STUBS also running
     sbt run
 
-It should then be listening on ports 9099 and 9025
+## Running the app and associated backend service via Service Manager
 
-    browse http://localhost:9099/agents-external-stubs/quick-start-hub
+    sm2 --start AGENTS_EXTERNAL_STUBS_FRONTEND
+    sm2 --start AGENTS_EXTERNAL_STUBS
+
+It should then be listening on ports 9099 and 9009. You could then start using the service at the quick start hub:
+
+    http://localhost:9099/agents-external-stubs/quick-start-hub
 
 ### License
 

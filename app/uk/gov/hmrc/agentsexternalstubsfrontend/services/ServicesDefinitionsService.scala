@@ -15,7 +15,7 @@
  */
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.services
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.Services

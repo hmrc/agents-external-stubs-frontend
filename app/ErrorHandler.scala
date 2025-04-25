@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-import javax.inject.{Inject, Singleton}
 import play.api.http.HeaderNames.CACHE_CONTROL
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.Results._
 import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.{Configuration, Environment, Logger, Mode}
+import play.twirl.api.Html
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
+import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AuthRedirects
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.error_template
 import uk.gov.hmrc.auth.core.{InsufficientEnrolments, NoActiveSession}
 import uk.gov.hmrc.http.{JsValidationException, NotFoundException}
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.bootstrap.config.{AuthRedirects, HttpAuditEvent}
+import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -38,10 +40,10 @@ class ErrorHandler @Inject() (
   appConfig: FrontendConfig,
   errorTemplateView: error_template,
   val auditConnector: AuditConnector
-)(implicit val config: Configuration, ec: ExecutionContext)
+)(implicit val config: Configuration, val ec: ExecutionContext)
     extends FrontendErrorHandler with AuthRedirects with ErrorAuditing {
 
-  val appName = appConfig.appName
+  val appName: String = appConfig.appName
 
   private val isDevEnv =
     if (env.mode.equals(Mode.Test)) false else env.mode.equals(Mode.Dev)
@@ -51,41 +53,46 @@ class ErrorHandler @Inject() (
     super.onClientError(request, statusCode, message)
   }
 
-  override def resolveError(request: RequestHeader, exception: Throwable) = {
+  override def resolveError(request: RequestHeader, exception: Throwable): Future[Result] = {
     auditServerError(request, exception)
-    implicit val r = Request(request, "")
+    implicit val r: Request[_] = Request(request, "")
     exception match {
       case _: NoActiveSession =>
-        toGGLogin(if (isDevEnv) s"http://${request.host}${request.uri}" else request.uri)
+        Future.successful(toGGLogin(if (isDevEnv) s"http://${request.host}${request.uri}" else request.uri))
       case _: InsufficientEnrolments =>
-        Forbidden(
-          errorTemplateView(
-            Messages("global.error.403.title"),
-            Messages("global.error.403.heading"),
-            Messages("global.error.403.message")
-          )
-        ).withHeaders(CACHE_CONTROL -> "no-cache")
+        Future.successful(
+          Forbidden(
+            errorTemplateView(
+              Messages("global.error.403.title"),
+              Messages("global.error.403.heading"),
+              Messages("global.error.403.message")
+            )
+          ).withHeaders(CACHE_CONTROL -> "no-cache")
+        )
       case ex =>
         Logger(getClass).warn(s"There has been a failure", ex)
-        InternalServerError(
-          errorTemplateView(
-            Messages("global.error.500.title"),
-            Messages("global.error.500.heading"),
-            Messages("global.error.500.message")
-          )
-        ).withHeaders(CACHE_CONTROL -> "no-cache")
+        Future.successful(
+          InternalServerError(
+            errorTemplateView(
+              Messages("global.error.500.title"),
+              Messages("global.error.500.heading"),
+              Messages("global.error.500.message")
+            )
+          ).withHeaders(CACHE_CONTROL -> "no-cache")
+        )
     }
   }
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
-    request: Request[_]
-  ) =
-    errorTemplateView(pageTitle, heading, message)
+    request: RequestHeader
+  ): Future[Html] = {
+    implicit val r: Request[_] = Request(request, "")
+    Future.successful(errorTemplateView(pageTitle, heading, message))
+  }
 }
 
 object EventTypes {
 
-  val RequestReceived: String = "RequestReceived"
   val TransactionFailureReason: String = "transactionFailureReason"
   val ServerInternalError: String = "ServerInternalError"
   val ResourceNotFound: String = "ResourceNotFound"

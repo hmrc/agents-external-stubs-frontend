@@ -1,9 +1,12 @@
+import uk.gov.hmrc.DefaultBuildSettings
+
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.16"
 
 lazy val root = (project in file("."))
   .settings(
     name := "agents-external-stubs-frontend",
     organization := "uk.gov.hmrc",
-    scalaVersion := "2.13.10",
     scalacOptions ++= Seq(
       "-Xlint:-missing-interpolator,_",
       "-Ywarn-dead-code",
@@ -15,25 +18,16 @@ lazy val root = (project in file("."))
       "-Wconf:src=*html:w", // silence html warnings as they are wrong
       "-language:implicitConversions"
     ),
-    majorVersion := 0,
     PlayKeys.playDefaultPort := 9099,
     resolvers ++= Seq(
       Resolver.typesafeRepo("releases"),
     ),
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
-    routesImport += "uk.gov.hmrc.play.bootstrap.binders._",
+    routesImport += "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
     CodeCoverageSettings.scoverageSettings,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     Compile / scalafmtOnCompile := true,
     Test / scalafmtOnCompile := true
-  )
-  .configs(IntegrationTest)
-  .settings(
-    Test / parallelExecution := false,
-    IntegrationTest / Keys.fork := false,
-    Defaults.itSettings,
-    IntegrationTest / unmanagedSourceDirectories += baseDirectory(_ / "it").value,
-    IntegrationTest / parallelExecution := false
   )
   .settings(
     //fix for scoverage compile errors for scala 2.13.10
@@ -41,4 +35,7 @@ lazy val root = (project in file("."))
   )
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
 
-inConfig(IntegrationTest)(org.scalafmt.sbt.ScalafmtPlugin.scalafmtConfigSettings)
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(root % "test->test")
+  .settings(DefaultBuildSettings.itSettings())
