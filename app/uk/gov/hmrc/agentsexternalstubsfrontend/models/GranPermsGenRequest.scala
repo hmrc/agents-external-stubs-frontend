@@ -34,7 +34,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.models
 
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 /** Request for generating large number of users for the purpose of testing Granular Permissions.
   */
@@ -49,13 +49,13 @@ case class GranPermsGenRequest(
 )
 
 object GranPermsGenRequest {
-  implicit val format = Json.format[GranPermsGenRequest]
+  implicit val format: OFormat[GranPermsGenRequest] = Json.format[GranPermsGenRequest]
 }
 
 case class GranPermsGenResponse(createdAgentsCount: Int, createdClientsCount: Int)
 
 object GranPermsGenResponse {
-  implicit val format = Json.format[GranPermsGenResponse]
+  implicit val format: OFormat[GranPermsGenResponse] = Json.format[GranPermsGenResponse]
 }
 
 object GranPermsGenRequestForm {

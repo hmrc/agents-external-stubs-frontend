@@ -14,30 +14,20 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichSelect}
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.{Select, SelectItem}
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukDateInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 
 @this(
         mainTemplate: main_template,
@@ -164,19 +154,19 @@
                                         enrolment(".identifier").size
                                     }" style="vertical-align: top;">
                                         @govukInput(Input(
-                                            formGroupClasses = "govuk-!-margin-bottom-0"
+                                            formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                         ).withFormField(groupForm(s"${enrolment.key}.key")))
                                     </td>
                                 }
 
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
-                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                    formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(groupForm(s"${identifier.key}.key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
-                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                    formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(groupForm(s"${identifier.key}.value")))
                             </td>
                                 @* TODO does this just removes the table row, not the data? *@
@@ -192,17 +182,17 @@
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell">
                             @govukInput(Input(
-                                formGroupClasses = "govuk-!-margin-bottom-0"
+                                formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                             ).withFormField(groupForm(s"principalEnrolments[${principalEnrolments.size}].key")))
                         </td>
                         <td class="govuk-table__cell">
                             @govukInput(Input(
-                                formGroupClasses = "govuk-!-margin-bottom-0"
+                                formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                             ).withFormField(groupForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].key")))
                         </td>
                         <td class="govuk-table__cell">
                             @govukInput(Input(
-                                formGroupClasses = "govuk-!-margin-bottom-0"
+                                formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                             ).withFormField(groupForm(s"principalEnrolments[${principalEnrolments.size}].identifiers[0].value")))
                         </td>
                         <td class="govuk-table__cell">
@@ -242,19 +232,19 @@
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
                                             @govukInput(Input(
-                                                formGroupClasses = "govuk-!-margin-bottom-0"
+                                                formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                             ).withFormField(groupForm(s"${enrolment.key}.key")))
                                         </td>
                                     }
 
                                 <td class="govuk-table__cell">
                                     @govukInput(Input(
-                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                        formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                     ).withFormField(groupForm(s"${identifier.key}.key")))
                                 </td>
                                 <td class="govuk-table__cell">
                                     @govukInput(Input(
-                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                        formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                     ).withFormField(groupForm(s"${identifier.key}.value")))
                                 </td>
                                 <td class="govuk-table__cell">
@@ -268,17 +258,17 @@
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
-                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                    formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(groupForm(s"delegatedEnrolments[${delegatedEnrolments.size}].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
-                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                    formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(groupForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
-                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                    formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(groupForm(s"delegatedEnrolments[${delegatedEnrolments.size}].identifiers[0].value")))
                             </td>
                             <td class="govuk-table__cell">
@@ -311,7 +301,7 @@
                                 <td style="vertical-align: top;">
                                     @govukInput(Input(
                                         classes = "govuk-input--width-10",
-                                        formGroupClasses = "govuk-!-margin-bottom-0"
+                                        formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                     ).withFormField(groupForm(s"suspendedRegimes[$index]")))
                                 </td>
                                 <td class="govuk-table__cell">
@@ -325,7 +315,7 @@
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
                                     classes = "govuk-input--width-10",
-                                    formGroupClasses = "govuk-!-margin-bottom-0"
+                                    formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(groupForm(s"suspendedRegimes[${suspendedRegimes.size}]")))
                             </td>
                             <td class="govuk-table__cell"></td>

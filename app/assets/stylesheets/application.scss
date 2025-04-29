@@ -38,7 +38,7 @@ div.test-user-action {
 }
 
 // badges (custom style to make different affinity groups stand out)
-@import "lib/govuk-frontend/govuk/all";
+@import "lib/govuk-frontend/dist/govuk/all";
 .badge {
   @extend .govuk-tag;
   font-size: 0.7em;

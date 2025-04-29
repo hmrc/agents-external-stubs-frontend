@@ -54,12 +54,7 @@ case class User(
   def updateAssignedPrincipalEnrolments(f: Seq[EnrolmentKey] => Seq[EnrolmentKey]): User =
     this.copy(assignedPrincipalEnrolments = f(this.assignedPrincipalEnrolments))
 
-  def updateAssignedDelegatedEnrolments(f: Seq[EnrolmentKey] => Seq[EnrolmentKey]): User =
-    this.copy(assignedDelegatedEnrolments = f(this.assignedDelegatedEnrolments))
-
   def lastName: Option[String] = name.map(_.split(" ").last)
-
-  def withRecordId(recordId: String): User = copy(recordIds = Some(recordIds.getOrElse(Seq.empty) :+ recordId))
 
   final val facts: String => Option[String] = {
     case n if n.toLowerCase.contains("postcode") => address.flatMap(_.postcode)

@@ -14,30 +14,21 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
-@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichSelect, RichTextarea}
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukFieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.{Select, SelectItem}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichTextarea
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 
 @this(
         mainTemplate: main_template,
@@ -91,21 +82,21 @@
         @for(header <- headers) {
             <div>
                 @govukInput(Input(
-                    formGroupClasses = "govuk-!-display-inline-block",
+                    formGroup = FormGroup(classes = Some("govuk-!-display-inline-block"))
                 ).withFormField(specialCaseForm(s"${header.key}.name")))
                 :
                 @govukInput(Input(
-                    formGroupClasses = "govuk-!-display-inline-block",
+                    formGroup = FormGroup(classes = Some("govuk-!-display-inline-block"))
                 ).withFormField(specialCaseForm(s"${header.key}.value")))
             </div>
         }
         <div>
             @govukInput(Input(
-                formGroupClasses = "govuk-!-display-inline-block",
+                formGroup = FormGroup(classes = Some("govuk-!-display-inline-block"))
             ).withFormField(specialCaseForm(s"response.headers[${headers.size}].name")))
             :
             @govukInput(Input(
-                formGroupClasses = "govuk-!-display-inline-block",
+                formGroup = FormGroup(classes = Some("govuk-!-display-inline-block"))
             ).withFormField(specialCaseForm(s"response.headers[${headers.size}].value")))
         </div>
 
