@@ -158,9 +158,12 @@ class RestQueryController @Inject() (
           case "GET"    => wsRequest.get()
           case "POST"   => wsRequest.post(query.payload.getOrElse(JsNull))
           case "PUT"    => wsRequest.put(query.payload.getOrElse(JsNull))
+          case "PATCH"  => wsRequest.patch(query.payload.getOrElse(JsNull))
           case "DELETE" => wsRequest.delete()
           case _ =>
-            Future.failed(new Exception(s"Method ${query.method} is not supported, try GET, POST, PUT or DELETE"))
+            Future.failed(
+              new Exception(s"Method ${query.method} is not supported, try GET, POST, PUT, PATCH or DELETE")
+            )
         }
       }.fold(
         e => Future.failed(new Exception(s"Error executing the request: ${e.getMessage}")),
@@ -189,7 +192,9 @@ object RestQueryController {
          else Map("Authorization" -> request.session.get(SessionKeys.authToken).get)) ++
         (if (h.exists(_._1.toLowerCase() == "x-session-id")) Map.empty
          else Map("X-Session-ID" -> request.session.get(SessionKeys.sessionId).get)) ++
-        (if (!h.exists(_._1.toLowerCase() == "content-type") && (method == "POST" || method == "PUT"))
+        (if (
+           !h.exists(_._1.toLowerCase() == "content-type") && (method == "POST" || method == "PUT" || method == "PATCH")
+         )
            Map("Content-Type" -> "application/json")
          else Map.empty)
     }
