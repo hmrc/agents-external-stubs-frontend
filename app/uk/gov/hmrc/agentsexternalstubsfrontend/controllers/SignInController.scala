@@ -203,9 +203,8 @@ class SignInController @Inject() (
         .signOut()
         .map(_ =>
           continue.fold(
-            Redirect(routes.SignInController.showSignInPage(None, None, None).url)
-              .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
-          )(c => Redirect(c.unsafeValue).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+            Redirect(routes.SignInController.showSignInPage(None, None, None).url).withNewSession
+          )(c => Redirect(c.unsafeValue).withNewSession)
         )
     }
 
@@ -215,9 +214,8 @@ class SignInController @Inject() (
         .signOut()
         .map(_ =>
           continue.fold(
-            Redirect(routes.SignInController.showSignInPageSCP(None, None).url)
-              .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
-          )(c => Redirect(c.unsafeValue).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+            Redirect(routes.SignInController.showSignInPageSCP(None, None).url).withNewSession
+          )(c => Redirect(c.unsafeValue).withNewSession)
         )
     }
 
@@ -295,9 +293,8 @@ class SignInController @Inject() (
         .signOut()
         .map(_ =>
           continue.fold(
-            Redirect(routes.SignInController.showSignInPageInternal(None, None, None).url)
-              .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
-          )(c => Redirect(c.unsafeValue).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+            Redirect(routes.SignInController.showSignInPageInternal(None, None, None).url).withNewSession
+          )(c => Redirect(c.unsafeValue).withNewSession)
         )
     }
 
@@ -307,9 +304,8 @@ class SignInController @Inject() (
         .signOut()
         .map(_ =>
           continue.fold(
-            Redirect(routes.SignInController.showSignInPageInternalSCP(None, None).url)
-              .discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME))
-          )(c => Redirect(c.unsafeValue).discardingCookies(DiscardingCookie(sessionCookieBaker.COOKIE_NAME)))
+            Redirect(routes.SignInController.showSignInPageInternalSCP(None, None).url).withNewSession
+          )(c => Redirect(c.unsafeValue).withNewSession)
         )
     }
 
