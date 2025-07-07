@@ -34,8 +34,10 @@ lazy val root = (project in file("."))
     libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
   )
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin)
 
 lazy val it = project
   .enablePlugins(PlayScala)
+  .disablePlugins(JUnitXmlReportPlugin)
   .dependsOn(root % "test->test")
   .settings(DefaultBuildSettings.itSettings())
