@@ -74,7 +74,7 @@ class UserFormSpec extends UnitSpec {
           confidenceLevel = None,
           nino = None,
           credentialStrength = Some("strong"),
-          credentialRole = Some("Admin"),
+          credentialRole = Some("User"),
           assignedPrincipalEnrolments =
             Seq(EnrolmentKey("FOO", Seq.empty), EnrolmentKey("BAR", Seq(Identifier("ABC", "123")))),
           assignedDelegatedEnrolments =
@@ -95,7 +95,7 @@ class UserFormSpec extends UnitSpec {
         "confidenceLevel"                                     -> "0",
         "userId"                                              -> "foo",
         "groupId"                                             -> "ABA-712-878-NHG",
-        "credentialRole"                                      -> "Admin"
+        "credentialRole"                                      -> "User"
       )
 
       form.fill(value).data shouldBe fieldValues.-("userId")
@@ -113,7 +113,7 @@ class UserFormSpec extends UnitSpec {
           nino = None,
           strideRoles = Seq("A", "BB", "cac"),
           credentialStrength = Some("strong"),
-          credentialRole = Some("Admin")
+          credentialRole = Some("User")
         )
 
       val fieldValues = Map(
@@ -122,7 +122,7 @@ class UserFormSpec extends UnitSpec {
         "confidenceLevel"    -> "0",
         "userId"             -> "foo",
         "groupId"            -> "ABA-712-878-NHG",
-        "credentialRole"     -> "Admin"
+        "credentialRole"     -> "User"
       )
 
       form.fill(value).data shouldBe fieldValues.-("userId")
