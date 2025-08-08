@@ -118,7 +118,7 @@ object AffinityGroup {
 }
 
 object CredentialRole {
-  val values = Seq("none", "User", "Assistant", "Admin")
+  val values = Seq("none", "User", "Assistant")
 }
 
 case class Country(name: String, code: String, phone_code: String)
