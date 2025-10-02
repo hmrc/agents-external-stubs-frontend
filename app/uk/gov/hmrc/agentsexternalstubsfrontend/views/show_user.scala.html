@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.{a, group_data}
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukInput, GovukSelect, GovukSummaryList, GovukTable}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
@@ -31,7 +31,9 @@
 
 @this(
         mainTemplate: main_template,
-        groupData: group_data, a: a,
+        navigationBar: navigationBar,
+        groupData: group_data,
+        a: a,
         form: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
         govukTable: GovukTable,
@@ -158,7 +160,11 @@
     }
 }
 
-@mainTemplate(title = msgs("user.title", user.userId), sidebar = Some(sidebarLinks)) {
+@mainTemplate(title = msgs("user.title", user.userId), wide = true) {
+
+@navigationBar(context)
+
+<div class="govuk-grid-column-two-thirds">
 
     <h1 class="govuk-heading-l">
     @if(userId==context.authorisedUserId){ @msgs("user.current.show.header", userId) }else{ @msgs("user.show.header", userId) }
@@ -391,6 +397,12 @@
           }
         </ul>
     }
+
+</div>
+
+<div class="govuk-grid-column-one-third">
+    @sidebarLinks
+</div>
 
 }
 
