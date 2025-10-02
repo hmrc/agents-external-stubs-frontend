@@ -15,20 +15,24 @@
  *@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components._
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 
 @this(
-mainTemplate: main_template,
-a: a
+    mainTemplate: main_template,
+    navigationBar: navigationBar,
+    a: a
 )
 
-@(isDev: Boolean = true)(implicit request: Request[_], msgs: Messages)
+@(context: PageContext, isDev: Boolean = true)(implicit request: Request[_], msgs: Messages)
 
 @baseUrl = @{ if(isDev) request.host else request.uri }
 
 @* don't need to be signed in to view this page *@
 @mainTemplate(title = "Quick start hub - Agents team", wide = true, showSignOut = false) {
+
+@navigationBar(context)
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
