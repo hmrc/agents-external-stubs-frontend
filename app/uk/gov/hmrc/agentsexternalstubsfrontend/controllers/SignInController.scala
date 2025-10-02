@@ -54,8 +54,6 @@ class SignInController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-//          println("AAAAAAAAAAAAAAAA")
-//          println(credentials)
           Future.successful(Ok(quickStartView(pageContext(credentials))))
         }
     }
