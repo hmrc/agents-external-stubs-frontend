@@ -25,7 +25,7 @@
     a: a
 )
 
-@(context: PageContext, isDev: Boolean = true)(implicit request: Request[_], msgs: Messages)
+@(quickStartHubBaseUrl: String, quickStartHubStrideBaseUrl: String, context: PageContext, isDev: Boolean = true)(implicit request: Request[_], msgs: Messages)
 
 @baseUrl = @{ if(isDev) request.host else request.uri }
 

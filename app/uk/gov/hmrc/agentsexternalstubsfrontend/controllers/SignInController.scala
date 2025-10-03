@@ -31,6 +31,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
 import org.joda.time.DateTime
+import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms._
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
@@ -38,6 +39,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 @Singleton
 class SignInController @Inject() (
   override val messagesApi: MessagesApi,
+  appConfig: FrontendConfig,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   signInView: sign_in,
   quickStartView: quick_start_agents_hub,
@@ -54,7 +56,15 @@ class SignInController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          Future.successful(Ok(quickStartView(pageContext(credentials))))
+          Future.successful(
+            Ok(
+              quickStartView(
+                appConfig.quickStartHubBaseUrl,
+                appConfig.quickStartHubStrideBaseUrl,
+                pageContext(credentials)
+              )
+            )
+          )
         }
     }
 

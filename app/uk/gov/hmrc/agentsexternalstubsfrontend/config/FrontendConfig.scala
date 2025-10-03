@@ -50,4 +50,8 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
   val authBaseUrl = baseUrl("auth")
 
   val aesBaseUrl = baseUrl("agents-external-stubs")
+
+  val quickStartHubBaseUrl = servicesConfig.getConfString("base-url", "")
+
+  val quickStartHubStrideBaseUrl = servicesConfig.getConfString("stride-base-url", "")
 }
