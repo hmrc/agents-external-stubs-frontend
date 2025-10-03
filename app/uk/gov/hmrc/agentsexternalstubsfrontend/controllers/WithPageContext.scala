@@ -29,14 +29,19 @@ trait WithPageContext {
 
     override def planetId: String = credentials.planetId
 
-//    TODO: Update this to use features.showQuickStartHub
-    override def menuItems: Seq[MenuItem] =
-      (features.showEnrolments, features.mayShowRestQuery(credentials.planetId)) match {
-        case (true, true)   => Menus.menu4
-        case (false, true)  => Menus.menu3
-        case (true, false)  => Menus.menu2
-        case (false, false) => Menus.menu1
-      }
+    override def menuItems: Seq[MenuItem] = {
+      import Menus._
+      Seq(
+        if (features.showQuickStartHub) Option(quickStartHub) else None,
+        Option(records),
+        Option(users),
+        Option(groups),
+        Option(showCurrentUser),
+        if (features.showEnrolments) Option(enrolments) else None,
+        Option(specialCases),
+        if (features.mayShowRestQuery(credentials.planetId)) Option(restQuery) else None,
+      ).flatten
+    }
 
     override def features: Features = self.features
   }
@@ -56,10 +61,5 @@ object Menus {
     MenuItem("link_special_cases", "specialCase.link.short", routes.SpecialCasesController.showAllSpecialCasesPage())
   val restQuery =
     MenuItem("link_rest_query", "rest.query.link.short", routes.RestQueryController.showRestQueryPage())
-
-  val menu1 = Seq(quickStartHub, records, users, groups, showCurrentUser, specialCases)
-  val menu2 = Seq(quickStartHub, records, users, groups, showCurrentUser, enrolments, specialCases)
-  val menu3 = Seq(quickStartHub, records, users, groups, showCurrentUser, specialCases, restQuery)
-  val menu4 = Seq(quickStartHub, records, users, groups, showCurrentUser, enrolments, specialCases, restQuery)
 
 }
