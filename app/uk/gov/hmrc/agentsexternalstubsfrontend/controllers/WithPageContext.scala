@@ -29,6 +29,7 @@ trait WithPageContext {
 
     override def planetId: String = credentials.planetId
 
+//    TODO: Update this to use features.showQuickStartHub
     override def menuItems: Seq[MenuItem] =
       (features.showEnrolments, features.mayShowRestQuery(credentials.planetId)) match {
         case (true, true)   => Menus.menu4

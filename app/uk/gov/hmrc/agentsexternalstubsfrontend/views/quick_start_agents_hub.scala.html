@@ -29,6 +29,22 @@
 
 @baseUrl = @{ if(isDev) request.host else request.uri }
 
+@agentSubscriptionStartLink = @{ "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9437/agent-subscription/task-list" }
+
+@agentOverseasSubStartLink = @{ "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9414/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend" }
+
+@agentServicesAccountHomeLink = @{ "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9401/agent-services-account/home&origin=agent-services-account-frontend" }
+
+@manageYourTaxAgentsLink = @{ "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9435/agent-client-relationships/manage-your-tax-agents" }
+
+@digitallyExcludedRelationshipsStrideLink = @{ "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fmanage-agent-authorisation%2Fstart&origin=agent-helpdesk-frontend" }
+
+@reviewOverseasApplicationsStrideLink = @{ "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fagent-services%2Fcheck-application%2Fsearch-applications&origin=agent-helpdesk-frontend" }
+
+@agentManuallyAssuredListStrideLink = @{ "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fagent-assurance%2Fagent-lists&origin=agent-helpdesk-frontend" }
+
+@altItsaStrideLink = @{ "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fcheck-itsa-partial-agent-authorisation&origin=agent-helpdesk-frontend" }
+
 @* don't need to be signed in to view this page *@
 @mainTemplate(title = "Quick start hub - Agents team", wide = true, showSignOut = false) {
 
@@ -58,17 +74,17 @@
     <p class="govuk-body govuk-body govuk-!-margin-bottom-0">primary enrolment is <strong>None</strong></p>
     <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
         <li>
-            @a(key = "Agent subscription start", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9437/agent-subscription/task-list")
+            @a(key = "Agent subscription start", href = agentSubscriptionStartLink)
         </li>
         <li>
-            @a(key = "Agent overseas sub start", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9414/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend")
+            @a(key = "Agent overseas sub start", href = agentOverseasSubStartLink)
         </li>
     </ul>
     </div>
 
     <div class="govuk-grid-column-one-half">
         <p class="govuk-body govuk-body govuk-!-margin-bottom-0">HMRC-AS-AGENT enrolment </p>
-        @a(key = "Agent services account home", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9401/agent-services-account/home&origin=agent-services-account-frontend")
+        @a(key = "Agent services account home", href = agentServicesAccountHomeLink)
     </div>
     @* keep it small to start? ASA home lets you navigate to mapping/invitations
     @a(key = "Mapping", href = routes.UserController.showAllUsersPage.url)
@@ -82,7 +98,7 @@
         <br>
     <h2 class="govuk-heading-m">As client (individual/org)</h2>
     <p class="govuk-body govuk-!-margin-bottom-0">If not using the agent invitation link... </p>
-    @a(key = "Manage your tax agents (agent-client-relationships)", href = "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9435/agent-client-relationships/manage-your-tax-agents")
+    @a(key = "Manage your tax agents (agent-client-relationships)", href = manageYourTaxAgentsLink)
     </div>
 </div>
 
