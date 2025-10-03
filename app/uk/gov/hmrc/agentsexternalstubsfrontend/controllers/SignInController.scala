@@ -39,7 +39,6 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 @Singleton
 class SignInController @Inject() (
   override val messagesApi: MessagesApi,
-  appConfig: FrontendConfig,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   signInView: sign_in,
   quickStartView: quick_start_agents_hub,
@@ -56,11 +55,13 @@ class SignInController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          val quickStartHubBaseUrl = configuration.getOptional[String]("base-url")
+          val quickStartHubStrideBaseUrl = configuration.getOptional[String]("stride-base-url")
           Future.successful(
             Ok(
               quickStartView(
-                appConfig.quickStartHubBaseUrl,
-                appConfig.quickStartHubStrideBaseUrl,
+                quickStartHubBaseUrl,
+                quickStartHubStrideBaseUrl,
                 pageContext(credentials)
               )
             )
