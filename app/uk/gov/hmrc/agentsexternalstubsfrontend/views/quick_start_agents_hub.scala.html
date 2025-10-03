@@ -29,6 +29,8 @@
 
 @baseUrl = @{ if(isDev) request.host else request.uri }
 
+<!--TODO: CORRECT LINK VALUES FOR STAGING-->
+
 @agentSubscriptionStartLink = @{ "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9437/agent-subscription/task-list" }
 
 @agentOverseasSubStartLink = @{ "http://localhost:9553/bas-gateway/sign-in?continue_url=http://localhost:9414/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend" }
@@ -109,19 +111,19 @@
     </div>
     <div class="govuk-grid-column-one-third">
      <p class="govuk-body govuk-!-margin-bottom-1">stride role 'maintain_agent_relationships'</p>
-     @a(key = "Digitally excluded authorisations", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fmanage-agent-authorisation%2Fstart&origin=agent-helpdesk-frontend")
+     @a(key = "Digitally excluded authorisations", href = digitallyExcludedRelationshipsStrideLink)
     </div>
     <div class="govuk-grid-column-one-third">
      <p class="govuk-body govuk-!-margin-bottom-1">stride role 'maintain_agent_overseas'</p>
-     @a(key = "Review overseas applications", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fagent-services%2Fcheck-application%2Fsearch-applications&origin=agent-helpdesk-frontend")
+     @a(key = "Review overseas applications", href = reviewOverseasApplicationsStrideLink)
     </div>
     <div class="govuk-grid-column-one-third">
      <p class="govuk-body govuk-!-margin-bottom-1">stride role 'maintain_agent_manually_assure'</p>
-     @a(key = "Agent manually assured list - AMLS", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fagent-assurance%2Fagent-lists&origin=agent-helpdesk-frontend")
+     @a(key = "Agent manually assured list - AMLS", href = agentManuallyAssuredListStrideLink)
     </div>
     <div class="govuk-grid-column-full govuk-!-margin-top-5">
      <p class="govuk-body govuk-!-margin-bottom-1">stride roles 'maintain_agent_manually_assure, maintain_agent_relationships'</p>
-     @a(key = "Alt itsa screen", href = "http://localhost:9041/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fcheck-itsa-partial-agent-authorisation&origin=agent-helpdesk-frontend")
+     @a(key = "Alt itsa screen", href = altItsaStrideLink)
     </div>
 </div>
 
