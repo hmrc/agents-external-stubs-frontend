@@ -39,7 +39,7 @@ trait WithPageContext {
         Option(showCurrentUser),
         if (features.showEnrolments) Option(enrolments) else None,
         Option(specialCases),
-        if (features.mayShowRestQuery(credentials.planetId)) Option(restQuery) else None,
+        if (features.mayShowRestQuery(credentials.planetId)) Option(restQuery) else None
       ).flatten
     }
 

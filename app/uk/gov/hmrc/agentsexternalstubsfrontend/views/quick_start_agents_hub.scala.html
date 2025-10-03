@@ -35,21 +35,21 @@
 
 @strideLinkBaseUrl = @{ quickStartHubStrideBaseUrl.getOrElse("http://localhost:9041") }
 
-@agentSubscriptionStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=http://localhost:9437/agent-subscription/task-list" }
+@agentSubscriptionStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ "http://localhost:9437" }/agent-subscription/task-list" }
 
-@agentOverseasSubStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=http://localhost:9414/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend" }
+@agentOverseasSubStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ "http://localhost:9414" }/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend" }
 
-@agentServicesAccountHomeLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=http://localhost:9401/agent-services-account/home&origin=agent-services-account-frontend" }
+@agentServicesAccountHomeLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ "http://localhost:9401" }/agent-services-account/home&origin=agent-services-account-frontend" }
 
-@manageYourTaxAgentsLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=http://localhost:9435/agent-client-relationships/manage-your-tax-agents" }
+@manageYourTaxAgentsLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ "http://localhost:9435" }/agent-client-relationships/manage-your-tax-agents" }
 
-@digitallyExcludedRelationshipsStrideLink = @{ s"$strideLinkBaseUrl/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fmanage-agent-authorisation%2Fstart&origin=agent-helpdesk-frontend" }
+@digitallyExcludedRelationshipsStrideLink = @{ s"$strideLinkBaseUrl/stride/sign-in?successURL=${ "http%3A%2F%2Flocalhost%3A9451" }%2Fmanage-agent-authorisation%2Fstart&origin=agent-helpdesk-frontend" }
 
-@reviewOverseasApplicationsStrideLink = @{ s"$strideLinkBaseUrl/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fagent-services%2Fcheck-application%2Fsearch-applications&origin=agent-helpdesk-frontend" }
+@reviewOverseasApplicationsStrideLink = @{ s"$strideLinkBaseUrl/stride/sign-in?successURL=${ "http%3A%2F%2Flocalhost%3A9451" }%2Fagent-services%2Fcheck-application%2Fsearch-applications&origin=agent-helpdesk-frontend" }
 
-@agentManuallyAssuredListStrideLink = @{ s"$strideLinkBaseUrl/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fagent-assurance%2Fagent-lists&origin=agent-helpdesk-frontend" }
+@agentManuallyAssuredListStrideLink = @{ s"$strideLinkBaseUrl/stride/sign-in?successURL=${ "http%3A%2F%2Flocalhost%3A9451" }%2Fagent-assurance%2Fagent-lists&origin=agent-helpdesk-frontend" }
 
-@altItsaStrideLink = @{ s"$strideLinkBaseUrl/stride/sign-in?successURL=http%3A%2F%2Flocalhost%3A9451%2Fcheck-itsa-partial-agent-authorisation&origin=agent-helpdesk-frontend" }
+@altItsaStrideLink = @{ s"$strideLinkBaseUrl/stride/sign-in?successURL=${ "http%3A%2F%2Flocalhost%3A9451" }%2Fcheck-itsa-partial-agent-authorisation&origin=agent-helpdesk-frontend" }
 
 @* don't need to be signed in to view this page *@
 @mainTemplate(title = "Quick start hub - Agents team", wide = true, showSignOut = false) {
