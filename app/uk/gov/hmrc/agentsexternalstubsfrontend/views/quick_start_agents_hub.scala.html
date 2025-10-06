@@ -29,8 +29,6 @@
 
 @baseUrl = @{ if(isDev) request.host else request.uri }
 
-<!--TODO: CORRECT LINK VALUES FOR STAGING-->
-
 @linkBaseUrl = @{ quickStartHubBaseUrl.getOrElse("http://localhost:9553") }
 
 @strideLinkBaseUrl = @{ quickStartHubStrideBaseUrl.getOrElse("http://localhost:9041") }
