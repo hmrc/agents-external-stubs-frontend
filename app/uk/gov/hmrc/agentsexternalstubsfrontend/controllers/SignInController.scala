@@ -28,13 +28,10 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{quick_start_agents_hu
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-
 import scala.concurrent.{ExecutionContext, Future}
 import org.joda.time.DateTime
-import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms._
-import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 
 @Singleton
 class SignInController @Inject() (
@@ -43,31 +40,16 @@ class SignInController @Inject() (
   signInView: sign_in,
   quickStartView: quick_start_agents_hub,
   val authConnector: AuthConnector,
-  val features: Features,
   ecp: Provider[ExecutionContext],
   sessionCookieBaker: SessionCookieBaker
 )(implicit val configuration: Configuration, cc: MessagesControllerComponents)
-    extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
+    extends FrontendController(cc) with AuthActions with I18nSupport {
 
   implicit val ec: ExecutionContext = ecp.get
 
-  def showQuickStart(): Action[AnyContent] =
-    Action.async { implicit request =>
-      authorised()
-        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          val quickStartHubBaseUrl = configuration.getOptional[String]("base-url")
-          val quickStartHubStrideBaseUrl = configuration.getOptional[String]("stride-base-url")
-          Future.successful(
-            Ok(
-              quickStartView(
-                quickStartHubBaseUrl,
-                quickStartHubStrideBaseUrl,
-                pageContext(credentials)
-              )
-            )
-          )
-        }
-    }
+  def showQuickStart(): Action[AnyContent] = Action { implicit request =>
+    Ok(quickStartView())
+  }
 
   def showSignInPage(
     continue: Option[RedirectUrl],

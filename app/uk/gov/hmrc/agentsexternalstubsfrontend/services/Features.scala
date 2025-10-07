@@ -32,10 +32,6 @@ class Features @Inject() (configuration: Configuration) {
     .getOptional[Boolean]("features.show-enrolments")
     .getOrElse(true)
 
-  lazy val showQuickStartHub: Boolean = configuration
-    .getOptional[Boolean]("features.show-quick-start-hub")
-    .getOrElse(true)
-
   private lazy val allowlistedPlanetPrefix: Option[String] = configuration
     .getOptional[String]("allowlisted-planet-prefix")
 }
