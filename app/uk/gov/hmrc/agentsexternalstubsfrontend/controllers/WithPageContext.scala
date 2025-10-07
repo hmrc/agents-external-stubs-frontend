@@ -29,13 +29,19 @@ trait WithPageContext {
 
     override def planetId: String = credentials.planetId
 
-    override def menuItems: Seq[MenuItem] =
-      (features.showEnrolments, features.mayShowRestQuery(credentials.planetId)) match {
-        case (true, true)   => Menus.menu4
-        case (false, true)  => Menus.menu3
-        case (true, false)  => Menus.menu2
-        case (false, false) => Menus.menu1
-      }
+    override def menuItems: Seq[MenuItem] = {
+      import Menus._
+      Seq(
+        if (features.showQuickStartHub) Option(quickStartHub) else None,
+        Option(records),
+        Option(users),
+        Option(groups),
+        Option(showCurrentUser),
+        if (features.showEnrolments) Option(enrolments) else None,
+        Option(specialCases),
+        if (features.mayShowRestQuery(credentials.planetId)) Option(restQuery) else None
+      ).flatten
+    }
 
     override def features: Features = self.features
   }
@@ -44,20 +50,16 @@ trait WithPageContext {
 
 object Menus {
 
-  val item1 = MenuItem("link_records_all", "records.link.all", routes.RecordsController.showAllRecordsPage())
-  val item2 = MenuItem("link_users_all", "users.link.all", routes.UserController.showAllUsersPage)
-  val item2b = MenuItem("link_groups_all", "groups.link.all", routes.GroupController.showAllGroupsPage)
-  val item3 = MenuItem("link_users_current", "users.link.current", routes.UserController.showUserPage())
-  val item4 = MenuItem("link_help_enrolments", "services.link.short", routes.KnownFactsController.showEnrolmentsPage)
-  val item7 =
+  val quickStartHub = MenuItem("link_quick_start", "ASA links", routes.SignInController.showQuickStart())
+  val records = MenuItem("link_records_all", "records.link.all", routes.RecordsController.showAllRecordsPage())
+  val users = MenuItem("link_users_all", "users.link.all", routes.UserController.showAllUsersPage)
+  val groups = MenuItem("link_groups_all", "groups.link.all", routes.GroupController.showAllGroupsPage)
+  val showCurrentUser = MenuItem("link_users_current", "users.link.current", routes.UserController.showUserPage())
+  val enrolments =
+    MenuItem("link_help_enrolments", "services.link.short", routes.KnownFactsController.showEnrolmentsPage)
+  val specialCases =
     MenuItem("link_special_cases", "specialCase.link.short", routes.SpecialCasesController.showAllSpecialCasesPage())
-  val item5 =
+  val restQuery =
     MenuItem("link_rest_query", "rest.query.link.short", routes.RestQueryController.showRestQueryPage())
-  val item6 = MenuItem("link_quick_start", "ASA links", routes.SignInController.showQuickStart())
-
-  val menu1 = Seq(item1, item2, item2b, item3, item7, item6)
-  val menu2 = Seq(item1, item2, item2b, item3, item4, item7, item6)
-  val menu3 = Seq(item1, item2, item2b, item3, item7, item5, item6)
-  val menu4 = Seq(item1, item2, item2b, item3, item4, item7, item5, item6)
 
 }
