@@ -29,9 +29,9 @@
 
 @baseUrl = @{ if(isDev) request.host else request.uri }
 
-@linkBaseUrl = @{ quickStartHubBaseUrl.getOrElse("http://localhost:9553") }
+@linkBaseUrl = @{ quickStartHubBaseUrl.map(url => s"$url/agents-external-stubs").getOrElse("http://localhost:9553") }
 
-@strideLinkBaseUrl = @{ quickStartHubStrideBaseUrl.getOrElse("http://localhost:9041") }
+@strideLinkBaseUrl = @{ quickStartHubStrideBaseUrl.map(url => s"$url/agents-external-stubs").getOrElse("http://localhost:9041") }
 
 @agentSubscriptionStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ quickStartHubBaseUrl.getOrElse("http://localhost:9437") }/agent-subscription/task-list" }
 
