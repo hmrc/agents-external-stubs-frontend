@@ -162,18 +162,24 @@
                 ).withFormField(userForm("address.line1")))
 
                 @govukInput(Input(
+                    id = "address-line2", // override to a unique id (hyphens)
+                    label = Label(classes = "govuk-visually-hidden", content = Text("Address line 2")),
                     attributes = Map("maxlength" -> "35"),
                     classes = "govuk-input govuk-input--width-20",
                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-1"))
                 ).withFormField(userForm("address.line2")))
 
                 @govukInput(Input(
+                    id = "address-line3",
+                    label = Label(classes = "govuk-visually-hidden", content = Text("Address line 3 (optional)")),
                     attributes = Map("maxlength" -> "35"),
                     classes = "govuk-input govuk-input--width-20",
                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-1"))
                 ).withFormField(userForm("address.line3")))
 
                 @govukInput(Input(
+                    id = "address-line4",
+                    label = Label(classes = "govuk-visually-hidden", content = Text("Address line 4 (town or city)")),
                     attributes = Map("maxlength" -> "35"),
                     classes = "govuk-input govuk-input--width-20",
                 ).withFormField(userForm("address.line4")))
@@ -220,7 +226,9 @@
                             <th class="govuk-table__header">Service key</th>
                             <th class="govuk-table__header">Identifier Name</th>
                             <th class="govuk-table__header">Identifier Value</th>
-                            <th class="govuk-table__header"></th>
+                            <th class="govuk-table__header govuk-table__header--numeric">
+                                <span class="govuk-visually-hidden">Actions</span>
+                            </th>
                         </thead>
 
                         @for((enrolment, enrIdx) <- assignedPrincipalEnrolments.zipWithIndex) {
@@ -231,6 +239,10 @@
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
                                             @govukInput(Input(
+                                                label = Label(
+                                                    classes = "govuk-visually-hidden",
+                                                    content = Text(s"Delegated enrolment ${enrIdx + 1} service key")
+                                                    ),
                                                 formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                             ).withFormField(userForm(s"${enrolment.key}.key")))
                                         </td>
@@ -238,11 +250,21 @@
 
                                 <td class="govuk-table__cell">
                                     @govukInput(Input(
+                                        label = Label(
+                                            // Visible label would mess up the table layout, so hide it visually:
+                                            classes = "govuk-visually-hidden",
+                                            // Clear, unique label for SR users; enrIdx/identIdx start at 0 so add 1 for human-friendly numbering
+                                            content = Text(s"Delegated enrolment ${enrIdx + 1} identifier ${identIdx + 1} value")
+                                        ),
                                         formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                     ).withFormField(userForm(s"${identifier.key}.key")))
                                 </td>
                                 <td class="govuk-table__cell">
                                     @govukInput(Input(
+                                        label = Label(
+                                            classes = "govuk-visually-hidden",
+                                            content = Text(s"Delegated enrolment ${enrIdx + 1} identifier ${identIdx + 1} name")
+                                            ),
                                         formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                     ).withFormField(userForm(s"${identifier.key}.value")))
                                 </td>
@@ -259,16 +281,19 @@
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
+                                    label = Label(classes = "govuk-visually-hidden", content = Text("Principal enrolment new service key")),
                                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(userForm(s"assignedPrincipalEnrolments[${assignedPrincipalEnrolments.size}].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
+                                    label = Label(classes = "govuk-visually-hidden", content = Text("Principal enrolment new identifier name")),
                                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(userForm(s"assignedPrincipalEnrolments[${assignedPrincipalEnrolments.size}].identifiers[0].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
+                                    label = Label(classes = "govuk-visually-hidden", content = Text("Principal enrolment new identifier value")),
                                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(userForm(s"assignedPrincipalEnrolments[${assignedPrincipalEnrolments.size}].identifiers[0].value")))
                             </td>
@@ -297,7 +322,9 @@
                             <th class="govuk-table__header">Service key</th>
                             <th class="govuk-table__header">Identifier Name</th>
                             <th class="govuk-table__header">Identifier Value</th>
-                            <th class="govuk-table__header"></th>
+                            <th class="govuk-table__header govuk-table__header--numeric">
+                                <span class="govuk-visually-hidden">Actions</span>
+                            </th>
                         </tr>
 
                         @for((enrolment, enrIdx) <- assignedDelegatedEnrolments.zipWithIndex) {
@@ -308,6 +335,10 @@
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
                                             @govukInput(Input(
+                                                label = Label(
+                                                    classes = "govuk-visually-hidden",
+                                                    content = Text(s"Delegated enrolment ${enrIdx + 1} service key")
+                                                    ),
                                                 formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                             ).withFormField(userForm(s"${enrolment.key}.key")))
                                         </td>
@@ -334,16 +365,19 @@
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
+                                    label = Label(classes = "govuk-visually-hidden", content = Text("Delegated enrolment new service key")),
                                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(userForm(s"assignedDelegatedEnrolments[${assignedDelegatedEnrolments.size}].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
+                                    label = Label(classes = "govuk-visually-hidden", content = Text("Delegated enrolment new identifier name")),
                                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(userForm(s"assignedDelegatedEnrolments[${assignedDelegatedEnrolments.size}].identifiers[0].key")))
                             </td>
                             <td class="govuk-table__cell">
                                 @govukInput(Input(
+                                    label = Label(classes = "govuk-visually-hidden", content = Text("Delegated enrolment new identifier value")),
                                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(userForm(s"assignedDelegatedEnrolments[${assignedDelegatedEnrolments.size}].identifiers[0].value")))
                             </td>

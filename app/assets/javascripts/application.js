@@ -43,6 +43,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
   }
 
+  // === A11y: give a unique name to the utility "Sign out" nav landmark ===
+  (function () {
+    function labelSignOutNav() {
+      var nodes = document.querySelectorAll('nav.hmrc-sign-out-nav');
+      nodes.forEach(function (el) {
+        if (!el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby')) {
+          el.setAttribute('aria-label', 'Sign out');
+        }
+      });
+    }
+
+    function onReady(fn) {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', fn);
+      } else {
+        fn();
+      }
+    }
+
+    onReady(labelSignOutNav);
+
+    // Optional: if your pages swap content dynamically, keep labels applied.
+    if ('MutationObserver' in window) {
+      var mo = new MutationObserver(labelSignOutNav);
+      mo.observe(document.documentElement, { childList: true, subtree: true });
+    }
+  })();
+
   //do other js stuff...
 
 }, false);
