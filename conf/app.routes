@@ -14,7 +14,7 @@ GET         /agents-external-stubs/bas-gateway/sign-in                          
 GET         /agents-external-stubs/bas-gateway/sso-sign-in                         @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signInSsoInternalSCP(continue_url: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
 GET         /agents-external-stubs/bas-gateway/sign-out-without-state              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutInternalSCP(continue: Option[RedirectUrl] ?= None)
 GET         /agents-external-stubs/bas-gateway/sign-out-with-state                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOutInternalSCP(continue: Option[RedirectUrl] ?= None)
-GET         /agents-external-stubs/bas-gateway/register                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.registerInternal(continueUrl: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
+GET         /agents-external-stubs/bas-gateway/register                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.registerInternal(RedirectUrl: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
 
 # deprecated company-auth-frontend stubs
 GET         /gg/sign-in                                                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[RedirectUrl], origin: Option[String], accountType: Option[String])
