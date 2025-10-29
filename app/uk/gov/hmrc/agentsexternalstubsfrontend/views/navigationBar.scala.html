@@ -21,7 +21,7 @@
 @(context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @if(context.menuItems.nonEmpty) {
-    <nav class="govuk-!-margin-bottom-5" id="top-nav-bar">
+    <nav class="govuk-!-margin-bottom-5" id="top-nav-bar" aria-label="Section navigation">
         <a class="govuk-body govuk-link"
             href="@context.menuItems.head.call.url">@msgs(context.menuItems.head.messageKey)</a>
             @for(menuItem <- context.menuItems.tail) {
