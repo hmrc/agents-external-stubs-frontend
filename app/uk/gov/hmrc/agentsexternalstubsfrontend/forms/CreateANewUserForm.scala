@@ -29,7 +29,7 @@ object CreateANewUserForm {
     Form[CreateANewUser](
       mapping(
         // TODO: NEED VERIFICATION AND ADD MESSAGE IN MESSAGES FILE
-        "userId" -> optional(text)
+        "userId" -> optional(text).verifying("User ID must be specified", _.nonEmpty)
       )(CreateANewUser.apply)(CreateANewUser.unapply)
     )
 
