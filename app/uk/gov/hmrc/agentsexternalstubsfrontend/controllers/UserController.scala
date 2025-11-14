@@ -86,9 +86,55 @@ class UserController @Inject() (
                     }
                 )
                 .getOrElse(Seq.empty),
+              CreateANewUserForm.form,
+              routes.UserController.createNewUserFromShowUserPage(continue, userId),
               pageContext(credentials)
             )
           )
+        }
+    }
+
+  def createNewUserFromShowUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          CreateANewUserForm.form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                for {
+                  user <- agentsExternalStubsConnector.getUser(userId.getOrElse(credentials.providerId))
+                  maybeGroup <- user.groupId match {
+                                  case None          => Future.successful(None)
+                                  case Some(groupId) => agentsExternalStubsConnector.getGroup(groupId).map(Some(_))
+                                }
+                } yield Ok(
+                  showUserView(
+                    user,
+                    maybeGroup,
+                    request.session.get(SessionKeys.authToken),
+                    request.session.get(SessionKeys.sessionId),
+                    routes.UserController.showEditUserPage(continue, userId),
+                    continue,
+                    user.userId,
+                    maybeGroup
+                      .map(group =>
+                        servicesDefinitionsService.servicesDefinitions
+                          .servicesFor(group.affinityGroup)
+                          .collect {
+                            case s if s.flags.multipleEnrolment   => s.name
+                            case s if !user.isEnrolledFor(s.name) => s.name
+                          }
+                      )
+                      .getOrElse(Seq.empty),
+                    formWithErrors,
+                    routes.UserController.createNewUserFromShowUserPage(continue, userId),
+                    pageContext(credentials)
+                  )
+                ),
+              createANewUser =>
+                Future.successful(Redirect(routes.UserController.showCreateUserPage(userId = createANewUser.userId)))
+            )
         }
     }
 
