@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.forms
 
-import play.api.data.Form
+import play.api.data.{Form, Mapping}
 import play.api.data.Forms.{mapping, optional, text}
+import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 
 case class CreateANewUser(
   userId: Option[String]
@@ -25,11 +26,22 @@ case class CreateANewUser(
 
 object CreateANewUserForm {
 
+  private def createANewUserId: Mapping[Option[String]] = optional(text verifying createANewUserIdConstraint)
+
+  private val userIdRegex = "^[A-Za-z0-9-_]{3,64}"
+
+  private val createANewUserIdConstraint: Constraint[String] = Constraint[String] { fieldValue: String =>
+    fieldValue match {
+      case value if !value.matches(userIdRegex) =>
+        Invalid(ValidationError("error.userId.invalid"))
+      case _ => Valid
+    }
+  }
+
   val form: Form[CreateANewUser] =
     Form[CreateANewUser](
       mapping(
-        // TODO: NEED VERIFICATION AND ADD MESSAGE IN MESSAGES FILE
-        "userId" -> optional(text).verifying("User ID must be specified", _.nonEmpty)
+        "userId" -> createANewUserId
       )(CreateANewUser.apply)(CreateANewUser.unapply)
     )
 
