@@ -22,7 +22,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{InitialUserCreationDataForm, UserForm}
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUserForm, InitialUserCreationDataForm, UserForm}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
@@ -447,11 +447,36 @@ class UserController @Inject() (
               Ok(
                 showAllUsersView(
                   users,
-                  request.session.get(SessionKeys.authToken),
                   routes.UserController.showUserPage(None),
+                  CreateANewUserForm.form,
                   pageContext(credentials)
                 )
               )
+            )
+        }
+    }
+
+  val createNewUserFromShowAllUsersPage: Action[AnyContent] =
+    Action.async { implicit request =>
+      authorised()
+        .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          CreateANewUserForm.form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                agentsExternalStubsConnector.getUsers
+                  .map(users =>
+                    Ok(
+                      showAllUsersView(
+                        users,
+                        routes.UserController.showUserPage(None),
+                        formWithErrors,
+                        pageContext(credentials)
+                      )
+                    )
+                  ),
+              createANewUser =>
+                Future.successful(Redirect(routes.UserController.showCreateUserPage(userId = createANewUser.userId)))
             )
         }
     }

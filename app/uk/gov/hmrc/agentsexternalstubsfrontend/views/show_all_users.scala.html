@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukInput, GovukTable}
@@ -23,6 +24,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, Table, TableRow}
 @import views.html.helper.CSRF
+@import uk.gov.hmrc.agentsexternalstubsfrontend.forms.CreateANewUser
 
 @this(
         mainTemplate: main_template,
@@ -33,7 +35,7 @@
         govukTable: GovukTable,
 )
 
-@(users: Users, authToken: Option[String], showCurrentUserUrl: Call, context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(users: Users, showCurrentUserUrl: Call, createANewUserForm: Form[CreateANewUser], context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @mainTemplate(title = msgs("users.title"), wide = true) {
 
@@ -44,7 +46,7 @@
     <div style="float: right; margin-bottom: 1em;position: relative; top:-3em;right: -3em;">
         <h3 class="govuk-heading-s govuk-!-margin-bottom-1" id="create-user-label">@msgs("users.link.create")</h3>
         <span class="govuk-hint govuk-!-margin-bottom-1" >Expected ID pattern [A-Za-z0-9-_]{3,64}</span>
-        @form(action = Call("GET", "/agents-external-stubs/user/create")) {
+        @form(action = routes.UserController.createNewUserFromShowAllUsersPage) {
             @{play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) }}
             <div style="vertical-align: bottom;">
                 @govukInput(Input(
