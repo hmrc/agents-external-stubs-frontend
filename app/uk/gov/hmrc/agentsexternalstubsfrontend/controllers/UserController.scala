@@ -57,6 +57,8 @@ class UserController @Inject() (
 
   val start: Action[AnyContent] = showUserPage(None, None)
 
+//  TODO: Pull out into shared method with form in signature aswell
+
   def showUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
@@ -483,6 +485,8 @@ class UserController @Inject() (
           )
       }
     }
+
+  //  TODO: Pull out into shared method with form in signature aswell
 
   val showAllUsersPage: Action[AnyContent] =
     Action.async { implicit request =>
