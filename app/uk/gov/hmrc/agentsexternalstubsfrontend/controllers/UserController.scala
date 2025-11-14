@@ -144,6 +144,8 @@ class UserController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
+          println("BBBBBBBB")
+          println(userId)
           userId match {
             case Some(uid) =>
               agentsExternalStubsConnector
@@ -513,7 +515,9 @@ class UserController @Inject() (
           CreateANewUserForm.form
             .bindFromRequest()
             .fold(
-              formWithErrors =>
+              formWithErrors => {
+                println("AAAAAAAAAA")
+                println(formWithErrors)
                 agentsExternalStubsConnector.getUsers
                   .map(users =>
                     Ok(
@@ -524,7 +528,8 @@ class UserController @Inject() (
                         pageContext(credentials)
                       )
                     )
-                  ),
+                  )
+              },
               createANewUser =>
                 Future.successful(Redirect(routes.UserController.showCreateUserPage(userId = createANewUser.userId)))
             )

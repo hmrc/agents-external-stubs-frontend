@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.{a, group_data}
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukInput, GovukSelect, GovukSummaryList, GovukTable}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -98,7 +99,7 @@
                 classes = "govuk-input--width-10",
                 formGroup = FormGroup(classes = Some("govuk-!-display-inline-block")),
                 attributes = Map("aria-labelledby" -> "create-user-label")
-            ))
+            ).withFormField(createANewUserForm("userId")))
             @govukButton(Button(
                 content = Text(msgs("user.show.create")),
                 classes = "govuk-!-display-inline",
