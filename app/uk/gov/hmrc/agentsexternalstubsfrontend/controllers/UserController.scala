@@ -18,12 +18,11 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
 import play.api.Configuration
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUser, CreateANewUserForm, InitialUserCreationDataForm, UserForm}
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUserForm, InitialUserCreationDataForm, UserForm}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
