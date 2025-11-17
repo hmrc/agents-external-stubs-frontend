@@ -4,6 +4,7 @@ error.summary.heading=There is a problem
 error.postcode.invalid=You can only enter these characters: A-Z 0-9
 error.telephone.invalid=You can only enter these characters: 0-9 ( ) space
 error.string.invalid=You can only enter these characters: a-z A-Z 0-9 ,.() - ! @ space
+error.userId.invalid=Enter a valid User ID
 error.email=Enter a valid email address
 
 # Service specific messages
