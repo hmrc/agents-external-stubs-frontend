@@ -18,11 +18,12 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.Provider
 import play.api.Configuration
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUserForm, InitialUserCreationDataForm, UserForm}
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUser, CreateANewUserForm, InitialUserCreationDataForm, UserForm}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
@@ -56,8 +57,6 @@ class UserController @Inject() (
   implicit val ec: ExecutionContext = ecp.get
 
   val start: Action[AnyContent] = showUserPage(None, None)
-
-//  TODO: Pull out into shared method with form in signature aswell
 
   def showUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
     Action.async { implicit request =>
@@ -487,8 +486,6 @@ class UserController @Inject() (
           )
       }
     }
-
-  //  TODO: Pull out into shared method with form in signature aswell
 
   val showAllUsersPage: Action[AnyContent] =
     Action.async { implicit request =>
