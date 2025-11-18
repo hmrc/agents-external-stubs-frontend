@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.{a, group_data}
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukInput, GovukSelect, GovukSummaryList, GovukTable}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -28,6 +29,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, Table, TableRow}
 @import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 @import views.html.helper.CSRF
+@import uk.gov.hmrc.agentsexternalstubsfrontend.forms.CreateANewUser
 
 @this(
         mainTemplate: main_template,
@@ -41,7 +43,7 @@
         govukInput: GovukInput,
         govukButton: GovukButton
 )
-@(user: User, maybeGroup: Option[Group], authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[RedirectUrl], userId: String,enrolments: Seq[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(user: User, maybeGroup: Option[Group], authToken: Option[String], sessionId: Option[String], editUrl: Call, continue: Option[RedirectUrl], userId: String, enrolments: Seq[String], createANewUserForm: Form[CreateANewUser], createNewUserUrl: Call, context: PageContext)(implicit request: Request[_], msgs: Messages)
 
 @sidebarLinks = {
     <nav id="secondary-nav" class="govuk-!-margin-bottom-3" role="navigation">
@@ -86,7 +88,7 @@
 
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1" id="create-user-label">@msgs("users.link.create")</h3>
 
-    @form(action = Call("GET", "/agents-external-stubs/user/create")) {
+    @form(action = createNewUserUrl) {
         @{play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) }}
         <span class="govuk-hint govuk-!-margin-bottom-1" >Expected ID pattern [A-Za-z0-9-_]{3,64}</span>
         <div style="vertical-align: middle;">
@@ -94,10 +96,10 @@
                 id = "userId",
                 name = "userId",
                 pattern = Some("[A-Za-z0-9-_]{3,64}"),
-                classes = "govuk-input govuk-input--width-5",
+                classes = "govuk-input--width-10",
                 formGroup = FormGroup(classes = Some("govuk-!-display-inline-block")),
                 attributes = Map("aria-labelledby" -> "create-user-label")
-            ))
+            ).withFormField(createANewUserForm("userId")))
             @govukButton(Button(
                 content = Text(msgs("user.show.create")),
                 classes = "govuk-!-display-inline",
