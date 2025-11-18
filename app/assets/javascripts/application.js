@@ -51,15 +51,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
     }
-
-    if (document.getElementById("js-remove-principal-enrolment") !== null) {
-        document.querySelector("#js-remove-principal-enrolment").addEventListener("click", function () {
-            removePrincipalEnrolment();
+    if (document.getElementById("js-principal-enrolments-table") !== null) {
+        document.querySelectorAll('#js-principal-enrolments-table tbody tr:not(:first-child)').forEach((row, index) => {
+            const removeButton = document.querySelector(`#js-remove-principal-enrolment-${index}`);
+            if (removeButton) {
+                removeButton.addEventListener('click', () => removePrincipalEnrolment(index));
+            }
         });
     }
-    if (document.getElementById("js-remove-delegated-enrolment") !== null) {
-        document.querySelector("#js-remove-delegated-enrolment").addEventListener("click", function () {
-            removeDelegatedEnrolment();
+
+    if (document.getElementById("js-delegated-enrolments-table") !== null) {
+        document.querySelectorAll('#js-delegated-enrolments-table tbody tr:not(:first-child)').forEach((row, index) => {
+            const removeButton = document.querySelector(`#js-remove-delegated-enrolment-${index}`);
+            console.log("Remove button: " + removeButton +". Row: " + row + ". Index: " + index);
+            if (removeButton) {
+                console.log("Remove button: " + removeButton +". Row: " + row + ". Index: " + index);
+                removeButton.addEventListener('click', () => removeDelegatedEnrolment(index));
+            }
         });
     }
 
@@ -91,26 +99,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })();
 
-    function removePrincipalEnrolment() {
-        const row = document
-            .getElementById("js-principal-enrolments-table")
-            .querySelector("tbody")
-            .lastElementChild;
-
-        if (row.id !== "principal-enrolments-heading") {
-            row.remove();
-        }
+    function removePrincipalEnrolment(index) {
+        document.getElementById(`assignedPrincipalEnrolments-${index}-row`).remove();
     }
 
-    function removeDelegatedEnrolment() {
-        const row = document
-            .getElementById("js-delegated-enrolments-table")
-            .querySelector("tbody")
-            .lastElementChild;
-
-        if (row.id !== "delegated-enrolments-heading") {
-            row.remove();
-        }
+    function removeDelegatedEnrolment(index) {
+        const rows = document.querySelectorAll(`#assignedDelegatedEnrolments-${index}-row`);
+        rows.forEach(row => row.remove());
     }
 
     //do other js stuff...

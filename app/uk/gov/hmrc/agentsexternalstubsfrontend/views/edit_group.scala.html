@@ -150,7 +150,7 @@
 
                     @for((enrolment, enrIdx) <- principalEnrolments.zipWithIndex) {
                         @for((identifier, identIdx) <- enrolment(".identifier").zipWithIndex) {
-                            <tr id="principalEnrolments-@{enrIdx}-row" class="govuk-table__row">
+                            <tr id="assignedPrincipalEnrolments-@{enrIdx}-row" class="govuk-table__row">
                                 @if(identIdx == 0) {
                                     <td class="govuk-table__cell" rowspan="@{
                                         enrolment(".identifier").size
@@ -170,6 +170,9 @@
                                 @govukInput(Input(
                                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(groupForm(s"${identifier.key}.value")))
+                            </td>
+                            <td class="govuk-table__cell">
+                                <a id="js-remove-principal-enrolment-@enrIdx" class="govuk-body govuk-link">Remove</a>
                             </td>
                             </tr>
                         }
@@ -197,10 +200,6 @@
 
                 </table>
 
-                <button id="js-remove-principal-enrolment" type="button" class="govuk-button govuk-button--secondary">
-                    Remove Principal Enrolment
-                </button>
-
             </div>
 
             @if(groupForm.data.get("affinityGroup").contains("Agent")) {
@@ -226,7 +225,7 @@
 
                         @for((enrolment, enrIdx) <- delegatedEnrolments.zipWithIndex) {
                             @for((identifier, identIdx) <- enrolment(".identifier").zipWithIndex) {
-                                <tr id="delegatedEnrolments-@{enrIdx}-row">
+                                <tr id="assignedDelegatedEnrolments-@{enrIdx}-row">
                                     @if(identIdx == 0) {
                                         <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
@@ -247,6 +246,15 @@
                                         formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                     ).withFormField(groupForm(s"${identifier.key}.value")))
                                 </td>
+                                @if(identIdx == 0) {
+                                    <td class="govuk-table__cell">
+                                        <a id="js-remove-delegated-enrolment-@enrIdx" class="govuk-body govuk-link">
+                                            Remove</a>
+                                    </td>
+                                } else {
+                                    <td class="govuk-table__cell">
+                                    </td>
+                                }
                                 </tr>
                             }
                         }
@@ -273,10 +281,6 @@
                         </tr>
 
                     </table>
-
-                    <button id="js-remove-delegated-enrolment" type="button" class="govuk-button govuk-button--secondary">
-                        Remove Delegated Enrolment
-                    </button>
 
                 </div>
             }
