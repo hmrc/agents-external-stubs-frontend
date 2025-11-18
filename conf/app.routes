@@ -58,6 +58,7 @@ POST       /agents-external-stubs/submit                    uk.gov.hmrc.agentsex
 GET         /agents-external-stubs                                                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start
 
 GET         /agents-external-stubs/user                                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showUserPage(continue: Option[RedirectUrl] ?= None, userId: Option[String] ?= None)
+POST        /agents-external-stubs/user                                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.createNewUserFromShowUserPage(continue: Option[RedirectUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/user/create                                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showCreateUserPage(continue: Option[RedirectUrl] ?= None, userId: Option[String] ?= None)
 POST        /agents-external-stubs/user/create                                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.submitCreateUserPage(continue: Option[RedirectUrl] ?= None, userId: String)
 GET         /agents-external-stubs/user/edit                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showEditUserPage(continue: Option[RedirectUrl] ?= None, userId: Option[String] ?= None)
@@ -65,6 +66,7 @@ POST        /agents-external-stubs/user/update                                  
 GET         /agents-external-stubs/user/amend                                      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.amendUser(continue: Option[RedirectUrl] ?= None, userId: Option[String] ?= None, assignedPrincipalEnrolment: Option[String] ?= None)
 GET         /agents-external-stubs/user/remove                                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.removeUser(continue: Option[RedirectUrl] ?= None, userId: Option[String] ?= None)
 GET         /agents-external-stubs/users                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
+POST        /agents-external-stubs/users                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.createNewUserFromShowAllUsersPage
 
 GET         /agents-external-stubs/group                                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.showGroupPage(continue: Option[RedirectUrl] ?= None, groupId: Option[String] ?= None)
 GET         /agents-external-stubs/group/edit                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.showEditGroupPage(continue: Option[RedirectUrl] ?= None, groupId: Option[String] ?= None)
