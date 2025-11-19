@@ -87,8 +87,10 @@
                         attributes = Map("id" -> "update1")
                     ))
 
-                    <a class="govuk-body govuk-link" href="@{cancelCall.url}">
-                        @msgs("user.edit.cancel")
+                    <a class="govuk-body govuk-link" href="@{
+                        cancelCall.url
+                    }">
+                    @msgs("user.edit.cancel")
                     </a>
                 </div>
 
@@ -123,9 +125,9 @@
                             ))
                         ))
                     ).withFormField(userForm("dateOfBirth")))
-@*                    @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
-                        '_legend -> Html("""<span class="h2-heading soft--ends">""" + msgs("user.form.dateOfBirth") + """</span>"""),
-                        '_labelClass -> "soft--ends"
+                    @* @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
+                    '_legend -> Html("""<span class="h2-heading soft--ends">""" + msgs("user.form.dateOfBirth") + """</span>"""),
+                    '_labelClass -> "soft--ends"
                     ) *@
                 }
 
@@ -205,8 +207,10 @@
                     attributes = Map("id" -> "update2")
                 ))
 
-                <a class="govuk-body govuk-link" href="@{cancelCall.url}">
-                    @msgs("user.edit.cancel")
+                <a class="govuk-body govuk-link" href="@{
+                    cancelCall.url
+                }">
+                @msgs("user.edit.cancel")
                 </a>
             </div>
 
@@ -214,8 +218,11 @@
                 <a class="govuk-body govuk-link" name="enrolments"></a>
                 <h2>Principal enrolments assigned to this user</h2>
 
+                <span class="govuk-hint">
+                    Identifiers do not need to be specified for Principal and Delegated enrolments as they will be auto-generated if not.</span>
+
                 <div id="assignedPrincipalEnrolments" class="form-group" style="text-align: right">
-                    <table style="width: 100%" class="govuk-table">
+                    <table id="js-principal-enrolments-table" style="width: 100%" class="govuk-table">
                         <colgroup>
                             <col width="30%">
                             <col width="30%">
@@ -238,42 +245,39 @@
                                         <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
-                                            @govukInput(Input(
-                                                label = Label(
-                                                    classes = "govuk-visually-hidden",
-                                                    content = Text(s"Delegated enrolment ${enrIdx + 1} service key")
-                                                    ),
-                                                formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
-                                            ).withFormField(userForm(s"${enrolment.key}.key")))
+                                        @govukInput(Input(
+                                            label = Label(
+                                                classes = "govuk-visually-hidden",
+                                                content = Text(s"Delegated enrolment ${enrIdx + 1} service key")
+                                            ),
+                                            formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
+                                        ).withFormField(userForm(s"${enrolment.key}.key")))
                                         </td>
                                     }
 
-                                <td class="govuk-table__cell">
-                                    @govukInput(Input(
-                                        label = Label(
-                                            // Visible label would mess up the table layout, so hide it visually:
-                                            classes = "govuk-visually-hidden",
-                                            // Clear, unique label for SR users; enrIdx/identIdx start at 0 so add 1 for human-friendly numbering
-                                            content = Text(s"Delegated enrolment ${enrIdx + 1} identifier ${identIdx + 1} value")
-                                        ),
-                                        formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
-                                    ).withFormField(userForm(s"${identifier.key}.key")))
-                                </td>
-                                <td class="govuk-table__cell">
-                                    @govukInput(Input(
-                                        label = Label(
-                                            classes = "govuk-visually-hidden",
-                                            content = Text(s"Delegated enrolment ${enrIdx + 1} identifier ${identIdx + 1} name")
+                                    <td class="govuk-table__cell">
+                                        @govukInput(Input(
+                                            label = Label(
+                                                // Visible label would mess up the table layout, so hide it visually:
+                                                classes = "govuk-visually-hidden",
+                                                // Clear, unique label for SR users; enrIdx/identIdx start at 0 so add 1 for human-friendly numbering
+                                                content = Text(s"Delegated enrolment ${enrIdx + 1} identifier ${identIdx + 1} value")
                                             ),
-                                        formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
-                                    ).withFormField(userForm(s"${identifier.key}.value")))
-                                </td>
-                                    @* TODO does this just remove the table row, not the data? also broken onclick is blocked by CSP *@
-                                <td class="govuk-table__cell">
-                                    <a class="govuk-body govuk-link" onclick="document.getElementById('assignedPrincipalEnrolments-@{enrIdx}-row').remove()">
-                                                Remove
-                                    </a>
-                                </td>
+                                            formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
+                                        ).withFormField(userForm(s"${identifier.key}.key")))
+                                    </td>
+                                    <td class="govuk-table__cell">
+                                        @govukInput(Input(
+                                            label = Label(
+                                                classes = "govuk-visually-hidden",
+                                                content = Text(s"Delegated enrolment ${enrIdx + 1} identifier ${identIdx + 1} name")
+                                            ),
+                                            formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
+                                        ).withFormField(userForm(s"${identifier.key}.value")))
+                                    </td>
+                                    <td class="govuk-table__cell">
+                                        <a id="js-remove-principal-enrolment-@enrIdx" class="govuk-body govuk-link">Remove</a>
+                                    </td>
                                 </tr>
                             }
                         }
@@ -311,21 +315,21 @@
                 <span class="govuk-hint">Only Agents can have assigned delegated enrolments.</span>
 
                 <div id="assignedDelegatedEnrolments" class="form-group" style="text-align: right">
-                    <table class="govuk-table" style="width: 100%">
+                    <table id="js-delegated-enrolments-table" class="govuk-table" style="width: 100%">
                         <colgroup>
                             <col width="30%">
                             <col width="30%">
                             <col width="30%">
                             <col width="10%">
                         </colgroup>
-                        <tr class="govuk-table__row">
+                        <thead class="govuk-table__head">
                             <th class="govuk-table__header">Service key</th>
                             <th class="govuk-table__header">Identifier Name</th>
                             <th class="govuk-table__header">Identifier Value</th>
                             <th class="govuk-table__header govuk-table__header--numeric">
                                 <span class="govuk-visually-hidden">Actions</span>
                             </th>
-                        </tr>
+                        </thead>
 
                         @for((enrolment, enrIdx) <- assignedDelegatedEnrolments.zipWithIndex) {
                             @for((identifier, identIdx) <- enrolment(".identifier").zipWithIndex) {
@@ -334,30 +338,35 @@
                                         <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
                                         }" style="vertical-align: top;">
-                                            @govukInput(Input(
-                                                label = Label(
-                                                    classes = "govuk-visually-hidden",
-                                                    content = Text(s"Delegated enrolment ${enrIdx + 1} service key")
-                                                    ),
-                                                formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
-                                            ).withFormField(userForm(s"${enrolment.key}.key")))
+                                        @govukInput(Input(
+                                            label = Label(
+                                                classes = "govuk-visually-hidden",
+                                                content = Text(s"Delegated enrolment ${enrIdx + 1} service key")
+                                            ),
+                                            formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
+                                        ).withFormField(userForm(s"${enrolment.key}.key")))
                                         </td>
                                     }
 
-                                <td class="govuk-table__cell">
-                                    @govukInput(Input(
-                                        formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
-                                    ).withFormField(userForm(s"${identifier.key}.key")))
-                                </td>
-                                <td class="govuk-table__cell">
-                                    @govukInput(Input(
-                                        formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
-                                    ).withFormField(userForm(s"${identifier.key}.value")))
-                                </td>
-                                <td class="govuk-table__cell">
-                                    <a class="govuk-body govuk-link"
-                                        onclick="document.getElementById('assignedDelegatedEnrolments-@{enrIdx}-row').remove()">Remove</a>
-                                </td>
+                                    <td class="govuk-table__cell">
+                                        @govukInput(Input(
+                                            formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
+                                        ).withFormField(userForm(s"${identifier.key}.key")))
+                                    </td>
+                                    <td class="govuk-table__cell">
+                                        @govukInput(Input(
+                                            formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
+                                        ).withFormField(userForm(s"${identifier.key}.value")))
+                                    </td>
+                                    @if(identIdx == 0) {
+                                        <td class="govuk-table__cell">
+                                            <a id="js-remove-delegated-enrolment-@enrIdx" class="govuk-body govuk-link">
+                                                Remove</a>
+                                        </td>
+                                    } else {
+                                        <td class="govuk-table__cell">
+                                        </td>
+                                    }
                                 </tr>
                             }
                         }
@@ -382,7 +391,6 @@
                                 ).withFormField(userForm(s"assignedDelegatedEnrolments[${assignedDelegatedEnrolments.size}].identifiers[0].value")))
                             </td>
                             <td class="govuk-table__cell">
-
                             </td>
                         </tr>
 
@@ -398,9 +406,7 @@
                 <span class="govuk-hint">
                     Only HMRC internal staff can have STRIDE roles. Provide role names comma separated.</span>
 
-                @govukInput(Input(
-                    attributes = Map("maxlength" -> "60")
-                ).withFormField(userForm("strideRoles")))
+                @govukInput(Input().withFormField(userForm("strideRoles")))
             }
 
             <h2>Specials</h2>
@@ -415,7 +421,7 @@
             ))
 
             @govukCheckboxes(Checkboxes(
-                    name = "deceased",
+                name = "deceased",
                 items = Seq(CheckboxItem(
                     content = Text(msgs("user.form.deceased")),
                     hint = Some(Hint(content = Text(msgs("user.form.deceased.hint")))),
@@ -436,8 +442,10 @@
                     attributes = Map("id" -> "update3")
                 ))
 
-                <a class="govuk-body govuk-link" href="@{cancelCall.url}">
-                    @msgs("user.edit.cancel")
+                <a class="govuk-body govuk-link" href="@{
+                    cancelCall.url
+                }">
+                @msgs("user.edit.cancel")
                 </a>
             </div>
 

@@ -131,8 +131,10 @@
             <a class="govuk-body govuk-link" name="enrolments"></a>
             <h2>Principal enrolments</h2>
 
+            <span class="govuk-hint">Identifiers do not need to be specified for Principal and Delegated enrolments as they will be auto-generated if not.</span>
+
             <div id="principalEnrolments" class="form-group" style="text-align: right">
-                <table style="width: 100%" class="govuk-table">
+                <table id="js-principal-enrolments-table" style="width: 100%" class="govuk-table">
                     <colgroup>
                         <col width="30%">
                         <col width="30%">
@@ -148,7 +150,7 @@
 
                     @for((enrolment, enrIdx) <- principalEnrolments.zipWithIndex) {
                         @for((identifier, identIdx) <- enrolment(".identifier").zipWithIndex) {
-                            <tr id="principalEnrolments-@{enrIdx}-row" class="govuk-table__row">
+                            <tr id="assignedPrincipalEnrolments-@{enrIdx}-row" class="govuk-table__row">
                                 @if(identIdx == 0) {
                                     <td class="govuk-table__cell" rowspan="@{
                                         enrolment(".identifier").size
@@ -169,11 +171,8 @@
                                     formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                 ).withFormField(groupForm(s"${identifier.key}.value")))
                             </td>
-                                @* TODO does this just removes the table row, not the data? *@
                             <td class="govuk-table__cell">
-                                <a class="govuk-body govuk-link" onclick="document.getElementById('principalEnrolments-@{enrIdx}-row').remove()">
-                                            Remove
-                                </a>
+                                <a id="js-remove-principal-enrolment-@enrIdx" class="govuk-body govuk-link">Remove</a>
                             </td>
                             </tr>
                         }
@@ -210,23 +209,23 @@
                 <span class="govuk-hint">Only Agents can have delegated enrolments.</span>
 
                 <div id="delegatedEnrolments" class="form-group" style="text-align: right">
-                    <table class="govuk-table" style="width: 100%">
+                    <table id="js-delegated-enrolments-table" class="govuk-table" style="width: 100%">
                         <colgroup>
                             <col width="30%">
                             <col width="30%">
                             <col width="30%">
                             <col width="10%">
                         </colgroup>
-                        <tr class="govuk-table__row">
+                        <thead class="govuk-table__head">
                             <th class="govuk-table__header">Service key</th>
                             <th class="govuk-table__header">Identifier Name</th>
                             <th class="govuk-table__header">Identifier Value</th>
                             <th class="govuk-table__header"></th>
-                        </tr>
+                        </thead>
 
                         @for((enrolment, enrIdx) <- delegatedEnrolments.zipWithIndex) {
                             @for((identifier, identIdx) <- enrolment(".identifier").zipWithIndex) {
-                                <tr id="delegatedEnrolments-@{enrIdx}-row">
+                                <tr id="assignedDelegatedEnrolments-@{enrIdx}-row">
                                     @if(identIdx == 0) {
                                         <td class="govuk-table__cell" rowspan="@{
                                             enrolment(".identifier").size
@@ -247,10 +246,15 @@
                                         formGroup = FormGroup(classes = Some("govuk-!-margin-bottom-0"))
                                     ).withFormField(groupForm(s"${identifier.key}.value")))
                                 </td>
-                                <td class="govuk-table__cell">
-                                    <a class="govuk-body govuk-link"
-                                        onclick="document.getElementById('delegatedEnrolments-@{enrIdx}-row').remove()">Remove</a>
-                                </td>
+                                @if(identIdx == 0) {
+                                    <td class="govuk-table__cell">
+                                        <a id="js-remove-delegated-enrolment-@enrIdx" class="govuk-body govuk-link">
+                                            Remove</a>
+                                    </td>
+                                } else {
+                                    <td class="govuk-table__cell">
+                                    </td>
+                                }
                                 </tr>
                             }
                         }
