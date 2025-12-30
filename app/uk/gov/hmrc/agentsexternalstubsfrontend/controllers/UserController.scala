@@ -488,7 +488,8 @@ class UserController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          agentsExternalStubsConnector.getUsers
+          agentsExternalStubsConnector
+            .getUsers()
             .map(users =>
               Ok(
                 showAllUsersView(
@@ -510,7 +511,8 @@ class UserController @Inject() (
             .bindFromRequest()
             .fold(
               formWithErrors =>
-                agentsExternalStubsConnector.getUsers
+                agentsExternalStubsConnector
+                  .getUsers()
                   .map(users =>
                     Ok(
                       showAllUsersView(

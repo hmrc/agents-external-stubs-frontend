@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,15 +118,27 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  def getUsers(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
-    val requestUrl = url"$baseUrl/agents-external-stubs/users"
-    http
-      .get(requestUrl)
-      .execute[Users]
-  }
+  def getUsers(
+    userId: Option[String] = None,
+    groupId: Option[String] = None,
+    agentCode: Option[String] = None,
+    limit: Option[Int] = None
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
-  def getUsersByGroupId(groupId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
-    val requestUrl = url"$baseUrl/agents-external-stubs/users?groupId=$groupId"
+    val queryParams =
+      Seq(
+        userId.map(u => s"userId=$u"),
+        groupId.map(g => s"groupId=$g"),
+        agentCode.map(a => s"agentCode=$a"),
+        limit.map(l => s"limit=$l")
+      ).flatten.mkString("&")
+
+    val requestUrl =
+      if (queryParams.isEmpty)
+        url"$baseUrl/agents-external-stubs/users"
+      else
+        url"$baseUrl/agents-external-stubs/users?$queryParams"
+
     http
       .get(requestUrl)
       .execute[Users]

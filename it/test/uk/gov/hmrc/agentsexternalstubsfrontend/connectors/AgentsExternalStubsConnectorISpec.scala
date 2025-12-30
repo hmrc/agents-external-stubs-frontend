@@ -99,7 +99,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
     "getUsers" should {
       "return an user for a valid userId" in {
         givenUsers(User("foo"), User("bar"))
-        val users: Users = await(connector.getUsers)
+        val users: Users = await(connector.getUsers())
         users.users.map(_.userId) should contain.only("foo", "bar")
       }
     }
