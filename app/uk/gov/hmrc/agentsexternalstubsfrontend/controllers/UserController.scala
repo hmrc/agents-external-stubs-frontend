@@ -484,7 +484,7 @@ class UserController @Inject() (
       }
     }
 
-  def showAllUsersPage: Action[AnyContent] =
+  val showAllUsersPage: Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
@@ -492,7 +492,6 @@ class UserController @Inject() (
 
           boundForm.fold(
             formWithErrors =>
-              // Invalid input (e.g. limit = abc)
               agentsExternalStubsConnector
                 .getUsers(None, None, None)
                 .map { users =>
