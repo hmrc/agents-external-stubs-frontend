@@ -34,6 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
+import scala.util.Try
 
 @Singleton
 class UserController @Inject() (
@@ -487,55 +488,40 @@ class UserController @Inject() (
   def showAllUsersPage(
     userId: Option[String],
     groupId: Option[String],
-    agentCode: Option[String],
-    limit: Option[Int]
+    limit: Option[String]
   ): Action[AnyContent] =
     Action.async { implicit request =>
       val normalizedUserId = userId.filter(_.nonEmpty)
       val normalizedGroupId = groupId.filter(_.nonEmpty)
-      val normalizedAgentCode = agentCode.filter(_.nonEmpty)
+      val parsedLimit: Option[Int] = limit.flatMap { raw =>
+        Try(raw.toInt).toOption
+      }
+      val limitError: Option[String] = limit.filter(_.nonEmpty).flatMap { raw =>
+        if (Try(raw.toInt).isFailure) Some("Limit must be a number")
+        else None
+      }
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          if (normalizedGroupId.isDefined && normalizedAgentCode.isDefined) {
-            Future.successful(
+          agentsExternalStubsConnector
+            .getUsers(
+              userId = normalizedUserId,
+              groupId = normalizedGroupId,
+              limit = parsedLimit
+            )
+            .map { users =>
               Ok(
                 showAllUsersView(
-                  Users(Seq.empty),
+                  users,
                   routes.UserController.showUserPage(None),
                   CreateANewUserForm.form,
                   pageContext(credentials),
                   normalizedUserId,
                   normalizedGroupId,
-                  normalizedAgentCode,
-                  limit,
-                  error = Some("You can filter by group ID or agent code, not both.")
+                  parsedLimit,
+                  error = limitError
                 )
               )
-            )
-          } else {
-            agentsExternalStubsConnector
-              .getUsers(
-                userId = normalizedUserId,
-                groupId = normalizedGroupId,
-                agentCode = normalizedAgentCode,
-                limit = limit
-              )
-              .map { users =>
-                Ok(
-                  showAllUsersView(
-                    users,
-                    routes.UserController.showUserPage(None),
-                    CreateANewUserForm.form,
-                    pageContext(credentials),
-                    normalizedUserId,
-                    normalizedGroupId,
-                    normalizedAgentCode,
-                    limit,
-                    error = None
-                  )
-                )
-              }
-          }
+            }
         }
     }
 
@@ -556,7 +542,6 @@ class UserController @Inject() (
                         routes.UserController.showUserPage(None),
                         formWithErrors,
                         pageContext(credentials),
-                        None,
                         None,
                         None,
                         Some(100),

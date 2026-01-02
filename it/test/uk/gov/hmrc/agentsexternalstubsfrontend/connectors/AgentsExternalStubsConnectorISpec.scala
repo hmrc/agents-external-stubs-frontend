@@ -109,7 +109,6 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         connector.getUsers(
           userId = None,
           groupId = None,
-          agentCode = None,
           limit = None
         )
 

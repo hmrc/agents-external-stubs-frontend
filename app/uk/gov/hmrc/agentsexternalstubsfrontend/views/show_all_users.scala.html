@@ -45,7 +45,6 @@
         context: PageContext,
         userId: Option[String],
         groupId: Option[String],
-        agentCode: Option[String],
         limit: Option[Int],
         error: Option[String]
 )(implicit request: Request[_], msgs: Messages)
@@ -67,7 +66,7 @@
         </div>
     }
 
-    <form method="GET" action="@routes.UserController.showAllUsersPage(None, None, None, None)">
+    <form method="GET" action="@routes.UserController.showAllUsersPage(None, None, None)">
         <div class="govuk-grid-row govuk-!-margin-bottom-4">
 
             <div class="govuk-grid-column-one-quarter">
@@ -90,15 +89,6 @@
 
             <div class="govuk-grid-column-one-quarter">
             @govukInput(Input(
-                name = "agentCode",
-                label = Label(content = Text("Agent code")),
-                value = agentCode,
-                classes = "govuk-input--width-10"
-            ))
-            </div>
-
-            <div class="govuk-grid-column-one-quarter">
-            @govukInput(Input(
                 name = "limit",
                 label = Label(content = Text("Limit")),
                 value = limit.map(_.toString),
@@ -108,9 +98,18 @@
 
         </div>
 
-        @govukButton(Button(
-            content = Text("Apply filters")
-        ))
+        <div class="goveu-button-group">
+            @govukButton(Button(
+                content = Text("Apply filters")
+            ))
+
+            <a
+                class="govuk-button govuk-button--secondary"
+                href="@routes.UserController.showAllUsersPage(None, None, None)"
+            >
+                Clear filters
+            </a>
+        </div>
     </form>
 
     <div style="float: right; margin-bottom: 1em;position: relative; top:-3em;right: -3em;">

@@ -111,7 +111,7 @@ class UserControllerISpec
         matches shouldBe limit
       }
 
-      "return an error when both groupId and agentCode are supplied" in {
+      "return an error when non-numeric entry to limit" in {
         givenAuthorised("Test123")
         givenUsers(
           User("Test123")
@@ -120,7 +120,7 @@ class UserControllerISpec
         val request =
           FakeRequest(
             GET,
-            "/agents-external-stubs/users?groupId=G1&agentCode=A1"
+            "/agents-external-stubs/users?limit=abc"
           ).withSession("authToken" -> "Bearer XYZ")
 
         val result = callEndpointWith(request)
@@ -128,7 +128,7 @@ class UserControllerISpec
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(
           result,
-          htmlEscapedMessage("You can filter by group ID or agent code, not both")
+          htmlEscapedMessage("Limit must be a number")
         )
       }
 
@@ -154,6 +154,24 @@ class UserControllerISpec
         body should include("""value="G1"""")
         body should include("""name="limit"""")
         body should include("""value="10"""")
+      }
+
+      "render clear filters button" in {
+        givenAuthorised("Test123")
+        givenUsers(User("Test123"))
+
+        val request =
+          FakeRequest(GET, "/agents-external-stubs/users?userId=Test&limit=10")
+            .withSession("authToken" -> "Bearer XYZ")
+
+        val result = callEndpointWith(request)
+
+        status(result) shouldBe 200
+
+        val body = contentAsString(Future.successful(result))
+
+        body should include("Clear filters")
+        body should include("""href="/agents-external-stubs/users"""")
       }
     }
   }

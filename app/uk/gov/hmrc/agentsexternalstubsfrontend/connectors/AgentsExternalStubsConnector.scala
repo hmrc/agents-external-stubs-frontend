@@ -121,7 +121,6 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
   def getUsers(
     userId: Option[String] = None,
     groupId: Option[String] = None,
-    agentCode: Option[String] = None,
     limit: Option[Int] = None
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
@@ -129,7 +128,6 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       Seq(
         userId.map(u => s"userId=$u"),
         groupId.map(g => s"groupId=$g"),
-        agentCode.map(a => s"agentCode=$a"),
         limit.map(l => s"limit=$l")
       ).flatten.mkString("&")
 
