@@ -1,5 +1,5 @@
 @*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@
 @import views.html.helper.CSRF
 @import uk.gov.hmrc.agentsexternalstubsfrontend.forms.CreateANewUser
 @import uk.gov.hmrc.govukfrontend.views.Aliases.Label
+@import uk.gov.hmrc.agentsexternalstubsfrontend.forms.UserFilters
+@import uk.gov.hmrc.govukfrontend.views.Aliases.ErrorMessage
 
 @this(
         mainTemplate: main_template,
@@ -37,16 +39,15 @@
         govukTable: GovukTable,
 )
 
-
 @(
         users: Users,
         showCurrentUserUrl: Call,
+        filtersForm: Form[UserFilters],
         createANewUserForm: Form[CreateANewUser],
         context: PageContext,
         userId: Option[String],
         groupId: Option[String],
-        limit: Option[Int],
-        error: Option[String]
+        limit: Option[Int]
 )(implicit request: Request[_], msgs: Messages)
 
 @mainTemplate(title = msgs("users.title"), wide = true) {
@@ -55,62 +56,57 @@
 
     <h1 class="govuk-heading-l">@msgs("users.show.header", context.planetId)</h1>
 
-    @error.map { msg =>
-        <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-title">
-            <h2 class="govuk-error-summary__title" id="error-summary-title">
-                There is a problem
-            </h2>
-            <div class="govuk-error-summary__body">
-                <p>@msg</p>
-            </div>
-        </div>
-    }
+    <form method="GET" action="@routes.UserController.showAllUsersPage">
 
-    <form method="GET" action="@routes.UserController.showAllUsersPage(None, None, None)">
-        <div class="govuk-grid-row govuk-!-margin-bottom-4">
-
-            <div class="govuk-grid-column-one-quarter">
-            @govukInput(Input(
-                name = "userId",
-                label = Label(content = Text("User ID")),
-                value = userId,
-                classes = "govuk-input--width-10"
-            ))
-            </div>
-
-            <div class="govuk-grid-column-one-quarter">
-            @govukInput(Input(
-                name = "groupId",
-                label = Label(content = Text("Group ID")),
-                value = groupId,
-                classes = "govuk-input--width-10"
-            ))
-            </div>
-
-            <div class="govuk-grid-column-one-quarter">
-            @govukInput(Input(
-                name = "limit",
-                label = Label(content = Text("Limit")),
-                value = limit.map(_.toString),
-                classes = "govuk-input--width-5"
-            ))
-            </div>
-
+        <div class="govuk-form-group">
+        @govukInput(
+            Input(
+                name  = "userId",
+                label = Label(content = Text("Search by user ID (optional)")),
+                value = filtersForm("userId").value
+            )
+        )
         </div>
 
-        <div class="goveu-button-group">
-            @govukButton(Button(
-                content = Text("Apply filters")
-            ))
+        <div class="govuk-form-group">
+        @govukInput(
+            Input(
+                name  = "groupId",
+                label = Label(content = Text("Search by group ID (optional)")),
+                value = filtersForm("groupId").value
+            )
+        )
+        </div>
+
+        <div class="govuk-form-group @if(filtersForm.error("limit").isDefined){govuk-form-group--error}">
+        @govukInput(
+            Input(
+                name  = "limit",
+                label = Label(content = Text("Limit results (optional)")),
+                value = filtersForm("limit").value,
+                classes = "govuk-input--width-5" + (if (filtersForm.error("limit").isDefined) " govuk-input--error" else ""),
+                errorMessage = filtersForm.error("limit").map { err =>
+                    ErrorMessage(
+                        content = Text(msgs(err.message, err.args: _*))
+                    )
+                }
+            )
+        )
+        </div>
+
+        <div class="govuk-button-group">
+            @govukButton(Button(content = Text("Apply filters")))
 
             <a
-                class="govuk-button govuk-button--secondary"
-                href="@routes.UserController.showAllUsersPage(None, None, None)"
+            class="govuk-button govuk-button--secondary"
+            href="@routes.UserController.showAllUsersPage"
             >
                 Clear filters
             </a>
         </div>
+
     </form>
+
 
     <div style="float: right; margin-bottom: 1em;position: relative; top:-3em;right: -3em;">
         <h3 class="govuk-heading-s govuk-!-margin-bottom-1" id="create-user-label">@msgs("users.link.create")</h3>

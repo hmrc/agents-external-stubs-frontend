@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUserForm, InitialUserCreationDataForm, UserForm}
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUserForm, InitialUserCreationDataForm, UserFiltersForm, UserForm}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
@@ -34,7 +34,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-import scala.util.Try
 
 @Singleton
 class UserController @Inject() (
@@ -422,7 +421,7 @@ class UserController @Inject() (
           val id = userId.getOrElse(credentials.providerId)
           (if (id == credentials.providerId) Future.successful(())
            else agentsExternalStubsConnector.removeUser(id))
-            .map(_ => Redirect(routes.UserController.showAllUsersPage()))
+            .map(_ => Redirect(routes.UserController.showAllUsersPage))
             .recover { case NonFatal(e) =>
               Ok(errorTemplateView("error.title", s"Error while removing $id", e.getMessage))
             }
@@ -485,43 +484,53 @@ class UserController @Inject() (
       }
     }
 
-  def showAllUsersPage(
-    userId: Option[String],
-    groupId: Option[String],
-    limit: Option[String]
-  ): Action[AnyContent] =
+  def showAllUsersPage: Action[AnyContent] =
     Action.async { implicit request =>
-      val normalizedUserId = userId.filter(_.nonEmpty)
-      val normalizedGroupId = groupId.filter(_.nonEmpty)
-      val parsedLimit: Option[Int] = limit.flatMap { raw =>
-        Try(raw.toInt).toOption
-      }
-      val limitError: Option[String] = limit.filter(_.nonEmpty).flatMap { raw =>
-        if (Try(raw.toInt).isFailure) Some("Limit must be a number")
-        else None
-      }
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          agentsExternalStubsConnector
-            .getUsers(
-              userId = normalizedUserId,
-              groupId = normalizedGroupId,
-              limit = parsedLimit
-            )
-            .map { users =>
-              Ok(
-                showAllUsersView(
-                  users,
-                  routes.UserController.showUserPage(None),
-                  CreateANewUserForm.form,
-                  pageContext(credentials),
-                  normalizedUserId,
-                  normalizedGroupId,
-                  parsedLimit,
-                  error = limitError
+          val boundForm = UserFiltersForm.form.bindFromRequest()
+
+          boundForm.fold(
+            formWithErrors =>
+              // Invalid input (e.g. limit = abc)
+              agentsExternalStubsConnector
+                .getUsers(None, None, None)
+                .map { users =>
+                  Ok(
+                    showAllUsersView(
+                      users = users,
+                      showCurrentUserUrl = routes.UserController.showUserPage(None),
+                      filtersForm = formWithErrors,
+                      createANewUserForm = CreateANewUserForm.form,
+                      context = pageContext(credentials),
+                      userId = None,
+                      groupId = None,
+                      limit = None
+                    )
+                  )
+                },
+            filters =>
+              agentsExternalStubsConnector
+                .getUsers(
+                  userId = filters.userId.filter(_.nonEmpty),
+                  groupId = filters.groupId.filter(_.nonEmpty),
+                  limit = filters.limit
                 )
-              )
-            }
+                .map { users =>
+                  Ok(
+                    showAllUsersView(
+                      users = users,
+                      showCurrentUserUrl = routes.UserController.showUserPage(None),
+                      filtersForm = boundForm,
+                      createANewUserForm = CreateANewUserForm.form,
+                      context = pageContext(credentials),
+                      userId = None,
+                      groupId = None,
+                      limit = None
+                    )
+                  )
+                }
+          )
         }
     }
 
@@ -538,14 +547,14 @@ class UserController @Inject() (
                   .map(users =>
                     Ok(
                       showAllUsersView(
-                        users,
-                        routes.UserController.showUserPage(None),
-                        formWithErrors,
-                        pageContext(credentials),
-                        None,
-                        None,
-                        Some(100),
-                        None
+                        users = users,
+                        showCurrentUserUrl = routes.UserController.showUserPage(None),
+                        filtersForm = UserFiltersForm.form,
+                        createANewUserForm = formWithErrors,
+                        context = pageContext(credentials),
+                        userId = None,
+                        groupId = None,
+                        limit = Some(100)
                       )
                     )
                   ),
