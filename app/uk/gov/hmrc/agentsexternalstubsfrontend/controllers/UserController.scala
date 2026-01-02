@@ -421,7 +421,7 @@ class UserController @Inject() (
           val id = userId.getOrElse(credentials.providerId)
           (if (id == credentials.providerId) Future.successful(())
            else agentsExternalStubsConnector.removeUser(id))
-            .map(_ => Redirect(routes.UserController.showAllUsersPage))
+            .map(_ => Redirect(routes.UserController.showAllUsersPage()))
             .recover { case NonFatal(e) =>
               Ok(errorTemplateView("error.title", s"Error while removing $id", e.getMessage))
             }
@@ -484,22 +484,58 @@ class UserController @Inject() (
       }
     }
 
-  val showAllUsersPage: Action[AnyContent] =
+  def showAllUsersPage(
+    userId: Option[String],
+    groupId: Option[String],
+    agentCode: Option[String],
+    limit: Option[Int]
+  ): Action[AnyContent] =
     Action.async { implicit request =>
+      val normalizedUserId = userId.filter(_.nonEmpty)
+      val normalizedGroupId = groupId.filter(_.nonEmpty)
+      val normalizedAgentCode = agentCode.filter(_.nonEmpty)
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          agentsExternalStubsConnector
-            .getUsers()
-            .map(users =>
+          if (normalizedGroupId.isDefined && normalizedAgentCode.isDefined) {
+            Future.successful(
               Ok(
                 showAllUsersView(
-                  users,
+                  Users(Seq.empty),
                   routes.UserController.showUserPage(None),
                   CreateANewUserForm.form,
-                  pageContext(credentials)
+                  pageContext(credentials),
+                  normalizedUserId,
+                  normalizedGroupId,
+                  normalizedAgentCode,
+                  limit,
+                  error = Some("You can filter by group ID or agent code, not both.")
                 )
               )
             )
+          } else {
+            agentsExternalStubsConnector
+              .getUsers(
+                userId = normalizedUserId,
+                groupId = normalizedGroupId,
+                agentCode = normalizedAgentCode,
+                limit = limit
+              )
+              .map { users =>
+                Ok(
+                  showAllUsersView(
+                    users,
+                    routes.UserController.showUserPage(None),
+                    CreateANewUserForm.form,
+                    pageContext(credentials),
+                    normalizedUserId,
+                    normalizedGroupId,
+                    normalizedAgentCode,
+                    limit,
+                    error = None
+                  )
+                )
+              }
+          }
         }
     }
 
@@ -519,7 +555,12 @@ class UserController @Inject() (
                         users,
                         routes.UserController.showUserPage(None),
                         formWithErrors,
-                        pageContext(credentials)
+                        pageContext(credentials),
+                        None,
+                        None,
+                        None,
+                        Some(100),
+                        None
                       )
                     )
                   ),

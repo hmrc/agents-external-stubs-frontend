@@ -102,6 +102,23 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         val users: Users = await(connector.getUsers())
         users.users.map(_.userId) should contain.only("foo", "bar")
       }
+
+      "omit empty query parameters" in {
+        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+
+        connector.getUsers(
+          userId = None,
+          groupId = None,
+          agentCode = None,
+          limit = None
+        )
+
+        verify(
+          getRequestedFor(
+            urlEqualTo("/agents-external-stubs/users")
+          )
+        )
+      }
     }
 
     "updateUser" should {

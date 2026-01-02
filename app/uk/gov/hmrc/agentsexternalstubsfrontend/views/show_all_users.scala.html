@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, Table, TableRow}
 @import views.html.helper.CSRF
 @import uk.gov.hmrc.agentsexternalstubsfrontend.forms.CreateANewUser
+@import uk.gov.hmrc.govukfrontend.views.Aliases.Label
 
 @this(
         mainTemplate: main_template,
@@ -36,7 +37,18 @@
         govukTable: GovukTable,
 )
 
-@(users: Users, showCurrentUserUrl: Call, createANewUserForm: Form[CreateANewUser], context: PageContext)(implicit request: Request[_], msgs: Messages)
+
+@(
+        users: Users,
+        showCurrentUserUrl: Call,
+        createANewUserForm: Form[CreateANewUser],
+        context: PageContext,
+        userId: Option[String],
+        groupId: Option[String],
+        agentCode: Option[String],
+        limit: Option[Int],
+        error: Option[String]
+)(implicit request: Request[_], msgs: Messages)
 
 @mainTemplate(title = msgs("users.title"), wide = true) {
 
@@ -44,9 +56,66 @@
 
     <h1 class="govuk-heading-l">@msgs("users.show.header", context.planetId)</h1>
 
+    @error.map { msg =>
+        <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-title">
+            <h2 class="govuk-error-summary__title" id="error-summary-title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <p>@msg</p>
+            </div>
+        </div>
+    }
+
+    <form method="GET" action="@routes.UserController.showAllUsersPage(None, None, None, None)">
+        <div class="govuk-grid-row govuk-!-margin-bottom-4">
+
+            <div class="govuk-grid-column-one-quarter">
+            @govukInput(Input(
+                name = "userId",
+                label = Label(content = Text("User ID")),
+                value = userId,
+                classes = "govuk-input--width-10"
+            ))
+            </div>
+
+            <div class="govuk-grid-column-one-quarter">
+            @govukInput(Input(
+                name = "groupId",
+                label = Label(content = Text("Group ID")),
+                value = groupId,
+                classes = "govuk-input--width-10"
+            ))
+            </div>
+
+            <div class="govuk-grid-column-one-quarter">
+            @govukInput(Input(
+                name = "agentCode",
+                label = Label(content = Text("Agent code")),
+                value = agentCode,
+                classes = "govuk-input--width-10"
+            ))
+            </div>
+
+            <div class="govuk-grid-column-one-quarter">
+            @govukInput(Input(
+                name = "limit",
+                label = Label(content = Text("Limit")),
+                value = limit.map(_.toString),
+                classes = "govuk-input--width-5"
+            ))
+            </div>
+
+        </div>
+
+        @govukButton(Button(
+            content = Text("Apply filters")
+        ))
+    </form>
+
     <div style="float: right; margin-bottom: 1em;position: relative; top:-3em;right: -3em;">
         <h3 class="govuk-heading-s govuk-!-margin-bottom-1" id="create-user-label">@msgs("users.link.create")</h3>
-        <span class="govuk-hint govuk-!-margin-bottom-1" >Expected ID pattern [A-Za-z0-9-_]{3,64}</span>
+        <span class="govuk-hint govuk-!-margin-bottom-1">Expected ID pattern [A-Za-z0-9-_]{3,64}</span>
         @form(action = routes.UserController.createNewUserFromShowAllUsersPage) {
             @{play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) }}
             <div style="vertical-align: bottom;">
@@ -71,13 +140,11 @@
     </p>
 
     @form(action = Call("GET", "/agents-external-stubs/planet/destroy"), 'name -> "destroyPlanet", 'id -> "destroyPlanet") {
-        @{
-            play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
-        }
-    <a id="link_planet_destroy" class="govuk-body govuk-link">
+        @{ play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) } }
+        <a id="link_planet_destroy" class="govuk-body govuk-link">
         @msgs("planet.link.destroy")
-    </a>
-    }
+        </a>
+        }
 
     @govukTable(Table(
         head = Some(Seq(
@@ -88,38 +155,43 @@
         rows = users.users.sortBy(_.userId).map { user =>
             Seq(
                 TableRow(content = {
-                    val linkToGroupView: Option[String] = user.groupId.map(groupId => s"""<a href="/agents-external-stubs/group?groupId=$groupId">$groupId</a>""")
-                    HtmlContent(s"""<div ${if (user.userId==context.authorisedUserId) """class="govuk-!-font-weight-bold"""" else ""}>${user.userId}</div>
-                                                  |<div style="font-size:70%;">group: ${linkToGroupView.getOrElse("none")}</div>
-                                                  |""".stripMargin)
+                    val linkToGroupView: Option[String] =
+                        user.groupId.map(groupId => s"""<a href="/agents-external-stubs/group?groupId=$groupId">$groupId</a>""")
+                    HtmlContent(
+                        s"""<div ${if (user.userId == context.authorisedUserId) """class="govuk-!-font-weight-bold"""" else ""}>${user.userId}</div>
+                           |<div style="font-size:70%;">group: ${linkToGroupView.getOrElse("none")}</div>
+                           |""".stripMargin
+                    )
                 }),
                 TableRow(content = HtmlContent(
-                    (for {
-                        e <- user.assignedPrincipalEnrolments
-                    } yield s"""<div><span style="display: inline-block;">${e.service}</span> <span>${e.identifiers.map(_.value).mkString("(","/",")")}</span></div>""").mkString("\n")
+                    user.assignedPrincipalEnrolments.map { e =>
+                        s"""<div><span style="display: inline-block;">${e.service}</span>
+                           |<span>${e.identifiers.map(_.value).mkString("(", "/", ")")}</span></div>""".stripMargin
+                    }.mkString("\n")
                 )),
                 TableRow(content =
-                        if (user.userId==context.authorisedUserId) HtmlContent(
+                    if (user.userId == context.authorisedUserId)
+                        HtmlContent(
                             s"""<div class="test-user-action">
-                               |    <a id="${user.userId}-view" class="govuk-body govuk-link"
-                               |        href="/agents-external-stubs/user?userId=${user.userId}">View</a>
-                               |    <a id="${user.userId}-edit" class="govuk-body govuk-link"
-                               |    href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a>
-                               |    <span class="current-user">Current user </span>
-                               |</div>
-                               |""".stripMargin
-                        ) else HtmlContent(
+                               |<a id="${user.userId}-view" class="govuk-body govuk-link"
+                               |href="/agents-external-stubs/user?userId=${user.userId}">View</a>
+                               |<a id="${user.userId}-edit" class="govuk-body govuk-link"
+                               |href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a>
+                               |<span class="current-user">Current user</span>
+                               |</div>""".stripMargin
+                        )
+                    else
+                        HtmlContent(
                             s"""<div class="test-user-action">
-                               |    <a id="${user.userId}-view" class="govuk-body govuk-link"
-                               |    href="/agents-external-stubs/user?userId=${user.userId}">View</a>
-                               |    <a id="${user.userId}-edit" class="govuk-body govuk-link"
-                               |    href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a>
-                               |    <a id="${user.userId}-remove" class="govuk-body govuk-link"
-                               |    href="/agents-external-stubs/user/remove?userId=${user.userId}">Remove</a>
-                               |    <a id="${user.userId}-sign-in" class="govuk-body govuk-link"
-                               |    href="/agents-external-stubs/sign-in?userId=${user.userId}&continue=/agents-external-stubs/users&providerType=${user.defaultProviderType}">Sign-in</a>
-                               |</div>
-                               |""".stripMargin
+                               |<a id="${user.userId}-view" class="govuk-body govuk-link"
+                               |href="/agents-external-stubs/user?userId=${user.userId}">View</a>
+                               |<a id="${user.userId}-edit" class="govuk-body govuk-link"
+                               |href="/agents-external-stubs/user/edit?userId=${user.userId}">Edit</a>
+                               |<a id="${user.userId}-remove" class="govuk-body govuk-link"
+                               |href="/agents-external-stubs/user/remove?userId=${user.userId}">Remove</a>
+                               |<a id="${user.userId}-sign-in" class="govuk-body govuk-link"
+                               |href="/agents-external-stubs/sign-in?userId=${user.userId}&continue=/agents-external-stubs/users&providerType=${user.defaultProviderType}">Sign-in</a>
+                               |</div>""".stripMargin
                         )
                 )
             )

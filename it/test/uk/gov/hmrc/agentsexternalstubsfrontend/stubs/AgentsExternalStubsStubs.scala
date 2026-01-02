@@ -135,15 +135,32 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     )
   }
 
-  def givenUsers(users: User*) =
+  def givenUsers(users: User*): Unit =
     stubFor(
-      get(urlEqualTo(s"/agents-external-stubs/users"))
+      get(urlPathEqualTo("/agents-external-stubs/users"))
         .willReturn(
           aResponse()
             .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(
               Json
                 .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .toString()
+            )
+        )
+    )
+
+  def givenUsersWithLimit(limit: Int, users: User*): Unit =
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("limit", equalTo(limit.toString))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.take(limit).map(user => Json.toJson(user)))))
                 .toString()
             )
         )

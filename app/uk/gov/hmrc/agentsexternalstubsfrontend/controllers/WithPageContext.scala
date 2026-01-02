@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ object Menus {
 
   val quickStartHub = MenuItem("link_quick_start", "ASA links", routes.SignInController.showQuickStart())
   val records = MenuItem("link_records_all", "records.link.all", routes.RecordsController.showAllRecordsPage())
-  val users = MenuItem("link_users_all", "users.link.all", routes.UserController.showAllUsersPage)
+  val users = MenuItem("link_users_all", "users.link.all", routes.UserController.showAllUsersPage())
   val groups = MenuItem("link_groups_all", "groups.link.all", routes.GroupController.showAllGroupsPage)
   val showCurrentUser = MenuItem("link_users_current", "users.link.current", routes.UserController.showUserPage())
   val enrolments =
