@@ -26,6 +26,7 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
+import java.net.URL
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -124,18 +125,40 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
     limit: Option[Int] = None
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
-    val queryParams =
-      Seq(
-        userId.map(u => s"userId=$u"),
-        groupId.map(g => s"groupId=$g"),
-        limit.map(l => s"limit=$l")
-      ).flatten.mkString("&")
+//    val queryParams =
+//      Seq(
+//        userId.map(u => s"userId=$u"),
+//        groupId.map(g => s"groupId=$g"),
+//        limit.map(l => s"limit=$l")
+//        //        TODO: This is being parsed as %26 rather than &
+//      ).flatten.mkString("&")
 
-    val requestUrl =
-      if (queryParams.isEmpty)
+//    val requestUrl =
+//      if (queryParams.isEmpty)
+//        url"$baseUrl/agents-external-stubs/users"
+//      else {
+//        url"$baseUrl/agents-external-stubs/users?$queryParams"
+//      }
+
+//    TODO: There must be a better way???
+    val requestUrl = (limit, userId, groupId) match {
+      case (None, None, None) =>
         url"$baseUrl/agents-external-stubs/users"
-      else
-        url"$baseUrl/agents-external-stubs/users?$queryParams"
+      case (Some(l), None, None) =>
+        url"$baseUrl/agents-external-stubs/users?limit=$l"
+      case (None, Some(uId), None) =>
+        url"$baseUrl/agents-external-stubs/users?userId=$uId"
+      case (None, None, Some(gId)) =>
+        url"$baseUrl/agents-external-stubs/users?groupId=$gId"
+      case (Some(l), Some(uId), None) =>
+        url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId"
+      case (Some(l), None, Some(gId)) =>
+        url"$baseUrl/agents-external-stubs/users?limit=$l&groupId=$gId"
+      case (None, Some(uId), Some(gId)) =>
+        url"$baseUrl/agents-external-stubs/users?userId=$uId&groupId=$gId"
+      case (Some(l), Some(uId), Some(gId)) =>
+        url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId&groupId=$gId"
+    }
 
     http
       .get(requestUrl)
