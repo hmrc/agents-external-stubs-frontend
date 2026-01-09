@@ -513,6 +513,7 @@ class UserController @Inject() (
                 .getUsers(
                   userId = filters.userId.filter(_.nonEmpty),
                   groupId = filters.groupId.filter(_.nonEmpty),
+                  principalEnrolmentService = filters.principalEnrolmentService.filter(_.nonEmpty),
                   limit = filters.limit
                 )
                 .map { users =>

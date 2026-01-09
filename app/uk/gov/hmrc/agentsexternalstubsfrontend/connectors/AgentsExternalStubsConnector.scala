@@ -122,6 +122,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
   def getUsers(
     userId: Option[String] = None,
     groupId: Option[String] = None,
+    principalEnrolmentService: Option[String] = None,
     limit: Option[Int] = None
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
@@ -141,23 +142,42 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
 //      }
 
 //    TODO: There must be a better way???
-    val requestUrl = (limit, userId, groupId) match {
-      case (None, None, None) =>
-        url"$baseUrl/agents-external-stubs/users"
-      case (Some(l), None, None) =>
+//              TODO: Add principalEnrolmentService: Option[String] = None
+    val requestUrl = (limit, userId, groupId, principalEnrolmentService) match {
+      case (None, None, None, None) =>
+//        url"$baseUrl/agents-external-stubs/users"
+//        TODO: Below is for testing BE principalEnrolmentService param
+        url"$baseUrl/agents-external-stubs/users?principalEnrolmentService=HMRC-MTD-IT"
+      case (Some(l), None, None, None) =>
         url"$baseUrl/agents-external-stubs/users?limit=$l"
-      case (None, Some(uId), None) =>
+      case (None, Some(uId), None, None) =>
         url"$baseUrl/agents-external-stubs/users?userId=$uId"
-      case (None, None, Some(gId)) =>
+      case (None, None, Some(gId), None) =>
         url"$baseUrl/agents-external-stubs/users?groupId=$gId"
-      case (Some(l), Some(uId), None) =>
+      case (None, None, None, Some(peService)) =>
+        url"$baseUrl/agents-external-stubs/users?principalEnrolmentService=$peService"
+      case (Some(l), Some(uId), None, None) =>
         url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId"
-      case (Some(l), None, Some(gId)) =>
+      case (Some(l), None, Some(gId), None) =>
         url"$baseUrl/agents-external-stubs/users?limit=$l&groupId=$gId"
-      case (None, Some(uId), Some(gId)) =>
+      case (Some(l), None, None, Some(peService)) =>
+        url"$baseUrl/agents-external-stubs/users?limit=$l&principalEnrolmentService=$peService"
+      case (None, Some(uId), Some(gId), None) =>
         url"$baseUrl/agents-external-stubs/users?userId=$uId&groupId=$gId"
-      case (Some(l), Some(uId), Some(gId)) =>
+      case (None, Some(uId), None, Some(peService)) =>
+        url"$baseUrl/agents-external-stubs/users?userId=$uId&principalEnrolmentService=$peService"
+      case (None, None, Some(gId), Some(peService)) =>
+        url"$baseUrl/agents-external-stubs/users?groupId=$gId&principalEnrolmentService=$peService"
+      case (Some(l), Some(uId), Some(gId), None) =>
         url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId&groupId=$gId"
+      case (Some(l), Some(uId), None, Some(peService)) =>
+        url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId&principalEnrolmentService=$peService"
+      case (Some(l), None, Some(gId), Some(peService)) =>
+        url"$baseUrl/agents-external-stubs/users?limit=$l&groupId=$gId&principalEnrolmentService=$peService"
+      case (None, Some(uId), Some(gId), Some(peService)) =>
+        url"$baseUrl/agents-external-stubs/users?userId=$uId&groupId=$gId&principalEnrolmentService=$peService"
+      case (Some(l), Some(uId), Some(gId), Some(peService)) =>
+        url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId&groupId=$gId&principalEnrolmentService=$peService"
     }
 
     http
