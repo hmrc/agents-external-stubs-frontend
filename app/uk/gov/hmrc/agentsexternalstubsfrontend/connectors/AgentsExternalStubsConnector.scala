@@ -145,9 +145,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
 //              TODO: Add principalEnrolmentService: Option[String] = None
     val requestUrl = (limit, userId, groupId, principalEnrolmentService) match {
       case (None, None, None, None) =>
-//        url"$baseUrl/agents-external-stubs/users"
-//        TODO: Below is for testing BE principalEnrolmentService param
-        url"$baseUrl/agents-external-stubs/users?principalEnrolmentService=HMRC-MTD-IT"
+        url"$baseUrl/agents-external-stubs/users"
       case (Some(l), None, None, None) =>
         url"$baseUrl/agents-external-stubs/users?limit=$l"
       case (None, Some(uId), None, None) =>
