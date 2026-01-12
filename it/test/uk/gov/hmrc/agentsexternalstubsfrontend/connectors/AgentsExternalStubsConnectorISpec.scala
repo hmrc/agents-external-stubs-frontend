@@ -103,6 +103,8 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         users.users.map(_.userId) should contain.only("foo", "bar")
       }
 
+//      TODO: Add extra ITs for different param combinations
+
       "omit empty query parameters" in {
         val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
 

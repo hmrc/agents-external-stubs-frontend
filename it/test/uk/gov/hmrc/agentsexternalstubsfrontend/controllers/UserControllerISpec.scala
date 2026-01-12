@@ -111,6 +111,8 @@ class UserControllerISpec
         matches shouldBe limit
       }
 
+//      TODO: Add ITs for different parameter combinations
+
       "return an error when non-numeric entry to limit" in {
         givenAuthorised("Test123")
         givenUsers(
@@ -133,6 +135,7 @@ class UserControllerISpec
       }
 
       "preserve filter values after submitting filters" in {
+//        TODO: Add additional filter fields to this test
         givenAuthorised("Test123")
         givenUsers(User("Test123"), User("test456"))
 
