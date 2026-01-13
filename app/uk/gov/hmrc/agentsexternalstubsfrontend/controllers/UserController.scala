@@ -484,6 +484,9 @@ class UserController @Inject() (
       }
     }
 
+//  TODO: Load list of groups using getGroups in order to populate groupId dropdown
+//  TODO: Load list of services using ServicesDefinitionService in order to populate principalEnrolmentService dropdown select
+// TODO: Use Future for comprehension
   val showAllUsersPage: Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
