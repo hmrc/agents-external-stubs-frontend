@@ -54,6 +54,12 @@ class UserControllerISpec
 
     "GET /agents-external-stubs/users" should {
 
+      //      TODO: Improve values in usersList so they can used for each getUsersIT
+      val usersList: List[User] = List(
+        User("foo"),
+        User("bar")
+      )
+
       "render users page with no filters" in {
         givenAuthorised("Test123")
         givenUsers(
@@ -67,10 +73,11 @@ class UserControllerISpec
         val result = callEndpointWith(request)
 
         status(result) shouldBe 200
+//        TODO: Test results are returned here
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
       }
 
-      "allow filtering by partial userId" in {
+      "allow partial filtering by userId parameter" in {
         givenAuthorised("Test123")
         givenUsers(
           User("Test123"),
@@ -86,7 +93,16 @@ class UserControllerISpec
         val result = callEndpointWith(request)
 
         status(result) shouldBe 200
+//        TODO: Testing of this should be more precise
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
+      }
+
+      "allow filtering by groupId parameter" in {
+
+      }
+
+      "allow filtering by principalEnrolmentService parameter" in {
+
       }
 
       "allow limiting results by limit parameter" in {
@@ -111,7 +127,9 @@ class UserControllerISpec
         matches shouldBe limit
       }
 
-//      TODO: Add ITs for different parameter combinations
+      "allow filtering by userId, groupId, principalEnrolmentService and limit parameters" in {
+
+      }
 
       "return an error when non-numeric entry to limit" in {
         givenAuthorised("Test123")
@@ -135,7 +153,7 @@ class UserControllerISpec
       }
 
       "preserve filter values after submitting filters" in {
-//        TODO: Add additional filter fields to this test
+//        TODO: Add additional principalEnrolmentService filter field to this test
         givenAuthorised("Test123")
         givenUsers(User("Test123"), User("test456"))
 

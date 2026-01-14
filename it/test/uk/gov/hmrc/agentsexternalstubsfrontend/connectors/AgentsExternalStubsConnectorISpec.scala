@@ -97,28 +97,40 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
     }
 
     "getUsers" should {
-      "return an user for a valid userId" in {
-        givenUsers(User("foo"), User("bar"))
-        val users: Users = await(connector.getUsers())
-        users.users.map(_.userId) should contain.only("foo", "bar")
+//      TODO: Improve values in usersList so they can used for each getUsersIT
+      val usersList: List[User] = List(
+        User("foo"),
+        User("bar")
+      )
+
+      //      TODO: Add extra ITs for different param combinations
+      "return users for a valid userId param" in {
+
       }
 
-//      TODO: Add extra ITs for different param combinations
+      "return users for a valid groupId param" in {
 
-      "omit empty query parameters" in {
+      }
+
+      "return users for a valid principalEnrolmentService param" in {
+
+      }
+
+      "return users to a limited number of results" in {
+
+      }
+
+      "return users filtered by userId, groupId, principalEnrolmentService and limit params" in {
+
+      }
+
+      "return users for empty query parameters" in {
+        givenUsers(usersList :_*)
         val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        val users: Users = await(connector.getUsers(userId = None, groupId = None, limit = None))
 
-        connector.getUsers(
-          userId = None,
-          groupId = None,
-          limit = None
-        )
-
-        verify(
-          getRequestedFor(
-            urlEqualTo("/agents-external-stubs/users")
-          )
-        )
+        verify(getRequestedFor(urlEqualTo("/agents-external-stubs/users")))
+        users.users.map(_.userId) should contain.only("foo", "bar")
       }
     }
 

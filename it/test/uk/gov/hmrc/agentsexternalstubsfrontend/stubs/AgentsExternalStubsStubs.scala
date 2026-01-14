@@ -166,6 +166,8 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
         )
     )
 
+//  TODO: Will need givenUsersWithUserId, givenUsersWithGroupId, givenUsersWithPrincipalEnrolmentService, givenUsersWithAllQueryParams
+
   def givenAllRecords =
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/records"))
