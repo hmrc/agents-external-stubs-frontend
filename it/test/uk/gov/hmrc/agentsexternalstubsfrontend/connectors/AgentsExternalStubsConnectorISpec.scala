@@ -103,25 +103,73 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         User("bar")
       )
 
-      //      TODO: Add extra ITs for different param combinations
       "return users for a valid userId param" in {
+        val userId = "oo"
 
+        givenUsers(usersList :_*)
+        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        val users: Users = await(connector.getUsers(userId = Some(userId)))
+
+        verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?userId=$userId")))
+        //      TODO: Correct Condition
+        users.users.map(_.userId) should contain.only("foo")
       }
 
       "return users for a valid groupId param" in {
+        val groupId = "group1"
 
+        givenUsers(usersList :_*)
+        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        val users: Users = await(connector.getUsers(groupId = Some(groupId)))
+
+        verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?groupId=$groupId")))
+        //      TODO: Correct Condition
+        users.users.map(_.userId) should contain.only("foo", "bar")
       }
 
       "return users for a valid principalEnrolmentService param" in {
+        val principalEnrolmentService = "HMRC-MTD-IT"
 
+        givenUsers(usersList :_*)
+        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        val users: Users = await(connector.getUsers(principalEnrolmentService = Some(principalEnrolmentService)))
+
+        verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?principalEnrolmentService=$principalEnrolmentService")))
+        //      TODO: Correct Condition
+        users.users.map(_.userId) should contain.only("foo", "bar")
       }
 
       "return users to a limited number of results" in {
+        val limit = 2
 
+        givenUsers(usersList :_*)
+        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        val users: Users = await(connector.getUsers(limit = Some(limit)))
+
+        verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?limit=$limit")))
+        //      TODO: Correct Condition
+        users.users.map(_.userId) should contain.only("foo", "bar")
       }
 
       "return users filtered by userId, groupId, principalEnrolmentService and limit params" in {
+        val userId = "oo"
+        val groupId = "group1"
+        val principalEnrolmentService = "HMRC-MTD-IT"
+        val limit = 2
 
+        givenUsers(usersList :_*)
+        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        val users: Users = await(connector.getUsers(
+          userId = Some(userId),
+          groupId = Some(groupId),
+          principalEnrolmentService = Some(principalEnrolmentService),
+          limit = Some(limit)
+        ))
+
+        val expectedUrl = s"/agents-external-stubs/users?limit=$limit&userId=$userId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
+        verify(getRequestedFor(urlEqualTo(expectedUrl)))
+        //      TODO: Correct Condition
+        users.users.map(_.userId) should contain.only("foo", "bar")
       }
 
       "return users for empty query parameters" in {
