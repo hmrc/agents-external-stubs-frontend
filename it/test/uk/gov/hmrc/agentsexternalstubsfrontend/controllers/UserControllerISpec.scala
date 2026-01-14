@@ -56,8 +56,8 @@ class UserControllerISpec
 
       //      TODO: Improve values in usersList so they can used for each getUsersIT
       val usersList: List[User] = List(
-        User("foo"),
-        User("bar")
+        User("Test123"),
+        User("Test456")
       )
 
       "render users page with no filters" in {
@@ -78,16 +78,15 @@ class UserControllerISpec
       }
 
       "allow partial filtering by userId parameter" in {
+        val userId = "oo"
+
         givenAuthorised("Test123")
-        givenUsers(
-          User("Test123"),
-          User("Test456")
-        )
+        givenUsersWithUserId(userId, usersList: _*)
 
         val request =
           FakeRequest(
             GET,
-            "/agents-external-stubs/users?userId=Test"
+            s"/agents-external-stubs/users?userId=$userId"
           ).withSession("authToken" -> "Bearer XYZ")
 
         val result = callEndpointWith(request)
@@ -98,11 +97,41 @@ class UserControllerISpec
       }
 
       "allow filtering by groupId parameter" in {
+        val groupId = "group1"
 
+        givenAuthorised("Test123")
+        givenUsersWithGroupId(groupId, usersList: _*)
+
+        val request =
+          FakeRequest(
+            GET,
+            s"/agents-external-stubs/users?groupId=$groupId"
+          ).withSession("authToken" -> "Bearer XYZ")
+
+        val result = callEndpointWith(request)
+
+        status(result) shouldBe 200
+        //        TODO: Testing of this should be more precise
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
       }
 
       "allow filtering by principalEnrolmentService parameter" in {
+        val principalEnrolmentService = "HMRC-MTD-IT"
 
+        givenAuthorised("Test123")
+        givenUsersWithPrincipalEnrolmentService(principalEnrolmentService, usersList: _*)
+
+        val request =
+          FakeRequest(
+            GET,
+            s"/agents-external-stubs/users?principalEnrolmentService=$principalEnrolmentService"
+          ).withSession("authToken" -> "Bearer XYZ")
+
+        val result = callEndpointWith(request)
+
+        status(result) shouldBe 200
+        //        TODO: Testing of this should be more precise
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
       }
 
       "allow limiting results by limit parameter" in {
@@ -128,7 +157,27 @@ class UserControllerISpec
       }
 
       "allow filtering by userId, groupId, principalEnrolmentService and limit parameters" in {
+        val userId = "oo"
+        val groupId = "group1"
+        val principalEnrolmentService = "HMRC-MTD-IT"
+        val limit = 2
 
+        givenAuthorised("Test123")
+        givenUsersWithPrincipalEnrolmentService("HMRC-MTD-IT", usersList: _*)
+
+        val stubsUrl = s"/agents-external-stubs/users?limit=$limit&userId=$userId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
+
+        val request =
+          FakeRequest(
+            GET,
+            stubsUrl
+          ).withSession("authToken" -> "Bearer XYZ")
+
+        val result = callEndpointWith(request)
+
+        status(result) shouldBe 200
+        //        TODO: Testing of this should be more precise
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
       }
 
       "return an error when non-numeric entry to limit" in {
