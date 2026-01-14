@@ -166,7 +166,76 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
         )
     )
 
-//  TODO: Will need givenUsersWithUserId, givenUsersWithGroupId, givenUsersWithPrincipalEnrolmentService, givenUsersWithAllQueryParams
+  def givenUsersWithUserId(userId: String, users: User*): Unit =
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("userId", equalTo(userId))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+//                TODO: Correct below line condition
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .toString()
+            )
+        )
+    )
+
+  def givenUsersWithGroupId(groupId: String, users: User*): Unit =
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("groupId", equalTo(groupId))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+                //                TODO: Correct below line condition
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .toString()
+            )
+        )
+    )
+
+  def givenUsersWithPrincipalEnrolmentService(principalEnrolmentService: String, users: User*): Unit =
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("principalEnrolmentService", equalTo(principalEnrolmentService))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+                //                TODO: Correct below line condition
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .toString()
+            )
+        )
+    )
+
+  def givenUsersWithAllQueryParams(limit: Int, userId: String, groupId: String, principalEnrolmentService: String, users: User*): Unit =
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("limit", equalTo(limit.toString))
+        .withQueryParam("userId", equalTo(userId))
+        .withQueryParam("groupId", equalTo(groupId))
+        .withQueryParam("principalEnrolmentService", equalTo(principalEnrolmentService))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+                //                TODO: Correct below line condition
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .toString()
+            )
+        )
+    )
 
   def givenAllRecords =
     stubFor(
