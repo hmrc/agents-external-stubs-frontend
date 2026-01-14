@@ -113,6 +113,8 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?userId=$userId")))
         //      TODO: Correct Condition
         users.users.map(_.userId) should contain.only("foo")
+
+        true shouldBe false
       }
 
       "return users for a valid groupId param" in {
@@ -125,6 +127,8 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?groupId=$groupId")))
         //      TODO: Correct Condition
         users.users.map(_.userId) should contain.only("foo", "bar")
+
+        true shouldBe false
       }
 
       "return users for a valid principalEnrolmentService param" in {
@@ -137,6 +141,8 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?principalEnrolmentService=$principalEnrolmentService")))
         //      TODO: Correct Condition
         users.users.map(_.userId) should contain.only("foo", "bar")
+
+        true shouldBe false
       }
 
       "return users to a limited number of results" in {
@@ -149,6 +155,8 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?limit=$limit")))
         //      TODO: Correct Condition
         users.users.map(_.userId) should contain.only("foo", "bar")
+
+        true shouldBe false
       }
 
       "return users filtered by userId, groupId, principalEnrolmentService and limit params" in {
@@ -170,6 +178,8 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         verify(getRequestedFor(urlEqualTo(expectedUrl)))
         //      TODO: Correct Condition
         users.users.map(_.userId) should contain.only("foo", "bar")
+
+        true shouldBe false
       }
 
       "return users for empty query parameters" in {

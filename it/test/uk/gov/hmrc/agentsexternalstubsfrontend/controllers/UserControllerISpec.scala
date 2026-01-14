@@ -94,6 +94,8 @@ class UserControllerISpec
         status(result) shouldBe 200
 //        TODO: Testing of this should be more precise
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
+
+        true shouldBe false
       }
 
       "allow filtering by groupId parameter" in {
@@ -113,6 +115,8 @@ class UserControllerISpec
         status(result) shouldBe 200
         //        TODO: Testing of this should be more precise
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
+
+        true shouldBe false
       }
 
       "allow filtering by principalEnrolmentService parameter" in {
@@ -132,6 +136,8 @@ class UserControllerISpec
         status(result) shouldBe 200
         //        TODO: Testing of this should be more precise
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
+
+        true shouldBe false
       }
 
       "allow limiting results by limit parameter" in {
@@ -178,6 +184,8 @@ class UserControllerISpec
         status(result) shouldBe 200
         //        TODO: Testing of this should be more precise
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
+
+        true shouldBe false
       }
 
       "return an error when non-numeric entry to limit" in {
