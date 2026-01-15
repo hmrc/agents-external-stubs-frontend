@@ -116,14 +116,14 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       }
 
       "return users for a valid userId param" in {
-        val userId = "oo"
+        val userId = "zz"
 
         givenUsers(usersList :_*)
         val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
         val users: Users = await(connector.getUsers(userId = Some(userId)))
 
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?userId=$userId")))
-        users.users.map(_.userId) should contain.only("foo")
+        users.users.map(_.userId) should contain.only("fizz", "buzz")
       }
 
       "return users for a valid groupId param" in {

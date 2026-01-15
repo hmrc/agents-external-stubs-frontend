@@ -83,7 +83,7 @@ class UserControllerISpec
       }
 
       "allow partial filtering by userId parameter" in {
-        val userId = "oo"
+        val userId = "zz"
 
         givenAuthorised()
         givenUsersWithUserId(userId, usersList: _*)
@@ -100,8 +100,8 @@ class UserControllerISpec
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
         val body = contentAsString(Future.successful(result))
-        val expectedUsersDisplayed = Seq("foo").forall(body.contains)
-        val expectedUsersNotDisplayed = Seq("bar", "fizz", "buzz").forall(!body.contains(_))
+        val expectedUsersDisplayed = Seq("fizz", "buzz").forall(body.contains)
+        val expectedUsersNotDisplayed = Seq("foo", "bar").forall(!body.contains(_))
 
         expectedUsersDisplayed shouldBe true
         expectedUsersNotDisplayed shouldBe true
