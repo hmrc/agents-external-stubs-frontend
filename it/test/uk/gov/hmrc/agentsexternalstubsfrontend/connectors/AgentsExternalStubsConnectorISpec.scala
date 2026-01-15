@@ -108,7 +108,6 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
 
       "return users for empty query parameters" in {
         givenUsers(usersList :_*)
-        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
         val users: Users = await(connector.getUsers(userId = None, groupId = None, limit = None))
 
         verify(getRequestedFor(urlEqualTo("/agents-external-stubs/users")))
@@ -118,8 +117,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return users for a valid userId param" in {
         val userId = "zz"
 
-        givenUsers(usersList :_*)
-        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        givenUsersWithUserId(userId, usersList :_*)
         val users: Users = await(connector.getUsers(userId = Some(userId)))
 
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?userId=$userId")))
@@ -129,8 +127,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return users for a valid groupId param" in {
         val groupId = "group1"
 
-        givenUsers(usersList :_*)
-        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        givenUsersWithGroupId(groupId, usersList :_*)
         val users: Users = await(connector.getUsers(groupId = Some(groupId)))
 
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?groupId=$groupId")))
@@ -140,8 +137,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return users for a valid principalEnrolmentService param" in {
         val principalEnrolmentService = "HMRC-MTD-IT"
 
-        givenUsers(usersList :_*)
-        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        givenUsersWithPrincipalEnrolmentService(principalEnrolmentService, usersList :_*)
         val users: Users = await(connector.getUsers(principalEnrolmentService = Some(principalEnrolmentService)))
 
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?principalEnrolmentService=$principalEnrolmentService")))
@@ -151,8 +147,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return users to a limited number of results" in {
         val limit = 3
 
-        givenUsers(usersList :_*)
-        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        givenUsersWithLimit(limit, usersList :_*)
         val users: Users = await(connector.getUsers(limit = Some(limit)))
 
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?limit=$limit")))
@@ -165,8 +160,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         val principalEnrolmentService = "HMRC-MTD-IT"
         val limit = 2
 
-        givenUsers(usersList :_*)
-        val connector = app.injector.instanceOf[AgentsExternalStubsConnector]
+        givenUsersWithAllQueryParams(limit, userId, groupId, principalEnrolmentService, usersList :_*)
         val users: Users = await(connector.getUsers(
           userId = Some(userId),
           groupId = Some(groupId),
