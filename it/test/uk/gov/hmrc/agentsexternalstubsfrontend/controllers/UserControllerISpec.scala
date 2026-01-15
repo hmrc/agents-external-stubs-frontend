@@ -54,25 +54,18 @@ class UserControllerISpec
 
     "GET /agents-external-stubs/users" should {
 
-      //      TODO: Improve values in usersList so they can used for each getUsersIT
-//      def enrolmentKeyForService(service: String): EnrolmentKey =
-//        EnrolmentKey(service, Seq(Identifier("key", "value")))
-//      val usersList: List[User] = List(
-//        User("foo", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
-//        User("bar", groupId = Some("group2"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
-//        User("fizz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("something-else"))),
-//        User("buzz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
-//      )
+      def enrolmentKeyForService(service: String): EnrolmentKey =
+        EnrolmentKey(service, Seq(Identifier("key", "value")))
       val usersList: List[User] = List(
-        User("Test123"),
-        User("Test456")
+        User("foo", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
+        User("bar", groupId = Some("group2"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
+        User("fizz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("something-else"))),
+        User("buzz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
       )
 
       "render users page with no filters" in {
-        givenAuthorised("Test123")
-        givenUsers(
-          User("Test123")
-        )
+        givenAuthorised()
+        givenUsers(usersList: _*)
 
         val request =
           FakeRequest(GET, "/agents-external-stubs/users")
@@ -81,14 +74,18 @@ class UserControllerISpec
         val result = callEndpointWith(request)
 
         status(result) shouldBe 200
-//        TODO: Test results are returned here
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
+
+        val body = contentAsString(Future.successful(result))
+        val expectedUsersDisplayed = Seq("foo", "bar", "fizz", "buzz").forall(body.contains)
+
+        expectedUsersDisplayed shouldBe true
       }
 
       "allow partial filtering by userId parameter" in {
         val userId = "oo"
 
-        givenAuthorised("Test123")
+        givenAuthorised()
         givenUsersWithUserId(userId, usersList: _*)
 
         val request =
@@ -100,16 +97,20 @@ class UserControllerISpec
         val result = callEndpointWith(request)
 
         status(result) shouldBe 200
-//        TODO: Testing of this should be more precise
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        true shouldBe false
+        val body = contentAsString(Future.successful(result))
+        val expectedUsersDisplayed = Seq("foo").forall(body.contains)
+        val expectedUsersNotDisplayed = Seq("bar", "fizz", "buzz").forall(!body.contains(_))
+
+        expectedUsersDisplayed shouldBe true
+        expectedUsersNotDisplayed shouldBe true
       }
 
       "allow filtering by groupId parameter" in {
         val groupId = "group1"
 
-        givenAuthorised("Test123")
+        givenAuthorised()
         givenUsersWithGroupId(groupId, usersList: _*)
 
         val request =
@@ -121,16 +122,20 @@ class UserControllerISpec
         val result = callEndpointWith(request)
 
         status(result) shouldBe 200
-        //        TODO: Testing of this should be more precise
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        true shouldBe false
+        val body = contentAsString(Future.successful(result))
+        val expectedUsersDisplayed = Seq("foo", "fizz", "buzz").forall(body.contains)
+        val expectedUsersNotDisplayed = Seq("bar").forall(!body.contains(_))
+
+        expectedUsersDisplayed shouldBe true
+        expectedUsersNotDisplayed shouldBe true
       }
 
       "allow filtering by principalEnrolmentService parameter" in {
         val principalEnrolmentService = "HMRC-MTD-IT"
 
-        givenAuthorised("Test123")
+        givenAuthorised()
         givenUsersWithPrincipalEnrolmentService(principalEnrolmentService, usersList: _*)
 
         val request =
@@ -142,17 +147,20 @@ class UserControllerISpec
         val result = callEndpointWith(request)
 
         status(result) shouldBe 200
-        //        TODO: Testing of this should be more precise
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        true shouldBe false
+        val body = contentAsString(Future.successful(result))
+        val expectedUsersDisplayed = Seq("foo", "bar", "buzz").forall(body.contains)
+        val expectedUsersNotDisplayed = Seq("fizz").forall(!body.contains(_))
+
+        expectedUsersDisplayed shouldBe true
+        expectedUsersNotDisplayed shouldBe true
       }
 
       "allow limiting results by limit parameter" in {
-        givenAuthorised("Test123")
+        givenAuthorised()
         val limit = 2
-        val users = (1 to 5).map(i => User(s"user-$i"))
-        givenUsersWithLimit(limit, users: _*)
+        givenUsersWithLimit(limit, usersList: _*)
 
         val request =
           FakeRequest(
@@ -163,20 +171,23 @@ class UserControllerISpec
         val result = callEndpointWith(request)
 
         status(result) shouldBe 200
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
         val body = contentAsString(Future.successful(result))
-        val matches = Seq("user-1", "user-2", "user-3", "user-4", "user-5").count(body.contains)
+        val expectedUsersDisplayed = Seq("foo", "bar").forall(body.contains)
+        val expectedUsersNotDisplayed = Seq("fizz", "buzz").forall(!body.contains(_))
 
-        matches shouldBe limit
+        expectedUsersDisplayed shouldBe true
+        expectedUsersNotDisplayed shouldBe true
       }
 
       "allow filtering by userId, groupId, principalEnrolmentService and limit parameters" in {
-        val userId = "oo"
+        val userId = "zz"
         val groupId = "group1"
         val principalEnrolmentService = "HMRC-MTD-IT"
         val limit = 2
 
-        givenAuthorised("Test123")
+        givenAuthorised()
         givenUsersWithPrincipalEnrolmentService("HMRC-MTD-IT", usersList: _*)
 
         val stubsUrl = s"/agents-external-stubs/users?limit=$limit&userId=$userId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
@@ -190,10 +201,14 @@ class UserControllerISpec
         val result = callEndpointWith(request)
 
         status(result) shouldBe 200
-        //        TODO: Testing of this should be more precise
-        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Test123"))
+        checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        true shouldBe false
+        val body = contentAsString(Future.successful(result))
+        val expectedUsersDisplayed = Seq("buzz").forall(body.contains)
+        val expectedUsersNotDisplayed = Seq("foo", "bar", "fizz").forall(!body.contains(_))
+
+        expectedUsersDisplayed shouldBe true
+        expectedUsersNotDisplayed shouldBe true
       }
 
       "return an error when non-numeric entry to limit" in {
