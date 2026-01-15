@@ -63,6 +63,8 @@ class UserControllerISpec
         User("buzz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
       )
 
+      //        TODO: Need to correct/improve form of testing which results are returned for getUsers tests below!!! Use Jsoup
+
       "render users page with no filters" in {
         givenAuthorised()
         givenUsers(usersList: _*)
