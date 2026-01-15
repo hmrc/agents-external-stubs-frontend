@@ -22,7 +22,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, AuthStubs}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.User
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{EnrolmentKey, Identifier, User}
 
 import scala.concurrent.Future
 
@@ -55,6 +55,14 @@ class UserControllerISpec
     "GET /agents-external-stubs/users" should {
 
       //      TODO: Improve values in usersList so they can used for each getUsersIT
+//      def enrolmentKeyForService(service: String): EnrolmentKey =
+//        EnrolmentKey(service, Seq(Identifier("key", "value")))
+//      val usersList: List[User] = List(
+//        User("foo", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
+//        User("bar", groupId = Some("group2"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
+//        User("fizz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("something-else"))),
+//        User("buzz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
+//      )
       val usersList: List[User] = List(
         User("Test123"),
         User("Test456")
