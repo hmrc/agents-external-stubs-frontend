@@ -144,13 +144,14 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(
               Json
-                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(Json.toJson(_)))))
                 .toString()
             )
         )
     )
 
-  def givenUsersWithLimit(limit: Int, users: User*): Unit =
+  def givenUsersWithLimit(limit: Int, users: User*): Unit = {
+    val filteredUsers = users.take(limit)
     stubFor(
       get(urlPathEqualTo("/agents-external-stubs/users"))
         .withQueryParam("limit", equalTo(limit.toString))
@@ -160,13 +161,15 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(
               Json
-                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.take(limit).map(user => Json.toJson(user)))))
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
                 .toString()
             )
         )
     )
+  }
 
-  def givenUsersWithUserId(userId: String, users: User*): Unit =
+  def givenUsersWithUserId(userId: String, users: User*): Unit = {
+    val filteredUsers = users.filter(_.userId.contains(userId))
     stubFor(
       get(urlPathEqualTo("/agents-external-stubs/users"))
         .withQueryParam("userId", equalTo(userId))
@@ -176,14 +179,15 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(
               Json
-//                TODO: Correct below line condition
-                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
                 .toString()
             )
         )
     )
+  }
 
-  def givenUsersWithGroupId(groupId: String, users: User*): Unit =
+  def givenUsersWithGroupId(groupId: String, users: User*): Unit = {
+    val filteredUsers = users.filter(_.groupId.contains(groupId))
     stubFor(
       get(urlPathEqualTo("/agents-external-stubs/users"))
         .withQueryParam("groupId", equalTo(groupId))
@@ -193,14 +197,15 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(
               Json
-                //                TODO: Correct below line condition
-                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
                 .toString()
             )
         )
     )
+  }
 
-  def givenUsersWithPrincipalEnrolmentService(principalEnrolmentService: String, users: User*): Unit =
+  def givenUsersWithPrincipalEnrolmentService(principalEnrolmentService: String, users: User*): Unit = {
+    val filteredUsers = users.filter(_.assignedPrincipalEnrolments.map(_.service).contains(principalEnrolmentService))
     stubFor(
       get(urlPathEqualTo("/agents-external-stubs/users"))
         .withQueryParam("principalEnrolmentService", equalTo(principalEnrolmentService))
@@ -210,14 +215,19 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(
               Json
-                //                TODO: Correct below line condition
-                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
                 .toString()
             )
         )
     )
+  }
 
-  def givenUsersWithAllQueryParams(limit: Int, userId: String, groupId: String, principalEnrolmentService: String, users: User*): Unit =
+  def givenUsersWithAllQueryParams(limit: Int, userId: String, groupId: String, principalEnrolmentService: String, users: User*): Unit = {
+    val filteredUsers = users
+      .filter(_.userId.contains(userId))
+      .filter(_.groupId.contains(groupId))
+      .filter(_.assignedPrincipalEnrolments.map(_.service).contains(principalEnrolmentService))
+      .take(limit)
     stubFor(
       get(urlPathEqualTo("/agents-external-stubs/users"))
         .withQueryParam("limit", equalTo(limit.toString))
@@ -230,12 +240,12 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(
               Json
-                //                TODO: Correct below line condition
-                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
                 .toString()
             )
         )
     )
+  }
 
   def givenAllRecords =
     stubFor(
