@@ -224,14 +224,13 @@ class UserControllerISpec
       }
 
       "preserve filter values after submitting filters" in {
-//        TODO: Add additional principalEnrolmentService filter field to this test
         givenAuthorised("Test123")
         givenUsers(User("Test123"), User("test456"))
 
         val request =
           FakeRequest(
             GET,
-            "/agents-external-stubs/users?userId=Test&groupId=G1&limit=10"
+            "/agents-external-stubs/users?userId=TestId&principalEnrolmentService=HMRC-MTD-IT&groupId=G1&limit=10"
           ).withSession("authToken" -> "Bearer XYZ")
 
         val result = callEndpointWith(request)
@@ -241,7 +240,9 @@ class UserControllerISpec
         val body = contentAsString(Future.successful(result))
 
         body should include("""name="userId"""")
-        body should include("""value="Test"""")
+        body should include("""value="TestId"""")
+        body should include("""name="principalEnrolmentService"""")
+        body should include("""value="HMRC-MTD-IT"""")
         body should include("""name="groupId"""")
         body should include("""value="G1"""")
         body should include("""name="limit"""")
