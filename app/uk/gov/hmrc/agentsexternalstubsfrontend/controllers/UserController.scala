@@ -496,7 +496,7 @@ class UserController @Inject() (
           boundForm.fold(
             formWithErrors =>
               agentsExternalStubsConnector
-                .getUsers(None, None, None)
+                .getUsers(None, None, None, None)
                 .map { users =>
                   Ok(
                     showAllUsersView(
