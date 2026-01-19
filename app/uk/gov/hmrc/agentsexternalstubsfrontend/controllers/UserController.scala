@@ -504,6 +504,8 @@ class UserController @Inject() (
                 Ok(
                   showAllUsersView(
                     users = users,
+                    groups = groups.groups.map(_.groupId),
+                    services = services.services.map(_.name),
                     showCurrentUserUrl = routes.UserController.showUserPage(None),
                     filtersForm = formWithErrors,
                     createANewUserForm = CreateANewUserForm.form,
@@ -531,6 +533,7 @@ class UserController @Inject() (
 //                  )
 //                },
             filters =>
+//              TODO: Debug here as now failing after addition of loaded dropdown
               for {
                 groups <- agentsExternalStubsConnector.getGroups
                 users <- agentsExternalStubsConnector.getUsers(
@@ -545,6 +548,8 @@ class UserController @Inject() (
                 Ok(
                   showAllUsersView(
                     users = users,
+                    groups = groups.groups.map(_.groupId),
+                    services = services.services.map(_.name),
                     showCurrentUserUrl = routes.UserController.showUserPage(None),
                     filtersForm = boundForm,
                     createANewUserForm = CreateANewUserForm.form,
@@ -597,6 +602,8 @@ class UserController @Inject() (
                   Ok(
                     showAllUsersView(
                       users = users,
+                      groups = groups.groups.map(_.groupId),
+                      services = services.services.map(_.name),
                       showCurrentUserUrl = routes.UserController.showUserPage(None),
                       filtersForm = UserFiltersForm.form,
                       createANewUserForm = CreateANewUserForm.form,

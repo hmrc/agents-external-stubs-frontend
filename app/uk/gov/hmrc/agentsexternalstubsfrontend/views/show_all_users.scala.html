@@ -17,12 +17,13 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
-@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukInput, GovukTable}
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukInput, GovukSelect, GovukTable}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichSelect}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.{Select, SelectItem}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, Table, TableRow}
 @import views.html.helper.CSRF
 @import uk.gov.hmrc.agentsexternalstubsfrontend.forms.CreateANewUser
@@ -36,11 +37,14 @@
         form: FormWithCSRF,
         govukInput: GovukInput,
         govukButton: GovukButton,
+        govukSelect: GovukSelect,
         govukTable: GovukTable,
 )
 
 @(
         users: Users,
+        groups: Seq[String] = Seq.empty,
+        services: Seq[String] = Seq.empty,
         showCurrentUserUrl: Call,
         filtersForm: Form[UserFilters],
         createANewUserForm: Form[CreateANewUser],
@@ -70,24 +74,18 @@
 
         @* TODO: Load list of groups using getGroups and make this a dropdown select *@
         <div class="govuk-form-group govuk-input--width-20" id="width-20" name="width20">
-        @govukInput(
-            Input(
-                name  = "groupId",
+            @govukSelect(Select(
                 label = Label(content = Text("Search by group ID (optional)")),
-                value = filtersForm("groupId").value
-            )
-        )
+                items = SelectItem(value = None, text = "--") +: groups.map(group => SelectItem(value = Some(group), text = group))
+            ).withFormField(filtersForm("groupId")))
         </div>
 
         @* TODO: Load list of services using ServicesDefinitionService and make this a dropdown select *@
         <div class="govuk-form-group govuk-input--width-20" id="width-20" name="width20">
-        @govukInput(
-            Input(
-                name  = "principalEnrolmentService",
+            @govukSelect(Select(
                 label = Label(content = Text("Search by service (optional)")),
-                value = filtersForm("principalEnrolmentService").value
-            )
-        )
+                items = SelectItem(value = None, text = "--") +: services.map(service => SelectItem(value = Some(service), text = service))
+            ).withFormField(filtersForm("principalEnrolmentService")))
         </div>
 
         <div class="govuk-form-group @if(filtersForm.error("limit").isDefined){govuk-form-group--error}">
