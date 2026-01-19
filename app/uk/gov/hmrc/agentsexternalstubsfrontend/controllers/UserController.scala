@@ -495,44 +495,77 @@ class UserController @Inject() (
 
           boundForm.fold(
             formWithErrors =>
-              agentsExternalStubsConnector
-                .getUsers(None, None, None, None)
-                .map { users =>
-                  Ok(
-                    showAllUsersView(
-                      users = users,
-                      showCurrentUserUrl = routes.UserController.showUserPage(None),
-                      filtersForm = formWithErrors,
-                      createANewUserForm = CreateANewUserForm.form,
-                      context = pageContext(credentials),
-                      userId = None,
-                      groupId = None,
-                      limit = None
-                    )
-                  )
-                },
+              for {
+                users <- agentsExternalStubsConnector.getUsers(None, None, None, None)
+              } yield Ok(
+                showAllUsersView(
+                  users = users,
+                  showCurrentUserUrl = routes.UserController.showUserPage(None),
+                  filtersForm = formWithErrors,
+                  createANewUserForm = CreateANewUserForm.form,
+                  context = pageContext(credentials),
+                  userId = None,
+                  groupId = None,
+                  limit = None
+                )
+              ),
+//              agentsExternalStubsConnector
+//                .getUsers(None, None, None, None)
+//                .map { users =>
+//                  Ok(
+//                    showAllUsersView(
+//                      users = users,
+//                      showCurrentUserUrl = routes.UserController.showUserPage(None),
+//                      filtersForm = formWithErrors,
+//                      createANewUserForm = CreateANewUserForm.form,
+//                      context = pageContext(credentials),
+//                      userId = None,
+//                      groupId = None,
+//                      limit = None
+//                    )
+//                  )
+//                },
             filters =>
-              agentsExternalStubsConnector
-                .getUsers(
+              for {
+                users <- agentsExternalStubsConnector.getUsers(
                   userId = filters.userId.filter(_.nonEmpty),
                   groupId = filters.groupId.filter(_.nonEmpty),
                   principalEnrolmentService = filters.principalEnrolmentService.filter(_.nonEmpty),
                   limit = filters.limit
                 )
-                .map { users =>
-                  Ok(
-                    showAllUsersView(
-                      users = users,
-                      showCurrentUserUrl = routes.UserController.showUserPage(None),
-                      filtersForm = boundForm,
-                      createANewUserForm = CreateANewUserForm.form,
-                      context = pageContext(credentials),
-                      userId = None,
-                      groupId = None,
-                      limit = None
-                    )
-                  )
-                }
+              } yield Ok(
+                showAllUsersView(
+                  users = users,
+                  showCurrentUserUrl = routes.UserController.showUserPage(None),
+                  filtersForm = boundForm,
+                  createANewUserForm = CreateANewUserForm.form,
+                  context = pageContext(credentials),
+                  userId = None,
+                  groupId = None,
+                  limit = None
+                )
+              )
+            //              agentsExternalStubsConnector
+//                .getUsers(
+//                  userId = filters.userId.filter(_.nonEmpty),
+//                  groupId = filters.groupId.filter(_.nonEmpty),
+//                  principalEnrolmentService = filters.principalEnrolmentService.filter(_.nonEmpty),
+//                  limit = filters.limit
+//                )
+//                .map { users =>
+//                  Ok(
+//                    showAllUsersView(
+//                      users = users,
+//                      showCurrentUserUrl = routes.UserController.showUserPage(None),
+//                      filtersForm = boundForm,
+//                      createANewUserForm = CreateANewUserForm.form,
+//                      context = pageContext(credentials),
+//                      userId = None,
+//                      groupId = None,
+//                      limit = None
+//                    )
+//                  )
+//                }
           )
         }
     }
