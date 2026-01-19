@@ -76,7 +76,7 @@
         <div class="govuk-form-group govuk-input--width-20" id="width-20" name="width20">
             @govukSelect(Select(
                 label = Label(content = Text("Search by group ID (optional)")),
-                items = SelectItem(value = None, text = "--") +: groups.map(group => SelectItem(value = Some(group), text = group))
+                items = SelectItem(value = None, text = "") +: groups.map(group => SelectItem(value = Some(group), text = group))
             ).withFormField(filtersForm("groupId")))
         </div>
 
@@ -84,7 +84,7 @@
         <div class="govuk-form-group govuk-input--width-20" id="width-20" name="width20">
             @govukSelect(Select(
                 label = Label(content = Text("Search by service (optional)")),
-                items = SelectItem(value = None, text = "--") +: services.map(service => SelectItem(value = Some(service), text = service))
+                items = SelectItem(value = None, text = "") +: services.map(service => SelectItem(value = Some(service), text = service))
             ).withFormField(filtersForm("principalEnrolmentService")))
         </div>
 
