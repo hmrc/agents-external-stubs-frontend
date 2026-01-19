@@ -484,9 +484,6 @@ class UserController @Inject() (
       }
     }
 
-//  TODO: Load list of groups using getGroups in order to populate groupId dropdown
-//  TODO: Load list of services using ServicesDefinitionService in order to populate principalEnrolmentService dropdown select
-// TODO: Use Future for comprehension
   val showAllUsersPage: Action[AnyContent] =
     Action.async { implicit request =>
       authorised()
@@ -499,13 +496,11 @@ class UserController @Inject() (
                 groups <- agentsExternalStubsConnector.getGroups
                 users  <- agentsExternalStubsConnector.getUsers(None, None, None, None)
               } yield {
-                val hereIsGroups = groups
-                val services = servicesDefinitionsService.servicesDefinitions
                 Ok(
                   showAllUsersView(
                     users = users,
                     groups = groups.groups.map(_.groupId),
-                    services = services.services.map(_.name),
+                    services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
                     showCurrentUserUrl = routes.UserController.showUserPage(None),
                     filtersForm = formWithErrors,
                     createANewUserForm = CreateANewUserForm.form,
@@ -516,24 +511,7 @@ class UserController @Inject() (
                   )
                 )
               },
-//              agentsExternalStubsConnector
-//                .getUsers(None, None, None, None)
-//                .map { users =>
-//                  Ok(
-//                    showAllUsersView(
-//                      users = users,
-//                      showCurrentUserUrl = routes.UserController.showUserPage(None),
-//                      filtersForm = formWithErrors,
-//                      createANewUserForm = CreateANewUserForm.form,
-//                      context = pageContext(credentials),
-//                      userId = None,
-//                      groupId = None,
-//                      limit = None
-//                    )
-//                  )
-//                },
             filters =>
-//              TODO: Debug here as now failing after addition of loaded dropdown
               for {
                 groups <- agentsExternalStubsConnector.getGroups
                 users <- agentsExternalStubsConnector.getUsers(
@@ -543,13 +521,11 @@ class UserController @Inject() (
                            limit = filters.limit
                          )
               } yield {
-                val hereIsGroups = groups
-                val services = servicesDefinitionsService.servicesDefinitions
                 Ok(
                   showAllUsersView(
                     users = users,
                     groups = groups.groups.map(_.groupId),
-                    services = services.services.map(_.name),
+                    services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
                     showCurrentUserUrl = routes.UserController.showUserPage(None),
                     filtersForm = boundForm,
                     createANewUserForm = CreateANewUserForm.form,
@@ -560,27 +536,6 @@ class UserController @Inject() (
                   )
                 )
               }
-            //              agentsExternalStubsConnector
-//                .getUsers(
-//                  userId = filters.userId.filter(_.nonEmpty),
-//                  groupId = filters.groupId.filter(_.nonEmpty),
-//                  principalEnrolmentService = filters.principalEnrolmentService.filter(_.nonEmpty),
-//                  limit = filters.limit
-//                )
-//                .map { users =>
-//                  Ok(
-//                    showAllUsersView(
-//                      users = users,
-//                      showCurrentUserUrl = routes.UserController.showUserPage(None),
-//                      filtersForm = boundForm,
-//                      createANewUserForm = CreateANewUserForm.form,
-//                      context = pageContext(credentials),
-//                      userId = None,
-//                      groupId = None,
-//                      limit = None
-//                    )
-//                  )
-//                }
           )
         }
     }
@@ -597,13 +552,11 @@ class UserController @Inject() (
                   groups <- agentsExternalStubsConnector.getGroups
                   users  <- agentsExternalStubsConnector.getUsers(None, None, None, None)
                 } yield {
-                  val hereIsGroups = groups
-                  val services = servicesDefinitionsService.servicesDefinitions
                   Ok(
                     showAllUsersView(
                       users = users,
                       groups = groups.groups.map(_.groupId),
-                      services = services.services.map(_.name),
+                      services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
                       showCurrentUserUrl = routes.UserController.showUserPage(None),
                       filtersForm = UserFiltersForm.form,
                       createANewUserForm = CreateANewUserForm.form,
@@ -614,23 +567,6 @@ class UserController @Inject() (
                     )
                   )
                 },
-//              formWithErrors =>
-//                agentsExternalStubsConnector
-//                  .getUsers()
-//                  .map(users =>
-//                    Ok(
-//                      showAllUsersView(
-//                        users = users,
-//                        showCurrentUserUrl = routes.UserController.showUserPage(None),
-//                        filtersForm = UserFiltersForm.form,
-//                        createANewUserForm = formWithErrors,
-//                        context = pageContext(credentials),
-//                        userId = None,
-//                        groupId = None,
-//                        limit = Some(100)
-//                      )
-//                    )
-//                  ),
               createANewUser =>
                 Future.successful(Redirect(routes.UserController.showCreateUserPage(userId = createANewUser.userId)))
             )
