@@ -496,19 +496,24 @@ class UserController @Inject() (
           boundForm.fold(
             formWithErrors =>
               for {
-                users <- agentsExternalStubsConnector.getUsers(None, None, None, None)
-              } yield Ok(
-                showAllUsersView(
-                  users = users,
-                  showCurrentUserUrl = routes.UserController.showUserPage(None),
-                  filtersForm = formWithErrors,
-                  createANewUserForm = CreateANewUserForm.form,
-                  context = pageContext(credentials),
-                  userId = None,
-                  groupId = None,
-                  limit = None
+                groups <- agentsExternalStubsConnector.getGroups
+                users  <- agentsExternalStubsConnector.getUsers(None, None, None, None)
+              } yield {
+                val hereIsGroups = groups
+                val services = servicesDefinitionsService.servicesDefinitions
+                Ok(
+                  showAllUsersView(
+                    users = users,
+                    showCurrentUserUrl = routes.UserController.showUserPage(None),
+                    filtersForm = formWithErrors,
+                    createANewUserForm = CreateANewUserForm.form,
+                    context = pageContext(credentials),
+                    userId = None,
+                    groupId = None,
+                    limit = None
+                  )
                 )
-              ),
+              },
 //              agentsExternalStubsConnector
 //                .getUsers(None, None, None, None)
 //                .map { users =>
@@ -527,24 +532,29 @@ class UserController @Inject() (
 //                },
             filters =>
               for {
+                groups <- agentsExternalStubsConnector.getGroups
                 users <- agentsExternalStubsConnector.getUsers(
-                  userId = filters.userId.filter(_.nonEmpty),
-                  groupId = filters.groupId.filter(_.nonEmpty),
-                  principalEnrolmentService = filters.principalEnrolmentService.filter(_.nonEmpty),
-                  limit = filters.limit
+                           userId = filters.userId.filter(_.nonEmpty),
+                           groupId = filters.groupId.filter(_.nonEmpty),
+                           principalEnrolmentService = filters.principalEnrolmentService.filter(_.nonEmpty),
+                           limit = filters.limit
+                         )
+              } yield {
+                val hereIsGroups = groups
+                val services = servicesDefinitionsService.servicesDefinitions
+                Ok(
+                  showAllUsersView(
+                    users = users,
+                    showCurrentUserUrl = routes.UserController.showUserPage(None),
+                    filtersForm = boundForm,
+                    createANewUserForm = CreateANewUserForm.form,
+                    context = pageContext(credentials),
+                    userId = None,
+                    groupId = None,
+                    limit = None
+                  )
                 )
-              } yield Ok(
-                showAllUsersView(
-                  users = users,
-                  showCurrentUserUrl = routes.UserController.showUserPage(None),
-                  filtersForm = boundForm,
-                  createANewUserForm = CreateANewUserForm.form,
-                  context = pageContext(credentials),
-                  userId = None,
-                  groupId = None,
-                  limit = None
-                )
-              )
+              }
             //              agentsExternalStubsConnector
 //                .getUsers(
 //                  userId = filters.userId.filter(_.nonEmpty),
@@ -578,22 +588,42 @@ class UserController @Inject() (
             .bindFromRequest()
             .fold(
               formWithErrors =>
-                agentsExternalStubsConnector
-                  .getUsers()
-                  .map(users =>
-                    Ok(
-                      showAllUsersView(
-                        users = users,
-                        showCurrentUserUrl = routes.UserController.showUserPage(None),
-                        filtersForm = UserFiltersForm.form,
-                        createANewUserForm = formWithErrors,
-                        context = pageContext(credentials),
-                        userId = None,
-                        groupId = None,
-                        limit = Some(100)
-                      )
+                for {
+                  groups <- agentsExternalStubsConnector.getGroups
+                  users  <- agentsExternalStubsConnector.getUsers(None, None, None, None)
+                } yield {
+                  val hereIsGroups = groups
+                  val services = servicesDefinitionsService.servicesDefinitions
+                  Ok(
+                    showAllUsersView(
+                      users = users,
+                      showCurrentUserUrl = routes.UserController.showUserPage(None),
+                      filtersForm = UserFiltersForm.form,
+                      createANewUserForm = CreateANewUserForm.form,
+                      context = pageContext(credentials),
+                      userId = None,
+                      groupId = None,
+                      limit = None
                     )
-                  ),
+                  )
+                },
+//              formWithErrors =>
+//                agentsExternalStubsConnector
+//                  .getUsers()
+//                  .map(users =>
+//                    Ok(
+//                      showAllUsersView(
+//                        users = users,
+//                        showCurrentUserUrl = routes.UserController.showUserPage(None),
+//                        filtersForm = UserFiltersForm.form,
+//                        createANewUserForm = formWithErrors,
+//                        context = pageContext(credentials),
+//                        userId = None,
+//                        groupId = None,
+//                        limit = Some(100)
+//                      )
+//                    )
+//                  ),
               createANewUser =>
                 Future.successful(Redirect(routes.UserController.showCreateUserPage(userId = createANewUser.userId)))
             )
