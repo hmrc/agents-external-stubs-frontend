@@ -495,22 +495,20 @@ class UserController @Inject() (
               for {
                 groups <- agentsExternalStubsConnector.getGroups
                 users  <- agentsExternalStubsConnector.getUsers(None, None, None, None)
-              } yield {
-                Ok(
-                  showAllUsersView(
-                    users = users,
-                    groups = groups.groups.map(_.groupId),
-                    services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
-                    showCurrentUserUrl = routes.UserController.showUserPage(None),
-                    filtersForm = formWithErrors,
-                    createANewUserForm = CreateANewUserForm.form,
-                    context = pageContext(credentials),
-                    userId = None,
-                    groupId = None,
-                    limit = None
-                  )
+              } yield Ok(
+                showAllUsersView(
+                  users = users,
+                  groups = groups.groups.map(_.groupId),
+                  services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
+                  showCurrentUserUrl = routes.UserController.showUserPage(None),
+                  filtersForm = formWithErrors,
+                  createANewUserForm = CreateANewUserForm.form,
+                  context = pageContext(credentials),
+                  userId = None,
+                  groupId = None,
+                  limit = None
                 )
-              },
+              ),
             filters =>
               for {
                 groups <- agentsExternalStubsConnector.getGroups
@@ -551,22 +549,20 @@ class UserController @Inject() (
                 for {
                   groups <- agentsExternalStubsConnector.getGroups
                   users  <- agentsExternalStubsConnector.getUsers(None, None, None, None)
-                } yield {
-                  Ok(
-                    showAllUsersView(
-                      users = users,
-                      groups = groups.groups.map(_.groupId),
-                      services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
-                      showCurrentUserUrl = routes.UserController.showUserPage(None),
-                      filtersForm = UserFiltersForm.form,
-                      createANewUserForm = CreateANewUserForm.form,
-                      context = pageContext(credentials),
-                      userId = None,
-                      groupId = None,
-                      limit = None
-                    )
+                } yield Ok(
+                  showAllUsersView(
+                    users = users,
+                    groups = groups.groups.map(_.groupId),
+                    services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
+                    showCurrentUserUrl = routes.UserController.showUserPage(None),
+                    filtersForm = UserFiltersForm.form,
+                    createANewUserForm = CreateANewUserForm.form,
+                    context = pageContext(credentials),
+                    userId = None,
+                    groupId = None,
+                    limit = None
                   )
-                },
+                ),
               createANewUser =>
                 Future.successful(Redirect(routes.UserController.showCreateUserPage(userId = createANewUser.userId)))
             )

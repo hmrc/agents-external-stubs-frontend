@@ -227,10 +227,15 @@ class UserControllerISpec
         givenServiceDefinitions
         givenUsers(User("Test123"), User("test456"))
 
+        val userId = "TestId"
+        val principalEnrolmentService = "HMRC-MTD-IT"
+        val groupId = "G1"
+        val limit = 10
+
         val request =
           FakeRequest(
             GET,
-            "/agents-external-stubs/users?userId=TestId&principalEnrolmentService=HMRC-MTD-IT&groupId=G1&limit=10"
+            s"/agents-external-stubs/users?userId=$userId&principalEnrolmentService=$principalEnrolmentService&groupId=$groupId&limit=$limit"
           ).withSession("authToken" -> "Bearer XYZ")
 
         val result = callEndpointWith(request)
@@ -240,15 +245,13 @@ class UserControllerISpec
         val body = contentAsString(Future.successful(result))
 
         body should include("""name="userId"""")
-        body should include("""value="TestId"""")
-//        TODO: Need to add this option to givenServiceDefinitions
+        body should include(s"""value="$userId"""")
         body should include("""name="principalEnrolmentService"""")
-        body should include("""value="HMRC-MTD-IT"""")
-//        TODO: Need to add this options to givenGroups
+        body should include(s"""value="$principalEnrolmentService"""")
         body should include("""name="groupId"""")
-        body should include("""value="G1"""")
+        body should include(s"""value="$groupId"""")
         body should include("""name="limit"""")
-        body should include("""value="10"""")
+        body should include(s"""value="$limit"""")
       }
 
       "render clear filters button" in {

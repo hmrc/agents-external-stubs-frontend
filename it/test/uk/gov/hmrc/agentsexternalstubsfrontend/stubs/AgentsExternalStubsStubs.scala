@@ -20,7 +20,8 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 import play.api.libs.json.{JsArray, Json}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, Groups, Services, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.Service.Flags
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, Group, Groups, Service, Services, User}
 
 import java.util.UUID
 
@@ -248,7 +249,9 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
   }
 
   def givenGroups = {
-    val groups: Groups = Groups(Seq.empty)
+    val groups: Groups = Groups(Seq(
+      Group("foobar", "G1", "Agent", None, None, None, Seq.empty, Seq.empty)
+    ))
     stubFor(
       get(urlEqualTo("/agents-external-stubs/groups"))
         .willReturn(
@@ -261,7 +264,9 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
   }
 
   def givenServiceDefinitions = {
-    val serviceDefinitions: Services = Services(Seq.empty)
+    val serviceDefinitions: Services = Services(Seq(
+      Service("HMRC-MTD-IT", "HMRC Making Tax Digital Income Tax", Seq.empty, Seq.empty, Seq.empty, Flags(true, false, false, false, true, true))
+    ))
     stubFor(
       get(urlEqualTo("/agents-external-stubs/config/services"))
         .willReturn(
