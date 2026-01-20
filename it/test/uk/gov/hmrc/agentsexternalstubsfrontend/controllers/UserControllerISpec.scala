@@ -57,6 +57,12 @@ class UserControllerISpec
 
     "GET /agents-external-stubs/users" should {
 
+      trait SimpleGetUsersSetup {
+        givenAuthorised()
+        givenGroups
+        givenServiceDefinitions
+      }
+
       def enrolmentKeyForService(service: String): EnrolmentKey =
         EnrolmentKey(service, Seq(Identifier("key", "value")))
       val usersList: List[User] = List(
@@ -76,134 +82,126 @@ class UserControllerISpec
         users.toList
       }
 
-      "render users page with no filters" in {
-        givenAuthorised()
+      "render users page with no filters" in new SimpleGetUsersSetup {
         givenUsers(usersList: _*)
 
-        val request =
+        private val request =
           FakeRequest(GET, "/agents-external-stubs/users")
             .withSession("authToken" -> "Bearer XYZ")
 
-        val result = callEndpointWith(request)
+        private val result = callEndpointWith(request)
 
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        val body = contentAsString(Future.successful(result))
+        private val body = contentAsString(Future.successful(result))
         getUserIdsDisplayed(body) shouldBe List("bar", "buzz", "fizz", "foo")
       }
 
-      "allow partial filtering by userId parameter" in {
+      "allow partial filtering by userId parameter" in new SimpleGetUsersSetup {
         val userId = "zz"
-
-        givenAuthorised()
         givenUsersWithUserId(userId, usersList: _*)
 
-        val request =
+        private val request =
           FakeRequest(
             GET,
             s"/agents-external-stubs/users?userId=$userId"
           ).withSession("authToken" -> "Bearer XYZ")
 
-        val result = callEndpointWith(request)
+        private val result = callEndpointWith(request)
 
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        val body = contentAsString(Future.successful(result))
+        private val body = contentAsString(Future.successful(result))
         getUserIdsDisplayed(body) shouldBe List("buzz", "fizz")
       }
 
-      "allow filtering by groupId parameter" in {
+      "allow filtering by groupId parameter" in new SimpleGetUsersSetup {
         val groupId = "group1"
-
-        givenAuthorised()
         givenUsersWithGroupId(groupId, usersList: _*)
 
-        val request =
+        private val request =
           FakeRequest(
             GET,
             s"/agents-external-stubs/users?groupId=$groupId"
           ).withSession("authToken" -> "Bearer XYZ")
 
-        val result = callEndpointWith(request)
+        private val result = callEndpointWith(request)
 
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        val body = contentAsString(Future.successful(result))
+        private val body = contentAsString(Future.successful(result))
         getUserIdsDisplayed(body) shouldBe List("buzz", "fizz", "foo")
       }
 
-      "allow filtering by principalEnrolmentService parameter" in {
+      "allow filtering by principalEnrolmentService parameter" in new SimpleGetUsersSetup {
         val principalEnrolmentService = "HMRC-MTD-IT"
-
-        givenAuthorised()
         givenUsersWithPrincipalEnrolmentService(principalEnrolmentService, usersList: _*)
 
-        val request =
+        private val request =
           FakeRequest(
             GET,
             s"/agents-external-stubs/users?principalEnrolmentService=$principalEnrolmentService"
           ).withSession("authToken" -> "Bearer XYZ")
 
-        val result = callEndpointWith(request)
+        private val result = callEndpointWith(request)
 
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        val body = contentAsString(Future.successful(result))
+        private val body = contentAsString(Future.successful(result))
         getUserIdsDisplayed(body) shouldBe List("bar", "buzz", "foo")
       }
 
-      "allow limiting results by limit parameter" in {
-        givenAuthorised()
+      "allow limiting results by limit parameter" in new SimpleGetUsersSetup {
         val limit = 3
         givenUsersWithLimit(limit, usersList: _*)
 
-        val request =
+        private val request =
           FakeRequest(
             GET,
             s"/agents-external-stubs/users?limit=$limit"
           ).withSession("authToken" -> "Bearer XYZ")
 
-        val result = callEndpointWith(request)
+        private val result = callEndpointWith(request)
 
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        val body = contentAsString(Future.successful(result))
+        private val body = contentAsString(Future.successful(result))
         getUserIdsDisplayed(body) shouldBe List("bar", "fizz", "foo")
       }
 
-      "allow filtering by userId, groupId, principalEnrolmentService and limit parameters" in {
+      "allow filtering by userId, groupId, principalEnrolmentService and limit parameters" in new SimpleGetUsersSetup {
         val userId = "zz"
         val groupId = "group1"
         val principalEnrolmentService = "HMRC-MTD-IT"
         val limit = 2
-
-        givenAuthorised()
         givenUsersWithAllQueryParams(limit, userId, groupId, principalEnrolmentService, usersList: _*)
 
         val stubsUrl = s"/agents-external-stubs/users?limit=$limit&userId=$userId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
 
-        val request =
+        private val request =
           FakeRequest(
             GET,
             stubsUrl
           ).withSession("authToken" -> "Bearer XYZ")
 
-        val result = callEndpointWith(request)
+        private val result = callEndpointWith(request)
 
         status(result) shouldBe 200
         checkHtmlResultWithBodyText(result, htmlEscapedMessage("Your test users"))
 
-        val body = contentAsString(Future.successful(result))
+        private val body = contentAsString(Future.successful(result))
         getUserIdsDisplayed(body) shouldBe List("buzz")
       }
 
       "return an error when non-numeric entry to limit" in {
         givenAuthorised("Test123")
+        givenGroups
+        givenServiceDefinitions
         givenUsers(
           User("Test123")
         )
@@ -225,6 +223,8 @@ class UserControllerISpec
 
       "preserve filter values after submitting filters" in {
         givenAuthorised("Test123")
+        givenGroups
+        givenServiceDefinitions
         givenUsers(User("Test123"), User("test456"))
 
         val request =
@@ -241,8 +241,10 @@ class UserControllerISpec
 
         body should include("""name="userId"""")
         body should include("""value="TestId"""")
+//        TODO: Need to add this option to givenServiceDefinitions
         body should include("""name="principalEnrolmentService"""")
         body should include("""value="HMRC-MTD-IT"""")
+//        TODO: Need to add this options to givenGroups
         body should include("""name="groupId"""")
         body should include("""value="G1"""")
         body should include("""name="limit"""")
@@ -251,6 +253,8 @@ class UserControllerISpec
 
       "render clear filters button" in {
         givenAuthorised("Test123")
+        givenGroups
+        givenServiceDefinitions
         givenUsers(User("Test123"))
 
         val request =

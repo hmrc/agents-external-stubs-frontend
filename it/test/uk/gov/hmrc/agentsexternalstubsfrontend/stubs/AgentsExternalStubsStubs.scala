@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 import play.api.libs.json.{JsArray, Json}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, Groups, Services, User}
 
 import java.util.UUID
 
@@ -243,6 +243,32 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
                 .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
                 .toString()
             )
+        )
+    )
+  }
+
+  def givenGroups = {
+    val groups: Groups = Groups(Seq.empty)
+    stubFor(
+      get(urlEqualTo("/agents-external-stubs/groups"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(Json.obj("groups" -> Json.toJsFieldJsValueWrapper(groups.groups)).toString())
+        )
+    )
+  }
+
+  def givenServiceDefinitions = {
+    val serviceDefinitions: Services = Services(Seq.empty)
+    stubFor(
+      get(urlEqualTo("/agents-external-stubs/config/services"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(Json.obj("services" -> Json.toJsFieldJsValueWrapper(serviceDefinitions.services.map(Json.toJson(_)(Services.f3)))).toString())
         )
     )
   }
