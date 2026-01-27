@@ -74,7 +74,6 @@ class UserControllerISpec
 
       def getUserIdsDisplayed(body: String): List[String] = {
         val html = Jsoup.parse(body)
-//        TODO: Is there a neater way to do this?
         val users: scala.collection.mutable.ListBuffer[String] = ListBuffer.empty
         html.select("tbody tr").forEach(tr => {
           users += tr.select("div").first().text()
