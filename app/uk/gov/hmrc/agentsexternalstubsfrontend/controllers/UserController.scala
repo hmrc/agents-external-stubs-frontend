@@ -518,22 +518,20 @@ class UserController @Inject() (
                            principalEnrolmentService = filters.principalEnrolmentService.filter(_.nonEmpty),
                            limit = filters.limit
                          )
-              } yield {
-                Ok(
-                  showAllUsersView(
-                    users = users,
-                    groups = groups.groups.map(_.groupId),
-                    services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
-                    showCurrentUserUrl = routes.UserController.showUserPage(None),
-                    filtersForm = boundForm,
-                    createANewUserForm = CreateANewUserForm.form,
-                    context = pageContext(credentials),
-                    userId = None,
-                    groupId = None,
-                    limit = None
-                  )
+              } yield Ok(
+                showAllUsersView(
+                  users = users,
+                  groups = groups.groups.map(_.groupId),
+                  services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
+                  showCurrentUserUrl = routes.UserController.showUserPage(None),
+                  filtersForm = boundForm,
+                  createANewUserForm = CreateANewUserForm.form,
+                  context = pageContext(credentials),
+                  userId = None,
+                  groupId = None,
+                  limit = None
                 )
-              }
+              )
           )
         }
     }

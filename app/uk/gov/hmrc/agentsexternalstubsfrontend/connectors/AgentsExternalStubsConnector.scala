@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 import play.api.http.Status
 import play.api.libs.json._
 import play.mvc.Http.HeaderNames
+import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
@@ -26,7 +27,7 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
-import java.net.URL
+import java.net.URI
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -126,56 +127,15 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
     limit: Option[Int] = None
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
-//    val queryParams =
-//      Seq(
-//        userId.map(u => s"userId=$u"),
-//        groupId.map(g => s"groupId=$g"),
-//        limit.map(l => s"limit=$l")
-//        //        TODO: This is being parsed as %26 rather than &
-//      ).flatten.mkString("&")
+    val params: List[(String, String)] = List(
+      limit.map(_.toString).map("limit" -> _),
+      userId.map("userId" -> _),
+      groupId.map("groupId" -> _),
+      principalEnrolmentService.map("principalEnrolmentService" -> _),
+    ).flatten
 
-//    val requestUrl =
-//      if (queryParams.isEmpty)
-//        url"$baseUrl/agents-external-stubs/users"
-//      else {
-//        url"$baseUrl/agents-external-stubs/users?$queryParams"
-//      }
-
-//    TODO: There must be a better way???
-    val requestUrl = (limit, userId, groupId, principalEnrolmentService) match {
-      case (None, None, None, None) =>
-        url"$baseUrl/agents-external-stubs/users"
-      case (Some(l), None, None, None) =>
-        url"$baseUrl/agents-external-stubs/users?limit=$l"
-      case (None, Some(uId), None, None) =>
-        url"$baseUrl/agents-external-stubs/users?userId=$uId"
-      case (None, None, Some(gId), None) =>
-        url"$baseUrl/agents-external-stubs/users?groupId=$gId"
-      case (None, None, None, Some(peService)) =>
-        url"$baseUrl/agents-external-stubs/users?principalEnrolmentService=$peService"
-      case (Some(l), Some(uId), None, None) =>
-        url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId"
-      case (Some(l), None, Some(gId), None) =>
-        url"$baseUrl/agents-external-stubs/users?limit=$l&groupId=$gId"
-      case (Some(l), None, None, Some(peService)) =>
-        url"$baseUrl/agents-external-stubs/users?limit=$l&principalEnrolmentService=$peService"
-      case (None, Some(uId), Some(gId), None) =>
-        url"$baseUrl/agents-external-stubs/users?userId=$uId&groupId=$gId"
-      case (None, Some(uId), None, Some(peService)) =>
-        url"$baseUrl/agents-external-stubs/users?userId=$uId&principalEnrolmentService=$peService"
-      case (None, None, Some(gId), Some(peService)) =>
-        url"$baseUrl/agents-external-stubs/users?groupId=$gId&principalEnrolmentService=$peService"
-      case (Some(l), Some(uId), Some(gId), None) =>
-        url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId&groupId=$gId"
-      case (Some(l), Some(uId), None, Some(peService)) =>
-        url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId&principalEnrolmentService=$peService"
-      case (Some(l), None, Some(gId), Some(peService)) =>
-        url"$baseUrl/agents-external-stubs/users?limit=$l&groupId=$gId&principalEnrolmentService=$peService"
-      case (None, Some(uId), Some(gId), Some(peService)) =>
-        url"$baseUrl/agents-external-stubs/users?userId=$uId&groupId=$gId&principalEnrolmentService=$peService"
-      case (Some(l), Some(uId), Some(gId), Some(peService)) =>
-        url"$baseUrl/agents-external-stubs/users?limit=$l&userId=$uId&groupId=$gId&principalEnrolmentService=$peService"
-    }
+    val uri = uri"/users".addParams(params: _*)
+    val requestUrl = new URI(s"$baseUrl/agents-external-stubs$uri").toURL
 
     http
       .get(requestUrl)
