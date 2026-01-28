@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUserForm, InitialUserCreationDataForm, UserForm}
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUserForm, InitialUserCreationDataForm, UserFiltersForm, UserForm}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
@@ -488,17 +488,51 @@ class UserController @Inject() (
     Action.async { implicit request =>
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
-          agentsExternalStubsConnector.getUsers
-            .map(users =>
-              Ok(
+          val boundForm = UserFiltersForm.form.bindFromRequest()
+
+          boundForm.fold(
+            formWithErrors =>
+              for {
+                groups <- agentsExternalStubsConnector.getGroups
+                users  <- agentsExternalStubsConnector.getUsers(None, None, None, None)
+              } yield Ok(
                 showAllUsersView(
-                  users,
-                  routes.UserController.showUserPage(None),
-                  CreateANewUserForm.form,
-                  pageContext(credentials)
+                  users = users,
+                  groups = groups.groups.map(_.groupId),
+                  services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
+                  showCurrentUserUrl = routes.UserController.showUserPage(None),
+                  filtersForm = formWithErrors,
+                  createANewUserForm = CreateANewUserForm.form,
+                  context = pageContext(credentials),
+                  userId = None,
+                  groupId = None,
+                  limit = None
+                )
+              ),
+            filters =>
+              for {
+                groups <- agentsExternalStubsConnector.getGroups
+                users <- agentsExternalStubsConnector.getUsers(
+                           userId = filters.userId.filter(_.nonEmpty),
+                           groupId = filters.groupId.filter(_.nonEmpty),
+                           principalEnrolmentService = filters.principalEnrolmentService.filter(_.nonEmpty),
+                           limit = filters.limit
+                         )
+              } yield Ok(
+                showAllUsersView(
+                  users = users,
+                  groups = groups.groups.map(_.groupId),
+                  services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
+                  showCurrentUserUrl = routes.UserController.showUserPage(None),
+                  filtersForm = boundForm,
+                  createANewUserForm = CreateANewUserForm.form,
+                  context = pageContext(credentials),
+                  userId = None,
+                  groupId = None,
+                  limit = None
                 )
               )
-            )
+          )
         }
     }
 
@@ -509,19 +543,24 @@ class UserController @Inject() (
           CreateANewUserForm.form
             .bindFromRequest()
             .fold(
-              formWithErrors => {
-                agentsExternalStubsConnector.getUsers
-                  .map(users =>
-                    Ok(
-                      showAllUsersView(
-                        users,
-                        routes.UserController.showUserPage(None),
-                        formWithErrors,
-                        pageContext(credentials)
-                      )
-                    )
+              formWithErrors =>
+                for {
+                  groups <- agentsExternalStubsConnector.getGroups
+                  users  <- agentsExternalStubsConnector.getUsers(None, None, None, None)
+                } yield Ok(
+                  showAllUsersView(
+                    users = users,
+                    groups = groups.groups.map(_.groupId),
+                    services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
+                    showCurrentUserUrl = routes.UserController.showUserPage(None),
+                    filtersForm = UserFiltersForm.form,
+                    createANewUserForm = CreateANewUserForm.form,
+                    context = pageContext(credentials),
+                    userId = None,
+                    groupId = None,
+                    limit = None
                   )
-              },
+                ),
               createANewUser =>
                 Future.successful(Redirect(routes.UserController.showCreateUserPage(userId = createANewUser.userId)))
             )

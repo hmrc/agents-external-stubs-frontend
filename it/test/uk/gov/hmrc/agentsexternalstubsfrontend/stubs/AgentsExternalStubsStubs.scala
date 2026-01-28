@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 import play.api.libs.json.{JsArray, Json}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.Service.Flags
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, Group, Groups, Service, Services, User}
 
 import java.util.UUID
 
@@ -135,19 +136,147 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     )
   }
 
-  def givenUsers(users: User*) =
+  def givenUsers(users: User*): Unit =
     stubFor(
-      get(urlEqualTo(s"/agents-external-stubs/users"))
+      get(urlPathEqualTo("/agents-external-stubs/users"))
         .willReturn(
           aResponse()
             .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
             .withBody(
               Json
-                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(user => Json.toJson(user)))))
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(users.map(Json.toJson(_)))))
                 .toString()
             )
         )
     )
+
+  def givenUsersWithLimit(limit: Int, users: User*): Unit = {
+    val filteredUsers = users.take(limit)
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("limit", equalTo(limit.toString))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
+                .toString()
+            )
+        )
+    )
+  }
+
+  def givenUsersWithUserId(userId: String, users: User*): Unit = {
+    val filteredUsers = users.filter(_.userId.contains(userId))
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("userId", equalTo(userId))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
+                .toString()
+            )
+        )
+    )
+  }
+
+  def givenUsersWithGroupId(groupId: String, users: User*): Unit = {
+    val filteredUsers = users.filter(_.groupId.contains(groupId))
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("groupId", equalTo(groupId))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
+                .toString()
+            )
+        )
+    )
+  }
+
+  def givenUsersWithPrincipalEnrolmentService(principalEnrolmentService: String, users: User*): Unit = {
+    val filteredUsers = users.filter(_.assignedPrincipalEnrolments.map(_.service).contains(principalEnrolmentService))
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("principalEnrolmentService", equalTo(principalEnrolmentService))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
+                .toString()
+            )
+        )
+    )
+  }
+
+  def givenUsersWithAllQueryParams(limit: Int, userId: String, groupId: String, principalEnrolmentService: String, users: User*): Unit = {
+    val filteredUsers = users
+      .filter(_.userId.contains(userId))
+      .filter(_.groupId.contains(groupId))
+      .filter(_.assignedPrincipalEnrolments.map(_.service).contains(principalEnrolmentService))
+      .take(limit)
+    stubFor(
+      get(urlPathEqualTo("/agents-external-stubs/users"))
+        .withQueryParam("limit", equalTo(limit.toString))
+        .withQueryParam("userId", equalTo(userId))
+        .withQueryParam("groupId", equalTo(groupId))
+        .withQueryParam("principalEnrolmentService", equalTo(principalEnrolmentService))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(
+              Json
+                .obj("users" -> Json.toJsFieldJsValueWrapper(JsArray(filteredUsers.map(Json.toJson(_)))))
+                .toString()
+            )
+        )
+    )
+  }
+
+  def givenGroups = {
+    val groups: Groups = Groups(Seq(
+      Group("foobar", "G1", "Agent", None, None, None, Seq.empty, Seq.empty)
+    ))
+    stubFor(
+      get(urlEqualTo("/agents-external-stubs/groups"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(Json.obj("groups" -> Json.toJsFieldJsValueWrapper(groups.groups)).toString())
+        )
+    )
+  }
+
+  def givenServiceDefinitions = {
+    val serviceDefinitions: Services = Services(Seq(
+      Service("HMRC-MTD-IT", "HMRC Making Tax Digital Income Tax", Seq.empty, Seq.empty, Seq.empty, Flags(true, false, false, false, true, true))
+    ))
+    stubFor(
+      get(urlEqualTo("/agents-external-stubs/config/services"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
+            .withBody(Json.obj("services" -> Json.toJsFieldJsValueWrapper(serviceDefinitions.services.map(Json.toJson(_)(Services.f3)))).toString())
+        )
+    )
+  }
 
   def givenAllRecords =
     stubFor(

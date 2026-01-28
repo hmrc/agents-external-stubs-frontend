@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 import play.api.http.Status
 import play.api.libs.json._
 import play.mvc.Http.HeaderNames
+import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
@@ -26,6 +27,7 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
+import java.net.URI
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -118,15 +120,23 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  def getUsers(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
-    val requestUrl = url"$baseUrl/agents-external-stubs/users"
-    http
-      .get(requestUrl)
-      .execute[Users]
-  }
+  def getUsers(
+    userId: Option[String] = None,
+    groupId: Option[String] = None,
+    principalEnrolmentService: Option[String] = None,
+    limit: Option[Int] = None
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
-  def getUsersByGroupId(groupId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
-    val requestUrl = url"$baseUrl/agents-external-stubs/users?groupId=$groupId"
+    val params: List[(String, String)] = List(
+      limit.map(_.toString).map("limit" -> _),
+      userId.map("userId" -> _),
+      groupId.map("groupId" -> _),
+      principalEnrolmentService.map("principalEnrolmentService" -> _),
+    ).flatten
+
+    val uri = uri"/users".addParams(params: _*)
+    val requestUrl = new URI(s"$baseUrl/agents-external-stubs$uri").toURL
+
     http
       .get(requestUrl)
       .execute[Users]
