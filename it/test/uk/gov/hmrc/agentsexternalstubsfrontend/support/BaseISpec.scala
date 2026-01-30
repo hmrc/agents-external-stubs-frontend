@@ -47,7 +47,9 @@ class BaseISpec
     new GuiceApplicationBuilder()
       .configure(
         "microservice.services.agents-external-stubs.port" -> wireMockPort,
-        "microservice.services.auth.port"                  -> wireMockPort
+        "microservice.services.auth.port"                  -> wireMockPort,
+        "microservice.services.agent-registration.port" -> wireMockPort,
+        "microservice.services.agent-client-relationships.port" -> wireMockPort
       )
 
   override def commonStubs(): Unit = {

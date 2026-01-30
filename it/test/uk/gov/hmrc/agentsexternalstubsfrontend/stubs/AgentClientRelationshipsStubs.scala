@@ -1,0 +1,37 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentsexternalstubsfrontend.stubs
+
+
+import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.http.Status.OK
+import play.api.libs.json.Json
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.JourneySetupRequest
+
+trait AgentClientRelationshipsStubs {
+
+  def givenTestOnlyJourneySetup(journeySetupRequest: JourneySetupRequest): StubMapping =
+    stubFor(put(urlEqualTo("/test-only/journey-setup")).withRequestBody(equalToJson(Json.toJson(journeySetupRequest).toString()))
+      .willReturn(aResponse().withStatus(OK)))
+
+  def givenTestOnlyCreateRelationship(arn: String, clientId: String, service: String, clientIdType: String): StubMapping = {
+    stubFor(put(urlEqualTo(s"/test-only/agent/$arn/service/$service/client/$clientIdType/$clientId"))
+      .willReturn(aResponse().withStatus(OK)))
+
+  }
+}

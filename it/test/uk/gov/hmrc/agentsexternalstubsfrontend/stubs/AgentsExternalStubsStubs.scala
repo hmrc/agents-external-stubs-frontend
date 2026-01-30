@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,16 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
-import play.api.libs.json.{JsArray, Json}
+import play.api.http.Status.CREATED
+import play.api.libs.json.{JsArray, JsValue, Json}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.Service.Flags
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, Group, Groups, Service, Services, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, EnrolmentKey, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.TestFixtures.nino
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 import java.util.UUID
 
@@ -36,7 +41,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
   ): String = {
     val authToken = UUID.randomUUID().toString
 
-    stubFor(
+        stubFor(
       post(urlEqualTo(s"/agents-external-stubs/sign-in"))
         .withRequestBody(
           equalToJson(
@@ -69,6 +74,33 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     )
 
     authToken
+  }
+
+  def givenSignIn(userId: String, authToken: String, providerType: String, planetId: String): StubMapping = {
+    stubFor(post(urlEqualTo("/agents-external-stubs/sign-in"))
+      .willReturn(aResponse()
+        .withStatus(CREATED)
+        .withHeader("Location", s"/agents-external-stubs/session/$authToken")))
+
+
+    stubFor(
+      get(urlEqualTo(s"/agents-external-stubs/session/$authToken"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.CREATED)
+            .withBody(
+              Json
+                .obj(
+                  "sessionId" -> UUID.randomUUID().toString,
+                  "userId" -> userId,
+                  "authToken" -> authToken,
+                  "providerType" -> providerType,
+                  "planetId" -> planetId
+                )
+                .toString()
+            )
+        )
+    )
   }
 
   def givenCurrentSession(): Unit =
@@ -135,6 +167,94 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
         )
     )
   }
+
+  def givenCreateStrideUser(role: String, userId: String): StubMapping = {
+    stubFor(
+      post(urlEqualTo(s"/agents-external-stubs/users"))
+        .withRequestBody(equalToJson(s"""{"strideRoles": ["$role"]}"""))
+        .willReturn(aResponse()
+          .withStatus(CREATED)
+          .withHeader("Location", s"/agents-external-stubs/users/$userId")))
+
+    stubFor(get(urlEqualTo(s"/agents-external-stubs/users/$userId"))
+      .willReturn(aResponse()
+        .withStatus(Status.OK)
+        .withBody(userResponseBody(userId, """[]""", Some(""" "maintain_agent_relationships" """)))))
+
+  }
+
+  def givenCreateCleanAgent(userId: String): StubMapping = {
+    stubFor(
+      post(urlEqualTo(s"/agents-external-stubs/users?affinityGroup=Agent"))
+        .willReturn(aResponse()
+          .withStatus(CREATED)
+          .withHeader("Location", s"/agents-external-stubs/users/$userId")))
+
+    stubFor(get(urlEqualTo(s"/agents-external-stubs/users/$userId"))
+      .willReturn(aResponse()
+        .withStatus(Status.OK)
+        .withBody(userResponseBody(userId, """[]""", None))))
+  }
+
+
+  def givenCreateUser(affinityGroup: AffinityGroup, serviceKeys: List[EnrolmentKey], userId: String): StubMapping = {
+
+    val jsonRequestBody = s"""{ "assignedPrincipalEnrolments": ["${serviceKeys.map(_.service).mkString("\",\"")}"] }"""
+
+    val assignedPrincipalEnrolmentsResponse = s"""["${serviceKeys.map(_.tag).mkString("\",\"")}"]"""
+
+
+    stubFor(
+      post(urlEqualTo(s"/agents-external-stubs/users?affinityGroup=$affinityGroup"))
+        .withRequestBody(equalToJson(jsonRequestBody))
+        .willReturn(aResponse()
+          .withStatus(CREATED)
+          .withHeader("Location", s"/agents-external-stubs/users/$userId"))
+    )
+
+    stubFor(get(urlEqualTo(s"/agents-external-stubs/users/$userId"))
+      .willReturn(aResponse()
+        .withStatus(Status.OK)
+        .withBody(userResponseBody(userId, assignedPrincipalEnrolmentsResponse, None))))
+
+  }
+    def userResponseBody(userId: String, assignedPrincipalEnrolmentsResponse: String, strideRoles: Option[String]) =
+      s"""{
+         |  "userId": "$userId",
+         |  "credentialRole": "User",
+         |  "nino": "$nino",
+         |  "assignedPrincipalEnrolments": $assignedPrincipalEnrolmentsResponse,
+         |  "assignedDelegatedEnrolments": [],
+         |  "planetId": "mars",
+         |  "recordIds": ["123"],
+         |  "address": {
+         |    "line1": "21 Marshalls Rise",
+         |    "line2": "Portsmouth",
+         |    "postcode": "PO27 9OQ",
+         |    "countryCode": "GB"
+         |  },
+         |  "strideRoles": ${strideRoles.fold("[]")(sr => s"""[$sr]""")},
+         |  "_links": [
+         |    {
+         |      "rel": "update",
+         |      "href": "/agents-external-stubs/users/Ginny_3898"
+         |    },
+         |    {
+         |      "rel": "delete",
+         |      "href": "/agents-external-stubs/users/Ginny_3898"
+         |    },
+         |    {
+         |      "rel": "store",
+         |      "href": "/agents-external-stubs/users"
+         |    },
+         |    {
+         |      "rel": "list",
+         |      "href": "/agents-external-stubs/users"
+         |    }
+         |  ]
+         |}""".stripMargin
+
+
 
   def givenUsers(users: User*): Unit =
     stubFor(
@@ -288,6 +408,12 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withBody(validRecordsResponse)
         )
     )
+
+  def givenGetRecord(recordId: String, response: String): StubMapping =
+    stubFor(get(urlEqualTo(s"/agents-external-stubs/records/$recordId"))
+      .willReturn(aResponse()
+        .withStatus(Status.OK)
+        .withBody(response)))
 
   def givenAllSpecialCases =
     stubFor(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -49,6 +50,26 @@ object AuthenticatedSession {
 class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: HttpClientV2) {
 
   val baseUrl: String = appConfig.aesBaseUrl
+
+  def signIn()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] = {
+    val requestUrl = url"$baseUrl/agents-external-stubs/sign-in"
+    http
+      .post(requestUrl)
+      .execute[HttpResponse]
+      .flatMap { r =>
+        (r.status, r.header(HeaderNames.LOCATION)) match {
+          case (Status.BAD_REQUEST, _) => throw new BadRequestException(s"$baseUrl/agents-external-stubs/sign-in")
+          case (_, None)               => throw new IllegalStateException()
+          case (s, Some(l)) =>
+            val urlBuilder = baseUrl + l
+            val getSessionUrl = url"$urlBuilder"
+            http
+              .get(getSessionUrl)
+              .execute[AuthenticatedSession]
+              .map(_.copy(newUserCreated = Some(s == 201)))
+        }
+      }
+  }
 
   def signIn(
     credentials: SignInRequest
@@ -96,6 +117,32 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
+  def createUser(affinityGroup: Option[AffinityGroup], userBody: JsValue)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[User] = {
+    val urlBuilder =
+      s"$baseUrl/agents-external-stubs/users" + affinityGroup.fold("")(ag => s"?affinityGroup=${ag.toString}")
+    val requestUrl = url"$urlBuilder"
+    http
+      .post(requestUrl)
+      .withBody(userBody)
+      .execute[HttpResponse]
+      .flatMap { r =>
+        (r.status, r.header(HeaderNames.LOCATION)) match {
+          case (Status.BAD_REQUEST, _) => throw new BadRequestException(s"$baseUrl/agents-external-stubs/sign-in")
+          case (_, None)               => throw new IllegalStateException()
+          case (s, Some(l)) =>
+            val urlBuilder = baseUrl + l
+            val getUserUrl = url"$urlBuilder"
+            http
+              .get(getUserUrl)
+              .execute[HttpResponse]
+              .map(res => res.json.as[User])
+        }
+      }
+  }
+
   def createUser(user: User, affinityGroup: Option[String])(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
@@ -128,10 +175,10 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
     val params: List[(String, String)] = List(
-      limit.map(_.toString).map("limit" -> _),
-      userId.map("userId" -> _),
-      groupId.map("groupId" -> _),
-      principalEnrolmentService.map("principalEnrolmentService" -> _),
+      limit.map(_.toString).map("limit"                         -> _),
+      userId.map("userId"                                       -> _),
+      groupId.map("groupId"                                     -> _),
+      principalEnrolmentService.map("principalEnrolmentService" -> _)
     ).flatten
 
     val uri = uri"/users".addParams(params: _*)
