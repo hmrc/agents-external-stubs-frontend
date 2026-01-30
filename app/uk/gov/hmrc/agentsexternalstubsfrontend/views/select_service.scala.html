@@ -25,8 +25,7 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models.AsaService
-@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.ASAJourneyService
 
 @this(
         mainTemplate: main_template,
@@ -35,12 +34,13 @@
         govukButton: GovukButton
 )
 
-@(asaServiceForm: Form[AsaService], selectOptions: Seq[AsaService], journey: String)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = msgs(s"select-service.title,${msgs(s"journey-setup.$journey")}"), showSignOut = false,
+@(asaServiceForm: Form[ASAJourneyService], selectOptions: Seq[ASAJourneyService], journey: String)(implicit request: Request[_], msgs: Messages)
+
+@mainTemplate(title = msgs(s"select-service.title,${msgs(s"select-journey.$journey")}"), showSignOut = false,
     backLinkHref = Some(routes.AsaJourneySetupController.selectJourney().url)) {
 
-    <h1 class="govuk-heading-xl">@msgs(s"select-service.title",s"${msgs(s"journey-setup.$journey")}")</h1>
+    <h1 class="govuk-heading-xl">@msgs(s"select-service.title",s"${msgs(s"select-journey.$journey")}")</h1>
 
     @formWithCSRF(action = routes.AsaJourneySetupController.submitSelectService) {
 
@@ -53,9 +53,9 @@
             items = selectOptions.map(option =>
                 SelectItem(
                     text = option.friendlyName,
-                    value = Some(option.id),
+                    value = Some(option.friendlyName),
                     attributes = Map(
-                        "id" -> s"${option.id}"
+                        "id" -> s"${option.friendlyName}"
                     )
                 )
             )

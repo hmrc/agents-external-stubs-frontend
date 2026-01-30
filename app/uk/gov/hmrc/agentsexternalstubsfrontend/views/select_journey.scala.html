@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models.AsaTestJourney
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.ASATestJourney
 
 
 @this(
@@ -24,15 +24,15 @@
 )
 
 
-@(journeys: List[AsaTestJourney])(implicit request: Request[_], msgs: Messages)
+@(journeys: List[ASATestJourney])(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = msgs("journey-setup.title"), showSignOut = false) {
+@mainTemplate(title = msgs("select-journey.title"), showSignOut = false) {
 
-    <h1 class="govuk-heading-xl">@msgs("journey-setup.title")</h1>
+    <h1 class="govuk-heading-xl">@msgs("select-journey.title")</h1>
 
     @for(j <- journeys){
         <p class="govuk-body">
-            <a href="@routes.AsaJourneySetupController.selectJourney(Some(j.toString))" class="govuk-link">@msgs(s"journey-setup.${j.toString}")</a>
+            <a href="@routes.AsaJourneySetupController.selectJourney(Some(j.id))" class="govuk-link">@msgs(s"select-journey.${j.id}")</a>
         </p>
     }
 }

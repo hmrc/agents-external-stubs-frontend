@@ -58,7 +58,7 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
 
   val agentRegistrationBaseUrl: String = baseUrl("agent-registration")
 
-  val showJourneySetup: Boolean = servicesConfig.getBoolean("features.show-journey-setup")
+  val showJourneySetup: Boolean = servicesConfig.getBoolean("features.asa-doorway-enabled")
 
   val agentRegistrationFrontendExternalUrl: String = getConfString("agent-registration-frontend.external-url")
 
@@ -71,5 +71,7 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
   val asafHost: String = getConfString("agent-services-account-frontend.external-url")
 
   val agentHelpdeskFrontendfHost: String = getConfString("agent-helpdesk-frontend.external-url")
+
+  val agentSubscriptionFrontendHost: String = getConfString("agent-subscription-frontend.external-url")
 
 }

@@ -17,17 +17,16 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.services
 
 import com.google.inject.{Inject, Singleton}
-import play.api.libs.json.{JsNull, Json}
+import play.api.libs.json._
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentClientRelationshipsConnector, AgentRegistrationConnector, AgentsExternalStubsConnector}
-import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.AsaTestJourney._
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
 import uk.gov.hmrc.agentsexternalstubsfrontend.util.RequestSupport._
+import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
+import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,241 +38,73 @@ class AsaJourneySetupService @Inject() (
   frontendConfig: FrontendConfig
 )(implicit ec: ExecutionContext) {
 
-  private def withActiveSession(
-    f: (String) => Future[JourneySetup]
-  )(implicit hc: HeaderCarrier): Future[JourneySetup] =
-    agentsExternalStubsConnector.signIn().flatMap { authSession =>
-      agentsExternalStubsConnector
-        .removeUser(authSession.userId)
-        .flatMap(_ => f(authSession.planetId))
-    }
+  def setupMainUser(journey: ASATestJourney)(implicit rh: RequestHeader) =
+    for {
+      authSession <- agentsExternalStubsConnector.signIn()
+      hc = HeaderCarrier(
+             sessionId = Some(SessionId(authSession.sessionId))
+           )
+      _ <- agentsExternalStubsConnector.removeUser(authSession.userId)(hc, ec)
 
-  def setupJourney(journey: String)(implicit hc: HeaderCarrier): Future[JourneySetup] =
-    journey match {
-      case "provide-details" =>
-        withActiveSession { (planetId: String) =>
-          val services = List(Itsa)
-          for {
-            ind    <- createUser(JourneySetupUser(Individual, services))(hc)
-            signIn <- agentsExternalStubsConnector.signIn(SignInRequest(ind.userId, planetId))
-            linkId <- agentRegistrationConnector.testOnlyJourneySetup()(hc)
-          } yield JourneySetup(
-            authSession = Some(signIn),
-            redirectUrl =
-              s"${frontendConfig.agentRegistrationFrontendExternalUrl}/agent-registration/provide-details/start/${linkId.linkId}",
-            journeyData = None,
-            journey = "provide-details",
-            service = None
-          )
-        }
-      case "myta-org" =>
-        withActiveSession { (planetId: String) =>
-          val services = List(Vat, Cbc, Ppt, Trust, TrustNT, CapitalGains)
-          for {
-            org <- createUser(
-                     JourneySetupUser(
-                       affinityGroup = Organisation,
-                       services = services
-                     )
-                   )(hc)
-            agent <- createAgentUser()
-            arn = extractArnFromAgent(agent)
-            invitations = services.map(svc =>
-                            JourneySetupInvitation(
-                              arn,
-                              extractIdentifier(org, svc.client.principalServiceKey.get),
-                              svc.relationship.clientIdTypeForRel,
-                              org.name.getOrElse(""),
-                              svc.relationship.delegatedServiceKey,
-                              Some("business")
-                            )
-                          )
-            signIn <- agentsExternalStubsConnector.signIn(SignInRequest(org.userId, planetId))
-            _ <- acrConnector.testOnlyJourneySetup(
-                   JourneySetupRequest(invitations = invitations)
-                 )
+      user <- createUser(
+                affinityGroup = journey.signedInUser.affinityGroup,
+                services = journey.signedInUser.services,
+                strideRole = journey.signedInUser.strideRole
+              )(hc)
+      authenticatedSession <- agentsExternalStubsConnector.signIn(
+                                SignInRequest(
+                                  userId = user.userId,
+                                  planetId = authSession.planetId,
+                                  providerType =
+                                    if (journey.signedInUser.affinityGroup.isEmpty)
+                                      AuthProvider.PrivilegedApplication
+                                    else AuthProvider.GovernmentGateway
+                                )
+                              )(hc, ec)
+      _ = clearSession()
+    } yield authenticatedSession
 
-          } yield JourneySetup(
-            authSession = Some(signIn),
-            redirectUrl = s"${frontendConfig.acrfHost}/agent-client-relationships/test-only/journey-setup/myta",
-            journeyData = None,
-            journey = "myta-org",
-            service = None
-          )
-        }
+  private def clearSession()(implicit rh: RequestHeader) = rh.session.--(List("service", "journey-data"))
 
-      case "myta-ind" =>
-        withActiveSession { (planetId: String) =>
-          for {
-            ind <- createUser(
-                     JourneySetupUser(
-                       affinityGroup = Individual,
-                       List(Itsa)
-                     )
-                   )(hc)
-            nino = ind.nino.get.value
-            agent1 <- createAgentUser()(hc)
-            arn1 = extractArnFromAgent(agent1)
-            agent2 <- createAgentUser()(hc)
-            arn2 = extractArnFromAgent(agent2)
-            signIn <- agentsExternalStubsConnector.signIn(SignInRequest(ind.userId, planetId))
-            _ <- acrConnector.testOnlyJourneySetup(
-                   JourneySetupRequest(
-                     invitations = Seq(
-                       JourneySetupInvitation(
-                         arn1,
-                         nino,
-                         "ni",
-                         ind.name.getOrElse(""),
-                         "HMRC-MTD-IT",
-                         Some("personal")
-                       ),
-                       JourneySetupInvitation(
-                         arn1,
-                         nino,
-                         "ni",
-                         ind.name.getOrElse(""),
-                         "PERSONAL-INCOME-RECORD",
-                         Some("personal")
-                       ),
-                       JourneySetupInvitation(
-                         arn2,
-                         nino,
-                         "ni",
-                         ind.name.getOrElse(""),
-                         "HMRC-MTD-IT-SUPP",
-                         Some("personal")
-                       ),
-                       JourneySetupInvitation(
-                         arn2,
-                         nino,
-                         "ni",
-                         ind.name.getOrElse(""),
-                         "PERSONAL-INCOME-RECORD",
-                         Some("personal")
-                       )
-                     )
-                   )
-                 )
-
-          } yield JourneySetup(
-            authSession = Some(signIn),
-            redirectUrl = s"${frontendConfig.acrfHost}/agent-client-relationships/test-only/journey-setup/myta",
-            journeyData = None,
-            journey = "myta-ind",
-            service = None
-          )
-        }
-
-      case "access-groups" =>
-        withActiveSession { (planetId: String) =>
-          for {
-            agent  <- createAgentUser()
-            signIn <- agentsExternalStubsConnector.signIn(SignInRequest(agent.userId, planetId))
-            _ <- agentsExternalStubsConnector.massCreateAssistantsAndUsers(
-                   GranPermsGenRequest(idPrefix = "asa-test", numberOfAgents = 15, numberOfClients = 75)
-                 ) //(hc.copy(authorization = Some(Authorization(s"Bearer ${signIn.authToken}"))), ec)
-
-          } yield JourneySetup(
-            authSession = Some(signIn),
-            redirectUrl =
-              s"${frontendConfig.asafHost}/agent-services-account/manage-account", //could replace with a test-only url and let the service decide where to go.
-            journeyData = None,
-            journey = "access-groups",
-            service = None
-          )
-        }
-
-      case serviceLed @ ("create-invitation" | "agent-led-deauth" | "hmrc-led-deauth") =>
-        Future.successful(
-          JourneySetup(None, routes.AsaJourneySetupController.showSelectService.url, None, serviceLed, None)
-        )
-
-      case "track" =>
-        withActiveSession { (planetId: String) =>
-          createAgentUser()
-            .flatMap(agent =>
-              Future
-                .sequence(
-                  supportedServices.map(service =>
-                    createUser(
-                      JourneySetupUser(
-                        affinityGroup = service.client.affinityGroup,
-                        services = List(service)
-                      )
-                    ).map(user =>
-                      JourneySetupInvitation(
-                        extractArnFromAgent(agent),
-                        extractOneIdentifier(user),
-                        service.relationship.clientIdTypeForRel,
-                        user.name.getOrElse("bob"),
-                        service.relationship.delegatedServiceKey,
-                        None
-                      )
-                    )
-                  )
-                )
-                .flatMap(invitations =>
-                  for {
-                    signin <- agentsExternalStubsConnector.signIn(SignInRequest(agent.userId, planetId))
-                    _      <- acrConnector.testOnlyJourneySetup(JourneySetupRequest(invitations = invitations))
-                  } yield JourneySetup(
-                    authSession = Some(signin),
-                    redirectUrl =
-                      s"${frontendConfig.acrfHost}/agent-client-relationships/test-only/journey-setup/track",
-                    journeyData = None,
-                    journey = "track",
-                    service = None
-                  )
-                )
-            )
-        }
-    }
-
-  def setupDataForJourneyWithServiceSelected(journey: JourneyWithServiceSelected, asaService: AsaService)(implicit
+  def setupDataForJourneyWithServiceSelected(
+    journey: ASATestJourneyWithServiceSelection,
+    asaJourneyService: ASAJourneyService
+  )(implicit
     rh: RequestHeader
   ): Future[String] =
     journey match {
       case CreateInvitation =>
         for {
           customer <- createUser(
-                        JourneySetupUser(
-                          affinityGroup = asaService.client.affinityGroup,
-                          services = List(asaService)
-                        )
+                        affinityGroup = Some(asaJourneyService.affinityGroup),
+                        services = List(asaJourneyService.clientEacdServiceKey)
                       )
-          testData <- extractTestDataFromUser(customer, asaService)
+          testData <- extractTestDataFromUser(customer, asaJourneyService)
         } yield testData
 
       case AgentLedDeauth =>
         for {
           customer <- createUser(
-                        JourneySetupUser(
-                          affinityGroup = asaService.client.affinityGroup,
-                          services = List(asaService)
-                        )
+                        affinityGroup = Some(asaJourneyService.affinityGroup),
+                        services = List(asaJourneyService.clientEacdServiceKey)
                       )
-          agent <- agentsExternalStubsConnector.getUser(
-                     rh.session.get("userId").getOrElse(throw new RuntimeException("no userId in session"))
-                   )
+          agent <- getSignedInUser()
           arn = extractArnFromAgent(agent)
           clientId = extractOneIdentifier(customer)
           _ <- acrConnector.testOnlyCreateRelationship(
                  arn,
                  clientId,
-                 asaService.relationship.delegatedServiceKey,
-                 asaService.relationship.clientIdTypeForRel
+                 asaJourneyService.relServiceName,
+                 asaJourneyService.createRelationshipIdTypeName
                )
-          testData <- extractTestDataFromUser(customer, asaService)
+          testData <- extractTestDataFromUser(customer, asaJourneyService)
         } yield testData
 
       case HmrcLedDeauth =>
         for {
           customer <- createUser(
-                        JourneySetupUser(
-                          affinityGroup = asaService.client.affinityGroup,
-                          services = List(asaService)
-                        )
+                        affinityGroup = Some(asaJourneyService.affinityGroup),
+                        services = List(asaJourneyService.clientEacdServiceKey)
                       )
           agent <- createAgentUser()
           arn = extractArnFromAgent(agent)
@@ -281,22 +112,20 @@ class AsaJourneySetupService @Inject() (
           _ <- acrConnector.testOnlyCreateRelationship(
                  arn,
                  clientId,
-                 asaService.relationship.delegatedServiceKey,
-                 asaService.relationship.clientIdTypeForRel
+                 asaJourneyService.relServiceName,
+                 asaJourneyService.createRelationshipIdTypeName
                )
-          testData <- extractTestDataFromUser(customer, asaService)
+          testData <- extractTestDataFromUser(customer, asaJourneyService)
         } yield testData
     }
 
   def setupDataForJourneyWithoutServiceSelected(
-    journey: JourneyWithoutServiceSelected
+    journey: ASATestJourneyWithoutServiceSelection
   )(implicit rh: RequestHeader): Future[Option[String]] =
     journey match {
       case MytaInd =>
         for {
-          ind <- agentsExternalStubsConnector.getUser(
-                   rh.session.get("userId").getOrElse(throw new RuntimeException("no userId in session"))
-                 )
+          ind    <- getSignedInUser()
           agent1 <- createAgentUser()
           nino = ind.nino.get.value
           arn1 = extractArnFromAgent(agent1)
@@ -344,18 +173,19 @@ class AsaJourneySetupService @Inject() (
 
       case MytaOrg =>
         for {
-          org <- agentsExternalStubsConnector.getUser(
-                   rh.session.get("userId").getOrElse(throw new RuntimeException("no userId in session"))
-                 )
+          org   <- getSignedInUser()
           agent <- createAgentUser()
           arn = extractArnFromAgent(agent)
-          invitations = journey.signedInUserServices.map { service =>
+          invitations = journey.signedInUser.services.map { eacdServiceKey =>
+                          val service = ASAJourneyService
+                            .asaJourneyServiceForEacdKey(eacdServiceKey.key)
+                            .getOrElse(throw new RuntimeException("no service found."))
                           JourneySetupInvitation(
                             arn,
-                            extractIdentifier(org, service.client.principalServiceKey.get),
-                            service.client.identifierName,
+                            extractIdentifier(org, service.clientEacdServiceKey.key),
+                            service.createInvitationIdTypeName,
                             org.name.getOrElse(""),
-                            service.relationship.delegatedServiceKey,
+                            service.relServiceName,
                             Some("business")
                           )
                         }
@@ -363,116 +193,73 @@ class AsaJourneySetupService @Inject() (
                  JourneySetupRequest(invitations = invitations)
                )
         } yield None
-      case Track               => ???
-      case AccessGroups        => ???
-      case MmtarProvideDetails => ???
-      case UkSubscription      => ???
+      case Track =>
+        for {
+          agent <- getSignedInUser()
+          arn = extractArnFromAgent(agent)
+          invitations <-
+            Future.sequence(
+              ASAJourneyService.asaJourneyServicesForCreateInvitation.map(service =>
+                createUser(Some(service.affinityGroup), List(service.clientEacdServiceKey)).map(user =>
+                  JourneySetupInvitation(
+                    arn = arn,
+                    clientId = extractOneIdentifier(user),
+                    suppliedClientIdType = service.createInvitationIdTypeName,
+                    clientName = user.name.getOrElse(""),
+                    service = service.relServiceName,
+                    clientType = Some(if (service.affinityGroup == Individual) "personal" else "business")
+                  )
+                )
+              )
+            )
+          _ <- acrConnector.testOnlyJourneySetup(JourneySetupRequest(invitations = invitations))
+        } yield None
+
+      case UkSubscription =>
+        val utrReads: Reads[String] = (JsPath \ "utr").read[String]
+        val postcodeReads: Reads[String] = (JsPath \ "addressDetails" \ "postalCode").read[String]
+        val crnReads: Reads[String] = (JsPath \ "crn").read[String]
+        for {
+          cleanAgent <- createAgentUser(None)
+          bpr        <- agentsExternalStubsConnector.getRecord(cleanAgent.recordIds.get.head)
+          utr = bpr.as[String](utrReads)
+          postcode = bpr.as[String](postcodeReads)
+          crn = bpr.as[String](crnReads)
+        } yield Some(s"""{"utr": "$utr", "postcode": "${easyCopy(postcode)}", "crn": "$crn" }""")
+
+      case AccessGroups =>
+        agentsExternalStubsConnector
+          .massCreateAssistantsAndUsers(
+            GranPermsGenRequest(idPrefix = "asa-test", numberOfAgents = 15, numberOfClients = 75)
+          )
+          .map(_ => None)
+
+      case MmtarProvideDetails =>
+        agentRegistrationConnector.testOnlyJourneySetup().map(linkId => Some(linkId.linkId))
 
     }
 
-  def setupJourneyForServiceSelected(journey: String, asaService: AsaService)(implicit
-    rh: RequestHeader
-  ): Future[JourneySetup] =
-    journey match {
-      case "create-invitation" =>
-        withActiveSession { (planetId: String) =>
-          for {
-            customer <- createUser(
-                          JourneySetupUser(
-                            affinityGroup = asaService.client.affinityGroup,
-                            services = List(asaService)
-                          )
-                        )
-            agent    <- createAgentUser()
-            testData <- extractTestDataFromUser(customer, asaService)
-            signIn <-
-              agentsExternalStubsConnector.signIn(SignInRequest(agent.userId, planetId))
-            service = s"${asaService.id}"
-          } yield JourneySetup(
-            authSession = Some(signIn),
-            redirectUrl = s"${routes.AsaJourneySetupController.showTestData.url}",
-            journeyData = Some(testData),
-            journey = journey,
-            service = Some(service)
-          )
-        }
+  private def getSignedInUser()(implicit rh: RequestHeader): Future[User] =
+    agentsExternalStubsConnector.getUser(
+      rh.session.get("userId").getOrElse(throw new RuntimeException("no userId in session"))
+    )
 
-      case "agent-led-deauth" =>
-        withActiveSession { (planetId: String) =>
-          for {
-            customer <- createUser(
-                          JourneySetupUser(
-                            affinityGroup = asaService.client.affinityGroup,
-                            services = List(asaService)
-                          )
-                        )(hc)
-            agent <- createAgentUser()(hc)
-            arn = extractArnFromAgent(agent)
-            clientId = extractOneIdentifier(customer)
-            testData <- extractTestDataFromUser(customer, asaService)
-            signIn <-
-              agentsExternalStubsConnector.signIn(SignInRequest(agent.userId, planetId))
-            _ <- acrConnector.testOnlyCreateRelationship(
-                   arn,
-                   clientId,
-                   asaService.relationship.delegatedServiceKey,
-                   asaService.relationship.clientIdTypeForRel
-                 )(hc.copy(authorization = Some(Authorization(s"Bearer ${signIn.authToken}"))))
+  def createUser(
+    affinityGroup: Option[AffinityGroup],
+    services: List[EACDServiceKey],
+    strideRole: Option[String] = None
+  )(implicit hc: HeaderCarrier): Future[User] = {
 
-            service = s"${asaService.id}"
-          } yield JourneySetup(
-            authSession = Some(signIn),
-            redirectUrl = s"${routes.AsaJourneySetupController.showTestData.url}",
-            journeyData = Some(testData),
-            journey = journey,
-            service = Some(service)
-          )
-        }
+    val serviceKeys = services.map(_.key)
 
-      case "hmrc-led-deauth" =>
-        withActiveSession { (planetId: String) =>
-          for {
-            customer <- createUser(
-                          JourneySetupUser(
-                            affinityGroup = asaService.client.affinityGroup,
-                            services = List(asaService)
-                          )
-                        )(hc)
-            agent <- createAgentUser()
-            arn = extractArnFromAgent(agent)
-            clientId = extractOneIdentifier(customer)
-            testData <- extractTestDataFromUser(customer, asaService)
-            _        <- createStrideUser(customer.name.getOrElse(""), "maintain_agent_relationships")
-            _ <- acrConnector.testOnlyCreateRelationship(
-                   arn,
-                   clientId,
-                   asaService.relationship.delegatedServiceKey,
-                   asaService.relationship.clientIdTypeForRel
-                 )
-            signIn <-
-              agentsExternalStubsConnector.signIn(
-                SignInRequest(customer.name.getOrElse(""), planetId, providerType = AuthProvider.PrivilegedApplication)
-              )(hc, ec)
-            service = s"${asaService.id}"
-          } yield JourneySetup(
-            authSession = Some(signIn),
-            redirectUrl = s"${routes.AsaJourneySetupController.showTestData.url}",
-            journeyData = Some(testData),
-            journey = journey,
-            service = Some(service)
-          )
-        }
-    }
+    val jsonUserBody = affinityGroup.fold(
+      s"""{"strideRoles": ["${strideRole.get}"]}"""
+    )(_ => s"""{"assignedPrincipalEnrolments":["${serviceKeys.mkString("\",\"")}"]}\"\"\"}\"\"\"}""")
 
-  private def createUser(user: JourneySetupUser)(implicit hc: HeaderCarrier): Future[User] =
     agentsExternalStubsConnector
       .createUser(
-        affinityGroup = Some(user.affinityGroup),
-        if (user.services.isEmpty) JsNull
-        else
-          Json.parse(
-            s"""{"assignedPrincipalEnrolments":["${serviceKeys(user.services).mkString("\",\"")}"]}"""
-          )
+        affinityGroup = affinityGroup,
+        Json.parse(jsonUserBody)
       )
       .flatMap(userCreated =>
         userCreated.assignedPrincipalEnrolments
@@ -482,53 +269,48 @@ class AsaJourneySetupService @Inject() (
           .getOrElse(Future.successful(()))
           .map(_ => userCreated)
       )
+  }
 
-  private def serviceKeys(services: List[AsaService]): List[String] =
-    services.flatMap(_.client.principalServiceKey)
-
-  private def createStrideUser(userId: String, role: String)(implicit hc: HeaderCarrier): Future[Unit] =
-    agentsExternalStubsConnector.createUser(
-      user = User(userId = userId, strideRoles = Seq(role)),
-      affinityGroup = None
-    )
-
-  private def createAgentUser(serviceKey: String = "HMRC-AS-AGENT")(implicit hc: HeaderCarrier): Future[User] =
+  private def createAgentUser(
+    serviceKey: Option[String] = Some("HMRC-AS-AGENT")
+  )(implicit hc: HeaderCarrier): Future[User] =
     agentsExternalStubsConnector.createUser(
       affinityGroup = Some(Agent),
-      userBody = Json.parse(
-        s"""{"assignedPrincipalEnrolments":["$serviceKey"]}"""
+      userBody = serviceKey.fold[JsValue](JsNull)(sk =>
+        Json.parse(
+          s"""{"assignedPrincipalEnrolments":["$sk"]}"""
+        )
       )
     )
 
-  private def extractTestDataFromUser(user: User, service: AsaService)(implicit rh: RequestHeader): Future[String] =
-    if (AsaTestJourney.isTrustService(service))
+  private def extractTestDataFromUser(user: User, asaJourneyService: ASAJourneyService)(implicit
+    rh: RequestHeader
+  ): Future[String] =
+    asaJourneyService.customerKnownFact.fold(
       Future.successful(
-        s"""{"${service.client.identifierName}": "${user.assignedPrincipalEnrolments.head.identifiers.head.value}"}"""
+        s"""{"${asaJourneyService.identifierName}": "${user.assignedPrincipalEnrolments.head.identifiers.head.value}"}"""
       )
-    else {
-      if (service.client.identifierSourcedFromBpr) {
+    )(customerKnownFact =>
+      if (asaJourneyService.identifierSourcedFromBpr) {
         agentsExternalStubsConnector.getRecord(user.recordIds.get.head).map { record =>
-          val identifierValue = record.as[String](service.client.identifierReadsPath)
+          val identifierValue = record.as[String](asaJourneyService.identifierReadsPath)
 
-          val mKnownFact = service.knownFact.map(kf => s""" "${kf.name}": "${record.as[String](kf.reads)}"}""")
+          val knownFact = s""" "${customerKnownFact.name}": "${record.as[String](customerKnownFact.reads)}"}"""
 
-          s""" {"${service.client.identifierName}":"$identifierValue" ${mKnownFact
-            .map(kf => s""", ${easyCopy(kf)}""")
-            .getOrElse(s"""}""")}  """
+          s""" {"${asaJourneyService.identifierName}":"$identifierValue" $knownFact"""
 
         }
-
       } else {
         val userJson = Json.toJson(user)
-        val identifierValue = easyCopy(userJson.as[String](service.client.identifierReadsPath))
+        val identifierValue = easyCopy(userJson.as[String](asaJourneyService.identifierReadsPath))
         val mKnownFact: Option[String] =
-          service.knownFact.map(kf => s""" "${kf.name}": "${userJson.as[String](kf.reads)}"}""")
+          asaJourneyService.customerKnownFact.map(kf => s""" "${kf.name}": "${userJson.as[String](kf.reads)}"}""")
 
-        Future.successful(s""" {"${service.client.identifierName}":"$identifierValue" ${mKnownFact
+        Future.successful(s""" {"${asaJourneyService.identifierName}":"$identifierValue" ${mKnownFact
           .map(kf => s""", ${easyCopy(kf)}""")
           .getOrElse(s"""}""")}  """)
       }
-    }
+    )
 
   private def easyCopy(str: String): String = str.replaceAll("\\s", "")
 

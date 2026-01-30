@@ -20,6 +20,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,7 +39,6 @@ class AgentRegistrationConnector @Inject() (appConfig: FrontendConfig, http: Htt
       .get(url)
       .execute[HttpResponse]
       .map(response => response.json.as[LinkResponse])
-
 }
 
 case class LinkResponse(linkId: String)

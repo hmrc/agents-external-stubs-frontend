@@ -16,16 +16,22 @@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.ASATestJourney
 
 @this(
         mainTemplate: main_template
 )
 
-@(journey: String, service: String, testData: String, continueUrl: String)(implicit request: Request[_], msgs: Messages)
 
-@mainTemplate(title = msgs(s"journey-data.$journey.$service.title"), showSignOut = false, backLinkHref = Some(routes.AsaJourneySetupController.showSelectService.url)) {
+@(journey: ASATestJourney, service: Option[String], testData: String, continueUrl: String)(implicit request: Request[_], msgs: Messages)
 
-    <h1 class="govuk-heading-xl">@msgs(s"journey-data.title", s"${msgs(s"journey-setup.$journey")}", s"${msgs(s"journey-setup.service.$service")}")</h1>
+@theTitle = @{service.fold(msgs("journey-data.title.no-service", msgs(s"select-journey.${journey.id}")))(svc => msgs(s"journey-data.title", msgs(s"select-journey.${journey.id}"), msgs(s"select-service.service.$svc")))}
+
+@backLinkUrl = @{if(journey.requiresServiceSelect) routes.AsaJourneySetupController.showSelectService.url else routes.AsaJourneySetupController.selectJourney().url}
+
+@mainTemplate(title = theTitle , showSignOut = false, backLinkHref = Some(backLinkUrl)) {
+
+    <h1 class="govuk-heading-xl">@theTitle</h1>
 
     <p  style="color:blue;font-family:'Courier New'">
         @testData

@@ -18,9 +18,10 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{JourneySetupRequest, User}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.JourneySetupRequest
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

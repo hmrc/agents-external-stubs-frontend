@@ -17,18 +17,9 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.models
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AuthenticatedSession
 import uk.gov.hmrc.auth.core.AffinityGroup
 
-case class JourneySetupUser(affinityGroup: AffinityGroup, services: List[AsaService])
-
-case class JourneySetup(
-  authSession: Option[AuthenticatedSession],
-  redirectUrl: String,
-  journeyData: Option[String],
-  journey: String,
-  service: Option[String]
-)
+case class JourneySetupUser(affinityGroup: AffinityGroup, services: List[EACDServiceKey])
 
 case class JourneySetupRequest(invitations: Seq[JourneySetupInvitation])
 

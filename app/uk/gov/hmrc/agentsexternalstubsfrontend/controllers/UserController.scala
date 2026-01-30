@@ -509,7 +509,7 @@ class UserController @Inject() (
           CreateANewUserForm.form
             .bindFromRequest()
             .fold(
-              formWithErrors => {
+              formWithErrors =>
                 agentsExternalStubsConnector.getUsers
                   .map(users =>
                     Ok(
@@ -520,8 +520,7 @@ class UserController @Inject() (
                         pageContext(credentials)
                       )
                     )
-                  )
-              },
+                  ),
               createANewUser =>
                 Future.successful(Redirect(routes.UserController.showCreateUserPage(userId = createANewUser.userId)))
             )

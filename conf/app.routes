@@ -97,13 +97,11 @@ GET         /agents-external-stubs/special-cases/edit                           
 POST        /agents-external-stubs/special-cases/update                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.upsertSpecialCase(caseId: Option[String] ?= None)
 GET         /agents-external-stubs/special-cases/delete                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SpecialCasesController.deleteSpecialCase(caseId: String)
 
-
-GET        /agents-external-stubs/asa-journey/select-journey                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.selectJourney(journey: Option[String] ?= None)
-GET        /agents-external-stubs/asa-journey/select-service                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.showSelectService
-POST       /agents-external-stubs/asa-journey/select-service                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.submitSelectService
-
-GET        /agents-external-stubs/asa-journey/create-test-data                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.createTestData()
-GET        /agents-external-stubs/asa-journey/journey-data                         @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.showTestData
+GET        /agents-external-stubs/asa-doorway                                      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.root
+GET        /agents-external-stubs/asa-doorway/select-journey                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.selectJourney(journey: Option[String] ?= None)
+GET        /agents-external-stubs/asa-doorway/select-service                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.showSelectService
+POST       /agents-external-stubs/asa-doorway/select-service                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.submitSelectService
+GET        /agents-external-stubs/asa-doorway/journey-data                         @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.AsaJourneySetupController.showTestData
 
 GET         /agents-external-stubs/planet/destroy                                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PlanetController.destroyPlanet
 

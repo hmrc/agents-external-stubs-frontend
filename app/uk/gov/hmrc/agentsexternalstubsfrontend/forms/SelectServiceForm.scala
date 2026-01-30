@@ -18,21 +18,25 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.forms
 
 import play.api.data.Form
 import play.api.data.Forms.{single, text}
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AsaService, AsaTestJourney}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{ASAJourneyService, ASATestJourney, ASATestJourneyWithServiceSelection}
 
 object SelectServiceForm {
 
-  val servicesForCreateInvitationJourney: Seq[AsaService] = AsaTestJourney.createInvitationServices
-  val servicesForDeauthorisation: Seq[AsaService] = AsaTestJourney.supportedServices
+  val servicesForCreateInvitationJourney: Seq[ASAJourneyService] =
+    ASAJourneyService.asaJourneyServicesForCreateInvitation
 
-  def servicesForJourney(journey: String): Seq[AsaService] =
-    if (journey == "create-invitation") servicesForCreateInvitationJourney else servicesForDeauthorisation
+  def servicesForJourney(journey: ASATestJourney): Seq[ASAJourneyService] =
+    if (journey.id == "create-invitation") servicesForCreateInvitationJourney
+    else ASAJourneyService.asaJourneyServicesForDeauth
 
-  def selectServiceFormForJourney(journey: String): Form[AsaService] = Form(
+  def selectServiceFormForJourney(journey: ASATestJourneyWithServiceSelection): Form[ASAJourneyService] = Form(
     single(
       "service" -> text
-        .verifying("select-service.error", x => servicesForJourney(journey).map(_.id).contains(x))
-        .transform(str => AsaTestJourney.forId(str), (svc: AsaService) => AsaTestJourney.unapply(svc).get)
+        .verifying("select-service.error", x => servicesForJourney(journey).map(_.friendlyName).contains(x))
+        .transform(
+          str => ASAJourneyService.asaJourneyServiceForFriendlyName(str),
+          (svc: ASAJourneyService) => svc.friendlyName
+        )
     )
   )
 }

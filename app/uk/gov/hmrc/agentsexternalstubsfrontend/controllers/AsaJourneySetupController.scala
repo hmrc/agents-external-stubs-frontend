@@ -18,17 +18,15 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.{Inject, Singleton}
 import org.joda.time.DateTime
-import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{SelectServiceForm, SignInRequest}
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.AsaTestJourney.asaTestJourneys
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SelectServiceForm
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.ASAJourneyService.asaJourneys
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.AsaJourneySetupService
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{journey_data, select_journey, select_service}
-import uk.gov.hmrc.auth.core.AffinityGroup.Agent
-import uk.gov.hmrc.http.{HeaderCarrier, SessionId, SessionKeys}
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{error_template, journey_data, select_journey, select_service}
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,202 +36,165 @@ class AsaJourneySetupController @Inject() (
   selectJourneyView: select_journey,
   journeyDataView: journey_data,
   selectServiceView: select_service,
+  errorTemplate: error_template,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   asaJourneySetupService: AsaJourneySetupService,
   frontendConfig: FrontendConfig
 )(implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
     extends FrontendController(mcc) {
 
-  def selectJourney(journey: Option[String]): Action[AnyContent] = Action.async { implicit request =>
-    onlyIfFeatureEnabled {
-      journey.fold(Future.successful(Ok(selectJourneyView(asaTestJourneys))))(testJourney =>
-        for {
-          authSession <- agentsExternalStubsConnector.signIn()
-          hc = HeaderCarrier(sessionId = Some(SessionId(authSession.sessionId)))
-          _ <- agentsExternalStubsConnector.removeUser(authSession.userId)(hc, ec)
-          journey = AsaTestJourney.toJourney(testJourney)
-          user <- createUser(journey)(hc)
-          signedIn <- agentsExternalStubsConnector.signIn(
-                        SignInRequest(
-                          userId = user.userId,
-                          planetId = authSession.planetId,
-                          providerType =
-                            if (journey.signedInUserAffinityGroup.isEmpty)
-                              AuthProvider.PrivilegedApplication
-                            else AuthProvider.GovernmentGateway
-                        )
-                      )(hc, ec)
-
-        } yield Redirect(routes.AsaJourneySetupController.showSelectService).withSession(
-          request.session +
-            (SessionKeys.sessionId            -> signedIn.sessionId) +
-            (SessionKeys.authToken            -> s"Bearer ${signedIn.authToken}") +
-            (SessionKeys.lastRequestTimestamp -> DateTime.now.getMillis.toString) +
-            ("planetId"                       -> signedIn.planetId) +
-            ("journey"                        -> testJourney) +
-            ("userId"                         -> user.userId)
-        )
-      )
-    }
+  def root: Action[AnyContent] = Action { _ =>
+    Redirect(routes.AsaJourneySetupController.selectJourney())
   }
 
-  private def createMainUser(asaTestJourney: AsaTestJourney)(implicit hc: HeaderCarrier): Future[User] =
-    ???
-
-  private def createUser(asaTestJourney: AsaTestJourney)(implicit hc: HeaderCarrier): Future[User] =
-    asaTestJourney.signedInUserAffinityGroup.fold(
-      agentsExternalStubsConnector
-        .createUser(affinityGroup = None, Json.parse(s"""{"strideRoles": ["maintain_agent_relationships"]}"""))
-    ) { ag =>
-      val serviceKeys =
-        if (ag == Agent) List("HMRC-AS-AGENT")
-        else asaTestJourney.signedInUserServices.flatMap(_.client.principalServiceKey)
-      agentsExternalStubsConnector
-        .createUser(
-          Some(ag),
-          Json.parse(
-            s"""{ "assignedPrincipalEnrolments":["${serviceKeys
-              .mkString("\",\"")}"]}\"\"\" }"""
-          )
-        )
-        .flatMap(userCreated =>
-          userCreated.assignedPrincipalEnrolments
-            .find(_.service == "IR-SA")
-            .map(_.identifiers.head.value)
-            .map(utr => agentsExternalStubsConnector.updateUser(userCreated.copy(utr = Some(utr))))
-            .getOrElse(Future.successful(()))
-            .map(_ => userCreated)
-        )
-    }
-
-  def showSelectService(): Action[AnyContent] = Action.async { implicit request =>
+  def selectJourney(journey: Option[String]): Action[AnyContent] = Action.async { implicit request =>
     onlyIfFeatureEnabled {
-      request.session
-        .get("journey")
-        .fold(
-          Future.successful(Redirect(routes.AsaJourneySetupController.selectJourney()))
-        )(journey =>
-          if (AsaTestJourney.toJourney(journey).requiresServiceSelect)
+      journey.fold(Future.successful(Ok(selectJourneyView(asaJourneys)))) { journeyId =>
+        ASAJourneyService
+          .asaJourneyForId(journeyId)
+          .fold(
             Future.successful(
-              Ok(
-                selectServiceView(
-                  SelectServiceForm.selectServiceFormForJourney(journey),
-                  SelectServiceForm.servicesForJourney(journey),
-                  journey
+              BadRequest(
+                errorTemplate(
+                  pageTitleMsgKey = "error.summary.heading",
+                  "error.summary.heading",
+                  "invalid journey"
                 )
               )
             )
-          else Future.successful(Redirect(routes.AsaJourneySetupController.createTestData()))
-        )
+          )(journey =>
+            asaJourneySetupService
+              .setupMainUser(journey)
+              .map(authSession =>
+                Redirect(routes.AsaJourneySetupController.showSelectService).withSession(
+                  request.session +
+                    (SessionKeys.sessionId            -> authSession.sessionId) +
+                    (SessionKeys.authToken            -> s"Bearer ${authSession.authToken}") +
+                    (SessionKeys.lastRequestTimestamp -> DateTime.now.getMillis.toString) +
+                    ("planetId"                       -> authSession.planetId) +
+                    ("journey"                        -> journeyId) +
+                    ("userId"                         -> authSession.userId) -
+                    "service" - "journey-data"
+                )
+              )
+          )
+      }
+    }
+  }
+
+  def showSelectService(): Action[AnyContent] = Action.async { implicit request =>
+    onlyIfFeatureEnabled {
+      withJourney {
+        case journey @ (journeyWithService: ASATestJourneyWithServiceSelection) =>
+          Future.successful(
+            Ok(
+              selectServiceView(
+                SelectServiceForm.selectServiceFormForJourney(journeyWithService),
+                SelectServiceForm.servicesForJourney(journeyWithService),
+                journey.id
+              )
+            )
+          )
+        case journey =>
+          createTestDataAndSetUrl(journey).map(nextUrl =>
+            Redirect(nextUrl.nextUrl).addingToSession("journey-data" -> nextUrl.testData.getOrElse(""))
+          )
+      }
     }
   }
 
   def submitSelectService: Action[AnyContent] = Action.async { implicit request =>
-    request.session
-      .get("journey")
-      .fold(Future.successful(Redirect(routes.AsaJourneySetupController.selectJourney()))) { journey =>
+    withJourney {
+      case j: ASATestJourneyWithServiceSelection =>
         SelectServiceForm
-          .selectServiceFormForJourney(journey)
+          .selectServiceFormForJourney(j)
           .bindFromRequest()
           .fold(
             hasErrors => Future.successful(BadRequest("invalid submission.")),
-            asaService =>
-              Future.successful(
-                Redirect(routes.AsaJourneySetupController.createTestData())
-                  .addingToSession("service" -> asaService.id)
-              )
-            //asaJourneySetupService
-            //.setupJourneyForServiceSelected(journey, asaService)
-            //.map(updateSessionAndRedirect(_))
-          )
-      }
-  }
-
-  def createTestData: Action[AnyContent] = Action.async { implicit request =>
-    onlyIfFeatureEnabled {
-      request.session
-        .get("journey")
-        .fold(Future.successful(Redirect(routes.AsaJourneySetupController.selectJourney()))) { testJourney =>
-          val asaTestJourney = AsaTestJourney.toJourney(testJourney)
-
-          asaTestJourney match {
-            case journey: JourneyWithServiceSelected =>
-              request.session
-                .get("service")
-                .fold(Future.successful(Redirect(routes.AsaJourneySetupController.showSelectService)))(svc =>
-                  asaJourneySetupService
-                    .setupDataForJourneyWithServiceSelected(journey, AsaTestJourney.forId(svc))
-                    .map(testData =>
-                      Redirect(routes.AsaJourneySetupController.showTestData)
-                        .addingToSession("journey-data" -> testData)
-                    )
-                )
-            case journey: JourneyWithoutServiceSelected =>
+            asaJourneyService =>
               asaJourneySetupService
-                .setupDataForJourneyWithoutServiceSelected(journey)
-                .map(_ =>
-                  journey match {
-                    case MytaInd | MytaOrg =>
-                      Redirect(s"${frontendConfig.acrfHost}/agent-client-relationships/test-only/journey-setup/myta")
-                    case Track =>
-                      Redirect(s"${frontendConfig.acrfHost}/agent-client-relationships/test-only/journey-setup/track")
-                    case AccessGroups        => Redirect("")
-                    case UkSubscription      => Redirect("")
-                    case MmtarProvideDetails => Redirect("")
-                  }
+                .setupDataForJourneyWithServiceSelected(j, asaJourneyService)
+                .map(testData =>
+                  Redirect(routes.AsaJourneySetupController.showTestData)
+                    .addingToSession("journey-data" -> testData, "service" -> asaJourneyService.friendlyName)
                 )
-
-          }
-
-        }
-
+          )
+      case _ => Future.successful(Redirect(routes.AsaJourneySetupController.selectJourney()))
     }
-
   }
 
-  def showTestData: Action[AnyContent] = Action { implicit request =>
-    request.session
-      .get("journey")
-      .fold(Redirect(routes.AsaJourneySetupController.selectJourney())) { journey =>
-        request.session.get("service").fold(Redirect(routes.AsaJourneySetupController.showSelectService)) { service =>
-          Ok(
-            journeyDataView(
-              journey,
-              service,
-              request.session.get("journey-data").getOrElse(""),
-              if (journey == "hmrc-led-deauth")
-                s"${frontendConfig.agentHelpdeskFrontendfHost}/manage-agent-authorisation"
-              else s"${frontendConfig.acrfTestOnlyUrl}/$journey"
+  def showTestData: Action[AnyContent] = Action.async { implicit request =>
+    onlyIfFeatureEnabled {
+      withJourney { journey =>
+        withJourneyData { journeyData =>
+          Future.successful(
+            Ok(
+              journeyDataView(
+                journey,
+                request.session.get("service"),
+                journeyData,
+                journey match {
+                  case HmrcLedDeauth  => s"${frontendConfig.agentHelpdeskFrontendfHost}/manage-agent-authorisation"
+                  case UkSubscription => s"${frontendConfig.agentSubscriptionFrontendHost}/agent-subscription/start"
+                  case _              => s"${frontendConfig.acrfTestOnlyUrl}/${journey.id}"
+                }
+              )
             )
           )
         }
       }
+    }
   }
 
-  private def updateSessionAndRedirect(journeySetup: JourneySetup)(implicit request: Request[_]): Result =
-    journeySetup.authSession match {
-      case Some(authSession) =>
-        Redirect(journeySetup.redirectUrl).withSession(
-          request.session +
-            (SessionKeys.sessionId            -> authSession.sessionId) +
-            (SessionKeys.authToken            -> s"Bearer ${authSession.authToken}") +
-            (SessionKeys.lastRequestTimestamp -> DateTime.now.getMillis.toString) +
-            ("planetId"                       -> authSession.planetId) +
-            ("journey-data"                   -> journeySetup.journeyData.getOrElse("")) +
-            ("service"                        -> journeySetup.service.getOrElse(""))
-        )
-      case None =>
-        Redirect(journeySetup.redirectUrl).withSession(
-          request.session +
-            ("journey"      -> journeySetup.journey) +
-            ("journey-data" -> journeySetup.journeyData.getOrElse("")) +
-            ("service"      -> journeySetup.service.getOrElse(""))
-        )
+  case class NextUrl(nextUrl: String, testData: Option[String])
+
+  private def createTestDataAndSetUrl(journey: ASATestJourney)(implicit rh: RequestHeader): Future[NextUrl] =
+    journey match {
+      case _: ASATestJourneyWithServiceSelection =>
+        Future.successful(NextUrl(routes.AsaJourneySetupController.showSelectService.url, None))
+      case journeyWithoutService: ASATestJourneyWithoutServiceSelection =>
+        asaJourneySetupService
+          .setupDataForJourneyWithoutServiceSelected(journeyWithoutService)
+          .map { journeyData =>
+            val url = {
+              journeyWithoutService match {
+                case MytaInd | MytaOrg =>
+                  s"${frontendConfig.acrfHost}/agent-client-relationships/test-only/journey-setup/myta"
+                case Track =>
+                  s"${frontendConfig.acrfHost}/agent-client-relationships/test-only/journey-setup/track"
+                case AccessGroups => s"${frontendConfig.asafHost}/agent-services-account/manage-account"
+                case UkSubscription =>
+                  routes.AsaJourneySetupController.showTestData.url
+                case MmtarProvideDetails =>
+                  s"${frontendConfig.agentRegistrationFrontendExternalUrl}/agent-registration/provide-details/start/${journeyData
+                    .getOrElse("")}"
+              }
+            }
+            NextUrl(url, journeyData)
+          }
     }
 
-  private def onlyIfFeatureEnabled(f: => Future[Result]) =
+  private def onlyIfFeatureEnabled(f: => Future[Result]): Future[Result] =
     if (frontendConfig.showJourneySetup) {
       f
     } else Future.successful(NotImplemented("Feature not enabled."))
+
+  private def withJourney(f: ASATestJourney => Future[Result])(implicit rh: RequestHeader): Future[Result] =
+    rh.session
+      .get("journey")
+      .fold(Future.successful(Redirect((routes.AsaJourneySetupController.selectJourney()))))(journeyStr =>
+        f(
+          ASAJourneyService
+            .asaJourneyForId(journeyStr)
+            .get
+        )
+      )
+
+  private def withJourneyData(f: String => Future[Result])(implicit rh: RequestHeader): Future[Result] =
+    rh.session
+      .get("journey-data")
+      .fold(Future.successful(Redirect((routes.AsaJourneySetupController.selectJourney()))))(journeyDataStr =>
+        f(journeyDataStr)
+      )
 
 }

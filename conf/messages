@@ -232,15 +232,18 @@ planet.link.destroy=End this planet and destroy the data
 #Help
 help.title=Create a client on Agents External Stubs
 
-#asa-journey-setup page
-journey-setup.title=ASA Journey Setup
-journey-setup.create-invitation=Create invitation
-journey-setup.agent-led-deauth=Agent led deauthorise
-journey-setup.hmrc-led-deauth=HMRC led deauthorise
-journey-setup.access-groups=Access Groups
-journey-setup.myta-org=Manage Your Tax Agents (Org)
-journey-setup.myta-ind=Manage Your Tax Agents (Ind)
-journey-setup.track=Track your recent authorisation requests
+#/asa-journey/select-journey
+select-journey.title=ASA Doorway
+select-journey.create-invitation=Create invitation
+select-journey.agent-led-deauth=Agent led deauthorise
+select-journey.hmrc-led-deauth=HMRC led deauthorise
+select-journey.access-groups=Access Groups
+select-journey.myta-org=Manage Your Tax Agents (Org)
+select-journey.myta-ind=Manage Your Tax Agents (Ind)
+select-journey.track=Track your recent authorisation requests
+select-journey.uk-subscription=UK Subscription
+select-journey.provide-details=MMTAR Provide details
+
 
 select-service.title=Select a service for the {0} journey
 select-service.label=Service
@@ -248,21 +251,22 @@ select-service.label=Service
 continue.button=Continue
 
 #define service names
-journey-setup.service.AltItsa=Alt ITSA
-journey-setup.service.Itsa=ITSA
-journey-setup.service.AltItsaSupp=Alt ITSA (supporting)
-journey-setup.service.ItsaSupp=ITSA (supporting)
-journey-setup.service.VAT=VAT
-journey-setup.service.PERSONAL-INCOME-RECORD=Income Record Viewer
-journey-setup.service.PPT=Plastic Packaging Tax
-journey-setup.service.Pillar2=Pillar 2
-journey-setup.service.CBC=Country-by-country
-journey-setup.service.CBCNonUk=Country-by-country (non-UK)
-journey-setup.service.CGT=Capital Gains Tax
-journey-setup.service.TERSNT=Non-taxable Trust
-journey-setup.service.TERS=Taxable Trust
+select-service.service.AltItsa=Alt ITSA
+select-service.service.Itsa=ITSA
+select-service.service.AltItsaSupporting=Alt ITSA (supporting)
+select-service.service.ItsaSupporting=ITSA (supporting)
+select-service.service.Vat=VAT
+select-service.service.IncomeRecordViewer=Income Record Viewer
+select-service.service.PlasticPackagingTax=Plastic Packaging Tax
+select-service.service.Pillar2=Pillar 2
+select-service.service.CountryByCountry=Country-by-country
+select-service.service.CountryByCountryNonUk=Country-by-country (non-UK)
+select-service.service.CapitalGainsTaxProperty=Capital Gains Tax
+select-service.service.NonTaxableTrust=Non-taxable Trust
+select-service.service.TaxableTrust=Taxable Trust
 
 #journey-data page
+journey-data.title.no-service={0} test data
 journey-data.title={0} for {1} test data
 journey-data.start=Start journey (opens in a new tab)
 journey-data.start-over=Start a new journey
