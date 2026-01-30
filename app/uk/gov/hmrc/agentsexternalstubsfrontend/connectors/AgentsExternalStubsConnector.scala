@@ -167,30 +167,6 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  // todo do we need this??
-  def updateCurrentUser(updatedUser: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-    val requestUrl = url"$baseUrl/agents-external-stubs/users"
-    http
-      .put(requestUrl)
-      .withBody(Json.toJson(updatedUser))
-      .execute[HttpResponse]
-      .flatMap { r =>
-        (r.status, r.header(HeaderNames.LOCATION)) match {
-          case (Status.BAD_REQUEST, _) => throw new BadRequestException(s"$baseUrl/agents-external-stubs/sign-in")
-          case (_, None)               => throw new IllegalStateException()
-          case (s, Some(l)) =>
-            val urlBuilder = baseUrl + l
-            val getUserUrl = url"$urlBuilder"
-            http
-              .get(getUserUrl)
-              .execute[HttpResponse]
-              .map(res => res.json.as[User])
-        }
-      }
-      .recover(handleNotFound)
-      .map(_ => ())
-  }
-
   def getUsers(
     userId: Option[String] = None,
     groupId: Option[String] = None,
