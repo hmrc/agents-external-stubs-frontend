@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.services
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentClientRelationshipsConnector, AgentRegistrationConnector, AgentsExternalStubsConnector}
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
@@ -34,8 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AsaJourneySetupService @Inject() (
   agentsExternalStubsConnector: AgentsExternalStubsConnector,
   agentRegistrationConnector: AgentRegistrationConnector,
-  acrConnector: AgentClientRelationshipsConnector,
-  frontendConfig: FrontendConfig
+  acrConnector: AgentClientRelationshipsConnector
 )(implicit ec: ExecutionContext) {
 
   def setupMainUser(journey: ASATestJourney)(implicit rh: RequestHeader) =

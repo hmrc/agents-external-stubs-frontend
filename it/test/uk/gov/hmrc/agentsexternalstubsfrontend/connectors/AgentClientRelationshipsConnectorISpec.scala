@@ -32,7 +32,7 @@ class AgentClientRelationshipsConnectorISpec  extends BaseISpec with AgentClient
     "return Future.unit" in {
 
       val req = JourneySetupRequest(
-        Seq(JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT", None)))
+        Seq(JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT", Some("personal"))))
 
       givenTestOnlyJourneySetup(req)
       val result: Unit = connector.testOnlyJourneySetup(req).futureValue
@@ -46,7 +46,7 @@ class AgentClientRelationshipsConnectorISpec  extends BaseISpec with AgentClient
 
       givenTestOnlyCreateRelationship(arn, nino, "HMRC-MTD-IT", "personal")
 
-      val result: Unit = connector.testOnlyCreateRelationship(arn, nino, "HMRC-MTD-IT", "ni").futureValue
+      val result: Unit = connector.testOnlyCreateRelationship(arn, nino, "HMRC-MTD-IT", "personal").futureValue
 
       result shouldBe()
     }

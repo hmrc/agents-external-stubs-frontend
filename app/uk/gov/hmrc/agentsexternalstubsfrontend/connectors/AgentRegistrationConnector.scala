@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
@@ -32,7 +32,7 @@ class AgentRegistrationConnector @Inject() (appConfig: FrontendConfig, http: Htt
 
   val url = url"${appConfig.agentRegistrationBaseUrl}/agent-registration/test-only/create-submitted-application"
 
-  implicit val format = Json.format[LinkResponse]
+  implicit val format: Format[LinkResponse] = Json.format[LinkResponse]
 
   def testOnlyJourneySetup()(implicit hc: HeaderCarrier): Future[LinkResponse] =
     http

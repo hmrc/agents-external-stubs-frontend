@@ -17,9 +17,6 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.models
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.auth.core.AffinityGroup
-
-case class JourneySetupUser(affinityGroup: AffinityGroup, services: List[EACDServiceKey])
 
 case class JourneySetupRequest(invitations: Seq[JourneySetupInvitation])
 
