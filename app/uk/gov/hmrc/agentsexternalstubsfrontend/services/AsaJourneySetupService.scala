@@ -59,10 +59,8 @@ class AsaJourneySetupService @Inject() (
                                     else AuthProvider.GovernmentGateway
                                 )
                               )(hc, ec)
-      _ = clearSession()
     } yield authenticatedSession
 
-  private def clearSession()(implicit rh: RequestHeader) = rh.session.--(List("service", "journey-data"))
 
   def setupDataForJourneyWithServiceSelected(
     journey: ASATestJourneyWithServiceSelection,
