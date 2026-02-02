@@ -65,9 +65,9 @@
         <div class="govuk-form-group govuk-input--width-20">
             @govukInput(
                 Input(
-                    name  = "searchUserId",
+                    name  = "partialUserId",
                     label = Label(content = Text("Search by user ID (optional)")),
-                    value = filtersForm("searchUserId").value
+                    value = filtersForm("partialUserId").value
                 )
             )
         </div>
