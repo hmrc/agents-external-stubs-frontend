@@ -513,7 +513,7 @@ class UserController @Inject() (
               for {
                 groups <- agentsExternalStubsConnector.getGroups
                 users <- agentsExternalStubsConnector.getUsers(
-                           userId = filters.userId.filter(_.nonEmpty),
+                           userId = filters.searchUserId.filter(_.nonEmpty),
                            groupId = filters.groupId.filter(_.nonEmpty),
                            principalEnrolmentService = filters.principalEnrolmentService.filter(_.nonEmpty),
                            limit = filters.limit
