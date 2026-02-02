@@ -61,7 +61,6 @@ class AsaJourneySetupService @Inject() (
                               )(hc, ec)
     } yield authenticatedSession
 
-
   def setupDataForJourneyWithServiceSelected(
     journey: ASATestJourneyWithServiceSelection,
     asaJourneyService: ASAJourneyService
