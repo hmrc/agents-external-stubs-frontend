@@ -62,24 +62,24 @@
 
     <form method="GET" action="@routes.UserController.showAllUsersPage">
 
-        <div class="govuk-form-group govuk-input--width-20" id="width-20" name="width20">
-        @govukInput(
-            Input(
-                name  = "userId",
-                label = Label(content = Text("Search by user ID (optional)")),
-                value = filtersForm("userId").value
+        <div class="govuk-form-group govuk-input--width-20">
+            @govukInput(
+                Input(
+                    name  = "partialUserId",
+                    label = Label(content = Text("Search by user ID (optional)")),
+                    value = filtersForm("partialUserId").value
+                )
             )
-        )
         </div>
 
-        <div class="govuk-form-group govuk-input--width-20" id="width-20" name="width20">
+        <div class="govuk-form-group govuk-input--width-20">
             @govukSelect(Select(
                 label = Label(content = Text("Search by group ID (optional)")),
                 items = SelectItem(value = None, text = "") +: groups.map(group => SelectItem(value = Some(group), text = group))
             ).withFormField(filtersForm("groupId")))
         </div>
 
-        <div class="govuk-form-group govuk-input--width-20" id="width-20" name="width20">
+        <div class="govuk-form-group govuk-input--width-20">
             @govukSelect(Select(
                 label = Label(content = Text("Search by service (optional)")),
                 items = SelectItem(value = None, text = "") +: services.map(service => SelectItem(value = Some(service), text = service))
@@ -87,28 +87,25 @@
         </div>
 
         <div class="govuk-form-group @if(filtersForm.error("limit").isDefined){govuk-form-group--error}">
-        @govukInput(
-            Input(
-                name  = "limit",
-                label = Label(content = Text("Limit results (optional)")),
-                value = filtersForm("limit").value,
-                classes = "govuk-input--width-5" + (if (filtersForm.error("limit").isDefined) " govuk-input--error" else ""),
-                errorMessage = filtersForm.error("limit").map { err =>
-                    ErrorMessage(
-                        content = Text(msgs(err.message, err.args: _*))
-                    )
-                }
+            @govukInput(
+                Input(
+                    name  = "limit",
+                    label = Label(content = Text("Limit results (optional)")),
+                    value = filtersForm("limit").value,
+                    classes = "govuk-input--width-5" + (if (filtersForm.error("limit").isDefined) " govuk-input--error" else ""),
+                    errorMessage = filtersForm.error("limit").map { err =>
+                        ErrorMessage(
+                            content = Text(msgs(err.message, err.args: _*))
+                        )
+                    }
+                )
             )
-        )
         </div>
 
         <div class="govuk-button-group">
             @govukButton(Button(content = Text("Apply filters")))
 
-            <a
-            class="govuk-button govuk-button--secondary"
-            href="@routes.UserController.showAllUsersPage"
-            >
+            <a class="govuk-button govuk-button--secondary" href="@routes.UserController.showAllUsersPage">
                 Clear filters
             </a>
         </div>

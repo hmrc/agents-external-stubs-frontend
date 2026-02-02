@@ -128,10 +128,10 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
     val params: List[(String, String)] = List(
-      limit.map(_.toString).map("limit" -> _),
-      userId.map("userId" -> _),
-      groupId.map("groupId" -> _),
-      principalEnrolmentService.map("principalEnrolmentService" -> _),
+      limit.map(_.toString).map(("limit", _)),
+      userId.map(("userId", _)),
+      groupId.map(("groupId", _)),
+      principalEnrolmentService.map(("principalEnrolmentService", _))
     ).flatten
 
     val uri = uri"/users".addParams(params: _*)

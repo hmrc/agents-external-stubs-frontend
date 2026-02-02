@@ -97,14 +97,14 @@ class UserControllerISpec
         getUserIdsDisplayed(body) shouldBe List("bar", "buzz", "fizz", "foo")
       }
 
-      "allow partial filtering by userId parameter" in new SimpleGetUsersSetup {
-        val userId = "zz"
-        givenUsersWithUserId(userId, usersList: _*)
+      "allow partial filtering by partialUserId parameter" in new SimpleGetUsersSetup {
+        val partialUserId = "zz"
+        givenUsersWithUserId(partialUserId, usersList: _*)
 
         private val request =
           FakeRequest(
             GET,
-            s"/agents-external-stubs/users?userId=$userId"
+            s"/agents-external-stubs/users?partialUserId=$partialUserId"
           ).withSession("authToken" -> "Bearer XYZ")
 
         private val result = callEndpointWith(request)
@@ -174,13 +174,13 @@ class UserControllerISpec
       }
 
       "allow filtering by userId, groupId, principalEnrolmentService and limit parameters" in new SimpleGetUsersSetup {
-        val userId = "zz"
+        val partialUserId = "zz"
         val groupId = "group1"
         val principalEnrolmentService = "HMRC-MTD-IT"
         val limit = 2
-        givenUsersWithAllQueryParams(limit, userId, groupId, principalEnrolmentService, usersList: _*)
+        givenUsersWithAllQueryParams(limit, partialUserId, groupId, principalEnrolmentService, usersList: _*)
 
-        val stubsUrl = s"/agents-external-stubs/users?limit=$limit&userId=$userId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
+        val stubsUrl = s"/agents-external-stubs/users?limit=$limit&partialUserId=$partialUserId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
 
         private val request =
           FakeRequest(
@@ -226,7 +226,7 @@ class UserControllerISpec
         givenServiceDefinitions
         givenUsers(User("Test123"), User("test456"))
 
-        val userId = "TestId"
+        val partialUserId = "TestId"
         val principalEnrolmentService = "HMRC-MTD-IT"
         val groupId = "G1"
         val limit = 10
@@ -234,7 +234,7 @@ class UserControllerISpec
         val request =
           FakeRequest(
             GET,
-            s"/agents-external-stubs/users?userId=$userId&principalEnrolmentService=$principalEnrolmentService&groupId=$groupId&limit=$limit"
+            s"/agents-external-stubs/users?partialUserId=$partialUserId&principalEnrolmentService=$principalEnrolmentService&groupId=$groupId&limit=$limit"
           ).withSession("authToken" -> "Bearer XYZ")
 
         val result = callEndpointWith(request)
@@ -243,8 +243,8 @@ class UserControllerISpec
 
         val body = contentAsString(Future.successful(result))
 
-        body should include("""name="userId"""")
-        body should include(s"""value="$userId"""")
+        body should include("""name="partialUserId"""")
+        body should include(s"""value="$partialUserId"""")
         body should include("""name="principalEnrolmentService"""")
         body should include(s"""value="$principalEnrolmentService"""")
         body should include("""name="groupId"""")
