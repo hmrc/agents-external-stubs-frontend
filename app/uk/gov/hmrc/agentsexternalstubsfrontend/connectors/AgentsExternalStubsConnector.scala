@@ -127,12 +127,11 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
     limit: Option[Int] = None
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
-//    TODO: Auto-formatting here obfuscates rather than helps. Rewrite to avoid
     val params: List[(String, String)] = List(
-      limit.map(_.toString).map("limit"                         -> _),
-      userId.map("userId"                                       -> _),
-      groupId.map("groupId"                                     -> _),
-      principalEnrolmentService.map("principalEnrolmentService" -> _)
+      limit.map(_.toString).map(("limit", _)),
+      userId.map(("userId", _)),
+      groupId.map(("groupId", _)),
+      principalEnrolmentService.map(("principalEnrolmentService", _))
     ).flatten
 
     val uri = uri"/users".addParams(params: _*)
