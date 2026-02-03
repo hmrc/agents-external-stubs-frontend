@@ -20,7 +20,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 
 case class UserFilters(
-  userId: Option[String],
+  partialUserId: Option[String],
   groupId: Option[String],
   principalEnrolmentService: Option[String],
   limit: Option[Int]
@@ -31,7 +31,7 @@ object UserFiltersForm {
   val form: Form[UserFilters] =
     Form(
       mapping(
-        "userId"                    -> optional(text),
+        "partialUserId"             -> optional(text),
         "groupId"                   -> optional(text),
         "principalEnrolmentService" -> optional(text),
         "limit"                     -> optional(number(min = 1, max = 100))
