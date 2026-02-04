@@ -29,6 +29,9 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
   private def getConfInt(config: String) =
     servicesConfig.getConfInt(config, throw new RuntimeException(s"config $config not found"))
 
+  private def getConfString(config: String) =
+    servicesConfig.getConfString(config, throw new RuntimeException(s"config $config not found"))
+
   val companyAuthFEPort = getConfInt("company-auth-frontend.port")
 
   val basGatewayFEPort = getConfInt("bas-gateway-frontend.port")
@@ -50,4 +53,25 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
   val authBaseUrl = baseUrl("auth")
 
   val aesBaseUrl = baseUrl("agents-external-stubs")
+
+  val acrBaseUrl: String = baseUrl("agent-client-relationships")
+
+  val agentRegistrationBaseUrl: String = baseUrl("agent-registration")
+
+  val showJourneySetup: Boolean = servicesConfig.getBoolean("features.asa-doorway-enabled")
+
+  val agentRegistrationFrontendExternalUrl: String = getConfString("agent-registration-frontend.external-url")
+
+  val acrfHost: String = getConfString("agent-client-relationships-frontend.external-url")
+
+  val acrfTestOnlyStartPath: String = getConfString("agent-client-relationships-frontend.test-only-start-path")
+
+  val acrfTestOnlyUrl: String = s"$acrfHost$acrfTestOnlyStartPath"
+
+  val asafHost: String = getConfString("agent-services-account-frontend.external-url")
+
+  val agentHelpdeskFrontendfHost: String = getConfString("agent-helpdesk-frontend.external-url")
+
+  val agentSubscriptionFrontendHost: String = getConfString("agent-subscription-frontend.external-url")
+
 }

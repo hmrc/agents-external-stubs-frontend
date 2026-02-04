@@ -1,0 +1,48 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.ASATestJourney
+
+@this(
+        mainTemplate: main_template
+)
+
+
+@(journey: ASATestJourney, service: Option[String], testData: String, continueUrl: String)(implicit request: Request[_], msgs: Messages)
+
+@theTitle = @{service.fold(msgs("journey-data.title.no-service", msgs(s"select-journey.${journey.id}")))(svc => msgs(s"journey-data.title", msgs(s"select-journey.${journey.id}"), msgs(s"select-service.service.$svc")))}
+
+@backLinkUrl = @{if(journey.requiresServiceSelect) routes.AsaJourneySetupController.showSelectService.url else routes.AsaJourneySetupController.selectJourney().url}
+
+@mainTemplate(title = theTitle , showSignOut = false, backLinkHref = Some(backLinkUrl)) {
+
+    <h1 class="govuk-heading-xl">@theTitle</h1>
+
+    <p  style="color:blue;font-family:'Courier New'">
+        @testData
+    </p>
+
+    <p class="govuk-body govuk-!-margin-top-5">
+        <a href="@continueUrl" target="_blank" rel="noreferrer noopener" class="govuk-link">@msgs("journey-data.start")</a>
+    </p>
+
+    <p class="govuk-body govuk-!-margin-top-5">
+        <a href="@routes.AsaJourneySetupController.selectJourney().url" class="govuk-link">@msgs("journey-data.start-over")</a>
+    </p>
+
+}
