@@ -40,7 +40,7 @@
 
     @for(j <- journeys){
         <p class="govuk-body">
-            <a href="@{mAdminHostPrefix(j)}@routes.AsaJourneySetupController.selectJourney(Some(j.id))" class="govuk-link">@msgs(s"select-journey.${j.id}")</a>
+            <a href="@mAdminHostPrefix(j)@routes.AsaJourneySetupController.selectJourney(Some(j.id))" class="govuk-link">@msgs(s"select-journey.${j.id}")</a>
         </p>
     }
 }
