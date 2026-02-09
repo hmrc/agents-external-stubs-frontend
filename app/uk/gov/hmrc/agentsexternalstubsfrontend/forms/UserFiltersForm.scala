@@ -34,7 +34,7 @@ object UserFiltersForm {
         "partialUserId"             -> optional(text),
         "groupId"                   -> optional(text),
         "principalEnrolmentService" -> optional(text),
-        "limit"                     -> optional(number(min = 1, max = 100))
+        "limit"                     -> optional(number(min = 1))
       )(UserFilters.apply)(UserFilters.unapply)
     )
 }
