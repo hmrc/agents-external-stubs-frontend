@@ -38,9 +38,8 @@ class AsaJourneySetupController @Inject() (
   selectServiceView: select_service,
   errorTemplate: error_template,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
-  asaJourneySetupService: AsaJourneySetupService,
-  frontendConfig: FrontendConfig
-)(implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  asaJourneySetupService: AsaJourneySetupService
+)(implicit mcc: MessagesControllerComponents, ec: ExecutionContext, frontendConfig: FrontendConfig)
     extends FrontendController(mcc) {
 
   def root: Action[AnyContent] = Action { _ =>

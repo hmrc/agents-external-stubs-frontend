@@ -17,6 +17,8 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.ASATestJourney
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.HmrcLedDeauth
+@import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 
 
 @this(
@@ -24,7 +26,13 @@
 )
 
 
-@(journeys: List[ASATestJourney])(implicit request: Request[_], msgs: Messages)
+@(journeys: List[ASATestJourney])(implicit request: Request[_], msgs: Messages, frontendConfig: FrontendConfig)
+
+@mAdminHostPrefix(journey: ASATestJourney) = @{ journey match {
+    case HmrcLedDeauth => if(request.host.startsWith("localhost") || request.host.contains("admin")) "" else s"${frontendConfig.agentHelpdeskFrontendfHost}"
+    case _ => ""
+}
+}
 
 @mainTemplate(title = msgs("select-journey.title"), showSignOut = false) {
 
@@ -32,7 +40,7 @@
 
     @for(j <- journeys){
         <p class="govuk-body">
-            <a href="@routes.AsaJourneySetupController.selectJourney(Some(j.id))" class="govuk-link">@msgs(s"select-journey.${j.id}")</a>
+            <a href="@{mAdminHostPrefix(j)}@routes.AsaJourneySetupController.selectJourney(Some(j.id))" class="govuk-link">@msgs(s"select-journey.${j.id}")</a>
         </p>
     }
 }
