@@ -46,7 +46,8 @@ sealed trait ASAJourneyService {
 case class SignedInUser(
   affinityGroup: Option[AffinityGroup],
   strideRole: Option[String] = None,
-  services: List[EACDServiceKey]
+  services: List[EACDServiceKey],
+  isAdmin: Boolean = true
 )
 
 sealed trait ASATestJourney {
@@ -429,6 +430,23 @@ case object MmtarProvideDetails extends ASATestJourneyWithoutServiceSelection {
 
 }
 
+//no service selection
+case object AsaDashboardAdminUser extends ASATestJourneyWithoutServiceSelection {
+  override val id: String = "manage-account"
+  override val signedInUser: SignedInUser = SignedInUser(affinityGroup = Some(Agent), services = List(ASAAgent))
+  override val requiresServiceSelect: Boolean = false
+
+}
+
+//no service selection
+case object AsaDashboardStandardUser extends ASATestJourneyWithoutServiceSelection {
+  override val id: String = "your-account"
+  override val signedInUser: SignedInUser =
+    SignedInUser(affinityGroup = Some(Agent), services = List(ASAAgent), isAdmin = false)
+  override val requiresServiceSelect: Boolean = false
+
+}
+
 object ASAJourneyService {
 
   private val asaJourneyServices: List[ASAJourneyService] = List(
@@ -488,7 +506,9 @@ object ASAJourneyService {
       UkSubscription,
       AccessGroups,
       Track,
-      MmtarProvideDetails
+      MmtarProvideDetails,
+      AsaDashboardAdminUser,
+      AsaDashboardStandardUser
     )
   private val eacdServices: List[EACDServiceKey] =
     List(ASAAgent, VatAgent, IrSa, HmrcPt, Itsa, ItsaSupp, Vat, Ppt, CgtPd, Trust, TrustNT, Cbc, CbcNonUk, Pillar2)

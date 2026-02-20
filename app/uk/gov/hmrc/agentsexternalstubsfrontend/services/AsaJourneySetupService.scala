@@ -44,11 +44,22 @@ class AsaJourneySetupService @Inject() (
            )
       _ <- agentsExternalStubsConnector.removeUser(authSession.userId)(hc, ec)
 
-      user <- createUser(
-                affinityGroup = journey.signedInUser.affinityGroup,
-                services = journey.signedInUser.services,
-                strideRole = journey.signedInUser.strideRole
-              )(hc)
+      admin <- createUser(
+                 affinityGroup = journey.signedInUser.affinityGroup,
+                 services = journey.signedInUser.services,
+                 strideRole = journey.signedInUser.strideRole
+               )(hc)
+
+      user <- if (journey.signedInUser.isAdmin) Future.successful(admin)
+              else
+                createUser(
+                  affinityGroup = journey.signedInUser.affinityGroup,
+                  services = journey.signedInUser.services,
+                  strideRole = journey.signedInUser.strideRole,
+                  groupId = admin.groupId,
+                  isAdmin = false
+                )(hc)
+
       authenticatedSession <- agentsExternalStubsConnector.signIn(
                                 SignInRequest(
                                   userId = user.userId,
@@ -232,6 +243,7 @@ class AsaJourneySetupService @Inject() (
       case MmtarProvideDetails =>
         agentRegistrationConnector.testOnlyJourneySetup().map(linkId => Some(linkId.linkId))
 
+      case AsaDashboardAdminUser | AsaDashboardStandardUser => Future.successful(None)
     }
 
   private def getSignedInUser()(implicit rh: RequestHeader): Future[User] =
@@ -242,14 +254,19 @@ class AsaJourneySetupService @Inject() (
   def createUser(
     affinityGroup: Option[AffinityGroup],
     services: List[EACDServiceKey],
-    strideRole: Option[String] = None
+    strideRole: Option[String] = None,
+    groupId: Option[String] = None,
+    isAdmin: Boolean = true
   )(implicit hc: HeaderCarrier): Future[User] = {
 
     val serviceKeys = services.map(_.key)
 
     val jsonUserBody = affinityGroup.fold(
       s"""{"strideRoles": ["${strideRole.get}"]}"""
-    )(_ => s"""{"assignedPrincipalEnrolments":["${serviceKeys.mkString("\",\"")}"]}\"\"\"}\"\"\"}""")
+    )(_ => s"""{
+              |"credentialRole": "${if (isAdmin) "User" else "Assistant"}",
+              |${groupId.map(gid => s""" "groupId": "$gid", """).getOrElse("")}
+              |"assignedPrincipalEnrolments":["${serviceKeys.mkString("\",\"")}"]}\"\"\"}\"\"\"}""".stripMargin)
 
     agentsExternalStubsConnector
       .createUser(
