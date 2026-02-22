@@ -447,6 +447,15 @@ case object AsaDashboardStandardUser extends ASATestJourneyWithoutServiceSelecti
 
 }
 
+//no service selection
+case object MmtarStartRegistration extends ASATestJourneyWithoutServiceSelection {
+  override val id: String = "agent-registration"
+  override val signedInUser: SignedInUser =
+    SignedInUser(affinityGroup = Some(Agent), services = List(VatAgent))
+  override val requiresServiceSelect: Boolean = false
+
+}
+
 object ASAJourneyService {
 
   private val asaJourneyServices: List[ASAJourneyService] = List(
@@ -506,9 +515,10 @@ object ASAJourneyService {
       UkSubscription,
       AccessGroups,
       Track,
-      MmtarProvideDetails,
       AsaDashboardAdminUser,
-      AsaDashboardStandardUser
+      AsaDashboardStandardUser,
+      MmtarProvideDetails,
+      MmtarStartRegistration
     )
   private val eacdServices: List[EACDServiceKey] =
     List(ASAAgent, VatAgent, IrSa, HmrcPt, Itsa, ItsaSupp, Vat, Ppt, CgtPd, Trust, TrustNT, Cbc, CbcNonUk, Pillar2)

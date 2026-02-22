@@ -197,9 +197,12 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
   }
 
 
-  def givenCreateUser(affinityGroup: AffinityGroup, serviceKeys: List[EnrolmentKey], userId: String): StubMapping = {
+  def givenCreateUser(affinityGroup: AffinityGroup, serviceKeys: List[EnrolmentKey], userId: String, isAdmin: Boolean = true, groupId: Option[String] = None): StubMapping = {
 
-    val jsonRequestBody = s"""{ "assignedPrincipalEnrolments": ["${serviceKeys.map(_.service).mkString("\",\"")}"] }"""
+    val jsonRequestBody = s"""{
+              |"credentialRole": "${if(isAdmin) "User" else "Assistant"}",
+              |${groupId.map(gid => s""" "groupId": "$gid", """).getOrElse("")}
+              |"assignedPrincipalEnrolments": ["${serviceKeys.map(_.service).mkString("\",\"")}"]}""".stripMargin
 
     val assignedPrincipalEnrolmentsResponse = s"""["${serviceKeys.map(_.tag).mkString("\",\"")}"]"""
 

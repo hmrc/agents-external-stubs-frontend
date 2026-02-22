@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.services
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentmtdidentifiers.model.Service.PersonalIncomeRecord
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentClientRelationshipsConnector, AgentRegistrationConnector, AgentsExternalStubsConnector}
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models._
@@ -112,7 +113,7 @@ class AsaJourneySetupService @Inject() (
                         affinityGroup = Some(asaJourneyService.affinityGroup),
                         services = List(asaJourneyService.clientEacdServiceKey)
                       )
-          agent <- createAgentUser()
+          agent <- createAsaAgent()
           arn = extractArnFromAgent(agent)
           clientId = extractOneIdentifier(customer)
           _ <- acrConnector.testOnlyCreateRelationship(
@@ -132,10 +133,10 @@ class AsaJourneySetupService @Inject() (
       case MytaInd =>
         for {
           ind    <- getSignedInUser()
-          agent1 <- createAgentUser()
+          agent1 <- createAsaAgent()
           nino = ind.nino.get.value
           arn1 = extractArnFromAgent(agent1)
-          agent2 <- createAgentUser()
+          agent2 <- createAsaAgent()
           arn2 = extractArnFromAgent(agent2)
           _ <- acrConnector.testOnlyJourneySetup(
                  JourneySetupRequest(
@@ -180,7 +181,7 @@ class AsaJourneySetupService @Inject() (
       case MytaOrg =>
         for {
           org   <- getSignedInUser()
-          agent <- createAgentUser()
+          agent <- createAsaAgent()
           arn = extractArnFromAgent(agent)
           invitations = journey.signedInUser.services.map { eacdServiceKey =>
                           val service = ASAJourneyService
@@ -226,7 +227,7 @@ class AsaJourneySetupService @Inject() (
         val postcodeReads: Reads[String] = (JsPath \ "addressDetails" \ "postalCode").read[String]
         val crnReads: Reads[String] = (JsPath \ "crn").read[String]
         for {
-          cleanAgent <- createAgentUser(None)
+          cleanAgent <- createCleanAgent()
           bpr        <- agentsExternalStubsConnector.getRecord(cleanAgent.recordIds.get.head)
           utr = bpr.as[String](utrReads)
           postcode = bpr.as[String](postcodeReads)
@@ -244,6 +245,8 @@ class AsaJourneySetupService @Inject() (
         agentRegistrationConnector.testOnlyJourneySetup().map(linkId => Some(linkId.linkId))
 
       case AsaDashboardAdminUser | AsaDashboardStandardUser => Future.successful(None)
+      case MmtarStartRegistration                           => Future.successful(None)
+
     }
 
   private def getSignedInUser()(implicit rh: RequestHeader): Future[User] =
@@ -283,16 +286,14 @@ class AsaJourneySetupService @Inject() (
       )
   }
 
-  private def createAgentUser(
-    serviceKey: Option[String] = Some("HMRC-AS-AGENT")
+  private def createAsaAgent()(implicit hc: HeaderCarrier): Future[User] =
+    createUser(affinityGroup = Some(Agent), services = List(ASAAgent))
+
+  private def createCleanAgent(
   )(implicit hc: HeaderCarrier): Future[User] =
     agentsExternalStubsConnector.createUser(
       affinityGroup = Some(Agent),
-      userBody = serviceKey.fold[JsValue](JsNull)(sk =>
-        Json.parse(
-          s"""{"assignedPrincipalEnrolments":["$sk"]}"""
-        )
-      )
+      userBody = JsNull
     )
 
   private def extractTestDataFromUser(user: User, asaJourneyService: ASAJourneyService)(implicit
