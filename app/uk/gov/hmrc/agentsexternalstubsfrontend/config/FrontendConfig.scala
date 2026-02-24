@@ -74,6 +74,5 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
 
   val agentSubscriptionFrontendHost: String = getConfString("agent-subscription-frontend.external-url")
 
-  val selfUrl: String = servicesConfig.getString("base-url")
 
 }
