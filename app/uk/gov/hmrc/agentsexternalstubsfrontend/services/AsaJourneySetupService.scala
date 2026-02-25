@@ -45,11 +45,14 @@ class AsaJourneySetupService @Inject() (
            )
       _ <- agentsExternalStubsConnector.removeUser(authSession.userId)(hc, ec)
 
-      admin <- createUser(
-                 affinityGroup = journey.signedInUser.affinityGroup,
-                 services = journey.signedInUser.services,
-                 strideRole = journey.signedInUser.strideRole
-               )(hc)
+      admin <- if (journey.signedInUser.services.isEmpty && journey.signedInUser.strideRole.isEmpty)
+                 createCleanAgent()(hc)
+               else
+                 createUser(
+                   affinityGroup = journey.signedInUser.affinityGroup,
+                   services = journey.signedInUser.services,
+                   strideRole = journey.signedInUser.strideRole
+                 )(hc)
 
       user <- if (journey.signedInUser.isAdmin) Future.successful(admin)
               else
@@ -246,6 +249,7 @@ class AsaJourneySetupService @Inject() (
 
       case AsaDashboardAdminUser | AsaDashboardStandardUser => Future.successful(None)
       case MmtarStartRegistration                           => Future.successful(None)
+      case OverseasApplication                              => Future.successful(None)
 
     }
 

@@ -246,6 +246,7 @@ select-journey.provide-details=MMTAR Provide details
 select-journey.manage-account=ASA Manage account
 select-journey.your-account=ASA Your account
 select-journey.agent-registration=MMTAR Start application
+select-journey.overseas-application=Overseas application
 
 select-service.title=Select a service for the {0} journey
 select-service.label=Service

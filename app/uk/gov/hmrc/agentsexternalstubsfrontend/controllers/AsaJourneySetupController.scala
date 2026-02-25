@@ -171,6 +171,8 @@ class AsaJourneySetupController @Inject() (
                 case AsaDashboardStandardUser => s"${frontendConfig.asafHost}/agent-services-account/your-account"
                 case MmtarStartRegistration =>
                   s"${frontendConfig.agentRegistrationFrontendExternalUrl}/agent-registration/test-only/show-agent-application"
+                case OverseasApplication =>
+                  s"${frontendConfig.agentOverseasFrontendHost}/agent-services/apply-from-outside-uk/create-account"
 
               }
             }
