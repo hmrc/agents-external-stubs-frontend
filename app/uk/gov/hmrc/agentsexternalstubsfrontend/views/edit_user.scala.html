@@ -431,9 +431,9 @@
 
             @govukInput(Input(
                 label = Label(
-                    content = Text("Agent entity UTR")
+                    content = Text("UTR")
                 ),
-                hint = Some(Hint(content = Text("The UTR associated with the agent entity that is not an enrolment on these credentials")))
+                hint = Some(Hint(content = Text("Adding a UTR for Individuals ensures calls to citizen details will return a sautr. For agents, the UTR will be copied to the BPR.")))
             ).withFormField(userForm("utr")))
 
             <div class="govuk-button-group">
