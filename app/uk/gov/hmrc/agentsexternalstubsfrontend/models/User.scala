@@ -105,7 +105,8 @@ object Identifier {
 }
 
 object ConfidenceLevel {
-  val values: Seq[(String, String)] = Seq("0" -> "none", "50" -> "50", "200" -> "200", "250" -> "250")
+  val values: Seq[(String, String)] = Seq("0" -> "none", "50" -> "50", "200" -> "200", "250" -> "250", "600" -> "600")
+  val Default: Int = 600
 }
 
 object CredStrength {

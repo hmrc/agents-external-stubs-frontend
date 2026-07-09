@@ -373,7 +373,8 @@ class UserController @Inject() (
                      user.copy(
                        userId = userId.get,
                        confidenceLevel =
-                         if (affinityGroup.contains(User.Individual)) Some(250) else user.confidenceLevel,
+                         if (affinityGroup.contains(User.Individual)) Some(ConfidenceLevel.Default)
+                         else user.confidenceLevel,
                        credentialStrength =
                          if (affinityGroup.contains(User.Individual)) Some("strong")
                          else user.credentialStrength
@@ -386,7 +387,8 @@ class UserController @Inject() (
                        user.copy(
                          userId = credentials.providerId,
                          confidenceLevel =
-                           if (affinityGroup.contains(User.Individual)) Some(250) else user.confidenceLevel,
+                           if (affinityGroup.contains(User.Individual)) Some(ConfidenceLevel.Default)
+                           else user.confidenceLevel,
                          credentialStrength =
                            if (affinityGroup.contains(User.Individual)) Some("strong")
                            else user.credentialStrength

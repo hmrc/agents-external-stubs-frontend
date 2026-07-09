@@ -47,7 +47,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
         val result =
           callEndpointWith(
-            FakeRequest(GET, "/mdtp/uplift?confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=aif")
+            FakeRequest(GET, "/mdtp/uplift?confidenceLevel=600&completionURL=/good&failureURL=/bad&origin=aif")
               .withSession("authToken" -> "Bearer XYZ")
           )
         status(result) shouldBe 200
@@ -62,12 +62,12 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
 
         "the completionUrl query parameter is missing" in new Setup {
 
-          val result = callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=250&failureURL=/bad"))
+          val result = callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=600&failureURL=/bad"))
           status(result) shouldBe 400
         }
 
         "the failureUrl query parameter is missing" in new Setup {
-          val result = callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=250&completionURL=/good"))
+          val result = callEndpointWith(FakeRequest(GET, "/mdtp/uplift?confidenceLevel=600&completionURL=/good"))
           status(result) shouldBe 400
         }
       }
@@ -78,7 +78,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val succeedRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
+            "/mdtp/uplift?journeyId=1234&confidenceLevel=600&completionURL=/good&failureURL=/bad&origin=ai"
           ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "Success~1234")
         )
@@ -95,7 +95,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val failRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
+            "/mdtp/uplift?journeyId=1234&confidenceLevel=600&completionURL=/good&failureURL=/bad&origin=ai"
           ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
@@ -113,7 +113,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
       "display the identity verification uplift page" in new Setup {
 
         val result = callEndpointWith(
-          FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=250&completionURL=/good&failureURL=/bad")
+          FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=600&completionURL=/good&failureURL=/bad")
             .withSession("authToken" -> "Bearer XYZ")
         )
         status(result) shouldBe 200
@@ -131,14 +131,14 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         "the completionUrl query parameter is missing" in new Setup {
 
           val result =
-            callEndpointWith(FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=250&failureURL=/bad"))
+            callEndpointWith(FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=600&failureURL=/bad"))
           status(result) shouldBe 400
         }
 
         "the failureUrl query parameter is missing" in new Setup {
 
           val result = callEndpointWith(
-            FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=250&completionURL=/good")
+            FakeRequest(GET, "/agents-external-stubs/mdtp/uplift?confidenceLevel=600&completionURL=/good")
           )
           status(result) shouldBe 400
         }
@@ -150,7 +150,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val succeedRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
+            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=600&completionURL=/good&failureURL=/bad&origin=ai"
           ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "Success~1234")
         )
@@ -168,7 +168,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val failRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
+            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=600&completionURL=/good&failureURL=/bad&origin=ai"
           ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
@@ -188,7 +188,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val failRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
+            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=600&completionURL=/good&failureURL=/bad&origin=ai"
           ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )
@@ -217,7 +217,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
         val failRequest = addCsrfToken(
           FakeRequest(
             POST,
-            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=250&completionURL=/good&failureURL=/bad&origin=ai"
+            "/agents-external-stubs/mdtp/uplift?journeyId=1234&confidenceLevel=600&completionURL=/good&failureURL=/bad&origin=ai"
           ).withSession("authToken" -> "Bearer XYZ")
             .withFormUrlEncodedBody("nino" -> "AB626225C", "option" -> "PreconditionFailed~1234")
         )

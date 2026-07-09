@@ -28,6 +28,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{Json, OFormat}
 import play.api.mvc._
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.ConfidenceLevel
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.iv_uplift
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
@@ -142,7 +143,7 @@ class IdentityVerificationController @Inject() (
                     ivUpliftView(
                       formWithErrors,
                       options(journeyId),
-                      upliftUrl(250, completionURL, failureURL, origin, doProxy)
+                      upliftUrl(ConfidenceLevel.Default, completionURL, failureURL, origin, doProxy)
                     )
                   )
                 ),
@@ -152,7 +153,7 @@ class IdentityVerificationController @Inject() (
                 if (journeyIdMatches && isSuccessful) {
                   for {
                     currentUser <- agentsExternalStubsConnector.getUser(credentials.providerId)
-                    modifiedUser = currentUser.copy(confidenceLevel = Some(250))
+                    modifiedUser = currentUser.copy(confidenceLevel = Some(ConfidenceLevel.Default))
                     _ <- agentsExternalStubsConnector.updateUser(modifiedUser)
                   } yield redirectWithJourneyId(completionURL.unsafeValue, journeyId)
                 } else {
