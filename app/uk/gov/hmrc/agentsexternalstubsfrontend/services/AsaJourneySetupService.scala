@@ -87,7 +87,8 @@ class AsaJourneySetupService @Inject() (
         for {
           customer <- createUser(
                         affinityGroup = Some(asaJourneyService.affinityGroup),
-                        services = List(asaJourneyService.clientEacdServiceKey)
+                        services = List(asaJourneyService.clientEacdServiceKey),
+                        userOverride = asaJourneyService.userOverride
                       )
           testData <- extractTestDataFromUser(customer, asaJourneyService)
         } yield testData
@@ -96,7 +97,8 @@ class AsaJourneySetupService @Inject() (
         for {
           customer <- createUser(
                         affinityGroup = Some(asaJourneyService.affinityGroup),
-                        services = List(asaJourneyService.clientEacdServiceKey)
+                        services = List(asaJourneyService.clientEacdServiceKey),
+                        userOverride = asaJourneyService.userOverride
                       )
           agent <- getSignedInUser()
           arn = extractArnFromAgent(agent)
@@ -114,7 +116,8 @@ class AsaJourneySetupService @Inject() (
         for {
           customer <- createUser(
                         affinityGroup = Some(asaJourneyService.affinityGroup),
-                        services = List(asaJourneyService.clientEacdServiceKey)
+                        services = List(asaJourneyService.clientEacdServiceKey),
+                        userOverride = asaJourneyService.userOverride
                       )
           agent <- createAsaAgent()
           arn = extractArnFromAgent(agent)
@@ -263,7 +266,8 @@ class AsaJourneySetupService @Inject() (
     services: List[EACDServiceKey],
     strideRole: Option[String] = None,
     groupId: Option[String] = None,
-    isAdmin: Boolean = true
+    isAdmin: Boolean = true,
+    userOverride: User => User = user => user
   )(implicit hc: HeaderCarrier): Future[User] = {
 
     val serviceKeys = services.map(_.key)
@@ -288,6 +292,11 @@ class AsaJourneySetupService @Inject() (
           .getOrElse(Future.successful(()))
           .map(_ => userCreated)
       )
+      .map { userCreated =>
+        val updatedUser = userOverride(userCreated)
+        if (updatedUser != userCreated) agentsExternalStubsConnector.updateUser(updatedUser)
+        updatedUser
+      }
   }
 
   private def createAsaAgent()(implicit hc: HeaderCarrier): Future[User] =
