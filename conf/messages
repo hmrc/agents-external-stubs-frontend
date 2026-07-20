@@ -256,6 +256,7 @@ continue.button=Continue
 #define service names
 select-service.service.AltItsa=Alt ITSA
 select-service.service.Itsa=ITSA
+select-service.service.ItsaOverseas=ITSA (overseas)
 select-service.service.AltItsaSupporting=Alt ITSA (supporting)
 select-service.service.ItsaSupporting=ITSA (supporting)
 select-service.service.Vat=VAT

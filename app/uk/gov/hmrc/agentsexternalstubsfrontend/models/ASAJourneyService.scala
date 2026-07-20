@@ -41,6 +41,7 @@ sealed trait ASAJourneyService {
   val createRelationshipIdTypeName: String
   val customerKnownFact: Option[CustomerKnownFact]
   val relServiceName: String
+  def userOverride: User => User = user => user
 }
 
 case class SignedInUser(
@@ -152,6 +153,29 @@ case object ItsaSuppService extends ASAJourneyService {
       )
     )
   override val relServiceName: String = ItsaSupp.key
+}
+
+case object ItsaOverseasService extends ASAJourneyService {
+  override val friendlyName: String = "ItsaOverseas"
+  override val affinityGroup: AffinityGroup = Individual
+  override val clientEacdServiceKey: EACDServiceKey = Itsa
+  override val identifierName: String = "nino" //to display on test data page
+  override val identifierSourcedFromBpr: Boolean = false
+  override val identifierReadsPath: Reads[String] = (JsPath \ "nino").read[String]
+  override val createInvitationIdTypeName: String = "ni"
+  override val createRelationshipIdTypeName: String = "NI"
+  override val customerKnownFact: Option[CustomerKnownFact] =
+    Some(
+      CustomerKnownFact(
+        name = "countryCode",
+        reads = (JsPath \ "address" \ "countryCode").read[String],
+        sourcedFromUserRecord = true
+      )
+    )
+  override val relServiceName: String = Itsa.key
+  override def userOverride: User => User = user => {
+    user.copy(address = user.address.map(_.copy(countryCode = Some("FR"))))
+  }
 }
 
 case object AltItsaService extends ASAJourneyService {
@@ -470,6 +494,7 @@ object ASAJourneyService {
   private val asaJourneyServices: List[ASAJourneyService] = List(
     ItsaService,
     ItsaSuppService,
+    ItsaOverseasService,
     AltItsaService,
     AltItsaSuppService,
     IRVService,
