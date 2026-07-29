@@ -17,11 +17,10 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import org.jsoup.Jsoup
-import org.jsoup.select.Elements
 import play.api.http.Writeable
 import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, AuthStubs}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{EnrolmentKey, Identifier, User}
@@ -29,10 +28,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.{EnrolmentKey, Identifier,
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 
-class UserControllerISpec
-  extends BaseISpec
-    with AgentsExternalStubsStubs
-    with AuthStubs {
+class UserControllerISpec extends BaseISpec with AgentsExternalStubsStubs with AuthStubs {
 
   def callEndpointWith[A: Writeable](request: Request[A]): Result =
     await(play.api.test.Helpers.route(app, request).get)
@@ -68,21 +64,23 @@ class UserControllerISpec
       val usersList: List[User] = List(
         User("foo", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
         User("bar", groupId = Some("group2"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
-        User("fizz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("something-else"))),
-        User("buzz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
+        User(
+          "fizz",
+          groupId = Some("group1"),
+          assignedPrincipalEnrolments = Seq(enrolmentKeyForService("something-else"))
+        ),
+        User("buzz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT")))
       )
 
       def getUserIdsDisplayed(body: String): List[String] = {
         val html = Jsoup.parse(body)
         val users: scala.collection.mutable.ListBuffer[String] = ListBuffer.empty
-        html.select("tbody tr").forEach(tr => {
-          users += tr.select("div").first().text()
-        })
+        html.select("tbody tr").forEach(tr => users += tr.select("div").first().text())
         users.toList
       }
 
       "render users page with no filters" in new SimpleGetUsersSetup {
-        givenUsers(usersList: _*)
+        givenUsers(usersList*)
 
         private val request =
           FakeRequest(GET, "/agents-external-stubs/users")
@@ -99,7 +97,7 @@ class UserControllerISpec
 
       "allow partial filtering by partialUserId parameter" in new SimpleGetUsersSetup {
         val partialUserId = "zz"
-        givenUsersWithUserId(partialUserId, usersList: _*)
+        givenUsersWithUserId(partialUserId, usersList*)
 
         private val request =
           FakeRequest(
@@ -118,7 +116,7 @@ class UserControllerISpec
 
       "allow filtering by groupId parameter" in new SimpleGetUsersSetup {
         val groupId = "group1"
-        givenUsersWithGroupId(groupId, usersList: _*)
+        givenUsersWithGroupId(groupId, usersList*)
 
         private val request =
           FakeRequest(
@@ -137,7 +135,7 @@ class UserControllerISpec
 
       "allow filtering by principalEnrolmentService parameter" in new SimpleGetUsersSetup {
         val principalEnrolmentService = "HMRC-MTD-IT"
-        givenUsersWithPrincipalEnrolmentService(principalEnrolmentService, usersList: _*)
+        givenUsersWithPrincipalEnrolmentService(principalEnrolmentService, usersList*)
 
         private val request =
           FakeRequest(
@@ -156,7 +154,7 @@ class UserControllerISpec
 
       "allow limiting results by limit parameter" in new SimpleGetUsersSetup {
         val limit = 3
-        givenUsersWithLimit(limit, usersList: _*)
+        givenUsersWithLimit(limit, usersList*)
 
         private val request =
           FakeRequest(
@@ -178,9 +176,10 @@ class UserControllerISpec
         val groupId = "group1"
         val principalEnrolmentService = "HMRC-MTD-IT"
         val limit = 2
-        givenUsersWithAllQueryParams(limit, partialUserId, groupId, principalEnrolmentService, usersList: _*)
+        givenUsersWithAllQueryParams(limit, partialUserId, groupId, principalEnrolmentService, usersList*)
 
-        val stubsUrl = s"/agents-external-stubs/users?limit=$limit&partialUserId=$partialUserId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
+        val stubsUrl =
+          s"/agents-external-stubs/users?limit=$limit&partialUserId=$partialUserId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
 
         private val request =
           FakeRequest(

@@ -19,13 +19,13 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 import com.google.inject.Provider
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
+import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.GroupForm
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.*
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -43,15 +43,16 @@ class GroupController @Inject() (
   showAllGroupsView: show_all_groups,
   val features: Features,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+)(using @unused configuration: Configuration, cc: MessagesControllerComponents)
     extends FrontendController(cc) with AuthorisedFunctions with I18nSupport with WithPageContext {
 
-  implicit val ec: ExecutionContext = ecp.get
+  given ExecutionContext = ecp.get
 
   val start: Action[AnyContent] = showGroupPage(None, None)
 
-  def showGroupPage(continue: Option[RedirectUrl], groupId: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+  def showGroupPage(@unused continue: Option[RedirectUrl], groupId: Option[String]): Action[AnyContent] =
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           for {
@@ -61,9 +62,6 @@ class GroupController @Inject() (
             showGroupView(
               group,
               users,
-              request.session.get(SessionKeys.authToken),
-              request.session.get(SessionKeys.sessionId),
-              group.groupId,
               pageContext(credentials)
             )
           )
@@ -71,7 +69,8 @@ class GroupController @Inject() (
     }
 
   def showEditGroupPage(continue: Option[RedirectUrl], groupId: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           agentsExternalStubsConnector
@@ -92,7 +91,8 @@ class GroupController @Inject() (
     }
 
   def updateGroup(continue: Option[RedirectUrl], groupId: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           GroupForm.form
@@ -112,8 +112,8 @@ class GroupController @Inject() (
                   )
                 ),
               group =>
-                (agentsExternalStubsConnector
-                  .updateGroup(group.copy(groupId = groupId.getOrElse(credentials.providerId))))
+                agentsExternalStubsConnector
+                  .updateGroup(group.copy(groupId = groupId.getOrElse(credentials.providerId)))
                   .map(_ =>
                     continue.fold(Redirect(routes.GroupController.showGroupPage(continue, groupId)))(continueUrl =>
                       Redirect(continueUrl.unsafeValue)
@@ -136,7 +136,8 @@ class GroupController @Inject() (
     }
 
   val showAllGroupsPage: Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           agentsExternalStubsConnector.getGroups
@@ -144,7 +145,6 @@ class GroupController @Inject() (
               Ok(
                 showAllGroupsView(
                   groups,
-                  request.session.get(SessionKeys.authToken),
                   pageContext(credentials)
                 )
               )

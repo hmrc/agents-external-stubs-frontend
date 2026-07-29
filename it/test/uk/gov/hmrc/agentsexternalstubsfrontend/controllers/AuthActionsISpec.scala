@@ -17,8 +17,8 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import play.api.mvc.Result
-import play.api.mvc.Results._
-import play.api.test.Helpers._
+import play.api.mvc.Results.*
+import play.api.test.Helpers.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, InsufficientEnrolments}
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
@@ -31,7 +31,7 @@ class AuthActionsISpec extends BaseISpec {
 
     override def authConnector: AuthConnector = app.injector.instanceOf[AuthConnector]
 
-    implicit val hc: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("Bearer XYZ")))
+    given HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("Bearer XYZ")))
     import scala.concurrent.ExecutionContext.Implicits.global
 
     def withAuthorisedAsAgent[A]: Result =

@@ -16,16 +16,16 @@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
-@import play.api.libs.json._
+@import play.api.libs.json.*
 
 @this(
         mainTemplate: main_template,
         a: a, navigationBar: navigationBar
 )
 
-@(genResponse: JsValue)(implicit request: Request[_], msgs: Messages)
+@(genResponse: JsValue)(implicit request: Request[?], msgs: Messages)
 @* taken from show_all_records *@
 @prettyPrint(json: JsValue) = {
   @if(json.isInstanceOf[JsObject]) {

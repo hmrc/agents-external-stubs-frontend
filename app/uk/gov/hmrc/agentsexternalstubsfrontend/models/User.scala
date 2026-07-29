@@ -17,10 +17,10 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.models
 
 import org.joda.time.LocalDate
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.domain.Nino
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.JodaReads._
+import play.api.libs.json.JodaWrites.*
+import play.api.libs.json.JodaReads.*
 
 import scala.io.{BufferedSource, Source}
 
@@ -65,7 +65,7 @@ case class User(
 object User {
   val Individual = "Individual"
 
-  implicit val formats: Format[User] = Json.format[User]
+  given formats: Format[User] = Json.format[User]
 }
 
 case class Address(
@@ -82,7 +82,7 @@ case class Address(
 }
 
 object Address {
-  implicit lazy val formats: Format[Address] = Json.format[Address]
+  given formats: Format[Address] = Json.format[Address]
 }
 
 case class Enrolment(key: String, identifiers: Option[Seq[Identifier]] = None) {
@@ -92,7 +92,7 @@ case class Enrolment(key: String, identifiers: Option[Seq[Identifier]] = None) {
 }
 
 object Enrolment {
-  implicit val format: Format[Enrolment] = Json.format[Enrolment]
+  given format: Format[Enrolment] = Json.format[Enrolment]
 }
 
 case class Identifier(key: String, value: String) {
@@ -100,8 +100,8 @@ case class Identifier(key: String, value: String) {
 }
 
 object Identifier {
-  implicit val format: Format[Identifier] = Json.format[Identifier]
-  implicit val ordering: Ordering[Identifier] = Ordering.by(_.key.toLowerCase)
+  given format: Format[Identifier] = Json.format[Identifier]
+  given ordering: Ordering[Identifier] = Ordering.by(_.key.toLowerCase)
 }
 
 object ConfidenceLevel {
@@ -126,7 +126,7 @@ case class Country(name: String, code: String, phone_code: String)
 
 object Country {
 
-  implicit val reads: Reads[Country] = Json.reads[Country]
+  given reads: Reads[Country] = Json.reads[Country]
 
   lazy val countriesSource: BufferedSource =
     Source.fromInputStream(getClass.getResourceAsStream("/countries.json"), "utf-8")

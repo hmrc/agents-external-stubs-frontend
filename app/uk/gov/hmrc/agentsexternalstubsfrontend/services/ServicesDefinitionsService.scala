@@ -22,7 +22,8 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.Services
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ServicesDefinitionsService @Inject() (
@@ -31,5 +32,12 @@ class ServicesDefinitionsService @Inject() (
 ) {
 
   lazy val servicesDefinitions: Services = Await
-    .result(agentsExternalStubsConnector.getServicesInfo()(HeaderCarrier(), materializer.executionContext), 30.seconds)
+    .result(
+      {
+        given HeaderCarrier = HeaderCarrier()
+        given ExecutionContext = materializer.executionContext
+        agentsExternalStubsConnector.getServicesInfo()
+      },
+      30.seconds
+    )
 }

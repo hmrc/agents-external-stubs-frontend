@@ -15,7 +15,7 @@
  */
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.models
-import play.api.libs.json._
+import play.api.libs.json.*
 
 case class EnrolmentKey(service: String, identifiers: Seq[Identifier]) {
   def isSingle: Boolean = identifiers.size == 1
@@ -34,11 +34,11 @@ object EnrolmentKey {
     } else Left("INVALID_ENROLMENT_KEY")
   }
 
-  implicit val writes: Writes[EnrolmentKey] = new Writes[EnrolmentKey] {
+  given writes: Writes[EnrolmentKey] = new Writes[EnrolmentKey] {
     override def writes(ek: EnrolmentKey): JsValue = JsString(ek.tag)
   }
 
-  implicit val reads: Reads[EnrolmentKey] = new Reads[EnrolmentKey] {
+  given reads: Reads[EnrolmentKey] = new Reads[EnrolmentKey] {
     override def reads(json: JsValue): JsResult[EnrolmentKey] = json match {
       case JsString(value) => apply(value).fold(JsError.apply, JsSuccess.apply(_))
       case _               => JsError("STRING_VALUE_EXPECTED")

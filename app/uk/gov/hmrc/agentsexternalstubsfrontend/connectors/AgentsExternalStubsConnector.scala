@@ -17,16 +17,17 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
 import play.api.http.Status
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.mvc.Http.HeaderNames
+import play.api.libs.ws.writeableOf_JsValue
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 
 import java.net.URI
 import javax.inject.{Inject, Singleton}
@@ -43,7 +44,7 @@ case class AuthenticatedSession(
 )
 
 object AuthenticatedSession {
-  implicit val reads: Reads[AuthenticatedSession] = Json.reads[AuthenticatedSession]
+  given Reads[AuthenticatedSession] = Json.reads[AuthenticatedSession]
 }
 
 @Singleton
@@ -51,7 +52,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
 
   val baseUrl: String = appConfig.aesBaseUrl
 
-  def signIn()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] = {
+  def signIn()(using hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/sign-in"
     http
       .post(requestUrl)
@@ -73,7 +74,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
 
   def signIn(
     credentials: SignInRequest
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] = {
+  )(using hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/sign-in"
     http
       .post(requestUrl)
@@ -94,7 +95,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       }
   }
 
-  def signOut()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def signOut()(using hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/sign-out"
     http
       .get(requestUrl)
@@ -102,14 +103,14 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  def currentSession()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] = {
+  def currentSession()(using hc: HeaderCarrier, ec: ExecutionContext): Future[AuthenticatedSession] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/session/current"
     http
       .get(requestUrl)
       .execute[AuthenticatedSession]
   }
 
-  def getUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[User] = {
+  def getUser(userId: String)(using hc: HeaderCarrier, ec: ExecutionContext): Future[User] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/users/$userId"
     http
       .get(requestUrl)
@@ -117,7 +118,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def createUser(affinityGroup: Option[AffinityGroup], userBody: JsValue)(implicit
+  def createUser(affinityGroup: Option[AffinityGroup], userBody: JsValue)(using
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[User] = {
@@ -132,7 +133,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
         (r.status, r.header(HeaderNames.LOCATION)) match {
           case (Status.BAD_REQUEST, _) => throw new BadRequestException(s"$baseUrl/agents-external-stubs/sign-in")
           case (_, None)               => throw new IllegalStateException()
-          case (s, Some(l)) =>
+          case (_, Some(l)) =>
             val urlBuilder = baseUrl + l
             val getUserUrl = url"$urlBuilder"
             http
@@ -143,7 +144,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       }
   }
 
-  def createUser(user: User, affinityGroup: Option[String])(implicit
+  def createUser(user: User, affinityGroup: Option[String])(using
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Unit] = {
@@ -157,7 +158,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  def updateUser(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def updateUser(user: User)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/users/${user.userId}"
     http
       .put(requestUrl)
@@ -172,7 +173,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
     groupId: Option[String] = None,
     principalEnrolmentService: Option[String] = None,
     limit: Option[Int] = None
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
+  )(using hc: HeaderCarrier, ec: ExecutionContext): Future[Users] = {
 
     val params: List[(String, String)] = List(
       limit.map(_.toString).map(("limit", _)),
@@ -181,7 +182,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       principalEnrolmentService.map(("principalEnrolmentService", _))
     ).flatten
 
-    val uri = uri"/users".addParams(params: _*)
+    val uri = uri"/users".addParams(params*)
     val requestUrl = new URI(s"$baseUrl/agents-external-stubs$uri").toURL
 
     http
@@ -189,7 +190,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .execute[Users]
   }
 
-  def removeUser(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def removeUser(userId: String)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/users/$userId"
     http
       .delete(requestUrl)
@@ -198,7 +199,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  def getGroup(groupId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Group] = {
+  def getGroup(groupId: String)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Group] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/groups/$groupId"
     http
       .get(requestUrl)
@@ -206,14 +207,14 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def getGroups(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Groups] = {
+  def getGroups(using hc: HeaderCarrier, ec: ExecutionContext): Future[Groups] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/groups"
     http
       .get(requestUrl)
       .execute[Groups]
   }
 
-  def updateGroup(group: Group)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def updateGroup(group: Group)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/groups/${group.groupId}"
     http
       .put(requestUrl)
@@ -225,7 +226,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
 
   def massCreateAssistantsAndUsers(
     request: GranPermsGenRequest
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[GranPermsGenResponse] = {
+  )(using hc: HeaderCarrier, ec: ExecutionContext): Future[GranPermsGenResponse] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/test/gran-perms/generate-users"
     http
       .post(requestUrl)
@@ -235,7 +236,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def getRecords(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Records] = {
+  def getRecords(using hc: HeaderCarrier, ec: ExecutionContext): Future[Records] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/records"
     http
       .get(requestUrl)
@@ -243,7 +244,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def getRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] = {
+  def getRecord(id: String)(using hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/records/$id"
     http
       .get(requestUrl)
@@ -251,7 +252,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def generateRecord(recordType: String, seed: String)(implicit
+  def generateRecord(recordType: String, seed: String)(using
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[JsObject] = {
@@ -262,7 +263,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def updateRecord(id: String, record: JsObject)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def updateRecord(id: String, record: JsObject)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/records/$id"
     http
       .put(requestUrl)
@@ -272,7 +273,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  def deleteRecord(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def deleteRecord(id: String)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/records/$id"
     http
       .delete(requestUrl)
@@ -281,7 +282,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  def createRecord(recordType: String, record: JsObject)(implicit
+  def createRecord(recordType: String, record: JsObject)(using
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[String]] = {
@@ -298,7 +299,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       )
   }
 
-  def getKnownFacts(enrolmentKey: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[EnrolmentInfo] = {
+  def getKnownFacts(enrolmentKey: String)(using hc: HeaderCarrier, ec: ExecutionContext): Future[EnrolmentInfo] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/known-facts/$enrolmentKey"
     http
       .get(requestUrl)
@@ -306,7 +307,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def getServicesInfo()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Services] = {
+  def getServicesInfo()(using hc: HeaderCarrier, ec: ExecutionContext): Future[Services] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/config/services"
     http
       .get(requestUrl)
@@ -315,7 +316,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def destroyPlanet(planetId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def destroyPlanet(planetId: String)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/planets/$planetId"
     http
       .delete(requestUrl)
@@ -324,7 +325,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  def getAllSpecialCases(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[SpecialCase]] = {
+  def getAllSpecialCases(using hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[SpecialCase]] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/special-cases"
     http
       .get(requestUrl)
@@ -338,7 +339,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       }
   }
 
-  def getSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SpecialCase]] = {
+  def getSpecialCase(id: String)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SpecialCase]] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/special-cases/$id"
     http
       .get(requestUrl)
@@ -350,7 +351,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def createSpecialCase(specialCase: SpecialCase)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = {
+  def createSpecialCase(specialCase: SpecialCase)(using hc: HeaderCarrier, ec: ExecutionContext): Future[String] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/special-cases"
     http
       .post(requestUrl)
@@ -364,7 +365,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def updateSpecialCase(specialCase: SpecialCase)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = {
+  def updateSpecialCase(specialCase: SpecialCase)(using hc: HeaderCarrier, ec: ExecutionContext): Future[String] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/special-cases/${specialCase.id.get}"
     http
       .put(requestUrl)
@@ -378,7 +379,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .recover(handleNotFound)
   }
 
-  def deleteSpecialCase(id: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def deleteSpecialCase(id: String)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/special-cases/$id"
     http
       .delete(requestUrl)
@@ -387,7 +388,7 @@ class AgentsExternalStubsConnector @Inject() (appConfig: FrontendConfig, http: H
       .map(_ => ())
   }
 
-  def storePdvResult(id: String, success: Boolean)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def storePdvResult(id: String, success: Boolean)(using hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val requestUrl = url"$baseUrl/agents-external-stubs/pdv-result/$id/$success"
     http
       .post(requestUrl)

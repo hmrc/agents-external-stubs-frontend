@@ -18,8 +18,8 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.head
 @import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsOneThirdMainContent
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcTrackingConsentSnippet}
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import views.html.helper.CSPNonce
 
 @this(
@@ -36,7 +36,7 @@
     showSignOut: Boolean = true,
     wide: Boolean = false,
     sidebar: Option[Html] = None // overrides the 'wide' option if present
-)(mainContent: Html)(implicit request : Request[_], msgs: Messages)
+)(mainContent: Html)(implicit request: Request[?], msgs: Messages)
 
 @additionalScripts = {
 <script src="@controllers.routes.Assets.versioned("javascripts/application.js")" @{CSPNonce.attr}></script>
@@ -61,4 +61,3 @@
         }
     )
 ))(mainContent)
-

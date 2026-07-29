@@ -23,12 +23,12 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.{Enrolment, Identifier}
 
 object ValidateHelper {
 
-  def nonEmpty(failure: String): Constraint[String] = Constraint[String] { fieldValue: String =>
+  def nonEmpty(failure: String): Constraint[String] = Constraint[String] { fieldValue =>
     if (fieldValue.trim.isEmpty) Invalid(ValidationError(failure)) else Valid
   }
 
   def validateField(emptyFailure: String, invalidFailure: String)(condition: String => Boolean): Constraint[String] =
-    Constraint[String] { fieldValue: String =>
+    Constraint[String] { fieldValue =>
       nonEmpty(emptyFailure)(fieldValue) match {
         case i: Invalid =>
           i
@@ -43,13 +43,13 @@ object ValidateHelper {
   val identifierMapping: Mapping[Identifier] = mapping(
     "key"   -> text,
     "value" -> text
-  )(Identifier.apply)(Identifier.unapply)
+  )(Identifier.apply)(i => Some((i.key, i.value)))
 
   val enrolmentMapping: Mapping[Option[Enrolment]] = optional(
     mapping(
       "key"         -> nonEmptyText,
       "identifiers" -> optional(seq(identifierMapping))
-    )(Enrolment.apply)(Enrolment.unapply)
+    )(Enrolment.apply)(e => Some((e.key, e.identifiers)))
   )
 
 }

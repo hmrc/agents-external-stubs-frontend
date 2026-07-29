@@ -31,7 +31,7 @@ case class Group(
 )
 
 object Group {
-  implicit val format: Format[Group] = Json.format[Group]
+  given format: Format[Group] = Json.format[Group]
 }
 
 object AG {

@@ -14,22 +14,18 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
-@import play.api.libs.json._
+@import play.api.libs.json.*
 
 @this(
         mainTemplate: main_template,
-        navigationBar: navigationBar,
-        form: FormWithCSRF,
-        govukTable: GovukTable
+        navigationBar: navigationBar
 )
 
-@(records: Records, showId: Option[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(records: Records, showId: Option[String], context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("records.title"), wide = true) {
     <style>

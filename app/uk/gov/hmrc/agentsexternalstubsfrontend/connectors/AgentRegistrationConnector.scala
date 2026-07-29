@@ -20,21 +20,19 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AgentRegistrationConnector @Inject() (appConfig: FrontendConfig, http: HttpClientV2)(implicit
-  ec: ExecutionContext
-) {
+class AgentRegistrationConnector @Inject() (appConfig: FrontendConfig, http: HttpClientV2)(using ec: ExecutionContext) {
 
   val url = url"${appConfig.agentRegistrationBaseUrl}/agent-registration/test-only/create-submitted-application"
 
-  implicit val format: Format[LinkResponse] = Json.format[LinkResponse]
+  given Format[LinkResponse] = Json.format[LinkResponse]
 
-  def testOnlyJourneySetup()(implicit hc: HeaderCarrier): Future[LinkResponse] =
+  def testOnlyJourneySetup()(using hc: HeaderCarrier): Future[LinkResponse] =
     http
       .get(url)
       .execute[HttpResponse]

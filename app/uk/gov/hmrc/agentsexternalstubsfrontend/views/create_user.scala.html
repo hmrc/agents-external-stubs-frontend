@@ -14,14 +14,15 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukErrorSummary}
+@import views.html.helper.Implicits.toAttributePair
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, GovukSelect, GovukRadios, GovukFieldset}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, GovukSelect, GovukRadios}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.{Select, SelectItem}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
@@ -29,7 +30,6 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{Radios, RadioItem}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
-@import views.html.helper.CSPNonce
 @import uk.gov.hmrc.agentsexternalstubsfrontend.forms.InitialUserCreationData
 
 @this(
@@ -39,11 +39,10 @@
         govukButton: GovukButton,
         govukSelect: GovukSelect,
         govukRadios: GovukRadios,
-        govukFieldset: GovukFieldset,
         navigationBar: navigationBar
 )
 
-@(initialUserDataForm: Form[InitialUserCreationData], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, services: Seq[(String,String)], context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(initialUserDataForm: Form[InitialUserCreationData], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, services: Seq[(String,String)], context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("user.title", userId), wide = true) {
 
@@ -60,7 +59,7 @@
     </p>
 
     <div style="width: 50%;">
-        @form(action = postUrl, 'id -> "initialUserDataForm", 'novalidate -> "novalidate") {
+        @form(action = postUrl, "id" -> "initialUserDataForm", "novalidate" -> "novalidate") {
             @govukRadios(Radios(
                 name = "affinityGroup",
                 fieldset = Some(Fieldset(

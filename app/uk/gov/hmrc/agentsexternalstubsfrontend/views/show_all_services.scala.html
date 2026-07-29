@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
 
 @this(mainTemplate: main_template, navigationBar: navigationBar)
 
-@(services:Services, context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(services:Services, context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("knownFacts.title"), wide = true) {
 

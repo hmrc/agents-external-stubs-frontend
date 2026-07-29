@@ -28,15 +28,20 @@ object TestFixtures {
 
   val agentRefNo = "585377395"
 
-
-  val asaEnrolment = EnrolmentKey(service = "HMRC-AS-AGENT", identifiers = Seq(Identifier("agentReferenceNumber",s"$arn")))
-  val asaEnrolment2 = EnrolmentKey(service = "HMRC-AS-AGENT", identifiers = Seq(Identifier("agentReferenceNumber",s"$arn2")))
-  val itsaEnrolment = EnrolmentKey(service = "HMRC-MTD-IT", identifiers = Seq(Identifier("MDITID",s"$mtdItId")))
+  val asaEnrolment =
+    EnrolmentKey(service = "HMRC-AS-AGENT", identifiers = Seq(Identifier("agentReferenceNumber", s"$arn")))
+  val asaEnrolment2 =
+    EnrolmentKey(service = "HMRC-AS-AGENT", identifiers = Seq(Identifier("agentReferenceNumber", s"$arn2")))
+  val itsaEnrolment = EnrolmentKey(service = "HMRC-MTD-IT", identifiers = Seq(Identifier("MDITID", s"$mtdItId")))
   val ptEnrolment = EnrolmentKey(service = "HMRC-PT", identifiers = Seq(Identifier("NINO", s"$nino")))
-  val hmceVatAgntEnrolment = EnrolmentKey(service = "HMCE-VAT-AGNT", identifiers = Seq(Identifier("AgentRefNo", s"$agentRefNo")))
+  val hmceVatAgntEnrolment =
+    EnrolmentKey(service = "HMCE-VAT-AGNT", identifiers = Seq(Identifier("AgentRefNo", s"$agentRefNo")))
 
-  def agentOrClientUser(userId: String, enrolments: List[EnrolmentKey]) = User(userId = userId, nino = Some(Nino(nino)),
-    assignedPrincipalEnrolments = enrolments, recordIds = Some(Seq("1234")))
-
+  def agentOrClientUser(userId: String, enrolments: List[EnrolmentKey]) = User(
+    userId = userId,
+    nino = Some(Nino(nino)),
+    assignedPrincipalEnrolments = enrolments,
+    recordIds = Some(Seq("1234"))
+  )
 
 }

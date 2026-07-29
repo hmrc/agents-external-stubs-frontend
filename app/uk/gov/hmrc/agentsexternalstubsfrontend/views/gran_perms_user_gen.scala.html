@@ -14,44 +14,34 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.RestQuery
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
-@import play.api.libs.ws.WSResponse
-@import play.mvc.Http.HeaderNames
-@import play.api.libs.json.Json
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import views.html.helper.Implicits.toAttributePair
 @import uk.gov.hmrc.govukfrontend.views.Aliases.{Input, Checkboxes, CheckboxItem}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import views.html.helper.CSPNonce
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
 
-
 @this(
         mainTemplate: main_template,
-        navigationBar: navigationBar,
         form: FormWithCSRF,
         govukInput: GovukInput,
         govukCheckboxes : GovukCheckboxes,
-        govukButton: GovukButton,
-        govukErrorSummary: GovukErrorSummary)
+        govukButton: GovukButton)
 
-
-@(reqForm: Form[GranPermsGenRequest])(implicit request: Request[_], msgs: Messages)
+@(reqForm: Form[GranPermsGenRequest])(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = "Generate test users for Granular Permissions", wide = true) {
 
     <h1 class="govuk-heading-l">Generate test users for Granular Permissions</h1>
 
-    @form(action = Call("POST", "/agents-external-stubs/test/gran-perms/generate-users-form"), 'id -> "restQueryForm", 'novalidate -> "novalidate") {
+    @form(action = Call("POST", "/agents-external-stubs/test/gran-perms/generate-users-form"), "id" -> "restQueryForm", "novalidate" -> "novalidate") {
         @govukInput(Input(
             label = Label(content = Text("ID prefix")),
             hint = Some(Hint(content = Text("The IDs of the users created will be prefixed with this string."))),

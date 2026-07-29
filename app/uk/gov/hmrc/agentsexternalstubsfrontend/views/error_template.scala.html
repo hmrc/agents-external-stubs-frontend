@@ -18,7 +18,7 @@
 
 @this(mainTemplate: main_template)
 
-@(pageTitleMsgKey: String, headingMsgKey: String, messageMsgKey: String)(implicit msgs: Messages, request: Request[_])
+@(pageTitleMsgKey: String, headingMsgKey: String, messageMsgKey: String)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs(pageTitleMsgKey)) {
  <h1 class="govuk-heading-l">@msgs(headingMsgKey)</h1>

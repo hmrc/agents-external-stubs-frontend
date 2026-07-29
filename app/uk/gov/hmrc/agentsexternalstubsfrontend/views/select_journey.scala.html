@@ -26,7 +26,7 @@
 )
 
 
-@(journeys: List[ASATestJourney])(implicit request: Request[_], msgs: Messages, frontendConfig: FrontendConfig)
+@(journeys: List[ASATestJourney])(implicit request: Request[?], msgs: Messages, frontendConfig: FrontendConfig)
 
 @mAdminHostPrefix(journey: ASATestJourney) = @{ journey match {
     case HmrcLedDeauth => if(request.host.startsWith("localhost") || request.host.contains("admin")) "" else s"${frontendConfig.agentHelpdeskFrontendfHost}"

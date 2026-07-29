@@ -16,7 +16,7 @@
 
 import play.api.http.HeaderNames.CACHE_CONTROL
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.Results._
+import play.api.mvc.Results.*
 import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.{Configuration, Environment, Logger, Mode}
 import play.twirl.api.Html
@@ -40,7 +40,7 @@ class ErrorHandler @Inject() (
   appConfig: FrontendConfig,
   errorTemplateView: error_template,
   val auditConnector: AuditConnector
-)(implicit val config: Configuration, val ec: ExecutionContext)
+)(using val config: Configuration, val ec: ExecutionContext)
     extends FrontendErrorHandler with AuthRedirects with ErrorAuditing {
 
   val appName: String = appConfig.appName
@@ -55,7 +55,7 @@ class ErrorHandler @Inject() (
 
   override def resolveError(request: RequestHeader, exception: Throwable): Future[Result] = {
     auditServerError(request, exception)
-    implicit val r: Request[_] = Request(request, "")
+    given Request[?] = Request(request, "")
     exception match {
       case _: NoActiveSession =>
         Future.successful(toGGLogin(if (isDevEnv) s"http://${request.host}${request.uri}" else request.uri))
@@ -83,10 +83,10 @@ class ErrorHandler @Inject() (
     }
   }
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(using
     request: RequestHeader
   ): Future[Html] = {
-    implicit val r: Request[_] = Request(request, "")
+    given Request[?] = Request(request, "")
     Future.successful(errorTemplateView(pageTitle, heading, message))
   }
 }
@@ -101,7 +101,7 @@ object EventTypes {
 
 trait ErrorAuditing extends HttpAuditEvent {
 
-  import EventTypes._
+  import EventTypes.*
 
   def auditConnector: AuditConnector
 
@@ -109,7 +109,7 @@ trait ErrorAuditing extends HttpAuditEvent {
   private val notFoundError = "Resource Endpoint Not Found"
   private val badRequestError = "Request bad format exception"
 
-  def auditServerError(request: RequestHeader, ex: Throwable)(implicit ec: ExecutionContext): Unit = {
+  def auditServerError(request: RequestHeader, ex: Throwable)(using ec: ExecutionContext): Unit = {
     val eventType = ex match {
       case _: NotFoundException     => ResourceNotFound
       case _: JsValidationException => ServerValidationError
@@ -121,26 +121,26 @@ trait ErrorAuditing extends HttpAuditEvent {
     }
     auditConnector.sendEvent(
       dataEvent(eventType, transactionName, request, Map(TransactionFailureReason -> ex.getMessage))(
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+        using HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       )
     )
   }
 
-  def auditClientError(request: RequestHeader, statusCode: Int, message: String)(implicit
+  def auditClientError(request: RequestHeader, statusCode: Int, message: String)(using
     ec: ExecutionContext
   ): Unit = {
-    import play.api.http.Status._
+    import play.api.http.Status.*
     statusCode match {
       case NOT_FOUND =>
         auditConnector.sendEvent(
           dataEvent(ResourceNotFound, notFoundError, request, Map(TransactionFailureReason -> message))(
-            HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+            using HeaderCarrierConverter.fromRequestAndSession(request, request.session)
           )
         )
       case BAD_REQUEST =>
         auditConnector.sendEvent(
           dataEvent(ServerValidationError, badRequestError, request, Map(TransactionFailureReason -> message))(
-            HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+            using HeaderCarrierConverter.fromRequestAndSession(request, request.session)
           )
         )
       case _ =>

@@ -14,41 +14,22 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.group_data
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 
 @this(
         mainTemplate: main_template,
         groupData: group_data,
-        form: FormWithCSRF,
-        govukSummaryList: GovukSummaryList,
-        govukTable: GovukTable,
-        govukSelect: GovukSelect,
-        govukInput: GovukInput,
-        govukButton: GovukButton
+        govukTable: GovukTable
 )
-@(group: Group, users: Users, authToken: Option[String], sessionId: Option[String], groupId: String, context: PageContext)(implicit request: Request[_], msgs: Messages)
-
-@showField(value: Option[_], name: String, id: String) = @{
-    value.map(x =>
-        SummaryListRow(key = Key(Text(msgs(name))), value = Value(Text(value.get.toString)))
-    )
-}
+@(group: Group, users: Users, context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = s"Group ${group.groupId}") {
 

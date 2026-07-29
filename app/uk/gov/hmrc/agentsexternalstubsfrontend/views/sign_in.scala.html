@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukFieldset}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
+@import views.html.helper.Implicits.toAttributePair
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Text, HtmlContent}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInput, GovukButton, GovukErrorSummary, GovukDetails}
@@ -28,6 +29,8 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.details.Details
 
+@import scala.language.deprecated.symbolLiterals
+
 @this(
         mainTemplate: main_template,
         form: FormWithCSRF,
@@ -37,11 +40,11 @@
         govukFieldset: GovukFieldset,
         govukDetails: GovukDetails)
 
-@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest], postUrl: Call)(implicit request: Request[_], msgs: Messages)
+@(loginForm:Form[uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest], postUrl: Call)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("login.title"), showSignOut = false) {
 
-    @form(action = postUrl, 'id -> "loginForm", 'novalidate -> "novalidate") {
+    @form(action = postUrl, "id" -> "loginForm", "novalidate" -> "novalidate") {
         @govukFieldset(Fieldset(
             legend = Some(Legend(
                 content = Text(msgs("login.sa.header")),

@@ -19,7 +19,8 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import play.api.mvc._
+import play.api.mvc.*
+import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -31,12 +32,13 @@ class PlanetController @Inject() (
   val authConnector: AuthConnector,
   agentsExternalStubsConnector: AgentsExternalStubsConnector,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+)(using @unused configuration: Configuration, cc: MessagesControllerComponents)
     extends FrontendController(cc) with AuthActions {
 
-  implicit val ec: ExecutionContext = ecp.get
+  given ExecutionContext = ecp.get
 
-  val destroyPlanet: Action[AnyContent] = Action.async { implicit request =>
+  val destroyPlanet: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         agentsExternalStubsConnector

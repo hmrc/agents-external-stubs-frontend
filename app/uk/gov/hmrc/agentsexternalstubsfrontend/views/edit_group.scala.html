@@ -15,10 +15,11 @@
  *@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichSelect}
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.helper.Implicits.toAttributePair
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -32,17 +33,13 @@
 @this(
         mainTemplate: main_template,
         form: FormWithCSRF,
-        govukTextarea: GovukTextarea,
         govukInput: GovukInput,
         govukSelect: GovukSelect,
         navigationBar: navigationBar,
         govukErrorSummary: GovukErrorSummary,
-        govukCheckboxes: GovukCheckboxes,
-        govukRadios: GovukRadios,
-        govukDateInput: GovukDateInput,
         govukButton: GovukButton)
 
-@(groupForm: Form[Group], postUrl: Call, cancelCall: Call, groupId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(groupForm: Form[Group], postUrl: Call, cancelCall: Call, groupId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @principalEnrolments = @{
     ViewHelper.buildTree("", groupForm.data)("principalEnrolments")
@@ -71,7 +68,7 @@
     </p>
 
     <div>
-    @form(action = postUrl, 'id -> "groupForm", 'novalidate -> "novalidate") {
+    @form(action = postUrl, "id" -> "groupForm", "novalidate" -> "novalidate") {
         <div>
             <div class="form-field-group">
 
@@ -346,4 +343,3 @@
     </div>
 
 }
-

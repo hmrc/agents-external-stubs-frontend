@@ -39,7 +39,21 @@ object GroupForm {
         _.getOrElse(Seq.empty).collect { case Some(x) => x }.toSet,
         set => Some(set.toSeq.map(Some(_)))
       )
-    )(Group.apply)(Group.unapply)
+    )(Group.apply)(g =>
+      Some(
+        (
+          g.planetId,
+          g.groupId,
+          g.affinityGroup,
+          g.agentId,
+          g.agentCode,
+          g.agentFriendlyName,
+          g.principalEnrolments,
+          g.delegatedEnrolments,
+          g.suspendedRegimes
+        )
+      )
+    )
   )
 
 }

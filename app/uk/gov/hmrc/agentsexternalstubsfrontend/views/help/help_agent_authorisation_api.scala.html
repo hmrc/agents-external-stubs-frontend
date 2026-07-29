@@ -18,7 +18,7 @@
 
 @this(mainTemplate: main_template)
 
-@()(implicit request: Request[_], msgs: Messages)
+@()(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("help.title"), wide = true) {
 

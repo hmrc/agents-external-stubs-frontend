@@ -15,7 +15,7 @@
  */
 
 package uk.gov.hmrc.agentsexternalstubsfrontend
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import scala.util.control.NonFatal
 

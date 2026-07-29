@@ -21,6 +21,6 @@ import play.api.libs.json.{Format, Json, Writes}
 case class Groups(groups: Seq[Group])
 
 object Groups {
-  implicit val groupFormat: Writes[Group] = Group.format
-  implicit def format: Format[Groups] = Json.format[Groups]
+  given groupFormat: Writes[Group] = Group.format
+  given format: Format[Groups] = Json.format[Groups]
 }

@@ -24,7 +24,6 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Result
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, Helpers}
 import play.twirl.api.HtmlFormat
@@ -39,24 +38,14 @@ class BaseISpec
     extends AnyWordSpecLike with GuiceOneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs
     with DefaultAwaitTimeout with Matchers with OptionValues with ScalaFutures {
 
-  override implicit lazy val app: Application = appBuilder.build()
+  override given app: Application = TestApplicationFactory.builder(wireMockPort).build()
 
   val appConfig: FrontendConfig = app.injector.instanceOf[FrontendConfig]
 
-  protected def appBuilder: GuiceApplicationBuilder =
-    new GuiceApplicationBuilder()
-      .configure(
-        "microservice.services.agents-external-stubs.port" -> wireMockPort,
-        "microservice.services.auth.port"                  -> wireMockPort,
-        "microservice.services.agent-registration.port" -> wireMockPort,
-        "microservice.services.agent-client-relationships.port" -> wireMockPort
-      )
-
-  override def commonStubs(): Unit = {
+  override def commonStubs(): Unit =
     givenAuditConnector()
-  }
 
-  protected implicit val materializer: Materializer = app.materializer
+  protected given Materializer = app.materializer
 
   protected def checkHtmlResultWithBodyText(result: Result, expectedSubstring: String): Unit = {
     status(result) shouldBe 200
@@ -66,11 +55,11 @@ class BaseISpec
   }
 
   private val messagesApi = app.injector.instanceOf[MessagesApi]
-  private implicit val messages: Messages = messagesApi.preferred(Seq.empty[Lang])
+  private given Messages = messagesApi.preferred(Seq.empty[Lang])
 
   protected def htmlEscapedMessage(key: String): String = HtmlFormat.escape(Messages(key)).toString
 
-  implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier =
+  given hc(using request: FakeRequest[?]): HeaderCarrier =
     HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
   // the following is a collection of useful methods that should minimise

@@ -19,20 +19,20 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{JourneySetupInvitation, JourneySetupRequest}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentClientRelationshipsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.TestFixtures._
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.TestFixtures.*
 import uk.gov.hmrc.http.HeaderCarrier
 
-class AgentClientRelationshipsConnectorISpec  extends BaseISpec with AgentClientRelationshipsStubs {
+class AgentClientRelationshipsConnectorISpec extends BaseISpec with AgentClientRelationshipsStubs {
 
-  private lazy val connector: AgentClientRelationshipsConnector = app.injector.instanceOf[AgentClientRelationshipsConnector]
+  private lazy val connector: AgentClientRelationshipsConnector =
+    app.injector.instanceOf[AgentClientRelationshipsConnector]
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given HeaderCarrier = HeaderCarrier()
 
   "testOnlyJourneySetup" should {
     "return Future.unit" in {
 
-      val req = JourneySetupRequest(
-        Seq(JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT", Some("personal"))))
+      val req = JourneySetupRequest(Seq(JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT", Some("personal"))))
 
       givenTestOnlyJourneySetup(req)
       val result: Unit = connector.testOnlyJourneySetup(req).futureValue
@@ -48,7 +48,7 @@ class AgentClientRelationshipsConnectorISpec  extends BaseISpec with AgentClient
 
       val result: Unit = connector.testOnlyCreateRelationship(arn, nino, "HMRC-MTD-IT", "personal").futureValue
 
-      result shouldBe()
+      result shouldBe ()
     }
   }
 }

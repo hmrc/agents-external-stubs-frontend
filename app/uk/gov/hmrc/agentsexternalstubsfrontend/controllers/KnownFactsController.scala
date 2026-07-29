@@ -20,7 +20,8 @@ import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
+import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.EnrolmentKey
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
@@ -42,12 +43,13 @@ class KnownFactsController @Inject() (
   showKnownFactsView: show_known_facts,
   showAllServicesView: show_all_services,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+)(using @unused configuration: Configuration, cc: MessagesControllerComponents)
     extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
 
-  implicit val ec: ExecutionContext = ecp.get
+  given ExecutionContext = ecp.get
 
-  def showKnownFactsPage(enrolmentKey: String): Action[AnyContent] = Action.async { implicit request =>
+  def showKnownFactsPage(enrolmentKey: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     EnrolmentKey(enrolmentKey).fold(
       _ =>
         Future.successful(
@@ -82,7 +84,8 @@ class KnownFactsController @Inject() (
     )
   }
 
-  val showEnrolmentsPage: Action[AnyContent] = Action.async { implicit request =>
+  val showEnrolmentsPage: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     if (features.showEnrolments)
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>

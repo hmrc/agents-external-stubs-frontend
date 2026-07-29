@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
 
 @this(mainTemplate: main_template, navigationBar: navigationBar)
 
-@(specialCases: Seq[SpecialCase], caseId: Option[String], viewUrl: String=>Call, editUrl: String=>Call, removeUrl: String=>Call, context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(specialCases: Seq[SpecialCase], caseId: Option[String], viewUrl: String=>Call, editUrl: String=>Call, removeUrl: String=>Call, context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("specialCase.title"), wide = true) {
 

@@ -15,11 +15,12 @@
  *@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.ViewHelper
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 @import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Checkboxes}
+@import views.html.helper.Implicits.toAttributePair
 @import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichSelect}
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -32,20 +33,20 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.{Select, SelectItem}
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.{RichDateInput, RichErrorSummary}
 
+@import scala.language.deprecated.symbolLiterals
+
 @this(
         mainTemplate: main_template,
         form: FormWithCSRF,
-        govukTextarea: GovukTextarea,
         govukInput: GovukInput,
         govukSelect: GovukSelect,
         navigationBar: navigationBar,
         govukErrorSummary: GovukErrorSummary,
         govukCheckboxes: GovukCheckboxes,
-        govukRadios: GovukRadios,
         govukDateInput: GovukDateInput,
         govukButton: GovukButton)
 
-@(userForm: Form[User], affinityGroup: Option[String], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(userForm: Form[User], affinityGroup: Option[String], postUrl: Call, cancelCall: Call, userId: String, hasContinue: Boolean, context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @assignedPrincipalEnrolments = @{
     ViewHelper.buildTree("", userForm.data)("assignedPrincipalEnrolments")
@@ -70,7 +71,7 @@
     </p>
 
     <div>
-    @form(action = postUrl, 'id -> "userForm", 'novalidate -> "novalidate") {
+    @form(action = postUrl, "id" -> "userForm", "novalidate" -> "novalidate") {
         <div>
             <div class="form-field-group">
 
@@ -124,7 +125,7 @@
                                 content = Text(msgs("user.form.dateOfBirth")),
                             ))
                         ))
-                    ).withFormField(userForm("dateOfBirth")))
+                    ).withDayMonthYearFormField(userForm("dateOfBirth")))
                     @* @dateFieldsFreeInlineLegend(userForm, "dateOfBirth",
                     '_legend -> Html("""<span class="h2-heading soft--ends">""" + msgs("user.form.dateOfBirth") + """</span>"""),
                     '_labelClass -> "soft--ends"

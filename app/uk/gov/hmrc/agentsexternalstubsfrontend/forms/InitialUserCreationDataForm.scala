@@ -31,7 +31,7 @@ object InitialUserCreationDataForm {
       mapping(
         "affinityGroup"             -> optional(text),
         "principalEnrolmentService" -> optional(text)
-      )(InitialUserCreationData.apply)(InitialUserCreationData.unapply)
+      )(InitialUserCreationData.apply)(data => Some((data.affinityGroup, data.principalEnrolmentService)))
     )
 
 }

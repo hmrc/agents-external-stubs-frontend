@@ -15,9 +15,10 @@
  *@
 
 @import play.api.Configuration
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import play.api.libs.json.JsObject
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
+@import views.html.helper.Implicits.toAttributePair
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
@@ -27,6 +28,8 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichTextarea
 
+@import scala.language.deprecated.symbolLiterals
+
 @this(
         mainTemplate: main_template,
         form: FormWithCSRF,
@@ -35,7 +38,7 @@
         navigationBar: navigationBar
 )
 
-@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, context: PageContext)(implicit request: Request[_], msgs: Messages, config: Configuration)
+@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, context: PageContext)(implicit request: Request[?], msgs: Messages, config: Configuration)
 
 @mainTemplate(title = msgs("records.title"), wide = true) {
 
@@ -48,7 +51,7 @@
     </p>
 
     <div>
-        @form(action = postUrl, 'id -> "recordForm", 'novalidate -> "novalidate") {
+        @form(action = postUrl, "id" -> "recordForm", "novalidate" -> "novalidate") {
             @govukTextarea(Textarea(
                 rows = 20,
                 classes = "textarea-large"

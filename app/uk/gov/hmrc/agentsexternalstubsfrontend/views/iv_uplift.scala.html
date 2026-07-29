@@ -41,7 +41,7 @@
     govukErrorSummary: GovukErrorSummary
 )
 
-@(pageForm: Form[UpliftRequest], options: Seq[(String, String)], formAction: Call)(implicit request: Request[_], msgs: Messages, configuration: Configuration)
+@(pageForm: Form[UpliftRequest], options: Seq[(String, String)], formAction: Call)(implicit request: Request[?], msgs: Messages, configuration: Configuration)
 
 @mainTemplate(title = msgs("login.title")) {
 

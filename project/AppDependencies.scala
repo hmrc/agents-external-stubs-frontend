@@ -11,7 +11,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% s"bootstrap-frontend-$playVer" % bootstrapVer,
     "uk.gov.hmrc"       %% s"play-frontend-hmrc-$playVer" % "12.29.0",
     "uk.gov.hmrc"       %% s"play-partials-$playVer"      % "10.2.0",
-    "uk.gov.hmrc"       %% "agent-mtd-identifiers"        % "2.2.0",
+    "uk.gov.hmrc"       %% "agent-mtd-identifiers"        % "3.0.0",
     "org.playframework" %% "play-json-joda"               % "3.0.4"
   )
 

@@ -17,15 +17,18 @@
 @import play.api.libs.json.JsObject
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import views.html.helper.Implicits.toAttributePair
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukTextarea
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichTextarea
 
+@import scala.language.deprecated.symbolLiterals
+
 @this(mainTemplate: main_template, form: FormWithCSRF, govukTextarea: GovukTextarea, navigationBar: navigationBar)
 
-@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, shakeUrl: Call, context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(recordForm: Form[JsObject], postUrl: Call, cancelUrl: Call, shakeUrl: Call, context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("records.title"), wide = true) {
 
@@ -42,7 +45,7 @@
             href="@{shakeUrl.url}">@msgs("records.create.shake")</a>
     </div>
 
-    @form(action = postUrl, 'id -> "recordForm", 'novalidate -> "novalidate") {
+    @form(action = postUrl, "id" -> "recordForm", "novalidate" -> "novalidate") {
         @govukTextarea(Textarea(
             rows = 20,
             classes = "textarea-large"

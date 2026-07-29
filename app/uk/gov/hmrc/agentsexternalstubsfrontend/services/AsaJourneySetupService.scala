@@ -17,13 +17,12 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.services
 
 import com.google.inject.{Inject, Singleton}
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentmtdidentifiers.model.Service.PersonalIncomeRecord
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentClientRelationshipsConnector, AgentRegistrationConnector, AgentsExternalStubsConnector}
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
-import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-import uk.gov.hmrc.agentsexternalstubsfrontend.util.RequestSupport._
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
+import uk.gov.hmrc.agentsexternalstubsfrontend.util.RequestSupport.given
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
@@ -35,24 +34,24 @@ class AsaJourneySetupService @Inject() (
   agentsExternalStubsConnector: AgentsExternalStubsConnector,
   agentRegistrationConnector: AgentRegistrationConnector,
   acrConnector: AgentClientRelationshipsConnector
-)(implicit ec: ExecutionContext) {
+)(using ec: ExecutionContext) {
 
-  def setupMainUser(journey: ASATestJourney)(implicit rh: RequestHeader) =
+  def setupMainUser(journey: ASATestJourney)(using rh: RequestHeader) =
     for {
       authSession <- agentsExternalStubsConnector.signIn()
       hc = HeaderCarrier(
              sessionId = Some(SessionId(authSession.sessionId))
            )
-      _ <- agentsExternalStubsConnector.removeUser(authSession.userId)(hc, ec)
+      _ <- agentsExternalStubsConnector.removeUser(authSession.userId)(using hc, ec)
 
       admin <- if (journey.signedInUser.services.isEmpty && journey.signedInUser.strideRole.isEmpty)
-                 createCleanAgent()(hc)
+                 createCleanAgent()(using hc)
                else
                  createUser(
                    affinityGroup = journey.signedInUser.affinityGroup,
                    services = journey.signedInUser.services,
                    strideRole = journey.signedInUser.strideRole
-                 )(hc)
+                 )(using hc)
 
       user <- if (journey.signedInUser.isAdmin) Future.successful(admin)
               else
@@ -62,7 +61,7 @@ class AsaJourneySetupService @Inject() (
                   strideRole = journey.signedInUser.strideRole,
                   groupId = admin.groupId,
                   isAdmin = false
-                )(hc)
+                )(using hc)
 
       authenticatedSession <- agentsExternalStubsConnector.signIn(
                                 SignInRequest(
@@ -73,15 +72,13 @@ class AsaJourneySetupService @Inject() (
                                       AuthProvider.PrivilegedApplication
                                     else AuthProvider.GovernmentGateway
                                 )
-                              )(hc, ec)
+                              )(using hc, ec)
     } yield authenticatedSession
 
   def setupDataForJourneyWithServiceSelected(
     journey: ASATestJourneyWithServiceSelection,
     asaJourneyService: ASAJourneyService
-  )(implicit
-    rh: RequestHeader
-  ): Future[String] =
+  )(using rh: RequestHeader): Future[String] =
     journey match {
       case CreateInvitation =>
         for {
@@ -134,7 +131,7 @@ class AsaJourneySetupService @Inject() (
 
   def setupDataForJourneyWithoutServiceSelected(
     journey: ASATestJourneyWithoutServiceSelection
-  )(implicit rh: RequestHeader): Future[Option[String]] =
+  )(using rh: RequestHeader): Future[Option[String]] =
     journey match {
       case MytaInd =>
         for {
@@ -235,9 +232,9 @@ class AsaJourneySetupService @Inject() (
         for {
           cleanAgent <- createCleanAgent()
           bpr        <- agentsExternalStubsConnector.getRecord(cleanAgent.recordIds.get.head)
-          utr = bpr.as[String](utrReads)
-          postcode = bpr.as[String](postcodeReads)
-          crn = bpr.as[String](crnReads)
+          utr = bpr.as[String](using utrReads)
+          postcode = bpr.as[String](using postcodeReads)
+          crn = bpr.as[String](using crnReads)
         } yield Some(s"""{"utr": "$utr", "postcode": "${easyCopy(postcode)}", "crn": "$crn" }""")
 
       case AccessGroups =>
@@ -256,7 +253,7 @@ class AsaJourneySetupService @Inject() (
 
     }
 
-  private def getSignedInUser()(implicit rh: RequestHeader): Future[User] =
+  private def getSignedInUser()(using rh: RequestHeader): Future[User] =
     agentsExternalStubsConnector.getUser(
       rh.session.get("userId").getOrElse(throw new RuntimeException("no userId in session"))
     )
@@ -268,7 +265,7 @@ class AsaJourneySetupService @Inject() (
     groupId: Option[String] = None,
     isAdmin: Boolean = true,
     userOverride: User => User = user => user
-  )(implicit hc: HeaderCarrier): Future[User] = {
+  )(using hc: HeaderCarrier): Future[User] = {
 
     val serviceKeys = services.map(_.key)
 
@@ -299,17 +296,17 @@ class AsaJourneySetupService @Inject() (
       }
   }
 
-  private def createAsaAgent()(implicit hc: HeaderCarrier): Future[User] =
-    createUser(affinityGroup = Some(Agent), services = List(ASAAgent))
+  private def createAsaAgent()(using hc: HeaderCarrier): Future[User] =
+    createUser(affinityGroup = Some(Agent), services = List(EACDServiceKey.ASAAgent))
 
   private def createCleanAgent(
-  )(implicit hc: HeaderCarrier): Future[User] =
+  )(using hc: HeaderCarrier): Future[User] =
     agentsExternalStubsConnector.createUser(
       affinityGroup = Some(Agent),
       userBody = JsNull
     )
 
-  private def extractTestDataFromUser(user: User, asaJourneyService: ASAJourneyService)(implicit
+  private def extractTestDataFromUser(user: User, asaJourneyService: ASAJourneyService)(using
     rh: RequestHeader
   ): Future[String] =
     asaJourneyService.customerKnownFact.fold(
@@ -319,22 +316,22 @@ class AsaJourneySetupService @Inject() (
     )(customerKnownFact =>
       if (asaJourneyService.identifierSourcedFromBpr) {
         agentsExternalStubsConnector.getRecord(user.recordIds.get.head).map { record =>
-          val identifierValue = record.as[String](asaJourneyService.identifierReadsPath)
+          val identifierValue = record.as[String](using asaJourneyService.identifierReadsPath)
 
-          val knownFact = s""" "${customerKnownFact.name}": "${record.as[String](customerKnownFact.reads)}"}"""
+          val knownFact = s""" "${customerKnownFact.name}": "${record.as[String](using customerKnownFact.reads)}"}"""
 
           s""" {"${asaJourneyService.identifierName}":"$identifierValue" $knownFact"""
 
         }
       } else {
         val userJson = Json.toJson(user)
-        val identifierValue = easyCopy(userJson.as[String](asaJourneyService.identifierReadsPath))
+        val identifierValue = easyCopy(userJson.as[String](using asaJourneyService.identifierReadsPath))
         val mKnownFact: Option[String] =
-          asaJourneyService.customerKnownFact.map(kf => s""" "${kf.name}": "${userJson.as[String](kf.reads)}"}""")
+          asaJourneyService.customerKnownFact.map(kf => s""" "${kf.name}": "${userJson.as[String](using kf.reads)}"}""")
 
         Future.successful(s""" {"${asaJourneyService.identifierName}":"$identifierValue" ${mKnownFact
-          .map(kf => s""", ${easyCopy(kf)}""")
-          .getOrElse(s"""}""")}  """)
+            .map(kf => s""", ${easyCopy(kf)}""")
+            .getOrElse(s"""}""")}  """)
       }
     )
 

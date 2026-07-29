@@ -22,6 +22,6 @@ case class KnownFact(key: String, value: String) {
 }
 
 object KnownFact {
-  implicit val reads: Reads[KnownFact] = Json.reads[KnownFact]
-  implicit val ordering: Ordering[KnownFact] = Ordering.by(_.key)
+  given reads: Reads[KnownFact] = Json.reads[KnownFact]
+  given ordering: Ordering[KnownFact] = Ordering.by(_.key)
 }

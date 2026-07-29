@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.http.SessionKeys
 import play.api.mvc.Cookie
