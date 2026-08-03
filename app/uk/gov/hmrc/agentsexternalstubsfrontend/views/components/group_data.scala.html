@@ -14,9 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
-@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -24,31 +22,23 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 
 @this(
-        mainTemplate: main_template,
-        form: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
-        govukTable: GovukTable,
-        govukSelect: GovukSelect,
-        govukInput: GovukInput,
-        govukButton: GovukButton
+        govukTable: GovukTable
 )
 
-@(group: Group, context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(group: Group, context: PageContext)(implicit msgs: Messages)
 
-@showField(value: Option[_], name: String, id: String) = @{
-    value.map(x =>
-        SummaryListRow(key = Key(Text(msgs(name))), value = Value(Text(value.get.toString)))
-    )
+@showField(value: Option[?], name: String) = @{
+    if value.isDefined then
+        Some(SummaryListRow(key = Key(Text(msgs(name))), value = Value(Text(value.get.toString))))
+    else
+        None
 }
 
 @govukSummaryList(SummaryList(
@@ -64,9 +54,9 @@
                              |</span>""".stripMargin))
         )
     ) ++ List(
-        showField(group.agentId,"Agent Id","agentId"),
-        showField(group.agentCode,"Agent code","agentCode"),
-        showField(group.agentFriendlyName,"Agent friendly name","agentFriendlyName"),
+        showField(group.agentId,"Agent Id"),
+        showField(group.agentCode,"Agent code"),
+        showField(group.agentFriendlyName,"Agent friendly name"),
     ).flatten
 ))
 
@@ -171,7 +161,7 @@
             head = Some(List(
                 HeadCell(Text("Regime")),
             )),
-            rows = group.suspendedRegimes.toSeq.zipWithIndex.map { case (suspendedRegime, index) =>
+            rows = group.suspendedRegimes.toSeq.zipWithIndex.map { case (suspendedRegime, _) =>
                 Seq(TableRow(
                     if (context.features.showEnrolments) HtmlContent(s"""<a class="govuk-body govuk-link" href="/agents-external-stubs/services#$suspendedRegime">$suspendedRegime</a>""")
                     else Text(suspendedRegime)

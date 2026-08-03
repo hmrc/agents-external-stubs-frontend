@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 import play.api.mvc.Result
 import uk.gov.hmrc.agentmtdidentifiers.model.{Arn, MtdItId}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
-import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.authorisedEnrolments
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -29,7 +29,7 @@ trait AuthActions extends AuthorisedFunctions {
 
   protected def withAuthorisedAsAgent[A](
     body: Arn => Future[Result]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+  )(using hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
     withEnrolledFor("HMRC-AS-AGENT", "AgentReferenceNumber") {
       case Some(arn) => body(Arn(arn))
       case None      => Future.failed(InsufficientEnrolments("AgentReferenceNumber identifier not found"))
@@ -37,7 +37,7 @@ trait AuthActions extends AuthorisedFunctions {
 
   protected def withAuthorisedAsClient[A](
     body: MtdItId => Future[Result]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+  )(using hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
     withEnrolledFor("HMRC-MTD-IT", "MTDITID") {
       case Some(mtdItID) => body(MtdItId(mtdItID))
       case None          => Future.failed(InsufficientEnrolments("MTDITID identifier not found"))
@@ -45,7 +45,7 @@ trait AuthActions extends AuthorisedFunctions {
 
   protected def withEnrolledFor[A](serviceName: String, identifierKey: String)(
     body: Option[String] => Future[Result]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+  )(using hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
     authorised(
       Enrolment(serviceName)
         and AuthProviders(GovernmentGateway)

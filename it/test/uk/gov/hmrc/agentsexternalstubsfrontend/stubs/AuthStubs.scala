@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.SessionKeys
 
@@ -25,9 +25,9 @@ trait AuthStubs {
   case class Enrolment(serviceName: String, identifierName: String, identifierValue: String)
 
   def authorisedAsValidAgent[A](request: FakeRequest[A], arn: String) =
-    authenticated(request, Enrolment("HMRC-AS-AGENT", "AgentReferenceNumber", arn), isAgent = true)
+    authenticated(request, Enrolment("HMRC-AS-AGENT", "AgentReferenceNumber", arn))
 
-  def authenticated[A](request: FakeRequest[A], enrolment: Enrolment, isAgent: Boolean): FakeRequest[A] = {
+  def authenticated[A](request: FakeRequest[A], enrolment: Enrolment): FakeRequest[A] = {
     givenAuthorisedFor(
       s"""
          |{

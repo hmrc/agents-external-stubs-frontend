@@ -21,7 +21,8 @@ import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
+import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.RecordForm
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
@@ -40,12 +41,13 @@ class RecordsController @Inject() (
   createRecordView: create_record,
   val features: Features,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+)(using @unused configuration: Configuration, cc: MessagesControllerComponents)
     extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
 
-  implicit val ec: ExecutionContext = ecp.get
+  given ExecutionContext = ecp.get
 
-  def showAllRecordsPage(showId: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+  def showAllRecordsPage(showId: Option[String]): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         agentsExternalStubsConnector.getRecords
@@ -53,7 +55,8 @@ class RecordsController @Inject() (
       }
   }
 
-  def deleteRecord(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def deleteRecord(id: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised() {
       agentsExternalStubsConnector
         .deleteRecord(id)
@@ -61,7 +64,8 @@ class RecordsController @Inject() (
     }
   }
 
-  def showEditRecordPage(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def showEditRecordPage(id: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         agentsExternalStubsConnector
@@ -79,7 +83,8 @@ class RecordsController @Inject() (
       }
   }
 
-  def updateRecord(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def updateRecord(id: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         RecordForm.form
@@ -114,7 +119,8 @@ class RecordsController @Inject() (
       }
   }
 
-  def showAddRecordPage(`type`: String, seed: String): Action[AnyContent] = Action.async { implicit request =>
+  def showAddRecordPage(`type`: String, seed: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         agentsExternalStubsConnector
@@ -133,7 +139,8 @@ class RecordsController @Inject() (
       }
   }
 
-  def createRecord(`type`: String, seed: String): Action[AnyContent] = Action.async { implicit request =>
+  def createRecord(`type`: String, seed: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         RecordForm.form

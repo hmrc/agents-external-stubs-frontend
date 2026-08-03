@@ -57,8 +57,8 @@ case class NinoWithoutSuffix(nino: String) extends TaxIdentifier with SimpleName
 
 object NinoWithoutSuffix extends (String => NinoWithoutSuffix) {
 
-  implicit val ninoWrite: Writes[NinoWithoutSuffix] = new SimpleObjectWrites[NinoWithoutSuffix](_.value)
-  implicit val ninoRead: Reads[NinoWithoutSuffix] =
+  given ninoWrite: Writes[NinoWithoutSuffix] = new SimpleObjectWrites[NinoWithoutSuffix](_.value)
+  given ninoRead: Reads[NinoWithoutSuffix] =
     new SimpleObjectReads[NinoWithoutSuffix]("nino-without-suffix", NinoWithoutSuffix.apply)
 
   def isValid(nino: String): Boolean = nino != null && (Nino.isValid(nino + "A") || Nino.isValid(nino))

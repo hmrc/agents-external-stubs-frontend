@@ -16,15 +16,14 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.http.Status.CREATED
-import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.libs.json.{JsArray, Json}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.Service.Flags
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, Group, Groups, Service, Services, User}
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, EnrolmentKey, User}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, EnrolmentKey, Group, Groups, Service, Services, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.TestFixtures.nino
 import uk.gov.hmrc.auth.core.AffinityGroup
 
@@ -41,7 +40,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
   ): String = {
     val authToken = UUID.randomUUID().toString
 
-        stubFor(
+    stubFor(
       post(urlEqualTo(s"/agents-external-stubs/sign-in"))
         .withRequestBody(
           equalToJson(
@@ -77,11 +76,14 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
   }
 
   def givenSignIn(userId: String, authToken: String, providerType: String, planetId: String): StubMapping = {
-    stubFor(post(urlEqualTo("/agents-external-stubs/sign-in"))
-      .willReturn(aResponse()
-        .withStatus(CREATED)
-        .withHeader("Location", s"/agents-external-stubs/session/$authToken")))
-
+    stubFor(
+      post(urlEqualTo("/agents-external-stubs/sign-in"))
+        .willReturn(
+          aResponse()
+            .withStatus(CREATED)
+            .withHeader("Location", s"/agents-external-stubs/session/$authToken")
+        )
+    )
 
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/session/$authToken"))
@@ -91,11 +93,11 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
             .withBody(
               Json
                 .obj(
-                  "sessionId" -> UUID.randomUUID().toString,
-                  "userId" -> userId,
-                  "authToken" -> authToken,
+                  "sessionId"    -> UUID.randomUUID().toString,
+                  "userId"       -> userId,
+                  "authToken"    -> authToken,
                   "providerType" -> providerType,
-                  "planetId" -> planetId
+                  "planetId"     -> planetId
                 )
                 .toString()
             )
@@ -172,92 +174,115 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     stubFor(
       post(urlEqualTo(s"/agents-external-stubs/users"))
         .withRequestBody(equalToJson(s"""{"strideRoles": ["$role"]}"""))
-        .willReturn(aResponse()
-          .withStatus(CREATED)
-          .withHeader("Location", s"/agents-external-stubs/users/$userId")))
+        .willReturn(
+          aResponse()
+            .withStatus(CREATED)
+            .withHeader("Location", s"/agents-external-stubs/users/$userId")
+        )
+    )
 
-    stubFor(get(urlEqualTo(s"/agents-external-stubs/users/$userId"))
-      .willReturn(aResponse()
-        .withStatus(Status.OK)
-        .withBody(userResponseBody(userId, """[]""", Some(""" "maintain_agent_relationships" """)))))
+    stubFor(
+      get(urlEqualTo(s"/agents-external-stubs/users/$userId"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withBody(userResponseBody(userId, """[]""", Some(""" "maintain_agent_relationships" """)))
+        )
+    )
 
   }
 
   def givenCreateCleanAgent(userId: String): StubMapping = {
     stubFor(
       post(urlEqualTo(s"/agents-external-stubs/users?affinityGroup=Agent"))
-        .willReturn(aResponse()
-          .withStatus(CREATED)
-          .withHeader("Location", s"/agents-external-stubs/users/$userId")))
+        .willReturn(
+          aResponse()
+            .withStatus(CREATED)
+            .withHeader("Location", s"/agents-external-stubs/users/$userId")
+        )
+    )
 
-    stubFor(get(urlEqualTo(s"/agents-external-stubs/users/$userId"))
-      .willReturn(aResponse()
-        .withStatus(Status.OK)
-        .withBody(userResponseBody(userId, """[]""", None))))
+    stubFor(
+      get(urlEqualTo(s"/agents-external-stubs/users/$userId"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withBody(userResponseBody(userId, """[]""", None))
+        )
+    )
   }
 
+  def givenCreateUser(
+    affinityGroup: AffinityGroup,
+    serviceKeys: List[EnrolmentKey],
+    userId: String,
+    isAdmin: Boolean = true,
+    groupId: Option[String] = None
+  ): StubMapping = {
 
-  def givenCreateUser(affinityGroup: AffinityGroup, serviceKeys: List[EnrolmentKey], userId: String, isAdmin: Boolean = true, groupId: Option[String] = None): StubMapping = {
-
-    val jsonRequestBody = s"""{
-              |"credentialRole": "${if(isAdmin) "User" else "Assistant"}",
-              |${groupId.map(gid => s""" "groupId": "$gid", """).getOrElse("")}
-              |"assignedPrincipalEnrolments": ["${serviceKeys.map(_.service).mkString("\",\"")}"]}""".stripMargin
+    val jsonRequestBody =
+      s"""{
+         |"credentialRole": "${if (isAdmin) "User" else "Assistant"}",
+         |${groupId.map(gid => s""" "groupId": "$gid", """).getOrElse("")}
+         |"assignedPrincipalEnrolments": ["${serviceKeys.map(_.service).mkString("\",\"")}"]}""".stripMargin
 
     val assignedPrincipalEnrolmentsResponse = s"""["${serviceKeys.map(_.tag).mkString("\",\"")}"]"""
-
 
     stubFor(
       post(urlEqualTo(s"/agents-external-stubs/users?affinityGroup=$affinityGroup"))
         .withRequestBody(equalToJson(jsonRequestBody))
-        .willReturn(aResponse()
-          .withStatus(CREATED)
-          .withHeader("Location", s"/agents-external-stubs/users/$userId"))
+        .willReturn(
+          aResponse()
+            .withStatus(CREATED)
+            .withHeader("Location", s"/agents-external-stubs/users/$userId")
+        )
     )
 
-    stubFor(get(urlEqualTo(s"/agents-external-stubs/users/$userId"))
-      .willReturn(aResponse()
-        .withStatus(Status.OK)
-        .withBody(userResponseBody(userId, assignedPrincipalEnrolmentsResponse, None))))
+    stubFor(
+      get(urlEqualTo(s"/agents-external-stubs/users/$userId"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withBody(userResponseBody(userId, assignedPrincipalEnrolmentsResponse, None))
+        )
+    )
 
   }
-    def userResponseBody(userId: String, assignedPrincipalEnrolmentsResponse: String, strideRoles: Option[String]) =
-      s"""{
-         |  "userId": "$userId",
-         |  "credentialRole": "User",
-         |  "nino": "$nino",
-         |  "assignedPrincipalEnrolments": $assignedPrincipalEnrolmentsResponse,
-         |  "assignedDelegatedEnrolments": [],
-         |  "planetId": "mars",
-         |  "recordIds": ["123"],
-         |  "address": {
-         |    "line1": "21 Marshalls Rise",
-         |    "line2": "Portsmouth",
-         |    "postcode": "PO27 9OQ",
-         |    "countryCode": "GB"
-         |  },
-         |  "strideRoles": ${strideRoles.fold("[]")(sr => s"""[$sr]""")},
-         |  "_links": [
-         |    {
-         |      "rel": "update",
-         |      "href": "/agents-external-stubs/users/Ginny_3898"
-         |    },
-         |    {
-         |      "rel": "delete",
-         |      "href": "/agents-external-stubs/users/Ginny_3898"
-         |    },
-         |    {
-         |      "rel": "store",
-         |      "href": "/agents-external-stubs/users"
-         |    },
-         |    {
-         |      "rel": "list",
-         |      "href": "/agents-external-stubs/users"
-         |    }
-         |  ]
-         |}""".stripMargin
-
-
+  def userResponseBody(userId: String, assignedPrincipalEnrolmentsResponse: String, strideRoles: Option[String]) =
+    s"""{
+       |  "userId": "$userId",
+       |  "credentialRole": "User",
+       |  "nino": "$nino",
+       |  "assignedPrincipalEnrolments": $assignedPrincipalEnrolmentsResponse,
+       |  "assignedDelegatedEnrolments": [],
+       |  "planetId": "mars",
+       |  "recordIds": ["123"],
+       |  "address": {
+       |    "line1": "21 Marshalls Rise",
+       |    "line2": "Portsmouth",
+       |    "postcode": "PO27 9OQ",
+       |    "countryCode": "GB"
+       |  },
+       |  "strideRoles": ${strideRoles.fold("[]")(sr => s"""[$sr]""")},
+       |  "_links": [
+       |    {
+       |      "rel": "update",
+       |      "href": "/agents-external-stubs/users/Ginny_3898"
+       |    },
+       |    {
+       |      "rel": "delete",
+       |      "href": "/agents-external-stubs/users/Ginny_3898"
+       |    },
+       |    {
+       |      "rel": "store",
+       |      "href": "/agents-external-stubs/users"
+       |    },
+       |    {
+       |      "rel": "list",
+       |      "href": "/agents-external-stubs/users"
+       |    }
+       |  ]
+       |}""".stripMargin
 
   def givenUsers(users: User*): Unit =
     stubFor(
@@ -346,7 +371,13 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     )
   }
 
-  def givenUsersWithAllQueryParams(limit: Int, userId: String, groupId: String, principalEnrolmentService: String, users: User*): Unit = {
+  def givenUsersWithAllQueryParams(
+    limit: Int,
+    userId: String,
+    groupId: String,
+    principalEnrolmentService: String,
+    users: User*
+  ): Unit = {
     val filteredUsers = users
       .filter(_.userId.contains(userId))
       .filter(_.groupId.contains(groupId))
@@ -372,9 +403,11 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
   }
 
   def givenGroups = {
-    val groups: Groups = Groups(Seq(
-      Group("foobar", "G1", "Agent", None, None, None, Seq.empty, Seq.empty)
-    ))
+    val groups: Groups = Groups(
+      Seq(
+        Group("foobar", "G1", "Agent", None, None, None, Seq.empty, Seq.empty)
+      )
+    )
     stubFor(
       get(urlEqualTo("/agents-external-stubs/groups"))
         .willReturn(
@@ -387,16 +420,32 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
   }
 
   def givenServiceDefinitions = {
-    val serviceDefinitions: Services = Services(Seq(
-      Service("HMRC-MTD-IT", "HMRC Making Tax Digital Income Tax", Seq.empty, Seq.empty, Seq.empty, Flags(true, false, false, false, true, true))
-    ))
+    val serviceDefinitions: Services = Services(
+      Seq(
+        Service(
+          "HMRC-MTD-IT",
+          "HMRC Making Tax Digital Income Tax",
+          Seq.empty,
+          Seq.empty,
+          Seq.empty,
+          Flags(true, false, false, false, true, true)
+        )
+      )
+    )
     stubFor(
       get(urlEqualTo("/agents-external-stubs/config/services"))
         .willReturn(
           aResponse()
             .withStatus(Status.OK)
             .withHeader(HeaderNames.CONTENT_TYPE, "application/json")
-            .withBody(Json.obj("services" -> Json.toJsFieldJsValueWrapper(serviceDefinitions.services.map(Json.toJson(_)(Services.f3)))).toString())
+            .withBody(
+              Json
+                .obj(
+                  "services" -> Json
+                    .toJsFieldJsValueWrapper(serviceDefinitions.services.map(Json.toJson(_)(using Services.f3)))
+                )
+                .toString()
+            )
         )
     )
   }
@@ -413,10 +462,14 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     )
 
   def givenGetRecord(recordId: String, response: String): StubMapping =
-    stubFor(get(urlEqualTo(s"/agents-external-stubs/records/$recordId"))
-      .willReturn(aResponse()
-        .withStatus(Status.OK)
-        .withBody(response)))
+    stubFor(
+      get(urlEqualTo(s"/agents-external-stubs/records/$recordId"))
+        .willReturn(
+          aResponse()
+            .withStatus(Status.OK)
+            .withBody(response)
+        )
+    )
 
   def givenAllSpecialCases =
     stubFor(

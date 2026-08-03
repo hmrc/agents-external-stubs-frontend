@@ -21,7 +21,7 @@ import play.api.http.Writeable
 import play.api.libs.typedmap.TypedKey
 import play.api.mvc.{Headers, Request, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, _}
+import play.api.test.Helpers.{GET, *}
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, AuthStubs}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
@@ -240,7 +240,7 @@ class IdentityVerificationControllerISpec extends BaseISpec with AgentsExternalS
     }
   }
 
-  def addCsrfToken[T](fakeRequest: FakeRequest[T])(implicit app: Application) = {
+  def addCsrfToken[T](fakeRequest: FakeRequest[T])(using app: Application) = {
     val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
     val csrfFilter = app.injector.instanceOf[CSRFFilter]
     val token = csrfFilter.tokenProvider.generateToken

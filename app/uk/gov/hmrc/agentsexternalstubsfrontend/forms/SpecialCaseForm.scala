@@ -30,26 +30,26 @@ object SpecialCaseForm {
     "method"      -> nonEmptyText,
     "body"        -> optional(nonEmptyText),
     "contentType" -> optional(nonEmptyText)
-  )(SpecialCase.RequestMatch.apply)(SpecialCase.RequestMatch.unapply)
+  )(SpecialCase.RequestMatch.apply)(rm => Some((rm.path, rm.method, rm.body, rm.contentType)))
 
   val headerMapping: Mapping[SpecialCase.Header] = mapping(
     "name"  -> nonEmptyText,
     "value" -> nonEmptyText
-  )(SpecialCase.Header.apply)(SpecialCase.Header.unapply)
+  )(SpecialCase.Header.apply)(h => Some((h.name, h.value)))
 
   val responseMapping: Mapping[SpecialCase.Response] = mapping(
     "status" -> number(200, 599),
     "body"   -> optional(nonEmptyText),
     "headers" -> optional(seq(optional(headerMapping)))
       .transform[Option[Seq[SpecialCase.Header]]](_.map(_.collect { case Some(x) => x }), _.map(_.map(Option.apply)))
-  )(SpecialCase.Response.apply)(SpecialCase.Response.unapply)
+  )(SpecialCase.Response.apply)(r => Some((r.status, r.body, r.headers)))
 
   val form: Form[SpecialCase] = Form[SpecialCase](
     mapping(
       "requestMatch" -> requestMatchMapping,
       "response"     -> responseMapping,
       "id"           -> optional(text)
-    )(SpecialCase.apply)(SpecialCase.unapply)
+    )(SpecialCase.apply)(s => Some((s.requestMatch, s.response, s.id)))
   )
 
 }

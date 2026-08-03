@@ -15,9 +15,10 @@
  *@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukInput, GovukSelect, GovukTable}
+@import views.html.helper.Implicits.toAttributePair
 @import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichSelect}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
@@ -45,14 +46,10 @@
         users: Users,
         groups: Seq[String] = Seq.empty,
         services: Seq[String] = Seq.empty,
-        showCurrentUserUrl: Call,
         filtersForm: Form[UserFilters],
         createANewUserForm: Form[CreateANewUser],
-        context: PageContext,
-        userId: Option[String],
-        groupId: Option[String],
-        limit: Option[Int]
-)(implicit request: Request[_], msgs: Messages)
+        context: PageContext
+)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("users.title"), wide = true) {
 
@@ -95,7 +92,7 @@
                     classes = "govuk-input--width-5" + (if (filtersForm.error("limit").isDefined) " govuk-input--error" else ""),
                     errorMessage = filtersForm.error("limit").map { err =>
                         ErrorMessage(
-                            content = Text(msgs(err.message, err.args: _*))
+                            content = Text(msgs(err.message, err.args*))
                         )
                     }
                 )
@@ -117,7 +114,7 @@
         <h3 class="govuk-heading-s govuk-!-margin-bottom-1" id="create-user-label">@msgs("users.link.create")</h3>
         <span class="govuk-hint govuk-!-margin-bottom-1">Expected ID pattern [A-Za-z0-9-_]{3,64}</span>
         @form(action = routes.UserController.createNewUserFromShowAllUsersPage) {
-            @{play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) }}
+            @CSRF.formField
             <div style="vertical-align: bottom;">
                 @govukInput(Input(
                     id = "userId",
@@ -139,8 +136,8 @@
     @msgs("users.show.description")
     </p>
 
-    @form(action = Call("GET", "/agents-external-stubs/planet/destroy"), 'name -> "destroyPlanet", 'id -> "destroyPlanet") {
-        @{ play.filters.csrf.CSRF.getToken(request).map { token => CSRF.formField(request) } }
+    @form(action = Call("GET", "/agents-external-stubs/planet/destroy"), "name" -> "destroyPlanet", "id" -> "destroyPlanet") {
+        @CSRF.formField
         <a id="link_planet_destroy" class="govuk-body govuk-link">
         @msgs("planet.link.destroy")
         </a>

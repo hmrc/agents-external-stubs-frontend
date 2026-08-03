@@ -36,10 +36,10 @@ object SpecialCase {
 
   case class Response(status: Int, body: Option[String] = None, headers: Option[Seq[Header]] = None)
 
-  implicit val formats1: Format[RequestMatch] = Json.format[RequestMatch]
-  implicit val formats2: Format[Header] = Json.format[Header]
-  implicit val formats3: Format[Response] = Json.format[Response]
-  implicit val formats: Format[SpecialCase] = Json.format[SpecialCase]
+  given formats1: Format[RequestMatch] = Json.format[RequestMatch]
+  given formats2: Format[Header] = Json.format[Header]
+  given formats3: Format[Response] = Json.format[Response]
+  given formats: Format[SpecialCase] = Json.format[SpecialCase]
 
   val httpStatusCodes: Map[Int, String] = Map(
     200 -> "OK",

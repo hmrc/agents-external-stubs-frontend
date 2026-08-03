@@ -30,7 +30,7 @@ trait WithPageContext {
     override def planetId: String = credentials.planetId
 
     override def menuItems: Seq[MenuItem] = {
-      import Menus._
+      import Menus.*
       Seq(
         if (features.showQuickStartHub) Option(quickStartHub) else None,
         Option(records),

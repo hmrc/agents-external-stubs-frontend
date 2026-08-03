@@ -17,16 +17,18 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import play.api.http.Status.OK
 
 trait AgentRegistrationStubs {
 
   def givenLinkCreated(): StubMapping = stubFor(
-    get(
-    urlEqualTo("/agent-registration/test-only/create-submitted-application"))
-      .willReturn(aResponse()
-      .withStatus(OK)
-      .withBody(s"""{"linkId": "abc123"}""")))
+    get(urlEqualTo("/agent-registration/test-only/create-submitted-application"))
+      .willReturn(
+        aResponse()
+          .withStatus(OK)
+          .withBody(s"""{"linkId": "abc123"}""")
+      )
+  )
 
 }

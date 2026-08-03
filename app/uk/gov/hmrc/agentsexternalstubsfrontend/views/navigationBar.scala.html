@@ -14,11 +14,11 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 
 @this()
 
-@(context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @if(context.menuItems.nonEmpty) {
     <nav class="govuk-!-margin-bottom-5" id="top-nav-bar" aria-label="Section navigation">

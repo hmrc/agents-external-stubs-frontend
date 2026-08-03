@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.forms
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 
 case class UserFilters(
   partialUserId: Option[String],
@@ -35,6 +35,6 @@ object UserFiltersForm {
         "groupId"                   -> optional(text),
         "principalEnrolmentService" -> optional(text),
         "limit"                     -> optional(number(min = 1))
-      )(UserFilters.apply)(UserFilters.unapply)
+      )(UserFilters.apply)(f => Some((f.partialUserId, f.groupId, f.principalEnrolmentService, f.limit)))
     )
 }

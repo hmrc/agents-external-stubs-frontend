@@ -19,21 +19,22 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 import play.api.http.Writeable
 import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, await, _}
+import play.api.test.Helpers.{GET, await, *}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, JourneySetupInvitation, JourneySetupRequest, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentClientRelationshipsStubs, AgentsExternalStubsStubs}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.TestFixtures._
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.TestFixtures.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 
-class AsaJourneySetupControllerISpec extends BaseISpec with AgentsExternalStubsStubs with AgentClientRelationshipsStubs {
+class AsaJourneySetupControllerISpec
+    extends BaseISpec with AgentsExternalStubsStubs with AgentClientRelationshipsStubs {
 
   def callEndpointWith[A: Writeable](request: Request[A]): Result = await(play.api.test.Helpers.route(app, request).get)
 
-  val asaDoorwayPath: String      = "/agents-external-stubs/asa-doorway"
-  val selectJourneyPath: String   = s"$asaDoorwayPath/select-journey"
-  val selectServicePath: String   = s"$asaDoorwayPath/select-service"
-  val journeyDataPath: String     = s"$asaDoorwayPath/journey-data"
+  val asaDoorwayPath: String = "/agents-external-stubs/asa-doorway"
+  val selectJourneyPath: String = s"$asaDoorwayPath/select-journey"
+  val selectServicePath: String = s"$asaDoorwayPath/select-service"
+  val journeyDataPath: String = s"$asaDoorwayPath/journey-data"
 
   s"GET $asaDoorwayPath" should {
     s"redirect to $selectJourneyPath" in {
@@ -104,19 +105,27 @@ class AsaJourneySetupControllerISpec extends BaseISpec with AgentsExternalStubsS
 
       givenUser(agentOrClientUser("bob", List(itsaEnrolment, ptEnrolment)))
       givenCreateUser(Agent, List(asaEnrolment), "agent1")
-      givenTestOnlyJourneySetup(JourneySetupRequest(Seq(
-        JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT", Some("personal")),
-        JourneySetupInvitation(arn, nino, "ni", "", "PERSONAL-INCOME-RECORD", Some("personal")),
-        JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT-SUPP", Some("personal")),
-        JourneySetupInvitation(arn, nino, "ni", "", "PERSONAL-INCOME-RECORD", Some("personal"))
-      )))
+      givenTestOnlyJourneySetup(
+        JourneySetupRequest(
+          Seq(
+            JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT", Some("personal")),
+            JourneySetupInvitation(arn, nino, "ni", "", "PERSONAL-INCOME-RECORD", Some("personal")),
+            JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT-SUPP", Some("personal")),
+            JourneySetupInvitation(arn, nino, "ni", "", "PERSONAL-INCOME-RECORD", Some("personal"))
+          )
+        )
+      )
 
-      val result = callEndpointWith(FakeRequest(GET, selectServicePath)
-        .withSession("journey" -> "myta-ind", "userId" -> "bob"))
+      val result = callEndpointWith(
+        FakeRequest(GET, selectServicePath)
+          .withSession("journey" -> "myta-ind", "userId" -> "bob")
+      )
 
       status(result) shouldBe SEE_OTHER
 
-      redirectLocation(result).get shouldBe "http://localhost:9435/agent-client-relationships/test-only/journey-setup/myta"
+      redirectLocation(
+        result
+      ).get shouldBe "http://localhost:9435/agent-client-relationships/test-only/journey-setup/myta"
     }
 
     s"redirect to $journeyDataPath when the journey saved is Uk Subscription" in {
@@ -125,9 +134,10 @@ class AsaJourneySetupControllerISpec extends BaseISpec with AgentsExternalStubsS
       givenCreateCleanAgent("agent2")
       givenGetRecord("123", s"""{"utr": "12345", "crn": "a876", "addressDetails": {"postalCode": "BN3111"}}""")
 
-
-      val result = callEndpointWith(FakeRequest(GET, selectServicePath)
-        .withSession("journey" -> "uk-subscription", "userId" -> "bob"))
+      val result = callEndpointWith(
+        FakeRequest(GET, selectServicePath)
+          .withSession("journey" -> "uk-subscription", "userId" -> "bob")
+      )
 
       status(result) shouldBe SEE_OTHER
 
@@ -141,10 +151,15 @@ class AsaJourneySetupControllerISpec extends BaseISpec with AgentsExternalStubsS
       givenUser(agentOrClientUser("agent1", List(asaEnrolment)))
       givenCreateUser(Individual, List(itsaEnrolment), "client")
 
-      givenTestOnlyJourneySetup(JourneySetupRequest(Seq(JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT", Some("personal")))))
+      givenTestOnlyJourneySetup(
+        JourneySetupRequest(Seq(JourneySetupInvitation(arn, nino, "ni", "", "HMRC-MTD-IT", Some("personal"))))
+      )
 
-      val result = callEndpointWith(FakeRequest(POST, selectServicePath).withFormUrlEncodedBody(("service", "Itsa"))
-        .withSession("journey" -> "create-invitation", "userId" -> "agent1"))
+      val result = callEndpointWith(
+        FakeRequest(POST, selectServicePath)
+          .withFormUrlEncodedBody(("service", "Itsa"))
+          .withSession("journey" -> "create-invitation", "userId" -> "agent1")
+      )
 
       status(result) shouldBe SEE_OTHER
 
@@ -153,8 +168,11 @@ class AsaJourneySetupControllerISpec extends BaseISpec with AgentsExternalStubsS
 
     s"redirect to $selectJourneyPath when wrong type of journey saved in session" in {
 
-      val result = callEndpointWith(FakeRequest(POST, selectServicePath).withFormUrlEncodedBody(("service", "Itsa"))
-        .withSession("journey" -> "uk-subscription", "userId" -> "agent1"))
+      val result = callEndpointWith(
+        FakeRequest(POST, selectServicePath)
+          .withFormUrlEncodedBody(("service", "Itsa"))
+          .withSession("journey" -> "uk-subscription", "userId" -> "agent1")
+      )
 
       status(result) shouldBe SEE_OTHER
 
@@ -165,8 +183,14 @@ class AsaJourneySetupControllerISpec extends BaseISpec with AgentsExternalStubsS
   s"GET $journeyDataPath" should {
     "display the test data" in {
 
-      val result = callEndpointWith(FakeRequest(GET, journeyDataPath)
-        .withSession("journey" -> "create-invitation", "userId" -> "agent1", "journey-data" -> s"""{"nino": "$nino", "postcode": "BN1"} """))
+      val result = callEndpointWith(
+        FakeRequest(GET, journeyDataPath)
+          .withSession(
+            "journey"      -> "create-invitation",
+            "userId"       -> "agent1",
+            "journey-data" -> s"""{"nino": "$nino", "postcode": "BN1"} """
+          )
+      )
 
       status(result) shouldBe OK
 

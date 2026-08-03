@@ -35,7 +35,7 @@
 )
 
 
-@(asaServiceForm: Form[ASAJourneyService], selectOptions: Seq[ASAJourneyService], journey: String)(implicit request: Request[_], msgs: Messages)
+@(asaServiceForm: Form[ASAJourneyService], selectOptions: Seq[ASAJourneyService], journey: String)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs(s"select-service.title,${msgs(s"select-journey.$journey")}"), showSignOut = false,
     backLinkHref = Some(routes.AsaJourneySetupController.selectJourney().url)) {

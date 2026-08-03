@@ -30,7 +30,7 @@ object UserForm {
     mapping(
       "key"         -> nonEmptyText,
       "identifiers" -> seq(identifierMapping)
-    )(EnrolmentKey.apply)(EnrolmentKey.unapply)
+    )(EnrolmentKey.apply)(e => Some((e.service, e.identifiers)))
   )
   val addressMapping: Mapping[Address] = mapping(
     "line1"       -> optional(nonEmptyText),
@@ -39,7 +39,7 @@ object UserForm {
     "line4"       -> optional(nonEmptyText),
     "postcode"    -> optional(nonEmptyText),
     "countryCode" -> optional(nonEmptyText)
-  )(Address.apply)(Address.unapply)
+  )(Address.apply)(a => Some((a.line1, a.line2, a.line3, a.line4, a.postcode, a.countryCode)))
 
   val form: Form[User] = Form[User](
     mapping(
@@ -66,7 +66,30 @@ object UserForm {
         .transform[Seq[String]](_.map(_.split(",").toSeq).getOrElse(Seq.empty), s => Some(s.mkString(","))),
       "deceased" -> optional(boolean),
       "utr"      -> optional(nonEmptyText)
-    )(User.apply)(User.unapply)
+    )(User.apply)(u =>
+      Some(
+        (
+          u.userId,
+          u.groupId,
+          u.confidenceLevel,
+          u.credentialStrength,
+          u.credentialRole,
+          u.nino,
+          u.assignedPrincipalEnrolments,
+          u.assignedDelegatedEnrolments,
+          u.name,
+          u.dateOfBirth,
+          u.isNonCompliant,
+          u.complianceIssues,
+          u.isPermanent,
+          u.recordIds,
+          u.address,
+          u.strideRoles,
+          u.deceased,
+          u.utr
+        )
+      )
+    )
   )
 
   def fromNone[T](none: T): Option[T] => Option[T] = {

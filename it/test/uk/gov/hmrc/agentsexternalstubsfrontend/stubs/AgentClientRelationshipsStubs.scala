@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.stubs
 
-
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status.OK
 import play.api.libs.json.Json
@@ -26,12 +25,21 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.JourneySetupRequest
 trait AgentClientRelationshipsStubs {
 
   def givenTestOnlyJourneySetup(journeySetupRequest: JourneySetupRequest): StubMapping =
-    stubFor(put(urlEqualTo("/test-only/journey-setup")).withRequestBody(equalToJson(Json.toJson(journeySetupRequest).toString()))
-      .willReturn(aResponse().withStatus(OK)))
+    stubFor(
+      put(urlEqualTo("/test-only/journey-setup"))
+        .withRequestBody(equalToJson(Json.toJson(journeySetupRequest).toString()))
+        .willReturn(aResponse().withStatus(OK))
+    )
 
-  def givenTestOnlyCreateRelationship(arn: String, clientId: String, service: String, clientIdType: String): StubMapping = {
-    stubFor(put(urlEqualTo(s"/test-only/agent/$arn/service/$service/client/$clientIdType/$clientId"))
-      .willReturn(aResponse().withStatus(OK)))
+  def givenTestOnlyCreateRelationship(
+    arn: String,
+    clientId: String,
+    service: String,
+    clientIdType: String
+  ): StubMapping =
+    stubFor(
+      put(urlEqualTo(s"/test-only/agent/$arn/service/$service/client/$clientIdType/$clientId"))
+        .willReturn(aResponse().withStatus(OK))
+    )
 
-  }
 }

@@ -18,12 +18,13 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
 import com.google.inject.{Inject, Singleton}
 import org.joda.time.DateTime
-import play.api.mvc._
+import play.api.i18n.Messages.implicitMessagesProviderToMessages
+import play.api.mvc.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SelectServiceForm
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.ASAJourneyService.asaJourneys
-import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.AsaJourneySetupService
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{error_template, journey_data, select_journey, select_service}
 import uk.gov.hmrc.http.SessionKeys
@@ -39,14 +40,16 @@ class AsaJourneySetupController @Inject() (
   errorTemplate: error_template,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   asaJourneySetupService: AsaJourneySetupService
-)(implicit mcc: MessagesControllerComponents, ec: ExecutionContext, frontendConfig: FrontendConfig)
+)(using mcc: MessagesControllerComponents, ec: ExecutionContext, frontendConfig: FrontendConfig)
     extends FrontendController(mcc) {
 
   def root: Action[AnyContent] = Action { _ =>
     Redirect(routes.AsaJourneySetupController.selectJourney())
   }
 
-  def selectJourney(journey: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+  def selectJourney(journey: Option[String]): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    given play.api.i18n.MessagesProvider = request
     onlyIfFeatureEnabled {
       journey.fold(Future.successful(Ok(selectJourneyView(asaJourneys)))) { journeyId =>
         ASAJourneyService
@@ -65,7 +68,7 @@ class AsaJourneySetupController @Inject() (
             asaJourneySetupService
               .setupMainUser(journey)
               .map(authSession =>
-                Redirect(routes.AsaJourneySetupController.showSelectService).withSession(
+                Redirect(routes.AsaJourneySetupController.showSelectService()).withSession(
                   request.session +
                     (SessionKeys.sessionId            -> authSession.sessionId) +
                     (SessionKeys.authToken            -> s"Bearer ${authSession.authToken}") +
@@ -81,7 +84,9 @@ class AsaJourneySetupController @Inject() (
     }
   }
 
-  def showSelectService(): Action[AnyContent] = Action.async { implicit request =>
+  def showSelectService(): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    given play.api.i18n.MessagesProvider = request
     onlyIfFeatureEnabled {
       withJourney {
         case journey @ (journeyWithService: ASATestJourneyWithServiceSelection) =>
@@ -102,14 +107,15 @@ class AsaJourneySetupController @Inject() (
     }
   }
 
-  def submitSelectService: Action[AnyContent] = Action.async { implicit request =>
+  def submitSelectService: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withJourney {
       case j: ASATestJourneyWithServiceSelection =>
         SelectServiceForm
           .selectServiceFormForJourney(j)
           .bindFromRequest()
           .fold(
-            hasErrors => Future.successful(BadRequest("invalid submission.")),
+            _ => Future.successful(BadRequest("invalid submission.")),
             asaJourneyService =>
               asaJourneySetupService
                 .setupDataForJourneyWithServiceSelected(j, asaJourneyService)
@@ -122,7 +128,9 @@ class AsaJourneySetupController @Inject() (
     }
   }
 
-  def showTestData: Action[AnyContent] = Action.async { implicit request =>
+  def showTestData: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    given play.api.i18n.MessagesProvider = request
     onlyIfFeatureEnabled {
       withJourney { journey =>
         withJourneyData { journeyData =>
@@ -147,15 +155,15 @@ class AsaJourneySetupController @Inject() (
 
   case class NextUrl(nextUrl: String, testData: Option[String])
 
-  private def createTestDataAndSetUrl(journey: ASATestJourney)(implicit rh: RequestHeader): Future[NextUrl] =
+  private def createTestDataAndSetUrl(journey: ASATestJourney)(using rh: RequestHeader): Future[NextUrl] =
     journey match {
       case _: ASATestJourneyWithServiceSelection =>
-        Future.successful(NextUrl(routes.AsaJourneySetupController.showSelectService.url, None))
+        Future.successful(NextUrl(routes.AsaJourneySetupController.showSelectService().url, None))
       case journeyWithoutService: ASATestJourneyWithoutServiceSelection =>
         asaJourneySetupService
           .setupDataForJourneyWithoutServiceSelected(journeyWithoutService)
           .map { journeyData =>
-            val url = {
+            val url =
               journeyWithoutService match {
                 case MytaInd | MytaOrg =>
                   s"${frontendConfig.acrfHost}/agent-client-relationships/test-only/journey-setup/myta"
@@ -166,7 +174,7 @@ class AsaJourneySetupController @Inject() (
                   routes.AsaJourneySetupController.showTestData.url
                 case MmtarProvideDetails =>
                   s"${frontendConfig.agentRegistrationFrontendExternalUrl}/agent-registration/provide-details/start/${journeyData
-                    .getOrElse("")}"
+                      .getOrElse("")}"
                 case AsaDashboardAdminUser    => s"${frontendConfig.asafHost}/agent-services-account/manage-account"
                 case AsaDashboardStandardUser => s"${frontendConfig.asafHost}/agent-services-account/your-account"
                 case MmtarStartRegistration =>
@@ -175,7 +183,6 @@ class AsaJourneySetupController @Inject() (
                   s"${frontendConfig.agentOverseasFrontendHost}/agent-services/apply-from-outside-uk/create-account"
 
               }
-            }
             NextUrl(url, journeyData)
           }
     }
@@ -185,10 +192,10 @@ class AsaJourneySetupController @Inject() (
       f
     } else Future.successful(NotImplemented("Feature not enabled."))
 
-  private def withJourney(f: ASATestJourney => Future[Result])(implicit rh: RequestHeader): Future[Result] =
+  private def withJourney(f: ASATestJourney => Future[Result])(using rh: RequestHeader): Future[Result] =
     rh.session
       .get("journey")
-      .fold(Future.successful(Redirect((routes.AsaJourneySetupController.selectJourney()))))(journeyStr =>
+      .fold(Future.successful(Redirect(routes.AsaJourneySetupController.selectJourney())))(journeyStr =>
         f(
           ASAJourneyService
             .asaJourneyForId(journeyStr)
@@ -196,10 +203,10 @@ class AsaJourneySetupController @Inject() (
         )
       )
 
-  private def withJourneyData(f: String => Future[Result])(implicit rh: RequestHeader): Future[Result] =
+  private def withJourneyData(f: String => Future[Result])(using rh: RequestHeader): Future[Result] =
     rh.session
       .get("journey-data")
-      .fold(Future.successful(Redirect((routes.AsaJourneySetupController.selectJourney()))))(journeyDataStr =>
+      .fold(Future.successful(Redirect(routes.AsaJourneySetupController.selectJourney())))(journeyDataStr =>
         f(journeyDataStr)
       )
 

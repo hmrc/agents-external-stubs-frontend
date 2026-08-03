@@ -20,9 +20,21 @@ import play.api.libs.json.{JsPath, Reads}
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 
-sealed trait EACDServiceKey {
-  val key: String
-}
+enum EACDServiceKey(val key: String):
+  case ASAAgent extends EACDServiceKey("HMRC-AS-AGENT")
+  case VatAgent extends EACDServiceKey("HMCE-VAT-AGNT")
+  case IrSa extends EACDServiceKey("IR-SA")
+  case Itsa extends EACDServiceKey("HMRC-MTD-IT")
+  case ItsaSupp extends EACDServiceKey("HMRC-MTD-IT-SUPP")
+  case Vat extends EACDServiceKey("HMRC-MTD-VAT")
+  case Ppt extends EACDServiceKey("HMRC-PPT-ORG")
+  case CgtPd extends EACDServiceKey("HMRC-CGT-PD")
+  case HmrcPt extends EACDServiceKey("HMRC-PT")
+  case Trust extends EACDServiceKey("HMRC-TERS-ORG")
+  case TrustNT extends EACDServiceKey("HMRC-TERSNT-ORG")
+  case Cbc extends EACDServiceKey("HMRC-CBC-ORG")
+  case CbcNonUk extends EACDServiceKey("HMRC-CBC-NONUK-ORG")
+  case Pillar2 extends EACDServiceKey("HMRC-PILLAR2-ORG")
 
 case class CustomerKnownFact(
   name: String,
@@ -31,7 +43,7 @@ case class CustomerKnownFact(
 )
 
 sealed trait ASAJourneyService {
-  val friendlyName: String //to display on service select
+  val friendlyName: String // to display on service select
   val affinityGroup: AffinityGroup
   val clientEacdServiceKey: EACDServiceKey
   val identifierName: String
@@ -60,66 +72,11 @@ sealed trait ASATestJourney {
 sealed trait ASATestJourneyWithServiceSelection extends ASATestJourney
 sealed trait ASATestJourneyWithoutServiceSelection extends ASATestJourney
 
-case object ASAAgent extends EACDServiceKey {
-  override val key = "HMRC-AS-AGENT"
-}
-
-case object VatAgent extends EACDServiceKey {
-  override val key = "HMCE-VAT-AGNT"
-}
-
-case object IrSa extends EACDServiceKey {
-  override val key = "IR-SA"
-}
-
-case object Itsa extends EACDServiceKey {
-  override val key = "HMRC-MTD-IT"
-}
-
-case object ItsaSupp extends EACDServiceKey {
-  override val key = "HMRC-MTD-IT-SUPP"
-}
-
-case object Vat extends EACDServiceKey {
-  override val key: String = "HMRC-MTD-VAT"
-}
-
-case object Ppt extends EACDServiceKey {
-  override val key = "HMRC-PPT-ORG"
-}
-
-case object CgtPd extends EACDServiceKey {
-  override val key = "HMRC-CGT-PD"
-}
-case object HmrcPt extends EACDServiceKey {
-  override val key = "HMRC-PT"
-}
-
-case object Trust extends EACDServiceKey {
-  override val key = "HMRC-TERS-ORG"
-}
-
-case object TrustNT extends EACDServiceKey {
-  override val key = "HMRC-TERSNT-ORG"
-}
-
-case object Cbc extends EACDServiceKey {
-  override val key = "HMRC-CBC-ORG"
-}
-
-case object CbcNonUk extends EACDServiceKey {
-  override val key = "HMRC-CBC-NONUK-ORG"
-}
-
-case object Pillar2 extends EACDServiceKey {
-  override val key = "HMRC-PILLAR2-ORG"
-}
-
 case object ItsaService extends ASAJourneyService {
   override val friendlyName: String = "Itsa"
   override val affinityGroup: AffinityGroup = Individual
-  override val clientEacdServiceKey: EACDServiceKey = Itsa
-  override val identifierName: String = "nino" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.Itsa
+  override val identifierName: String = "nino" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = false
   override val identifierReadsPath: Reads[String] = (JsPath \ "nino").read[String]
   override val createInvitationIdTypeName: String = "ni"
@@ -132,14 +89,14 @@ case object ItsaService extends ASAJourneyService {
         sourcedFromUserRecord = true
       )
     )
-  override val relServiceName: String = Itsa.key
+  override val relServiceName: String = EACDServiceKey.Itsa.key
 }
 
 case object ItsaSuppService extends ASAJourneyService {
   override val friendlyName: String = "ItsaSupporting"
   override val affinityGroup: AffinityGroup = Individual
-  override val clientEacdServiceKey: EACDServiceKey = Itsa
-  override val identifierName: String = "nino" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.Itsa
+  override val identifierName: String = "nino" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = false
   override val identifierReadsPath: Reads[String] = (JsPath \ "nino").read[String]
   override val createInvitationIdTypeName: String = "ni"
@@ -152,14 +109,14 @@ case object ItsaSuppService extends ASAJourneyService {
         sourcedFromUserRecord = true
       )
     )
-  override val relServiceName: String = ItsaSupp.key
+  override val relServiceName: String = EACDServiceKey.ItsaSupp.key
 }
 
 case object ItsaOverseasService extends ASAJourneyService {
   override val friendlyName: String = "ItsaOverseas"
   override val affinityGroup: AffinityGroup = Individual
-  override val clientEacdServiceKey: EACDServiceKey = Itsa
-  override val identifierName: String = "nino" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.Itsa
+  override val identifierName: String = "nino" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = false
   override val identifierReadsPath: Reads[String] = (JsPath \ "nino").read[String]
   override val createInvitationIdTypeName: String = "ni"
@@ -172,17 +129,16 @@ case object ItsaOverseasService extends ASAJourneyService {
         sourcedFromUserRecord = true
       )
     )
-  override val relServiceName: String = Itsa.key
-  override def userOverride: User => User = user => {
+  override val relServiceName: String = EACDServiceKey.Itsa.key
+  override def userOverride: User => User = user =>
     user.copy(address = user.address.map(_.copy(countryCode = Some("FR"))))
-  }
 }
 
 case object AltItsaService extends ASAJourneyService {
   override val friendlyName: String = "AltItsa"
   override val affinityGroup: AffinityGroup = Individual
-  override val clientEacdServiceKey: EACDServiceKey = IrSa
-  override val identifierName: String = "nino" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.IrSa
+  override val identifierName: String = "nino" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = false
   override val identifierReadsPath: Reads[String] = (JsPath \ "nino").read[String]
   override val createInvitationIdTypeName: String = "ni"
@@ -195,14 +151,14 @@ case object AltItsaService extends ASAJourneyService {
         sourcedFromUserRecord = true
       )
     )
-  override val relServiceName: String = Itsa.key
+  override val relServiceName: String = EACDServiceKey.Itsa.key
 }
 
 case object AltItsaSuppService extends ASAJourneyService {
   override val friendlyName: String = "AltItsaSupporting"
   override val affinityGroup: AffinityGroup = Individual
-  override val clientEacdServiceKey: EACDServiceKey = IrSa
-  override val identifierName: String = "nino" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.IrSa
+  override val identifierName: String = "nino" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = false
   override val identifierReadsPath: Reads[String] = (JsPath \ "nino").read[String]
   override val createInvitationIdTypeName: String = "ni"
@@ -215,14 +171,14 @@ case object AltItsaSuppService extends ASAJourneyService {
         sourcedFromUserRecord = true
       )
     )
-  override val relServiceName: String = ItsaSupp.key
+  override val relServiceName: String = EACDServiceKey.ItsaSupp.key
 }
 
 case object IRVService extends ASAJourneyService {
   override val friendlyName: String = "IncomeRecordViewer"
   override val affinityGroup: AffinityGroup = Individual
-  override val clientEacdServiceKey: EACDServiceKey = HmrcPt
-  override val identifierName: String = "nino" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.HmrcPt
+  override val identifierName: String = "nino" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = false
   override val identifierReadsPath: Reads[String] = (JsPath \ "nino").read[String]
   override val createInvitationIdTypeName: String = "ni"
@@ -241,8 +197,8 @@ case object IRVService extends ASAJourneyService {
 case object VatService extends ASAJourneyService {
   override val friendlyName: String = "Vat"
   override val affinityGroup: AffinityGroup = Organisation
-  override val clientEacdServiceKey: EACDServiceKey = Vat
-  override val identifierName: String = "vrn" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.Vat
+  override val identifierName: String = "vrn" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = true
   override val identifierReadsPath: Reads[String] = (JsPath \ "vrn").read[String]
   override val createInvitationIdTypeName: String = "vrn"
@@ -255,14 +211,14 @@ case object VatService extends ASAJourneyService {
         sourcedFromUserRecord = false
       )
     )
-  override val relServiceName: String = Vat.key
+  override val relServiceName: String = EACDServiceKey.Vat.key
 }
 
 case object PptService extends ASAJourneyService {
   override val friendlyName: String = "PlasticPackagingTax"
   override val affinityGroup: AffinityGroup = Organisation
-  override val clientEacdServiceKey: EACDServiceKey = Ppt
-  override val identifierName: String = "pptReference" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.Ppt
+  override val identifierName: String = "pptReference" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = true
   override val identifierReadsPath: Reads[String] = (JsPath \ "pptReference").read[String]
   override val createInvitationIdTypeName: String = "EtmpRegistrationNumber"
@@ -274,14 +230,14 @@ case object PptService extends ASAJourneyService {
       sourcedFromUserRecord = false
     )
   )
-  override val relServiceName: String = Ppt.key
+  override val relServiceName: String = EACDServiceKey.Ppt.key
 }
 
 case object CgtPdService extends ASAJourneyService {
   override val friendlyName: String = "CapitalGainsTaxProperty"
   override val affinityGroup: AffinityGroup = Organisation
-  override val clientEacdServiceKey: EACDServiceKey = CgtPd
-  override val identifierName: String = "cgtPdRef" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.CgtPd
+  override val identifierName: String = "cgtPdRef" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = true
   override val identifierReadsPath: Reads[String] = (JsPath \ "cgtPdRef").read[String]
   override val createInvitationIdTypeName: String = "CGTPDRef"
@@ -293,40 +249,40 @@ case object CgtPdService extends ASAJourneyService {
       sourcedFromUserRecord = false
     )
   )
-  override val relServiceName: String = CgtPd.key
+  override val relServiceName: String = EACDServiceKey.CgtPd.key
 }
 
 case object TaxableTrustService extends ASAJourneyService {
   override val friendlyName: String = "TaxableTrust"
   override val affinityGroup: AffinityGroup = Organisation
-  override val clientEacdServiceKey: EACDServiceKey = Trust
-  override val identifierName: String = "utr" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.Trust
+  override val identifierName: String = "utr" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = false
   override val identifierReadsPath: Reads[String] = (JsPath \ "assignedPrincipalEnrolments")(0).read[String]
   override val createInvitationIdTypeName: String = "utr"
   override val createRelationshipIdTypeName: String = "SAUTR"
   override val customerKnownFact: Option[CustomerKnownFact] = None
-  override val relServiceName: String = Trust.key
+  override val relServiceName: String = EACDServiceKey.Trust.key
 }
 
 case object NonTaxableTrustService extends ASAJourneyService {
   override val friendlyName: String = "NonTaxableTrust"
   override val affinityGroup: AffinityGroup = Organisation
-  override val clientEacdServiceKey: EACDServiceKey = TrustNT
-  override val identifierName: String = "urn" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.TrustNT
+  override val identifierName: String = "urn" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = false
   override val identifierReadsPath: Reads[String] = (JsPath \ "assignedPrincipalEnrolments")(0).read[String]
   override val createInvitationIdTypeName: String = "urn"
   override val createRelationshipIdTypeName: String = "URN"
   override val customerKnownFact: Option[CustomerKnownFact] = None
-  override val relServiceName: String = TrustNT.key
+  override val relServiceName: String = EACDServiceKey.TrustNT.key
 }
 
 case object CBCService extends ASAJourneyService {
   override val friendlyName: String = "CountryByCountry"
   override val affinityGroup: AffinityGroup = Organisation
-  override val clientEacdServiceKey: EACDServiceKey = Cbc
-  override val identifierName: String = "cbcId" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.Cbc
+  override val identifierName: String = "cbcId" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = true
   override val identifierReadsPath: Reads[String] = (JsPath \ "cbcId").read[String]
   override val createInvitationIdTypeName: String = "cbcId"
@@ -338,14 +294,14 @@ case object CBCService extends ASAJourneyService {
       sourcedFromUserRecord = false
     )
   )
-  override val relServiceName: String = Cbc.key
+  override val relServiceName: String = EACDServiceKey.Cbc.key
 }
 
 case object CBCNonUkService extends ASAJourneyService {
   override val friendlyName: String = "CountryByCountryNonUk"
   override val affinityGroup: AffinityGroup = Organisation
-  override val clientEacdServiceKey: EACDServiceKey = CbcNonUk
-  override val identifierName: String = "cbcId" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.CbcNonUk
+  override val identifierName: String = "cbcId" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = true
   override val identifierReadsPath: Reads[String] = (JsPath \ "cbcId").read[String]
   override val createInvitationIdTypeName: String = "cbcId"
@@ -357,14 +313,14 @@ case object CBCNonUkService extends ASAJourneyService {
       sourcedFromUserRecord = false
     )
   )
-  override val relServiceName: String = CbcNonUk.key
+  override val relServiceName: String = EACDServiceKey.CbcNonUk.key
 }
 
 case object Pillar2Service extends ASAJourneyService {
   override val friendlyName: String = "Pillar2"
   override val affinityGroup: AffinityGroup = Organisation
-  override val clientEacdServiceKey: EACDServiceKey = Pillar2
-  override val identifierName: String = "plrReference" //to display on test data page
+  override val clientEacdServiceKey: EACDServiceKey = EACDServiceKey.Pillar2
+  override val identifierName: String = "plrReference" // to display on test data page
   override val identifierSourcedFromBpr: Boolean = true
   override val identifierReadsPath: Reads[String] = (JsPath \ "plrReference").read[String]
   override val createInvitationIdTypeName: String = "PLRID"
@@ -377,13 +333,14 @@ case object Pillar2Service extends ASAJourneyService {
         sourcedFromUserRecord = false
       )
     )
-  override val relServiceName: String = Pillar2.key
+  override val relServiceName: String = EACDServiceKey.Pillar2.key
 }
 
 //requires service selection
 case object CreateInvitation extends ASATestJourneyWithServiceSelection {
   override val id: String = "create-invitation"
-  override val signedInUser: SignedInUser = SignedInUser(affinityGroup = Some(Agent), services = List(ASAAgent))
+  override val signedInUser: SignedInUser =
+    SignedInUser(affinityGroup = Some(Agent), services = List(EACDServiceKey.ASAAgent))
   override val requiresServiceSelect: Boolean = true
 }
 
@@ -391,7 +348,7 @@ case object CreateInvitation extends ASATestJourneyWithServiceSelection {
 case object MytaInd extends ASATestJourneyWithoutServiceSelection {
   override val id: String = "myta-ind"
   override val signedInUser: SignedInUser =
-    SignedInUser(affinityGroup = Some(Individual), services = List(Itsa, HmrcPt))
+    SignedInUser(affinityGroup = Some(Individual), services = List(EACDServiceKey.Itsa, EACDServiceKey.HmrcPt))
   override val requiresServiceSelect: Boolean = false
 
 }
@@ -400,7 +357,18 @@ case object MytaInd extends ASATestJourneyWithoutServiceSelection {
 case object MytaOrg extends ASATestJourneyWithoutServiceSelection {
   override val id: String = "myta-org"
   override val signedInUser: SignedInUser =
-    SignedInUser(affinityGroup = Some(Organisation), services = List(Ppt, CgtPd, Pillar2, Vat, Trust, TrustNT, Cbc))
+    SignedInUser(
+      affinityGroup = Some(Organisation),
+      services = List(
+        EACDServiceKey.Ppt,
+        EACDServiceKey.CgtPd,
+        EACDServiceKey.Pillar2,
+        EACDServiceKey.Vat,
+        EACDServiceKey.Trust,
+        EACDServiceKey.TrustNT,
+        EACDServiceKey.Cbc
+      )
+    )
   override val requiresServiceSelect: Boolean = false
 
 }
@@ -408,7 +376,8 @@ case object MytaOrg extends ASATestJourneyWithoutServiceSelection {
 //no service selection
 case object UkSubscription extends ASATestJourneyWithoutServiceSelection {
   override val id: String = "uk-subscription"
-  override val signedInUser: SignedInUser = SignedInUser(affinityGroup = Some(Agent), services = List(VatAgent))
+  override val signedInUser: SignedInUser =
+    SignedInUser(affinityGroup = Some(Agent), services = List(EACDServiceKey.VatAgent))
   override val requiresServiceSelect: Boolean = false
 
 }
@@ -425,7 +394,8 @@ case object HmrcLedDeauth extends ASATestJourneyWithServiceSelection {
 //requires service selection
 case object AgentLedDeauth extends ASATestJourneyWithServiceSelection {
   override val id: String = "agent-led-deauth"
-  override val signedInUser: SignedInUser = SignedInUser(affinityGroup = Some(Agent), services = List(ASAAgent))
+  override val signedInUser: SignedInUser =
+    SignedInUser(affinityGroup = Some(Agent), services = List(EACDServiceKey.ASAAgent))
   override val requiresServiceSelect: Boolean = true
 
 }
@@ -433,7 +403,8 @@ case object AgentLedDeauth extends ASATestJourneyWithServiceSelection {
 //no service selection
 case object Track extends ASATestJourneyWithoutServiceSelection {
   override val id: String = "track"
-  override val signedInUser: SignedInUser = SignedInUser(affinityGroup = Some(Agent), services = List(ASAAgent))
+  override val signedInUser: SignedInUser =
+    SignedInUser(affinityGroup = Some(Agent), services = List(EACDServiceKey.ASAAgent))
   override val requiresServiceSelect: Boolean = false
 
 }
@@ -441,7 +412,8 @@ case object Track extends ASATestJourneyWithoutServiceSelection {
 //no service selection
 case object AccessGroups extends ASATestJourneyWithoutServiceSelection {
   override val id: String = "access-groups"
-  override val signedInUser: SignedInUser = SignedInUser(affinityGroup = Some(Agent), services = List(ASAAgent))
+  override val signedInUser: SignedInUser =
+    SignedInUser(affinityGroup = Some(Agent), services = List(EACDServiceKey.ASAAgent))
   override val requiresServiceSelect: Boolean = false
 
 }
@@ -449,7 +421,8 @@ case object AccessGroups extends ASATestJourneyWithoutServiceSelection {
 //no service selection
 case object MmtarProvideDetails extends ASATestJourneyWithoutServiceSelection {
   override val id: String = "provide-details"
-  override val signedInUser: SignedInUser = SignedInUser(affinityGroup = Some(Individual), services = List(Itsa))
+  override val signedInUser: SignedInUser =
+    SignedInUser(affinityGroup = Some(Individual), services = List(EACDServiceKey.Itsa))
   override val requiresServiceSelect: Boolean = false
 
 }
@@ -457,7 +430,8 @@ case object MmtarProvideDetails extends ASATestJourneyWithoutServiceSelection {
 //no service selection
 case object AsaDashboardAdminUser extends ASATestJourneyWithoutServiceSelection {
   override val id: String = "manage-account"
-  override val signedInUser: SignedInUser = SignedInUser(affinityGroup = Some(Agent), services = List(ASAAgent))
+  override val signedInUser: SignedInUser =
+    SignedInUser(affinityGroup = Some(Agent), services = List(EACDServiceKey.ASAAgent))
   override val requiresServiceSelect: Boolean = false
 
 }
@@ -466,7 +440,7 @@ case object AsaDashboardAdminUser extends ASATestJourneyWithoutServiceSelection 
 case object AsaDashboardStandardUser extends ASATestJourneyWithoutServiceSelection {
   override val id: String = "your-account"
   override val signedInUser: SignedInUser =
-    SignedInUser(affinityGroup = Some(Agent), services = List(ASAAgent), isAdmin = false)
+    SignedInUser(affinityGroup = Some(Agent), services = List(EACDServiceKey.ASAAgent), isAdmin = false)
   override val requiresServiceSelect: Boolean = false
 
 }
@@ -475,7 +449,7 @@ case object AsaDashboardStandardUser extends ASATestJourneyWithoutServiceSelecti
 case object MmtarStartRegistration extends ASATestJourneyWithoutServiceSelection {
   override val id: String = "agent-registration"
   override val signedInUser: SignedInUser =
-    SignedInUser(affinityGroup = Some(Agent), services = List(VatAgent))
+    SignedInUser(affinityGroup = Some(Agent), services = List(EACDServiceKey.VatAgent))
   override val requiresServiceSelect: Boolean = false
 
 }
@@ -556,6 +530,21 @@ object ASAJourneyService {
       OverseasApplication
     )
   private val eacdServices: List[EACDServiceKey] =
-    List(ASAAgent, VatAgent, IrSa, HmrcPt, Itsa, ItsaSupp, Vat, Ppt, CgtPd, Trust, TrustNT, Cbc, CbcNonUk, Pillar2)
+    List(
+      EACDServiceKey.ASAAgent,
+      EACDServiceKey.VatAgent,
+      EACDServiceKey.IrSa,
+      EACDServiceKey.HmrcPt,
+      EACDServiceKey.Itsa,
+      EACDServiceKey.ItsaSupp,
+      EACDServiceKey.Vat,
+      EACDServiceKey.Ppt,
+      EACDServiceKey.CgtPd,
+      EACDServiceKey.Trust,
+      EACDServiceKey.TrustNT,
+      EACDServiceKey.Cbc,
+      EACDServiceKey.CbcNonUk,
+      EACDServiceKey.Pillar2
+    )
 
 }

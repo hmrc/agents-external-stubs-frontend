@@ -14,10 +14,11 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.RestQueryController.RestQuery
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import views.html.helper.Implicits.toAttributePair
 @import play.api.libs.ws.WSResponse
 @import play.mvc.Http.HeaderNames
 @import play.api.libs.json.Json
@@ -41,6 +42,8 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import views.html.helper.CSPNonce
 
+@import scala.language.deprecated.symbolLiterals
+
 @this(
         mainTemplate: main_template,
         navigationBar: navigationBar,
@@ -51,7 +54,7 @@
         govukTextarea: GovukTextarea,
         govukErrorSummary: GovukErrorSummary)
 
-@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, resetUrl: Call, response: Option[WSResponse], curlCommand: Option[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(restQueryForm: Form[RestQuery], postUrl: Call, cancelUrl: Call, resetUrl: Call, response: Option[WSResponse], curlCommand: Option[String], context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("rest.query.title"), wide = true) {
 
@@ -79,8 +82,8 @@
 
         <div style="margin-bottom: 2em;">
             <div style="font-family: monospace; font-size: 0.8em; color: gray">
-            @for((k,vv) <- r.allHeaders){
-                <div>@k: @vv</div>
+            @for((k, values) <- r.headers){
+                <div>@k: @values.mkString(", ")</div>
             }
             </div>
 
@@ -102,7 +105,7 @@
         </p>
     }
 
-    @form(action = postUrl, 'id -> "restQueryForm", 'novalidate -> "novalidate") {
+    @form(action = postUrl, "id" -> "restQueryForm", "novalidate" -> "novalidate") {
         @if(response.isDefined) {
             <div class="govuk-button-group">
                 @govukButton(Button(

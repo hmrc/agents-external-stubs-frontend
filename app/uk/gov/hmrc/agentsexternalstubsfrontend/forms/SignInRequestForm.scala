@@ -30,18 +30,18 @@ case class SignInRequest(
 )
 
 object SignInRequest {
-  implicit val writes: Writes[SignInRequest] = Json.writes[SignInRequest]
+  given writes: Writes[SignInRequest] = Json.writes[SignInRequest]
 }
 
 object SignInRequestForm {
 
   val form: Form[SignInRequest] = Form[SignInRequest](
     mapping(
-      "userId"             -> nonEmptyText,
-      "planetId"           -> nonEmptyText,
-      "password"           -> default(text, "p@ssw0rd"),
-      "providerType"       -> optional(nonEmptyText).transform[String](_.getOrElse(AuthProvider.GovernmentGateway), Some(_)),
+      "userId"       -> nonEmptyText,
+      "planetId"     -> nonEmptyText,
+      "password"     -> default(text, "p@ssw0rd"),
+      "providerType" -> optional(nonEmptyText).transform[String](_.getOrElse(AuthProvider.GovernmentGateway), Some(_)),
       "syncToAuthLoginApi" -> ignored(true)
-    )(SignInRequest.apply)(SignInRequest.unapply)
+    )(SignInRequest.apply)(r => Some((r.userId, r.planetId, r.plainTextPassword, r.providerType, r.syncToAuthLoginApi)))
   )
 }

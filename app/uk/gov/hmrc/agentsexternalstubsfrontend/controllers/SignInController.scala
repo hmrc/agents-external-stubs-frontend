@@ -21,7 +21,8 @@ import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.*
+import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{quick_start_agents_hub, sign_in}
@@ -32,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 import org.joda.time.DateTime
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
-import uk.gov.hmrc.agentsexternalstubsfrontend.forms._
+import uk.gov.hmrc.agentsexternalstubsfrontend.forms.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 
 @Singleton
@@ -43,15 +44,15 @@ class SignInController @Inject() (
   quickStartView: quick_start_agents_hub,
   val authConnector: AuthConnector,
   val features: Features,
-  ecp: Provider[ExecutionContext],
-  sessionCookieBaker: SessionCookieBaker
-)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+  ecp: Provider[ExecutionContext]
+)(using @unused configuration: Configuration, cc: MessagesControllerComponents)
     extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
 
-  implicit val ec: ExecutionContext = ecp.get
+  given ExecutionContext = ecp.get
 
   def showQuickStart(): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           val quickStartHubBaseUrl = configuration.getOptional[String]("base-url")
@@ -73,7 +74,8 @@ class SignInController @Inject() (
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    Action { implicit request =>
+    Action { request =>
+      given Request[AnyContent] = request
       Ok(
         signInView(
           SignInRequestForm.form,
@@ -105,14 +107,14 @@ class SignInController @Inject() (
   def signInSsoSCP(
     continue_url: Option[RedirectUrl],
     origin: Option[String],
-    accountType: Option[String]
+    @unused accountType: Option[String]
   ): Action[AnyContent] =
     signInSsoImpl(continue_url, origin, internal = false)
 
   def signInSsoInternalSCP(
     continue_url: Option[RedirectUrl],
     origin: Option[String],
-    accountType: Option[String]
+    @unused accountType: Option[String]
   ): Action[AnyContent] =
     signInSsoImpl(continue_url, origin, internal = true)
 
@@ -121,7 +123,8 @@ class SignInController @Inject() (
     origin: Option[String],
     internal: Boolean
   ): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       (for {
         _ <- agentsExternalStubsConnector.currentSession()
         result <- Future(
@@ -146,7 +149,8 @@ class SignInController @Inject() (
     accountType: Option[String],
     providerType: String
   ): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       SignInRequestForm.form
         .bindFromRequest()
         .fold(
@@ -177,9 +181,10 @@ class SignInController @Inject() (
   def showSignInStridePage(
     successURL: RedirectUrl,
     origin: Option[String],
-    failureURL: Option[String]
+    @unused failureURL: Option[String]
   ): Action[AnyContent] =
-    Action { implicit request =>
+    Action { request =>
+      given Request[AnyContent] = request
       Ok(
         signInView(
           SignInRequestForm.form,
@@ -190,7 +195,8 @@ class SignInController @Inject() (
     }
 
   def signInUser(continue: Option[RedirectUrl], userId: String, providerType: String): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           for {
@@ -215,7 +221,8 @@ class SignInController @Inject() (
     }
 
   def signOut(continue: Option[RedirectUrl]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       agentsExternalStubsConnector
         .signOut()
         .map(_ =>
@@ -226,7 +233,8 @@ class SignInController @Inject() (
     }
 
   def signOutSCP(continue: Option[RedirectUrl]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       agentsExternalStubsConnector
         .signOut()
         .map(_ =>
@@ -236,7 +244,7 @@ class SignInController @Inject() (
         )
     }
 
-  private def withNewSession(result: Result, session: AuthenticatedSession)(implicit
+  private def withNewSession(result: Result, session: AuthenticatedSession)(using
     request: Request[AnyContent]
   ): Result =
     result.withSession(
@@ -252,7 +260,8 @@ class SignInController @Inject() (
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    Action { implicit request =>
+    Action { request =>
+      given Request[AnyContent] = request
       Ok(
         signInView(
           SignInRequestForm.form,
@@ -284,9 +293,10 @@ class SignInController @Inject() (
   def showSignInStridePageInternal(
     successURL: RedirectUrl,
     origin: Option[String],
-    failureURL: Option[String]
+    @unused failureURL: Option[String]
   ): Action[AnyContent] =
-    Action { implicit request =>
+    Action { request =>
+      given Request[AnyContent] = request
       Ok(
         signInView(
           SignInRequestForm.form,
@@ -305,7 +315,8 @@ class SignInController @Inject() (
     signIn(continue, origin, accountType, providerType)
 
   def signOutInternal(continue: Option[RedirectUrl]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       agentsExternalStubsConnector
         .signOut()
         .map(_ =>
@@ -316,7 +327,8 @@ class SignInController @Inject() (
     }
 
   def signOutInternalSCP(continue: Option[RedirectUrl]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       agentsExternalStubsConnector
         .signOut()
         .map(_ =>

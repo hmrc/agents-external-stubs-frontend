@@ -20,12 +20,13 @@ import com.google.inject.Provider
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
-import play.api.mvc._
+import play.api.mvc.*
+import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{CreateANewUserForm, InitialUserCreationDataForm, UserFiltersForm, UserForm}
-import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.{Features, ServicesDefinitionsService}
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.*
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.{NotFoundException, SessionKeys}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
@@ -50,15 +51,16 @@ class UserController @Inject() (
   userGenComplete: access_group_user_gen_complete,
   val features: Features,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+)(using @unused configuration: Configuration, cc: MessagesControllerComponents)
     extends FrontendController(cc) with AuthorisedFunctions with I18nSupport with WithPageContext {
 
-  implicit val ec: ExecutionContext = ecp.get
+  given ExecutionContext = ecp.get
 
   val start: Action[AnyContent] = showUserPage(None, None)
 
   def showUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           for {
@@ -95,7 +97,8 @@ class UserController @Inject() (
     }
 
   def createNewUserFromShowUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           CreateANewUserForm.form
@@ -139,7 +142,8 @@ class UserController @Inject() (
     }
 
   def showCreateUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           userId match {
@@ -207,7 +211,8 @@ class UserController @Inject() (
     }
 
   def submitCreateUserPage(continue: Option[RedirectUrl], userId: String): Action[AnyContent] = Action.async {
-    implicit request =>
+    request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           InitialUserCreationDataForm.form
@@ -253,7 +258,8 @@ class UserController @Inject() (
   }
 
   def showEditUserPage(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           for {
@@ -293,17 +299,18 @@ class UserController @Inject() (
     userId: Option[String],
     affinityGroup: Option[String]
   ): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           UserForm.form
             .bindFromRequest()
             .fold(
-              formWithErrors =>
+              _formWithErrors =>
                 Future.successful(
                   Ok(
                     editUserView(
-                      formWithErrors,
+                      _formWithErrors,
                       affinityGroup,
                       routes.UserController.updateUser(continue, userId),
                       routes.UserController.showUserPage(continue, userId),
@@ -343,13 +350,14 @@ class UserController @Inject() (
     userId: Option[String],
     affinityGroup: Option[String]
   ): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           UserForm.form
             .bindFromRequest()
             .fold(
-              formWithErrors =>
+              _ =>
                 Future.successful(
                   Ok(
                     createUserView(
@@ -416,8 +424,9 @@ class UserController @Inject() (
         }
     }
 
-  def removeUser(continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
-    Action.async { implicit request =>
+  def removeUser(@unused _continue: Option[RedirectUrl], userId: Option[String]): Action[AnyContent] =
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           val id = userId.getOrElse(credentials.providerId)
@@ -435,7 +444,8 @@ class UserController @Inject() (
     userId: Option[String],
     assignedPrincipalEnrolment: Option[String]
   ): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           val id = userId.getOrElse(credentials.providerId)
@@ -462,14 +472,16 @@ class UserController @Inject() (
     }
 
   def showGranPermsCreateUsers: Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised() {
         Future.successful(Ok(granPermsUserGenView(GranPermsGenRequestForm.form)))
       }
     }
 
   def submitGranPermsCreateUsers: Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised() {
         GranPermsGenRequestForm.form
           .bindFromRequest()
@@ -487,7 +499,8 @@ class UserController @Inject() (
     }
 
   val showAllUsersPage: Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           val boundForm = UserFiltersForm.form.bindFromRequest()
@@ -502,13 +515,9 @@ class UserController @Inject() (
                   users = users,
                   groups = groups.groups.map(_.groupId),
                   services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
-                  showCurrentUserUrl = routes.UserController.showUserPage(None),
                   filtersForm = formWithErrors,
                   createANewUserForm = CreateANewUserForm.form,
-                  context = pageContext(credentials),
-                  userId = None,
-                  groupId = None,
-                  limit = None
+                  context = pageContext(credentials)
                 )
               ),
             filters =>
@@ -525,13 +534,9 @@ class UserController @Inject() (
                   users = users,
                   groups = groups.groups.map(_.groupId),
                   services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
-                  showCurrentUserUrl = routes.UserController.showUserPage(None),
                   filtersForm = boundForm,
                   createANewUserForm = CreateANewUserForm.form,
-                  context = pageContext(credentials),
-                  userId = None,
-                  groupId = None,
-                  limit = None
+                  context = pageContext(credentials)
                 )
               )
           )
@@ -539,13 +544,14 @@ class UserController @Inject() (
     }
 
   val createNewUserFromShowAllUsersPage: Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           CreateANewUserForm.form
             .bindFromRequest()
             .fold(
-              formWithErrors =>
+              _ =>
                 for {
                   groups <- agentsExternalStubsConnector.getGroups
                   users  <- agentsExternalStubsConnector.getUsers(None, None, None, None)
@@ -554,13 +560,9 @@ class UserController @Inject() (
                     users = users,
                     groups = groups.groups.map(_.groupId),
                     services = servicesDefinitionsService.servicesDefinitions.services.map(_.name),
-                    showCurrentUserUrl = routes.UserController.showUserPage(None),
                     filtersForm = UserFiltersForm.form,
                     createANewUserForm = CreateANewUserForm.form,
-                    context = pageContext(credentials),
-                    userId = None,
-                    groupId = None,
-                    limit = None
+                    context = pageContext(credentials)
                   )
                 ),
               createANewUser =>

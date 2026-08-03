@@ -17,9 +17,10 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
 import play.api.libs.json.Json
+import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.JourneySetupRequest
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
@@ -27,16 +28,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AgentClientRelationshipsConnector @Inject() (appConfig: FrontendConfig, http: HttpClientV2)(implicit
-  ec: ExecutionContext
-) {
+class AgentClientRelationshipsConnector @Inject() (appConfig: FrontendConfig, http: HttpClientV2)(using ec: ExecutionContext) {
 
-  def testOnlyJourneySetup(journeySetupRequest: JourneySetupRequest)(implicit hc: HeaderCarrier): Future[Unit] = {
+  def testOnlyJourneySetup(journeySetupRequest: JourneySetupRequest)(using hc: HeaderCarrier): Future[Unit] = {
     val url = url"${appConfig.acrBaseUrl}/test-only/journey-setup"
     http.put(url).withBody(Json.toJson(journeySetupRequest)).execute[HttpResponse].map(_ => ())
   }
 
-  def testOnlyCreateRelationship(arn: String, clientId: String, service: String, clientIdType: String)(implicit
+  def testOnlyCreateRelationship(arn: String, clientId: String, service: String, clientIdType: String)(using
     hc: HeaderCarrier
   ): Future[Unit] = {
     val url = url"${appConfig.acrBaseUrl}/test-only/agent/$arn/service/$service/client/$clientIdType/$clientId"

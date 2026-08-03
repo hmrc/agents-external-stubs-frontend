@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
-class TcpProxies @Inject() (appConfig: FrontendConfig)(implicit system: ActorSystem, materializer: Materializer) {
+class TcpProxies @Inject() (appConfig: FrontendConfig)(using system: ActorSystem, materializer: Materializer) {
 
   private val startProxies = appConfig.proxiesStart
   private val companyAuthFrontendPort = appConfig.companyAuthFEPort
@@ -43,7 +43,7 @@ class TcpProxies @Inject() (appConfig: FrontendConfig)(implicit system: ActorSys
   if (startProxies) {
     Logger(getClass).info("Starting TCP proxies ...")
 
-    implicit val ec: ExecutionContext = system.dispatcher
+    given ExecutionContext = system.dispatcher
 
     val agentsExternalStubsFrontendPort = Try(httpPort.toInt).toOption.getOrElse(9009)
 

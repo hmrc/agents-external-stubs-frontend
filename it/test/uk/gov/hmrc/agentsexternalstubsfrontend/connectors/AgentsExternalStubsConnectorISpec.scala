@@ -16,23 +16,23 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.http.{HttpHeader, HttpHeaders}
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase.RequestMatch
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, EnrolmentKey, Identifier, SpecialCase, User, Users}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.*
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStubsStubs {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given HeaderCarrier = HeaderCarrier()
 
   private lazy val connector: AgentsExternalStubsConnector = app.injector.instanceOf[AgentsExternalStubsConnector]
 
@@ -102,12 +102,16 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       val usersList: List[User] = List(
         User("foo", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
         User("bar", groupId = Some("group2"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
-        User("fizz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("something-else"))),
-        User("buzz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT"))),
+        User(
+          "fizz",
+          groupId = Some("group1"),
+          assignedPrincipalEnrolments = Seq(enrolmentKeyForService("something-else"))
+        ),
+        User("buzz", groupId = Some("group1"), assignedPrincipalEnrolments = Seq(enrolmentKeyForService("HMRC-MTD-IT")))
       )
 
       "return users for empty query parameters" in {
-        givenUsers(usersList :_*)
+        givenUsers(usersList*)
         val users: Users = await(connector.getUsers(userId = None, groupId = None, limit = None))
 
         verify(getRequestedFor(urlEqualTo("/agents-external-stubs/users")))
@@ -117,7 +121,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return users for a valid userId param" in {
         val userId = "zz"
 
-        givenUsersWithUserId(userId, usersList :_*)
+        givenUsersWithUserId(userId, usersList*)
         val users: Users = await(connector.getUsers(userId = Some(userId)))
 
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?userId=$userId")))
@@ -127,7 +131,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return users for a valid groupId param" in {
         val groupId = "group1"
 
-        givenUsersWithGroupId(groupId, usersList :_*)
+        givenUsersWithGroupId(groupId, usersList*)
         val users: Users = await(connector.getUsers(groupId = Some(groupId)))
 
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?groupId=$groupId")))
@@ -137,17 +141,21 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
       "return users for a valid principalEnrolmentService param" in {
         val principalEnrolmentService = "HMRC-MTD-IT"
 
-        givenUsersWithPrincipalEnrolmentService(principalEnrolmentService, usersList :_*)
+        givenUsersWithPrincipalEnrolmentService(principalEnrolmentService, usersList*)
         val users: Users = await(connector.getUsers(principalEnrolmentService = Some(principalEnrolmentService)))
 
-        verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?principalEnrolmentService=$principalEnrolmentService")))
+        verify(
+          getRequestedFor(
+            urlEqualTo(s"/agents-external-stubs/users?principalEnrolmentService=$principalEnrolmentService")
+          )
+        )
         users.users.map(_.userId) should contain.only("foo", "bar", "buzz")
       }
 
       "return users to a limited number of results" in {
         val limit = 3
 
-        givenUsersWithLimit(limit, usersList :_*)
+        givenUsersWithLimit(limit, usersList*)
         val users: Users = await(connector.getUsers(limit = Some(limit)))
 
         verify(getRequestedFor(urlEqualTo(s"/agents-external-stubs/users?limit=$limit")))
@@ -160,15 +168,18 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
         val principalEnrolmentService = "HMRC-MTD-IT"
         val limit = 2
 
-        givenUsersWithAllQueryParams(limit, userId, groupId, principalEnrolmentService, usersList :_*)
-        val users: Users = await(connector.getUsers(
-          userId = Some(userId),
-          groupId = Some(groupId),
-          principalEnrolmentService = Some(principalEnrolmentService),
-          limit = Some(limit)
-        ))
+        givenUsersWithAllQueryParams(limit, userId, groupId, principalEnrolmentService, usersList*)
+        val users: Users = await(
+          connector.getUsers(
+            userId = Some(userId),
+            groupId = Some(groupId),
+            principalEnrolmentService = Some(principalEnrolmentService),
+            limit = Some(limit)
+          )
+        )
 
-        val expectedUrl = s"/agents-external-stubs/users?limit=$limit&userId=$userId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
+        val expectedUrl =
+          s"/agents-external-stubs/users?limit=$limit&userId=$userId&groupId=$groupId&principalEnrolmentService=$principalEnrolmentService"
         verify(getRequestedFor(urlEqualTo(expectedUrl)))
         users.users.map(_.userId) should contain.only("buzz")
       }

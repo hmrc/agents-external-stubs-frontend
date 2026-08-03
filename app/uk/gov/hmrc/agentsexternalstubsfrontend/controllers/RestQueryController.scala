@@ -26,9 +26,11 @@ import play.api.data.Form
 import play.api.data.Forms.{mapping, optional, text}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.libs.ws.{WSClient, WSResponse}
-import play.api.mvc._
+import play.api.libs.ws.writeableOf_JsValue
+import play.api.mvc.*
+import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.rest_query
@@ -50,14 +52,15 @@ class RestQueryController @Inject() (
   val wsClient: WSClient,
   restQueryView: rest_query,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+)(using @unused configuration: Configuration, cc: MessagesControllerComponents)
     extends FrontendController(cc) with AuthActions with I18nSupport with WithPageContext {
 
-  implicit val ec: ExecutionContext = ecp.get
+  given ExecutionContext = ecp.get
 
-  import RestQueryController._
+  import RestQueryController.*
 
-  def showRestQueryPage(q: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+  def showRestQueryPage(q: Option[String]): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         if (features.mayShowRestQuery(credentials.planetId))
@@ -117,7 +120,8 @@ class RestQueryController @Inject() (
 
   }
 
-  val runQuery: Action[AnyContent] = Action.async { implicit request =>
+  val runQuery: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised()
       .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         if (features.mayShowRestQuery(credentials.planetId))
@@ -146,14 +150,14 @@ class RestQueryController @Inject() (
 
   private def runQuery(
     query: RestQuery
-  )(implicit request: Request[AnyContent]): Future[WSResponse] =
+  )(using request: Request[AnyContent]): Future[WSResponse] =
     if (Try(new URL(query.url)).isFailure)
       Future.failed(new Exception(s"Invalid URL ${query.url}"))
     else {
       Try {
         val wsRequest = wsClient
           .url(query.url)
-          .withHttpHeaders(query.headersWithDefault.toSeq: _*)
+          .withHttpHeaders(query.headersWithDefault.toSeq*)
         query.method match {
           case "GET"    => wsRequest.get()
           case "POST"   => wsRequest.post(query.payload.getOrElse(JsNull))
@@ -184,7 +188,7 @@ object RestQueryController {
       if (s.length() > 2048) None else Some(s)
     }
 
-    def headersWithDefault(implicit request: Request[AnyContent]): Map[String, String] = {
+    def headersWithDefault(using request: Request[AnyContent]): Map[String, String] = {
       val h = headers.map(RestQueryController.parseHeaders).getOrElse(Map.empty)
       h ++
         (if (h.exists(_._1.toLowerCase() == "authorization") || h.exists(_._1.toLowerCase() == "no-authorization"))
@@ -199,16 +203,16 @@ object RestQueryController {
          else Map.empty)
     }
 
-    def toCurlCommand(implicit request: Request[AnyContent]): String =
+    def toCurlCommand(using request: Request[AnyContent]): String =
       s"""curl -v -X $method ${headersWithDefault
-        .map { case (key, value) => s"""-H "$key: $value"""" }
-        .mkString(" ")} ${payload
-        .map(p => s"""--data '$p'""")
-        .getOrElse("")} $url"""
+          .map { case (key, value) => s"""-H "$key: $value"""" }
+          .mkString(" ")} ${payload
+          .map(p => s"""--data '$p'""")
+          .getOrElse("")} $url"""
   }
 
   object RestQuery {
-    implicit val format: Format[RestQuery] = Json.format[RestQuery]
+    given Format[RestQuery] = Json.format[RestQuery]
 
     def decode(s: String): Either[String, RestQuery] =
       try Right(Json.parse(new String(Base64.getUrlDecoder.decode(s), StandardCharsets.UTF_8)).as[RestQuery])
@@ -237,7 +241,7 @@ object RestQueryController {
           parseHeaders(h); true
         }
       )
-    )(RestQuery.apply)(RestQuery.unapply)
+    )(RestQuery.apply)(r => Some((r.method, r.url, r.payload, r.headers)))
   )
 
   def prettyPrintHeaders(headers: Seq[(String, String)]): Option[String] =

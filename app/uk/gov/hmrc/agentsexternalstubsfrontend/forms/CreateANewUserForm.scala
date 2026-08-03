@@ -28,7 +28,7 @@ object CreateANewUserForm {
 
   private val userIdRegex = "^[A-Za-z0-9-_]{3,64}"
 
-  private val createANewUserIdConstraint: Constraint[String] = Constraint[String] { fieldValue: String =>
+  private val createANewUserIdConstraint: Constraint[String] = Constraint[String] { fieldValue =>
     if (fieldValue.matches(userIdRegex)) Valid else Invalid(ValidationError("error.userId.invalid"))
   }
 
@@ -36,7 +36,7 @@ object CreateANewUserForm {
     Form[CreateANewUser](
       mapping(
         "userId" -> optional(text verifying createANewUserIdConstraint)
-      )(CreateANewUser.apply)(CreateANewUser.unapply)
+      )(CreateANewUser.apply)(u => Some(u.userId))
     )
 
 }

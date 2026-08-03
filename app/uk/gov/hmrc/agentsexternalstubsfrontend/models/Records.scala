@@ -31,5 +31,5 @@ case class Records(
 )
 
 object Records {
-  implicit val reads: Reads[Records] = Json.reads[Records]
+  given reads: Reads[Records] = Json.reads[Records]
 }

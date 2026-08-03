@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.routes
 @import uk.gov.hmrc.agentsexternalstubsfrontend.models.PageContext
-@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.components.*
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.{main_template, navigationBar}
 
 @this(
@@ -25,7 +25,7 @@
     a: a
 )
 
-@(quickStartHubBaseUrl: Option[String], quickStartHubStrideBaseUrl: Option[String], context: PageContext, isDev: Boolean = true)(implicit request: Request[_], msgs: Messages)
+@(quickStartHubBaseUrl: Option[String], quickStartHubStrideBaseUrl: Option[String], context: PageContext, isDev: Boolean = true)(implicit request: Request[?], msgs: Messages)
 
 @baseUrl = @{ if(isDev) request.host else request.uri }
 

@@ -2,26 +2,22 @@ import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.7.4"
 
 lazy val root = (project in file("."))
   .settings(
     name := "agents-external-stubs-frontend",
     organization := "uk.gov.hmrc",
     scalacOptions ++= Seq(
-      "-Xlint:-missing-interpolator,_",
-      "-Ywarn-dead-code",
-      "-deprecation",
       "-feature",
-      "-unchecked",
+      "-Werror",
       "-Wconf:src=target/.*:s", // silence warnings from compiled files
       "-Wconf:src=routes/.*:s", // silence warnings from routes files
-      "-Wconf:src=*html:w", // silence html warnings as they are wrong
-      "-language:implicitConversions"
+      "-Wconf:src=.*html.*&msg=Implicit parameters should be provided with a .*using.* clause:s", // silence the Twirl/implicit syntax warning only
     ),
     PlayKeys.playDefaultPort := 9099,
     resolvers ++= Seq(
-      Resolver.typesafeRepo("releases"),
+      Resolver.typesafeRepo("releases")
     ),
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     routesImport += "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
@@ -31,8 +27,8 @@ lazy val root = (project in file("."))
     Test / scalafmtOnCompile := true
   )
   .settings(
-    //fix for scoverage compile errors for scala 2.13.10
-    libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
+    Compile / scalacOptions := (Compile / scalacOptions).value.distinct,
+    Test / scalacOptions := (Test / scalacOptions).value.distinct
   )
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
@@ -41,4 +37,8 @@ lazy val it = project
   .enablePlugins(PlayScala)
   .disablePlugins(JUnitXmlReportPlugin)
   .dependsOn(root % "test->test")
-  .settings(DefaultBuildSettings.itSettings())
+  .settings(
+    DefaultBuildSettings.itSettings(),
+    Compile / scalacOptions := (Compile / scalacOptions).value.distinct,
+    Test / scalacOptions := (Test / scalacOptions).value.distinct
+  )

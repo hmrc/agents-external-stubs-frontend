@@ -14,10 +14,11 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentsexternalstubsfrontend.models._
+@import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 @import views.html.helper.CSRF
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.main_template
 @import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.navigationBar
+@import views.html.helper.Implicits.toAttributePair
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.Table
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukTable
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.HeadCell
@@ -25,19 +26,15 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 
 @this(
         mainTemplate: main_template,
         navigationBar: navigationBar,
         form: FormWithCSRF,
-        govukInput: GovukInput,
-        govukButton: GovukButton,
-        govukTable: GovukTable,
+        govukTable: GovukTable
 )
 
-@(groups: Groups, authToken: Option[String], context: PageContext)(implicit request: Request[_], msgs: Messages)
+@(groups: Groups, context: PageContext)(implicit request: Request[?], msgs: Messages)
 
 @mainTemplate(title = msgs("groups.title"), wide = true) {
 
@@ -49,10 +46,8 @@
     @msgs("groups.show.description")
     </p>
 
-    @form(action = Call("GET", "/agents-external-stubs/planet/destroy"), 'name -> "destroyPlanet", 'id -> "destroyPlanet") {
-        @{
-            play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
-        }
+    @form(action = Call("GET", "/agents-external-stubs/planet/destroy"), "name" -> "destroyPlanet", "id" -> "destroyPlanet") {
+        @CSRF.formField
     <a id="link_planet_destroy" class="govuk-body govuk-link">
         @msgs("planet.link.destroy")
     </a>

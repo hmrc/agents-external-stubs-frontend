@@ -60,9 +60,9 @@ case class Services(services: Seq[Service]) {
 
 object Services {
 
-  implicit val f0: Format[Service.Identifier] = Json.format[Service.Identifier]
-  implicit val f1: Format[Service.KnownFact] = Json.format[Service.KnownFact]
-  implicit val f2: Format[Service.Flags] = Json.format[Service.Flags]
-  implicit val f3: Format[Service] = Json.format[Service]
-  implicit val f4: Format[Services] = Json.format[Services]
+  given f0: Format[Service.Identifier] = Json.format[Service.Identifier]
+  given f1: Format[Service.KnownFact] = Json.format[Service.KnownFact]
+  given f2: Format[Service.Flags] = Json.format[Service.Flags]
+  given f3: Format[Service] = Json.format[Service]
+  given f4: Format[Services] = Json.format[Services]
 }

@@ -21,13 +21,13 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.twirl.api.Html
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.UpliftRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.{IdentityVerificationController, routes}
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.{SignInRequest, SignInRequestForm}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
-import uk.gov.hmrc.agentsexternalstubsfrontend.views.html._
+import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.*
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.UnitSpec
 
@@ -52,8 +52,8 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
     SignInRequest(userId = "My contact name", plainTextPassword = "AA1 1AA", planetId = "juniper")
   )
 
-  implicit val lang: Lang = Lang("en")
-  implicit val requestHeader: RequestHeader = FakeRequest()
+  given Lang = Lang("en")
+  given RequestHeader = FakeRequest()
   val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   val signInForm: sign_in = app.injector.instanceOf[sign_in]
   val errorTemplateView: error_template = app.injector.instanceOf[error_template]
@@ -71,18 +71,21 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
           msgs = appMessages
         )
       val content = contentAsString(html)
-      content should include(messagesApi("start.title"))
-      content should include(messagesApi("start.label"))
-      content should include(messagesApi("start.intro"))
-      content should include(messagesApi("start.helpdesklink.text1"))
-      content should include(messagesApi("start.helpdesklink.text2"))
       content should include(messagesApi("login.sa.header"))
       content should include(messagesApi("login.sa.description"))
       content should include(messagesApi("login.username"))
-      content should include(messagesApi("login.password"))
+      content should include(messagesApi("login.username.placeholder"))
+      content should include(messagesApi("login.planetId"))
+      content should include(messagesApi("login.planetId.placeholder"))
+      content should include(messagesApi("login.planetId.hint"))
+      content should include(messagesApi("login.submit"))
+      content should include("Why do I see this page?")
 
       val html2 =
-        signInForm.f(filledForm, routes.SignInController.signIn(None, None, None, AuthProvider.GovernmentGateway))(
+        signInForm.f(
+          filledForm,
+          routes.SignInController.signIn(None, Some("foo"), None, AuthProvider.GovernmentGateway)
+        )(
           FakeRequest(),
           appMessages
         )
@@ -110,11 +113,10 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       val content = contentAsString(html)
 
       content should include(messagesApi("uplift.header"))
-      content should include(messagesApi("uplift.description"))
-      content should include(messagesApi("uplift.form.dropdown.confidenceLevel"))
-      content should include(messagesApi("uplift.form.radio.willSucceed"))
-      content should include(messagesApi("uplift.form.radio.willFail"))
-      content should include(messagesApi("uplift.form.submit"))
+      content should include(messagesApi("configure_journey.requiredConfidenceLevel.label"))
+      content should include("Success")
+      content should include("Failed IV")
+      content should include("Submit")
 
       val html2 =
         upLiftView
@@ -136,8 +138,8 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
         pageTitleMsgKey = pageTitle,
         headingMsgKey = heading,
         messageMsgKey = message,
-        appMessages,
-        FakeRequest()
+        request = FakeRequest(),
+        msgs = appMessages
       )
 
       val content = contentAsString(html)
@@ -146,7 +148,7 @@ class ViewsSpec extends UnitSpec with GuiceOneAppPerSuite {
       content should include(message)
 
       val html2 =
-        errorTemplateView.f(pageTitle, heading, message)(appMessages, FakeRequest())
+        errorTemplateView.f(pageTitle, heading, message)(FakeRequest(), appMessages)
       contentAsString(html2) shouldBe content
     }
   }

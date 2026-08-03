@@ -24,7 +24,7 @@ class AgentRegistrationConnectorISpec extends BaseISpec with AgentRegistrationSt
 
   private lazy val connector: AgentRegistrationConnector = app.injector.instanceOf[AgentRegistrationConnector]
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given HeaderCarrier = HeaderCarrier()
 
   "testOnlyJourneySetup" should {
     "return Future.unit" in {

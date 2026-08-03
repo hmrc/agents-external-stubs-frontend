@@ -20,10 +20,11 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{Json, OFormat}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.PdvRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.pdv_start
@@ -39,10 +40,11 @@ class PersonalDetailsValidationController @Inject() (
   override val authConnector: AuthConnector,
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   pdvStartView: pdv_start
-)(implicit val configuration: Configuration, cc: MessagesControllerComponents, ec: ExecutionContext)
+)(using @unused configuration: Configuration, cc: MessagesControllerComponents, ec: ExecutionContext)
     extends FrontendController(cc) with AuthActions with I18nSupport {
 
-  def start(completionUrl: RedirectUrl): Action[AnyContent] = Action.async { implicit request =>
+  def start(completionUrl: RedirectUrl): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authorised().retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
       agentsExternalStubsConnector.getUser(credentials.providerId).map { _ =>
         Ok(
@@ -55,7 +57,8 @@ class PersonalDetailsValidationController @Inject() (
     }
   }
 
-  def submit(completionUrl: RedirectUrl): Action[AnyContent] = Action.async { implicit request =>
+  def submit(completionUrl: RedirectUrl): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     PersonalDetailsValidationController.PdvRequestForm
       .bindFromRequest()
       .fold(
@@ -84,12 +87,12 @@ object PersonalDetailsValidationController {
   case class PdvRequest(success: Boolean)
 
   object PdvRequest {
-    implicit val format: OFormat[PdvRequest] = Json.format
+    given OFormat[PdvRequest] = Json.format
   }
 
   val PdvRequestForm: Form[PdvRequest] = Form[PdvRequest](
     mapping(
       "success" -> boolean
-    )(PdvRequest.apply)(PdvRequest.unapply)
+    )(PdvRequest.apply)(p => Some(p.success))
   )
 }

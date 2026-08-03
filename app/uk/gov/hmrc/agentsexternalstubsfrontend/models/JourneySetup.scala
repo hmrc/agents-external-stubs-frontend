@@ -21,7 +21,7 @@ import play.api.libs.json.{Format, Json}
 case class JourneySetupRequest(invitations: Seq[JourneySetupInvitation])
 
 object JourneySetupRequest {
-  implicit val format: Format[JourneySetupRequest] = Json.format[JourneySetupRequest]
+  given format: Format[JourneySetupRequest] = Json.format[JourneySetupRequest]
 }
 
 case class JourneySetupInvitation(
@@ -34,5 +34,5 @@ case class JourneySetupInvitation(
 )
 
 object JourneySetupInvitation {
-  implicit val format: Format[JourneySetupInvitation] = Json.format[JourneySetupInvitation]
+  given format: Format[JourneySetupInvitation] = Json.format[JourneySetupInvitation]
 }

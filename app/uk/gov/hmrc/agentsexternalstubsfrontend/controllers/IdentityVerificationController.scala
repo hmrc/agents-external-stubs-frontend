@@ -23,10 +23,11 @@ import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{Json, OFormat}
-import play.api.mvc._
+import play.api.mvc.*
+import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.ConfidenceLevel
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.iv_uplift
@@ -44,12 +45,12 @@ class IdentityVerificationController @Inject() (
   val agentsExternalStubsConnector: AgentsExternalStubsConnector,
   ivUpliftView: iv_uplift,
   ecp: Provider[ExecutionContext]
-)(implicit val configuration: Configuration, cc: MessagesControllerComponents)
+)(using @unused configuration: Configuration, cc: MessagesControllerComponents)
     extends FrontendController(cc) with AuthActions with I18nSupport {
 
-  implicit val ec: ExecutionContext = ecp.get
+  given ExecutionContext = ecp.get
 
-  import IdentityVerificationController._
+  import IdentityVerificationController.*
 
   val journeyIdValue: String = UUID.randomUUID().toString
 
@@ -88,7 +89,8 @@ class IdentityVerificationController @Inject() (
     failureURL: RedirectUrl,
     origin: Option[String]
   )(doProxy: Boolean): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised().retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
         agentsExternalStubsConnector.getUser(credentials.providerId).map { currentUser =>
           val nino: String = currentUser.nino.map(_.value).getOrElse("")
@@ -131,7 +133,8 @@ class IdentityVerificationController @Inject() (
     failureURL: RedirectUrl,
     origin: Option[String]
   )(doProxy: Boolean): Action[AnyContent] =
-    Action.async { implicit request =>
+    Action.async { request =>
+      given Request[AnyContent] = request
       authorised()
         .retrieve(Retrievals.credentialsWithPlanetId) { credentials =>
           UpliftRequestForm
@@ -175,7 +178,7 @@ class IdentityVerificationController @Inject() (
 
   def upliftProxy(
     journeyId: String,
-    confidenceLevel: Int,
+    @unused confidenceLevel: Int,
     completionURL: RedirectUrl,
     failureURL: RedirectUrl,
     origin: Option[String]
@@ -184,7 +187,7 @@ class IdentityVerificationController @Inject() (
 
   def upliftInternal(
     journeyId: String,
-    confidenceLevel: Int,
+    @unused confidenceLevel: Int,
     completionURL: RedirectUrl,
     failureURL: RedirectUrl,
     origin: Option[String]
@@ -214,13 +217,13 @@ object IdentityVerificationController {
   case class UpliftRequest(nino: String, option: String)
 
   object UpliftRequest {
-    implicit val format: OFormat[UpliftRequest] = Json.format[UpliftRequest]
+    given OFormat[UpliftRequest] = Json.format[UpliftRequest]
   }
 
   val UpliftRequestForm: Form[UpliftRequest] = Form[UpliftRequest](
     mapping(
       "nino"   -> text.verifying("Enter a valid Nino", v => Nino.isValid(v.replace(" ", ""))),
       "option" -> text.verifying("Please select an Option", _.nonEmpty)
-    )((nino, option) => UpliftRequest(nino.replace(" ", ""), option))(UpliftRequest.unapply)
+    )(UpliftRequest.apply)(u => Some((u.nino, u.option)))
   )
 }
