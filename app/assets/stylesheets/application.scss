@@ -58,3 +58,11 @@ div.test-user-action {
 .badge-none {
   @extend .govuk-tag--red;
 }
+
+.govuk-header {
+  background: var(--govuk-brand-colour, #1d70b8);
+}
+
+.govuk-header__container {
+  margin-bottom: 0px;
+}
