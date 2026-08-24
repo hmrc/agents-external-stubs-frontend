@@ -50,7 +50,7 @@ div.test-user-action {
   @extend .govuk-tag--orange;
 }
 .badge-individual {
-  @extend .govuk-tag--blue;
+  @extend .govuk-tag--blue !optional;
 }
 .badge-agent {
   @extend .govuk-tag--pink;
