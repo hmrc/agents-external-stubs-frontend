@@ -45,7 +45,7 @@ class TcpProxies @Inject() (appConfig: FrontendConfig)(using system: ActorSystem
 
     given ExecutionContext = system.dispatcher
 
-    val agentsExternalStubsFrontendPort = Try(httpPort.toInt).toOption.getOrElse(9009)
+    val agentsExternalStubsFrontendPort = Try(httpPort.toInt).toOption.getOrElse(9099)
 
     val tcpOutgoingConnection: Flow[ByteString, ByteString, Future[Tcp.OutgoingConnection]] =
       Tcp().outgoingConnection("localhost", agentsExternalStubsFrontendPort)
