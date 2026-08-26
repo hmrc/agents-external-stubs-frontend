@@ -120,8 +120,8 @@ trait ErrorAuditing extends HttpAuditEvent {
       case _                    => unexpectedError
     }
     auditConnector.sendEvent(
-      dataEvent(eventType, transactionName, request, Map(TransactionFailureReason -> ex.getMessage))(
-        using HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      dataEvent(eventType, transactionName, request, Map(TransactionFailureReason -> ex.getMessage))(using
+        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       )
     )
   }
@@ -133,14 +133,14 @@ trait ErrorAuditing extends HttpAuditEvent {
     statusCode match {
       case NOT_FOUND =>
         auditConnector.sendEvent(
-          dataEvent(ResourceNotFound, notFoundError, request, Map(TransactionFailureReason -> message))(
-            using HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+          dataEvent(ResourceNotFound, notFoundError, request, Map(TransactionFailureReason -> message))(using
+            HeaderCarrierConverter.fromRequestAndSession(request, request.session)
           )
         )
       case BAD_REQUEST =>
         auditConnector.sendEvent(
-          dataEvent(ServerValidationError, badRequestError, request, Map(TransactionFailureReason -> message))(
-            using HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+          dataEvent(ServerValidationError, badRequestError, request, Map(TransactionFailureReason -> message))(using
+            HeaderCarrierConverter.fromRequestAndSession(request, request.session)
           )
         )
       case _ =>
