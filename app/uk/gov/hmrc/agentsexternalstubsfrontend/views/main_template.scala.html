@@ -51,7 +51,6 @@
         serviceUrl = None,
         signOutUrl = if(showSignOut) Some(routes.SignInController.signOutInternal().url) else None
     ),
-    banners = Banners(displayHmrcBanner = true),
     templateOverrides = TemplateOverrides(
         additionalHeadBlock = Some(head()),
         additionalScriptsBlock = Some(additionalScripts),
