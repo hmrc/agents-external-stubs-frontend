@@ -28,7 +28,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AgentClientRelationshipsConnector @Inject() (appConfig: FrontendConfig, http: HttpClientV2)(using ec: ExecutionContext) {
+class AgentClientRelationshipsConnector @Inject() (appConfig: FrontendConfig, http: HttpClientV2)(using
+  ec: ExecutionContext
+) {
 
   def testOnlyJourneySetup(journeySetupRequest: JourneySetupRequest)(using hc: HeaderCarrier): Future[Unit] = {
     val url = url"${appConfig.acrBaseUrl}/test-only/journey-setup"

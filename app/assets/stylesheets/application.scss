@@ -38,7 +38,7 @@ div.test-user-action {
 }
 
 // badges (custom style to make different affinity groups stand out)
-@import "lib/govuk-frontend/dist/govuk/all";
+@import "lib/govuk-frontend/dist/govuk/index";
 .badge {
   @extend .govuk-tag;
   font-size: 0.7em;
@@ -50,11 +50,19 @@ div.test-user-action {
   @extend .govuk-tag--orange;
 }
 .badge-individual {
-  @extend .govuk-tag--blue;
+  @extend .govuk-tag--blue !optional;
 }
 .badge-agent {
   @extend .govuk-tag--pink;
 }
 .badge-none {
   @extend .govuk-tag--red;
+}
+
+.govuk-header {
+  background: var(--govuk-brand-colour, #1d70b8);
+}
+
+.govuk-header__container {
+  margin-bottom: 0px;
 }
