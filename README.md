@@ -1,7 +1,8 @@
 # Agents External Stubs Frontend
 
-This microservice is part of Agent Services local testing framework, 
-providing necessary UI stubs complementing API stubs in [agents-external-stubs](https://github.com/hmrc/agents-external-stubs).
+This microservice is part of Agent Services local testing framework,
+providing necessary UI stubs complementing API stubs
+in [agents-external-stubs](https://github.com/hmrc/agents-external-stubs).
 
 This app SHOULD NOT be run on QA nor Production environment.
 
@@ -14,12 +15,32 @@ To handle requests aimed at stubbed frontend microservices we provide necessary 
 You can switch this behaviour off by setting `proxies.start` config property to `false`.
 
 ## Data Model
-Every stubbed user and other data live in some test sandbox (planet). 
-You have to declare existing or a new planet whenever you sign-in. Each authenticated session has planetId information. 
-Stubbed and custom UIs will consider only users and data assigned to the current planet. Other apps may contain data from multiple planets and can clash, so avoid the same names for your users with concurrent planets or tidy up data on these regularly.
+
+Every stubbed user and other data live in some test sandbox (planet).
+You have to declare existing or a new planet whenever you sign-in. Each authenticated session has planetId information.
+Stubbed and custom UIs will consider only users and data assigned to the current planet. Other apps may contain data
+from multiple planets and can clash, so avoid the same names for your users with concurrent planets or tidy up data on
+these regularly.
 
 User authentication expires after 15 minutes and so does the bearer token.
 All users and other data on each planet are removed after 12h unless marked as permanent.
+
+## Doorway
+
+You can use the doorway to kickstart a service-specific journey. Take a look at `/agents-external-stubs/asa-doorway` to
+see the available journeys. Each journey creates a new planet populated with the users or features required for that
+journey.
+
+## Authentication
+
+The external stubs frontend provides a stubbed authentication service. You can use it to sign in as a stubbed user and
+provides authentication for other services. If you enter the details of an unknown user the stubs service will direct to
+the new user creation page.
+
+### Gotchas
+
+The default sign-in journey uses the "Government Gateway" provider type. Some services do not accept auth tokens
+generated for that type and require refreshing the session (i.e. sign in, sign out) to generate the correct token.
 
 ## Stubbed UIs
 
@@ -48,5 +69,5 @@ It should then be listening on ports 9099 and 9009. You could then start using t
 
 ### License
 
-
-This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
+This code is open source software licensed under
+the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
