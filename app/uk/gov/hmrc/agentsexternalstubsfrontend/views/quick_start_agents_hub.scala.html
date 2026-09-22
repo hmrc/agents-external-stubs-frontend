@@ -33,7 +33,7 @@
 
 @strideLinkBaseUrl = @{ quickStartHubStrideBaseUrl.map(url => s"$url/agents-external-stubs").getOrElse("http://localhost:9041") }
 
-@agentSubscriptionStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ quickStartHubBaseUrl.getOrElse("http://localhost:9437") }/agent-subscription/task-list" }
+@agentRegistrationStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ quickStartHubBaseUrl.getOrElse("http://localhost:9437") }/agent-registration/task-list" }
 
 @agentOverseasSubStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ quickStartHubBaseUrl.getOrElse("http://localhost:9414") }/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend" }
 
@@ -78,7 +78,7 @@
     <p class="govuk-body govuk-body govuk-!-margin-bottom-0">primary enrolment is <strong>None</strong></p>
     <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
         <li>
-            @a(key = "Agent subscription start", href = agentSubscriptionStartLink)
+            @a(key = "Agent registration start", href = agentRegistrationStartLink)
         </li>
         <li>
             @a(key = "Agent overseas sub start", href = agentOverseasSubStartLink)
