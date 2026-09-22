@@ -33,7 +33,7 @@
 
 @strideLinkBaseUrl = @{ quickStartHubStrideBaseUrl.map(url => s"$url/agents-external-stubs").getOrElse("http://localhost:9041") }
 
-@agentRegistrationStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ quickStartHubBaseUrl.getOrElse("http://localhost:9437") }/agent-registration/task-list" }
+@agentRegistrationStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ quickStartHubBaseUrl.getOrElse("http://localhost:9437") }/agent-registration/apply/task-list" }
 
 @agentOverseasSubStartLink = @{ s"$linkBaseUrl/bas-gateway/sign-in?continue_url=${ quickStartHubBaseUrl.getOrElse("http://localhost:9414") }/agent-services/apply-from-outside-uk&origin=agent-overseas-frontend" }
 

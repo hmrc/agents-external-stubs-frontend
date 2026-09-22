@@ -142,7 +142,7 @@ class AsaJourneySetupController @Inject() (
                 journeyData,
                 journey match {
                   case HmrcLedDeauth  => s"${frontendConfig.agentHelpdeskFrontendfHost}/manage-agent-authorisation"
-                  case UkSubscription => s"${frontendConfig.agentRegistrationFrontendHost}/agent-registration/start"
+                  case UkSubscription => s"${frontendConfig.agentRegistrationFrontendHost}/agent-registration/apply"
                   case _              => s"${frontendConfig.acrfTestOnlyUrl}/${journey.id}"
                 }
               )
