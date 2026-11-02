@@ -22,12 +22,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, await, *}
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, JourneySetupInvitation, JourneySetupRequest, User}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentClientRelationshipsStubs, AgentsExternalStubsStubs}
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.{BaseISpec, ServerBaseISpec}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.TestFixtures.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 
 class AsaJourneySetupControllerISpec
-    extends BaseISpec with AgentsExternalStubsStubs with AgentClientRelationshipsStubs {
+    extends ServerBaseISpec with AgentsExternalStubsStubs with AgentClientRelationshipsStubs {
 
   def callEndpointWith[A: Writeable](request: Request[A]): Result = await(play.api.test.Helpers.route(app, request).get)
 

@@ -27,10 +27,11 @@ trait WireMockSupport extends BeforeAndAfterAll with BeforeAndAfterEach {
 
   def commonStubs(): Unit
 
-  val wireMockPort: Int = 11111
+  val wireMockPort: Int
   val wireMockHost = "localhost"
 
   protected def basicWireMockConfig(): WireMockConfiguration = wireMockConfig().port(wireMockPort)
+  
   private val wireMockServer = new WireMockServer(basicWireMockConfig())
 
   override protected def beforeAll(): Unit = {

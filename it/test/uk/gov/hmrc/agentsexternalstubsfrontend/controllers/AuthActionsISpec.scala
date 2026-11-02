@@ -19,13 +19,13 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 import play.api.mvc.Result
 import play.api.mvc.Results.*
 import play.api.test.Helpers.*
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.{BaseISpec, ServerBaseISpec}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, InsufficientEnrolments}
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
 
 import scala.concurrent.Future
 
-class AuthActionsISpec extends BaseISpec {
+class AuthActionsISpec extends ServerBaseISpec {
 
   object TestController extends AuthActions {
 

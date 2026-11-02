@@ -1,3 +1,4 @@
+import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
@@ -19,7 +20,7 @@ lazy val root = (project in file("."))
       Resolver.typesafeRepo("releases")
     ),
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
-    routesImport += "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
+    RoutesKeys.routesImport += "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
     CodeCoverageSettings.scoverageSettings,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     Compile / scalafmtOnCompile := true,

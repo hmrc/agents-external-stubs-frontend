@@ -18,11 +18,11 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{JourneySetupInvitation, JourneySetupRequest}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentClientRelationshipsStubs
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.{BaseISpec, ServerBaseISpec}
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.TestFixtures.*
 import uk.gov.hmrc.http.HeaderCarrier
 
-class AgentClientRelationshipsConnectorISpec extends BaseISpec with AgentClientRelationshipsStubs {
+class AgentClientRelationshipsConnectorISpec extends ServerBaseISpec with AgentClientRelationshipsStubs {
 
   private lazy val connector: AgentClientRelationshipsConnector =
     app.injector.instanceOf[AgentClientRelationshipsConnector]

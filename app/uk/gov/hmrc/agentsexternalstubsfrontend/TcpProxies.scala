@@ -20,56 +20,48 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.{Flow, Tcp}
 import org.apache.pekko.util.ByteString
-import javax.inject.{Inject, Singleton}
-import play.api.Logger
+import play.api.Logging
+import play.api.inject.ApplicationLifecycle
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 @Singleton
-class TcpProxies @Inject() (appConfig: FrontendConfig)(using system: ActorSystem, materializer: Materializer) {
+class TcpProxies @Inject (
+  appConfig: FrontendConfig,
+  applicationLifecycle: ApplicationLifecycle
+)(using system: ActorSystem)
+    extends Logging:
 
-  private val startProxies = appConfig.proxiesStart
-  private val companyAuthFrontendPort = appConfig.companyAuthFEPort
-  private val basGatewayFrontendPort = appConfig.basGatewayFEPort
-  private val strideAuthFrontendPort = appConfig.strideAuthFEPort
-  private val identityVerificationFrontendPort = appConfig.ivFEPort
-  private val governmentGatewayRegistrationFrontendPort = appConfig.ggRegEPort
-  private val personalDetailsValidationFrontendPort = appConfig.pvDetailsValidationFEPort
-  private val authLoginStubPort = appConfig.authLoginStubPort
-  private val httpPort = appConfig.httpPort
+  val proxiedServices: Map[String, Int] = Map(
+    "company-auth-frontend"                    -> appConfig.companyAuthFEPort,
+    "bas-gateway-frontend"                     -> appConfig.basGatewayFEPort,
+    "stride-auth-frontend"                     -> appConfig.strideAuthFEPort,
+    "identity-verification-frontend"           -> appConfig.ivFEPort,
+    "government-gateway-registration-frontend" -> appConfig.ggRegEPort,
+    "personal-details-validation-frontend"     -> appConfig.pvDetailsValidationFEPort,
+    "auth-login-stub"                          -> appConfig.authLoginStubPort
+  )
 
-  if (startProxies) {
-    Logger(getClass).info("Starting TCP proxies ...")
+  if !appConfig.proxiesStart then logger.info("TCP proxying feature is switched off")
+  else
+    logger.info("Starting local TCP proxies ...")
 
     given ExecutionContext = system.dispatcher
 
-    val agentsExternalStubsFrontendPort = Try(httpPort.toInt).toOption.getOrElse(9099)
+    val tcp = Tcp()
+    val tcpProxy = Flow[ByteString].via(tcp.outgoingConnection("localhost", appConfig.httpPort))
 
-    val tcpOutgoingConnection: Flow[ByteString, ByteString, Future[Tcp.OutgoingConnection]] =
-      Tcp().outgoingConnection("localhost", agentsExternalStubsFrontendPort)
-
-    val tcpProxy = Flow[ByteString].via(tcpOutgoingConnection)
-
-    def startProxy(port: Int, serviceName: String): Future[Unit] =
-      Tcp(system)
+    def startProxy(serviceName: String, port: Int): Future[Unit] =
+      tcp
         .bindAndHandle(tcpProxy, interface = "localhost", port = port)
-        .map(s => Logger(getClass).info(s"Listening for $serviceName requests on ${s.localAddress}"))
-        .recover { case e: Exception =>
-          Logger(getClass).error(s"Could not start TCP proxy for $serviceName requests on $port because of $e")
-        }
+        .map: binding =>
+          logger.info(s"Listening for $serviceName requests on ${binding.localAddress}")
+          applicationLifecycle.addStopHook: () =>
+            logger.info(s"Stopping TCP proxy for $serviceName requests on $port")
+            binding.unbind()
+        .recover: err =>
+          logger.error(s"Could not start TCP proxy for $serviceName requests on $port because of $err")
 
-    startProxy(companyAuthFrontendPort, "company-auth-frontend")
-    startProxy(basGatewayFrontendPort, "bas-gateway-frontend")
-    startProxy(strideAuthFrontendPort, "stride-auth-frontend")
-    startProxy(identityVerificationFrontendPort, "identity-verification-frontend")
-    startProxy(governmentGatewayRegistrationFrontendPort, "government-gateway-registration-frontend")
-    startProxy(personalDetailsValidationFrontendPort, "personal-details-validation-frontend")
-    startProxy(authLoginStubPort, "auth-login-stub")
-
-  } else {
-    Logger(getClass).info("TCP proxies feature switched off")
-  }
-
-}
+    Future.traverse(proxiedServices)(startProxy)

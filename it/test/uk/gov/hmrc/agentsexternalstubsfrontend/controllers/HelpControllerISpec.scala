@@ -21,9 +21,9 @@ import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, *}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, AuthStubs}
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.{BaseISpec, ServerBaseISpec}
 
-class HelpControllerISpec extends BaseISpec with AgentsExternalStubsStubs with AuthStubs {
+class HelpControllerISpec extends ServerBaseISpec with AgentsExternalStubsStubs with AuthStubs {
 
   def callEndpointWith[A: Writeable](request: Request[A]): Result = await(play.api.test.Helpers.route(app, request).get)
 
