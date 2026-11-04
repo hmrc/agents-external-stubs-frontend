@@ -14,9 +14,9 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "agent-mtd-identifiers"        % "3.0.0",
     "org.playframework" %% "play-json-joda"               % "3.0.4"
   )
-
   lazy val test: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc" %% s"bootstrap-test-$playVer" % bootstrapVer
+    "uk.gov.hmrc"            %% s"bootstrap-test-$playVer" % bootstrapVer,
+    "org.scalatestplus.play" %% "scalatestplus-play"       % "7.0.2"
   ).map(_ % Test)
 
 }

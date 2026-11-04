@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentsexternalstubsfrontend
 
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.test.WsTestClient
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.ServerBaseISpec
 import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.ServerBaseISpec
 
 class TcpProxiesSpec extends ServerBaseISpec with WsTestClient with TableDrivenPropertyChecks:
 

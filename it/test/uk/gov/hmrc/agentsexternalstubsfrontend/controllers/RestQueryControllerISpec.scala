@@ -21,7 +21,7 @@ import play.api.mvc.{Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, *}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AgentsExternalStubsStubs, AuthStubs}
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.{BaseISpec, ServerBaseISpec}
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.ServerBaseISpec
 
 class RestQueryControllerISpec extends ServerBaseISpec with AgentsExternalStubsStubs with AuthStubs {
 

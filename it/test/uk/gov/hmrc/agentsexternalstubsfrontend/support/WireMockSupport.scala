@@ -32,12 +32,12 @@ trait WireMockSupport extends BeforeAndAfterAll with BeforeAndAfterEach {
 
   protected def basicWireMockConfig(): WireMockConfiguration = wireMockConfig().port(wireMockPort)
   
-  private val wireMockServer = new WireMockServer(basicWireMockConfig())
+  lazy private val wireMockServer = new WireMockServer(basicWireMockConfig())
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    wireMockServer.start()
     WireMock.configureFor(wireMockHost, wireMockPort)
+    wireMockServer.start()
   }
 
   override protected def afterAll(): Unit = {
@@ -47,7 +47,6 @@ trait WireMockSupport extends BeforeAndAfterAll with BeforeAndAfterEach {
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    Thread.sleep(100)
     WireMock.reset()
     commonStubs()
   }

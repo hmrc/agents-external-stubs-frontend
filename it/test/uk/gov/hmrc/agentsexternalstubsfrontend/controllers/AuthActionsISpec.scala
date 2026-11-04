@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 import play.api.mvc.Result
 import play.api.mvc.Results.*
 import play.api.test.Helpers.*
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.{BaseISpec, ServerBaseISpec}
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.ServerBaseISpec
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, InsufficientEnrolments}
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
 

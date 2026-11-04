@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
+import play.api.mvc.Cookie
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
-import uk.gov.hmrc.http.SessionKeys
-import play.api.mvc.Cookie
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.{BaseISpec, ServerBaseISpec}
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.ServerBaseISpec
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 class SignInControllerISpec extends ServerBaseISpec with AgentsExternalStubsStubs {

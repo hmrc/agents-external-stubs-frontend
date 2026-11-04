@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.{BaseISpec, ServerBaseISpec}
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.ServerBaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 class AgentRegistrationConnectorISpec extends ServerBaseISpec with AgentRegistrationStubs {

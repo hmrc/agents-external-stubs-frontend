@@ -19,12 +19,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.support
 import org.scalatest.TestSuite
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
-import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.play.audit.http.connector.DatastreamMetrics
-import uk.gov.hmrc.play.bootstrap.audit.DisabledDatastreamMetricsProvider
-import uk.gov.hmrc.play.bootstrap.graphite.GraphiteMetricsModule
-import uk.gov.hmrc.play.bootstrap.metrics.{DisabledMetrics, DisabledMetricsFilter, Metrics, MetricsFilter}
 
 import java.net.ServerSocket
 import scala.util.Using
@@ -56,7 +51,4 @@ trait TestPlayServer extends GuiceOneServerPerSuite:
         "auditing.enabled"                                  -> false,
         "http.port"                                         -> assignedPort,
       )
-//      .disable[GraphiteMetricsModule]
-//      .overrides(bind[MetricsFilter].to[DisabledMetricsFilter])
-//      .overrides(bind[Metrics].to[DisabledMetrics])
       .build()

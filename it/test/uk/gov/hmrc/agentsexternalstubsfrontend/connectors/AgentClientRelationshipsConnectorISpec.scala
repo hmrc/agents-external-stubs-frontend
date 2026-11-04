@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.connectors
 
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.{JourneySetupInvitation, JourneySetupRequest}
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentClientRelationshipsStubs
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.{BaseISpec, ServerBaseISpec}
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.ServerBaseISpec
 import uk.gov.hmrc.agentsexternalstubsfrontend.support.TestFixtures.*
 import uk.gov.hmrc.http.HeaderCarrier
 

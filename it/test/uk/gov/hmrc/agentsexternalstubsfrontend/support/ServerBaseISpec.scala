@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.support
 
-import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.time.{Millis, Seconds, Span}
 
