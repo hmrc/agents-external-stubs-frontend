@@ -180,8 +180,7 @@ class SignInController @Inject() (
 
   def showSignInStridePage(
     successURL: RedirectUrl,
-    origin: Option[String],
-    @unused failureURL: Option[String]
+    origin: Option[String]
   ): Action[AnyContent] =
     Action { request =>
       given Request[AnyContent] = request
@@ -292,8 +291,7 @@ class SignInController @Inject() (
 
   def showSignInStridePageInternal(
     successURL: RedirectUrl,
-    origin: Option[String],
-    @unused failureURL: Option[String]
+    origin: Option[String]
   ): Action[AnyContent] =
     Action { request =>
       given Request[AnyContent] = request
