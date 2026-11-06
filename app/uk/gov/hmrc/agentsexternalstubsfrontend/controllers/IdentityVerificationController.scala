@@ -168,7 +168,7 @@ class IdentityVerificationController @Inject() (
         }
     }
 
-  var identityVerificationResults = scala.collection.mutable.Map[String, String]()
+  private val identityVerificationResults = scala.collection.mutable.Map[String, String]()
 
   private def storeResult(pair: (String, String)): Unit =
     identityVerificationResults += (pair._1 -> pair._2)

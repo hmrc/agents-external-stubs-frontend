@@ -16,16 +16,24 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.support
 
-import play.api.inject.guice.GuiceApplicationBuilder
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.time.{Millis, Seconds, Span}
 
-object TestApplicationFactory {
+import scala.concurrent.ExecutionContext
 
-  def builder(wireMockPort: Int): GuiceApplicationBuilder =
-    new GuiceApplicationBuilder()
-      .configure(
-        "microservice.services.agents-external-stubs.port"      -> wireMockPort,
-        "microservice.services.auth.port"                       -> wireMockPort,
-        "microservice.services.agent-registration.port"         -> wireMockPort,
-        "microservice.services.agent-client-relationships.port" -> wireMockPort
-      )
+abstract class ServerBaseISpec
+  extends BaseISpec
+    with ScalaFutures
+    with IntegrationPatience {
+
+  override val patienceConfig: PatienceConfig = PatienceConfig(
+    timeout = scaled(Span(25, Seconds)),
+    interval = scaled(Span(500, Millis))
+  )
+
+  def url = s"http://localhost:$port"
+
+  given ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+  given PatienceConfig = patienceConfig
+
 }

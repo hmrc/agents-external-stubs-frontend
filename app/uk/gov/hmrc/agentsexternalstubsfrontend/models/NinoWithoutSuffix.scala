@@ -29,7 +29,7 @@ case class NinoWithoutSuffix(nino: String) extends TaxIdentifier with SimpleName
   require(NinoWithoutSuffix.isValid(nino), s"$nino is not a valid nino.")
 
   override def value: String = nino.replace(" ", "")
-  def suffixlessValue: String = value.take(suffixlessNinoLength)
+  private def suffixlessValue: String = value.take(suffixlessNinoLength)
 
   // When using this make sure whatever uses the nino does not actually care about the suffix
   def anySuffixValue: String =
@@ -55,12 +55,12 @@ case class NinoWithoutSuffix(nino: String) extends TaxIdentifier with SimpleName
 
 }
 
-object NinoWithoutSuffix extends (String => NinoWithoutSuffix) {
+private object NinoWithoutSuffix extends (String => NinoWithoutSuffix) {
 
   given ninoWrite: Writes[NinoWithoutSuffix] = new SimpleObjectWrites[NinoWithoutSuffix](_.value)
   given ninoRead: Reads[NinoWithoutSuffix] =
     new SimpleObjectReads[NinoWithoutSuffix]("nino-without-suffix", NinoWithoutSuffix.apply)
 
-  def isValid(nino: String): Boolean = nino != null && (Nino.isValid(nino + "A") || Nino.isValid(nino))
+  private def isValid(nino: String): Boolean = nino != null && (Nino.isValid(nino + "A") || Nino.isValid(nino))
 
 }

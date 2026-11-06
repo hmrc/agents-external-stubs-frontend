@@ -110,7 +110,7 @@ object ConfidenceLevel {
 }
 
 object CredStrength {
-  val values = Seq("none", "strong", "weak")
+  val values: Seq[String] = Seq("none", "strong", "weak")
 }
 
 object AffinityGroup {
@@ -119,7 +119,7 @@ object AffinityGroup {
 }
 
 object CredentialRole {
-  val values = Seq("none", "User", "Assistant")
+  val values: Seq[String] = Seq("none", "User", "Assistant")
 }
 
 case class Country(name: String, code: String, phone_code: String)
@@ -128,7 +128,7 @@ object Country {
 
   given reads: Reads[Country] = Json.reads[Country]
 
-  lazy val countriesSource: BufferedSource =
+  private lazy val countriesSource: BufferedSource =
     Source.fromInputStream(getClass.getResourceAsStream("/countries.json"), "utf-8")
 
   lazy val countries: Seq[Country] = Json.parse(countriesSource.mkString).as[Seq[Country]]

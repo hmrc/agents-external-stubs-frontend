@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentsexternalstubsfrontend.services
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.json.*
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentClientRelationshipsConnector, AgentRegistrationConnector, AgentsExternalStubsConnector}
+import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.{AgentClientRelationshipsConnector, AgentRegistrationConnector, AgentsExternalStubsConnector, AuthenticatedSession}
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.util.RequestSupport.given
@@ -36,7 +36,7 @@ class AsaJourneySetupService @Inject() (
   acrConnector: AgentClientRelationshipsConnector
 )(using ec: ExecutionContext) {
 
-  def setupMainUser(journey: ASATestJourney)(using rh: RequestHeader) =
+  def setupMainUser(journey: ASATestJourney)(using rh: RequestHeader): Future[AuthenticatedSession] =
     for {
       authSession <- agentsExternalStubsConnector.signIn()
       hc = HeaderCarrier(

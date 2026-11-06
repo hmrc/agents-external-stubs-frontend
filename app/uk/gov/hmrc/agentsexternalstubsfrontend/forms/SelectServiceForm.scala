@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.{ASAJourneyService, ASATes
 
 object SelectServiceForm {
 
-  val servicesForCreateInvitationJourney: Seq[ASAJourneyService] =
+  private val servicesForCreateInvitationJourney: Seq[ASAJourneyService] =
     ASAJourneyService.asaJourneyServicesForCreateInvitation
 
   def servicesForJourney(journey: ASATestJourney): Seq[ASAJourneyService] =
