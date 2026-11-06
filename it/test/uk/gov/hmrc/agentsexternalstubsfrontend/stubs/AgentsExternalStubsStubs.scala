@@ -135,7 +135,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
         )
     )
 
-  def givenUserCanSignOut =
+  def givenUserCanSignOut: StubMapping =
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/sign-out"))
         .willReturn(
@@ -248,7 +248,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     )
 
   }
-  def userResponseBody(userId: String, assignedPrincipalEnrolmentsResponse: String, strideRoles: Option[String]) =
+  def userResponseBody(userId: String, assignedPrincipalEnrolmentsResponse: String, strideRoles: Option[String]): String =
     s"""{
        |  "userId": "$userId",
        |  "credentialRole": "User",
@@ -402,7 +402,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     )
   }
 
-  def givenGroups = {
+  def givenGroups: StubMapping = {
     val groups: Groups = Groups(
       Seq(
         Group("foobar", "G1", "Agent", None, None, None, Seq.empty, Seq.empty)
@@ -419,7 +419,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     )
   }
 
-  def givenServiceDefinitions = {
+  def givenServiceDefinitions: StubMapping = {
     val serviceDefinitions: Services = Services(
       Seq(
         Service(
@@ -450,7 +450,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
     )
   }
 
-  def givenAllRecords =
+  def givenAllRecords: StubMapping =
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/records"))
         .willReturn(
@@ -471,7 +471,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
         )
     )
 
-  def givenAllSpecialCases =
+  def givenAllSpecialCases: StubMapping =
     stubFor(
       get(urlEqualTo(s"/agents-external-stubs/special-cases"))
         .willReturn(
@@ -485,7 +485,7 @@ trait AgentsExternalStubsStubs extends ValidStubResponses {
 
 trait ValidStubResponses {
 
-  val validRecordsResponse =
+  val validRecordsResponse: String =
     """{
       |  "VatCustomerInformationRecord": [
       |    {
@@ -968,7 +968,7 @@ trait ValidStubResponses {
       |  }
       |]""".stripMargin
 
-  val validSpecialCaseResponse =
+  val validSpecialCaseResponse: String =
     """{
       |    "requestMatch": {
       |      "path": "/test",
