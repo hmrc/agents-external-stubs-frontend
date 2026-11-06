@@ -16,21 +16,15 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
-import java.nio.charset.StandardCharsets
-import java.util.Base64
-
 import com.google.inject.Provider
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional, text}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.*
-import play.api.libs.ws.{WSClient, WSResponse}
-import play.api.libs.ws.writeableOf_JsValue
+import play.api.libs.ws.{WSClient, WSResponse, writeableOf_JsValue}
 import play.api.mvc.*
-import scala.annotation.unused
 import uk.gov.hmrc.agentsexternalstubsfrontend.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentsexternalstubsfrontend.services.Features
 import uk.gov.hmrc.agentsexternalstubsfrontend.views.html.rest_query
@@ -38,10 +32,14 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import java.net.URI
+import java.nio.charset.StandardCharsets
+import java.util.Base64
+import javax.inject.{Inject, Singleton}
+import scala.annotation.unused
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.control.NonFatal
 import scala.util.Try
-import java.net.URL
+import scala.util.control.NonFatal
 
 @Singleton
 class RestQueryController @Inject() (
@@ -151,7 +149,7 @@ class RestQueryController @Inject() (
   private def runQuery(
     query: RestQuery
   )(using request: Request[AnyContent]): Future[WSResponse] =
-    if (Try(new URL(query.url)).isFailure)
+    if (Try(new URI(query.url).toURL).isFailure)
       Future.failed(new Exception(s"Invalid URL ${query.url}"))
     else {
       Try {
@@ -228,10 +226,10 @@ object RestQueryController {
     case None => Valid
   }
 
-  val RestQueryForm: Form[RestQuery] = Form[RestQuery](
+  private val RestQueryForm: Form[RestQuery] = Form[RestQuery](
     mapping(
       "method" -> text,
-      "url"    -> text.verifying("error.url", u => Try(new URL(u)).isSuccess),
+      "url"    -> text.verifying("error.url", u => Try(new URI(u).toURL).isSuccess),
       "payload" -> optional(text)
         .verifying(validJson)
         .transform[Option[JsValue]](_.map(Json.parse), _.map(Json.prettyPrint)),
@@ -255,7 +253,7 @@ object RestQueryController {
           .mkString("\n")
       )
 
-  def parseHeaders(headers: String): Map[String, String] =
+  private def parseHeaders(headers: String): Map[String, String] =
     if (headers.isEmpty) Map.empty
     else
       headers.linesIterator

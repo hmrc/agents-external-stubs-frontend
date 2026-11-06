@@ -41,7 +41,7 @@ object SpecialCase {
   given formats3: Format[Response] = Json.format[Response]
   given formats: Format[SpecialCase] = Json.format[SpecialCase]
 
-  val httpStatusCodes: Map[Int, String] = Map(
+  private val httpStatusCodes: Map[Int, String] = Map(
     200 -> "OK",
     201 -> "Created",
     202 -> "Accepted",
@@ -104,5 +104,6 @@ object SpecialCase {
     599 -> "Network Connect Timeout Error"
   )
 
-  val httpStatusCodeOptions = httpStatusCodes.map { case (k, v) => s"$k" -> s"$k $v" }.toSeq.sortBy(_._1)
+  val httpStatusCodeOptions: Seq[(String, String)] =
+    httpStatusCodes.map { case (k, v) => s"$k" -> s"$k $v" }.toSeq.sortBy(_._1)
 }

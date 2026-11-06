@@ -42,8 +42,6 @@ abstract class BaseISpec
       with ScalaFutures
       with TestPlayServer {
 
-//  override given app: Application = TestApplicationFactory.builder(wireMockPort).build()
-
   override def commonStubs(): Unit =
     givenAuditConnector()
 

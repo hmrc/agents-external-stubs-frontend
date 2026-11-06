@@ -153,7 +153,7 @@ class AsaJourneySetupController @Inject() (
     }
   }
 
-  case class NextUrl(nextUrl: String, testData: Option[String])
+  private case class NextUrl(nextUrl: String, testData: Option[String])
 
   private def createTestDataAndSetUrl(journey: ASATestJourney)(using rh: RequestHeader): Future[NextUrl] =
     journey match {

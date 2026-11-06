@@ -294,7 +294,7 @@ class UserController @Inject() (
     else
       updateExistingUser(continue, userId, affinityGroup)
 
-  def updateExistingUser(
+  private def updateExistingUser(
     continue: Option[RedirectUrl],
     userId: Option[String],
     affinityGroup: Option[String]
@@ -345,7 +345,7 @@ class UserController @Inject() (
         }
     }
 
-  def updateNewUser(
+  private def updateNewUser(
     continue: Option[RedirectUrl],
     userId: Option[String],
     affinityGroup: Option[String]
