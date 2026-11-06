@@ -277,11 +277,11 @@ class SignInController @Inject() (
     showSignInPageInternal(continue_url, origin, None)
 
   def registerInternal(
-    RedirectUrl: Option[RedirectUrl],
+    redirectUrl: Option[RedirectUrl],
     origin: Option[String],
     accountType: Option[String]
   ): Action[AnyContent] =
-    showSignInPageInternal(RedirectUrl, origin, accountType)
+    showSignInPageInternal(redirectUrl, origin, accountType)
 
   def showGovernmentGatewaySignInPageInternal(
     continue: Option[RedirectUrl],
