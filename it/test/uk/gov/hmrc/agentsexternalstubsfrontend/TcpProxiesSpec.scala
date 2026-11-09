@@ -28,7 +28,7 @@ class TcpProxiesSpec extends ServerBaseISpec with WsTestClient with TableDrivenP
   "TcpProxies" when:
     "launched" should:
       "forward to correct server port" in:
-        port shouldBe app.injector.instanceOf[FrontendConfig].httpPort
+        port shouldBe app.injector.instanceOf[FrontendConfig].tcpProxyPort
 
     forAll(services):
       case (service, given Port) =>

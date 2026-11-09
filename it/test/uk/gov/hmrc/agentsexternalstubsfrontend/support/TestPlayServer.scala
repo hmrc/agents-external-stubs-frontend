@@ -49,6 +49,6 @@ trait TestPlayServer extends GuiceOneServerPerSuite:
         "microservice.services.agent-client-relationships.port" -> wireMockPort,
         "metrics.enabled"                                   -> false,
         "auditing.enabled"                                  -> false,
-        "http.port"                                         -> assignedPort,
+        "tcpProxyTargetPort"                                         -> assignedPort,
       )
       .build()

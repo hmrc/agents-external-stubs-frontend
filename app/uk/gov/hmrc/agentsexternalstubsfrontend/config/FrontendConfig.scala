@@ -46,7 +46,7 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
 
   val authLoginStubPort: Int = getConfInt("auth-login-stub.port")
 
-  val httpPort: Int = servicesConfig.getInt("http.port")
+  val tcpProxyPort: Int = servicesConfig.getInt("tcpProxyTargetPort")
 
   val proxiesStart: Boolean = servicesConfig.getBoolean("proxies.start")
 

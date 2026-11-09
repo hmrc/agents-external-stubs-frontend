@@ -51,7 +51,7 @@ class TcpProxies @Inject (
     given ExecutionContext = system.dispatcher
 
     val tcp = Tcp()
-    val tcpProxy = Flow[ByteString].via(tcp.outgoingConnection("localhost", appConfig.httpPort))
+    val tcpProxy = Flow[ByteString].via(tcp.outgoingConnection("localhost", appConfig.tcpProxyPort))
 
     def startProxy(serviceName: String, port: Int): Future[Unit] =
       tcp
