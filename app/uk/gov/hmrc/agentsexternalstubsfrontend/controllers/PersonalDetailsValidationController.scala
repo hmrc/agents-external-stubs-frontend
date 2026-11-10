@@ -90,7 +90,7 @@ object PersonalDetailsValidationController {
     given OFormat[PdvRequest] = Json.format
   }
 
-  val PdvRequestForm: Form[PdvRequest] = Form[PdvRequest](
+  private val PdvRequestForm: Form[PdvRequest] = Form[PdvRequest](
     mapping(
       "success" -> boolean
     )(PdvRequest.apply)(p => Some(p.success))

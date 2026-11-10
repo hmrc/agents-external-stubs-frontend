@@ -28,7 +28,7 @@ import javax.inject.Inject
   *
   * Use it to provide HeaderCarrier, Lang, or Messages
   */
-class RequestSupport @Inject() () {
+class RequestSupport @Inject() {
   given hc(using request: Request[?]): HeaderCarrier = RequestSupport.hc(using request)
 }
 

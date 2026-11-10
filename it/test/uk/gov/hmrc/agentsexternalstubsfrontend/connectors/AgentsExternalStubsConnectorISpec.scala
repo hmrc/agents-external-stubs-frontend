@@ -23,14 +23,12 @@ import play.api.test.Helpers.*
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentsexternalstubsfrontend.forms.SignInRequest
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase.RequestMatch
-import uk.gov.hmrc.agentsexternalstubsfrontend.models.{AuthProvider, EnrolmentKey, Identifier, SpecialCase, User, Users}
+import uk.gov.hmrc.agentsexternalstubsfrontend.models.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.ServerBaseISpec
 import uk.gov.hmrc.http.*
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStubsStubs {
+class AgentsExternalStubsConnectorISpec extends ServerBaseISpec with AgentsExternalStubsStubs {
 
   given HeaderCarrier = HeaderCarrier()
 
@@ -335,7 +333,7 @@ class AgentsExternalStubsConnectorISpec extends BaseISpec with AgentsExternalStu
             )
         )
         val result: Unit = await(connector.deleteSpecialCase("123"))
-        result shouldBe (())
+        result shouldBe ()
       }
     }
   }

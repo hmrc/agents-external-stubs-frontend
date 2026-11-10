@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.agentsexternalstubsfrontend.controllers
 
+import play.api.mvc.Cookie
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.agentsexternalstubsfrontend.models.AuthProvider
-import uk.gov.hmrc.http.SessionKeys
-import play.api.mvc.Cookie
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.AgentsExternalStubsStubs
-import uk.gov.hmrc.agentsexternalstubsfrontend.support.BaseISpec
+import uk.gov.hmrc.agentsexternalstubsfrontend.support.ServerBaseISpec
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
-class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
+class SignInControllerISpec extends ServerBaseISpec with AgentsExternalStubsStubs {
 
   private lazy val controller: SignInController = app.injector.instanceOf[SignInController]
 
@@ -115,7 +115,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       }
 
       "redirect to edit user with if new one created" in {
-        val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
+        val authToken = givenUserCanSignIn("foo", "saturn")
         val result = controller.signIn(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest("POST", "/gg/sign-in")
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")
@@ -187,7 +187,7 @@ class SignInControllerISpec extends BaseISpec with AgentsExternalStubsStubs {
       }
 
       "redirect to edit user with if new one created" in {
-        val authToken = givenUserCanSignIn("foo", "saturn", newUser = true)
+        val authToken = givenUserCanSignIn("foo", "saturn")
         val result = controller.signInInternal(Some(RedirectUrl("/there")), None, None, AuthProvider.GovernmentGateway)(
           FakeRequest("POST", "/agents-external-stubs/gg/sign-in")
             .withFormUrlEncodedBody("userId" -> "foo", "planetId" -> "saturn")

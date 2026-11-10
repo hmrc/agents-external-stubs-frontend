@@ -9,14 +9,14 @@ object AppDependencies {
   lazy val compile: Seq[ModuleID] = Seq(
     ws,
     "uk.gov.hmrc"       %% s"bootstrap-frontend-$playVer" % bootstrapVer,
-    "uk.gov.hmrc"       %% s"play-frontend-hmrc-$playVer" % "13.11.0",
+    "uk.gov.hmrc"       %% s"play-frontend-hmrc-$playVer" % "13.16.0",
     "uk.gov.hmrc"       %% s"play-partials-$playVer"      % "10.2.0",
     "uk.gov.hmrc"       %% "agent-mtd-identifiers"        % "3.0.0",
-    "org.playframework" %% "play-json-joda"               % "3.0.4"
+    "org.playframework" %% "play-json-joda"               % "3.0.6"
   )
-
   lazy val test: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc" %% s"bootstrap-test-$playVer" % bootstrapVer
+    "uk.gov.hmrc"            %% s"bootstrap-test-$playVer" % bootstrapVer,
+    "org.scalatestplus.play" %% "scalatestplus-play"       % "7.0.2"
   ).map(_ % Test)
 
 }

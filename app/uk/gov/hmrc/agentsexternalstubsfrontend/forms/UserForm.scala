@@ -26,13 +26,13 @@ object UserForm {
 
   val none = "none"
 
-  val enrolmentKeyMapping: Mapping[Option[EnrolmentKey]] = optional(
+  private val enrolmentKeyMapping: Mapping[Option[EnrolmentKey]] = optional(
     mapping(
       "key"         -> nonEmptyText,
       "identifiers" -> seq(identifierMapping)
     )(EnrolmentKey.apply)(e => Some((e.service, e.identifiers)))
   )
-  val addressMapping: Mapping[Address] = mapping(
+  private val addressMapping: Mapping[Address] = mapping(
     "line1"       -> optional(nonEmptyText),
     "line2"       -> optional(nonEmptyText),
     "line3"       -> optional(nonEmptyText),
@@ -92,12 +92,12 @@ object UserForm {
     )
   )
 
-  def fromNone[T](none: T): Option[T] => Option[T] = {
+  private def fromNone[T](none: T): Option[T] => Option[T] = {
     case Some(`none`) => None
     case s            => s
   }
 
-  def toNone[T](none: T): Option[T] => Option[T] = {
+  private def toNone[T](none: T): Option[T] => Option[T] = {
     case None => Some(none)
     case s    => s
   }

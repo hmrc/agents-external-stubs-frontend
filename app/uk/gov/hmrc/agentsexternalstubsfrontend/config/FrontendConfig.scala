@@ -32,27 +32,25 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
   private def getConfString(config: String) =
     servicesConfig.getConfString(config, throw new RuntimeException(s"config $config not found"))
 
-  val companyAuthFEPort = getConfInt("company-auth-frontend.port")
+  val companyAuthFEPort: Int = getConfInt("company-auth-frontend.port")
 
-  val basGatewayFEPort = getConfInt("bas-gateway-frontend.port")
+  val basGatewayFEPort: Int = getConfInt("bas-gateway-frontend.port")
 
-  val strideAuthFEPort = getConfInt("stride-auth-frontend.port")
+  val strideAuthFEPort: Int = getConfInt("stride-auth-frontend.port")
 
-  val ivFEPort = getConfInt("identity-verification-frontend.port")
+  val ivFEPort: Int = getConfInt("identity-verification-frontend.port")
 
-  val ggRegEPort = getConfInt("government-gateway-registration-frontend.port")
+  val ggRegEPort: Int = getConfInt("government-gateway-registration-frontend.port")
 
-  val pvDetailsValidationFEPort = getConfInt("personal-details-validation-frontend.port")
+  val pvDetailsValidationFEPort: Int = getConfInt("personal-details-validation-frontend.port")
 
-  val authLoginStubPort = getConfInt("auth-login-stub.port")
+  val authLoginStubPort: Int = getConfInt("auth-login-stub.port")
 
-  val httpPort = servicesConfig.getInt("http.port")
+  val tcpProxyPort: Int = servicesConfig.getInt("tcpProxyTargetPort")
 
-  val proxiesStart = servicesConfig.getBoolean("proxies.start")
+  val proxiesStart: Boolean = servicesConfig.getBoolean("proxies.start")
 
-  val authBaseUrl = baseUrl("auth")
-
-  val aesBaseUrl = baseUrl("agents-external-stubs")
+  val aesBaseUrl: String = baseUrl("agents-external-stubs")
 
   val acrBaseUrl: String = baseUrl("agent-client-relationships")
 
@@ -64,13 +62,13 @@ class FrontendConfig @Inject() (servicesConfig: ServicesConfig) {
 
   val acrfHost: String = getConfString("agent-client-relationships-frontend.external-url")
 
-  val acrfTestOnlyStartPath: String = getConfString("agent-client-relationships-frontend.test-only-start-path")
+  private val acrfTestOnlyStartPath: String = getConfString("agent-client-relationships-frontend.test-only-start-path")
 
   val acrfTestOnlyUrl: String = s"$acrfHost$acrfTestOnlyStartPath"
 
   val asafHost: String = getConfString("agent-services-account-frontend.external-url")
 
-  val agentHelpdeskFrontendfHost: String = getConfString("agent-helpdesk-frontend.external-url")
+  val agentHelpdeskFrontendHost: String = getConfString("agent-helpdesk-frontend.external-url")
 
   val agentRegistrationFrontendHost: String = getConfString("agent-registration-frontend.external-url")
 

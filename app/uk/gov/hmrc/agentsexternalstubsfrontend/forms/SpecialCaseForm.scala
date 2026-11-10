@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentsexternalstubsfrontend.models.SpecialCase
 
 object SpecialCaseForm {
 
-  val requestMatchMapping: Mapping[SpecialCase.RequestMatch] = mapping(
+  private val requestMatchMapping: Mapping[SpecialCase.RequestMatch] = mapping(
     "path" -> nonEmptyText
       .transform[String](path => if (!path.startsWith("/")) "/" + path else path, identity)
       .verifying(path => path != "/")
@@ -32,12 +32,12 @@ object SpecialCaseForm {
     "contentType" -> optional(nonEmptyText)
   )(SpecialCase.RequestMatch.apply)(rm => Some((rm.path, rm.method, rm.body, rm.contentType)))
 
-  val headerMapping: Mapping[SpecialCase.Header] = mapping(
+  private val headerMapping: Mapping[SpecialCase.Header] = mapping(
     "name"  -> nonEmptyText,
     "value" -> nonEmptyText
   )(SpecialCase.Header.apply)(h => Some((h.name, h.value)))
 
-  val responseMapping: Mapping[SpecialCase.Response] = mapping(
+  private val responseMapping: Mapping[SpecialCase.Response] = mapping(
     "status" -> number(200, 599),
     "body"   -> optional(nonEmptyText),
     "headers" -> optional(seq(optional(headerMapping)))

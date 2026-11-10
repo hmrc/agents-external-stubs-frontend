@@ -26,11 +26,11 @@ import scala.util.control.NonFatal
 
 object DateFieldHelper {
 
-  def validateDate(value: String): Boolean = if (parseDate(value)) true else false
+  private def validateDate(value: String): Boolean = if (parseDate(value)) true else false
 
-  val dateTimeFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd")
+  private val dateTimeFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
-  def parseDate(date: String): Boolean =
+  private def parseDate(date: String): Boolean =
     try {
       dateTimeFormat.parseDateTime(date)
       true
@@ -38,7 +38,7 @@ object DateFieldHelper {
       case _: Throwable => false
     }
 
-  def parseDateIntoFields(date: String): Option[(String, String, String)] =
+  private def parseDateIntoFields(date: String): Option[(String, String, String)] =
     try {
       val l = dateTimeFormat.parseLocalDate(date)
       Some((l.getYear.toString, l.getMonthOfYear.toString, l.getDayOfMonth.toString))
@@ -46,7 +46,7 @@ object DateFieldHelper {
       case NonFatal(_) => None
     }
 
-  val formatDateFromFields: (String, String, String) => String = { case (y, m, d) =>
+  private val formatDateFromFields: (String, String, String) => String = { case (y, m, d) =>
     if (y.isEmpty || m.isEmpty || d.isEmpty) ""
     else {
       val month = if (m.length == 1) "0" + m else m

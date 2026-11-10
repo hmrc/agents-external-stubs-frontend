@@ -43,7 +43,7 @@ trait AuthActions extends AuthorisedFunctions {
       case None          => Future.failed(InsufficientEnrolments("MTDITID identifier not found"))
     }
 
-  protected def withEnrolledFor[A](serviceName: String, identifierKey: String)(
+  private def withEnrolledFor[A](serviceName: String, identifierKey: String)(
     body: Option[String] => Future[Result]
   )(using hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
     authorised(

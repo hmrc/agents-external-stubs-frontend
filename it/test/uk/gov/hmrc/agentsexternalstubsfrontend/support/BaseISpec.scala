@@ -21,46 +21,29 @@ import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.mvc.Result
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, Helpers}
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.agentsexternalstubsfrontend.config.FrontendConfig
 import uk.gov.hmrc.agentsexternalstubsfrontend.stubs.{AuthStubs, DataStreamStubs}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.Future
 
-class BaseISpec
-    extends AnyWordSpecLike with GuiceOneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs
-    with DefaultAwaitTimeout with Matchers with OptionValues with ScalaFutures {
-
-  override given app: Application = TestApplicationFactory.builder(wireMockPort).build()
-
-  val appConfig: FrontendConfig = app.injector.instanceOf[FrontendConfig]
+abstract class BaseISpec
+    extends AnyWordSpecLike
+      with WireMockSupport
+      with AuthStubs
+      with DataStreamStubs
+      with DefaultAwaitTimeout
+      with Matchers
+      with OptionValues
+      with ScalaFutures
+      with TestPlayServer {
 
   override def commonStubs(): Unit =
     givenAuditConnector()
-
-  protected given Materializer = app.materializer
-
-  protected def checkHtmlResultWithBodyText(result: Result, expectedSubstring: String): Unit = {
-    status(result) shouldBe 200
-    contentType(result) shouldBe Some("text/html")
-    charset(result) shouldBe Some("utf-8")
-    bodyOf(result) should include(expectedSubstring)
-  }
-
-  private val messagesApi = app.injector.instanceOf[MessagesApi]
-  private given Messages = messagesApi.preferred(Seq.empty[Lang])
-
-  protected def htmlEscapedMessage(key: String): String = HtmlFormat.escape(Messages(key)).toString
-
-  given hc(using request: FakeRequest[?]): HeaderCarrier =
-    HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
   // the following is a collection of useful methods that should minimise
   // the changes required when migrating away from hmrctest, which is now deprecated.
@@ -77,5 +60,21 @@ class BaseISpec
       case Some(s) if s.contains("charset=") => Some(s.split("; *charset=").drop(1).mkString.trim)
       case _                                 => None
     }
+
+  protected given Materializer = app.materializer
+  private val messagesApi = app.injector.instanceOf[MessagesApi]
+  private given Messages = messagesApi.preferred(Seq.empty[Lang])
+
+  protected def checkHtmlResultWithBodyText(result: Result, expectedSubstring: String): Unit = {
+    status(result) shouldBe 200
+    contentType(result) shouldBe Some("text/html")
+    charset(result) shouldBe Some("utf-8")
+    bodyOf(result) should include(expectedSubstring)
+  }
+
+  protected def htmlEscapedMessage(key: String): String = HtmlFormat.escape(Messages(key)).toString
+
+  given hc(using request: FakeRequest[?]): HeaderCarrier =
+    HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
 }
