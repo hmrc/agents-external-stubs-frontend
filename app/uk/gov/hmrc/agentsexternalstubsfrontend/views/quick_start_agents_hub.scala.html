@@ -63,15 +63,22 @@
 </div>
 
 <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m">ASA Doorway</h2>
+
+        <p class="govuk-body">ASA Doorway contains quick start data generation and page links for various journeys in ASA</p>
+        <p class="govuk-body">@a(key = "ASA Doorway home", href = routes.UserController.showAllUsersPage.url)</p>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h2 class="govuk-heading-m">All users</h2>
 
         <p class="govuk-body">
-            @a(
-            key = "See all existing users (opens in a new tab)",
-            href =  routes.UserController.showAllUsersPage.url,
-            openInNewWindow = true
-            )
+            @a(key = "See all existing users (opens in a new tab)",
+                href = routes.UserController.showAllUsersPage.url,
+                openInNewWindow = true)
         </p>
     </div>
 </div>
