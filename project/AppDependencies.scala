@@ -4,12 +4,12 @@ import sbt.*
 object AppDependencies {
 
   private val playVer = "play-30"
-  private val bootstrapVer = "10.7.1"
+  private val bootstrapVer = "10.9.0"
 
   lazy val compile: Seq[ModuleID] = Seq(
     ws,
     "uk.gov.hmrc"       %% s"bootstrap-frontend-$playVer" % bootstrapVer,
-    "uk.gov.hmrc"       %% s"play-frontend-hmrc-$playVer" % "13.16.0",
+    "uk.gov.hmrc"       %% s"play-frontend-hmrc-$playVer" % "13.17.0",
     "uk.gov.hmrc"       %% s"play-partials-$playVer"      % "10.2.0",
     "uk.gov.hmrc"       %% "agent-mtd-identifiers"        % "3.0.0",
     "org.playframework" %% "play-json-joda"               % "3.0.6"
