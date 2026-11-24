@@ -59,12 +59,26 @@
         <h1 class="govuk-heading-l">Quick start hub</h1>
 
         <p class="govuk-body">Intended as a shortcut to the start of ASA journeys, must sign in with appropriate user type.</p>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m">ASA Doorway</h2>
+
+        <p class="govuk-body">ASA Doorway contains quick start data generation and page links for various journeys in ASA</p>
+        <p class="govuk-body">@a(key = "ASA Doorway home", href = routes.AsaJourneySetupController.root.url)</p>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-m">All users</h2>
+
         <p class="govuk-body">
-            @a(
-                key = "See all existing users (opens in a new tab)",
-                href =  routes.UserController.showAllUsersPage.url,
-                openInNewWindow = true
-            )
+            @a(key = "See all existing users (opens in a new tab)",
+                href = routes.UserController.showAllUsersPage.url,
+                openInNewWindow = true)
         </p>
     </div>
 </div>
@@ -72,7 +86,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-    <h2 class="govuk-heading-m">As agent</h2>
+        <h2 class="govuk-heading-m">As agent</h2>
     </div>
     <div class="govuk-grid-column-one-third">
     <p class="govuk-body govuk-body govuk-!-margin-bottom-0">primary enrolment is <strong>None</strong></p>
@@ -90,42 +104,37 @@
         <p class="govuk-body govuk-body govuk-!-margin-bottom-0">HMRC-AS-AGENT enrolment </p>
         @a(key = "Agent services account home", href = agentServicesAccountHomeLink)
     </div>
-    @* keep it small to start? ASA home lets you navigate to mapping/invitations
-    @a(key = "Mapping", href = routes.UserController.showAllUsersPage.url)
-
-    @a(key = "Invitations", href = routes.UserController.showAllUsersPage.url)
-    *@
 </div>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <br>
-    <h2 class="govuk-heading-m">As client (individual/org)</h2>
-    <p class="govuk-body govuk-!-margin-bottom-0">If not using the agent invitation link... </p>
-    @a(key = "Manage your tax agents (agent-client-relationships)", href = manageYourTaxAgentsLink)
+        <h2 class="govuk-heading-m">As client (individual/org)</h2>
+        <p class="govuk-body govuk-!-margin-bottom-0">If not using the agent invitation link... </p>
+        @a(key = "Manage your tax agents (agent-client-relationships)", href = manageYourTaxAgentsLink)
     </div>
 </div>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <br>
-    <h2 class="govuk-heading-m">As hmrc helpdesk staff (affinity type None with STRIDE)</h2>
+        <h2 class="govuk-heading-m">As hmrc helpdesk staff (affinity type None with STRIDE)</h2>
     </div>
     <div class="govuk-grid-column-one-third">
-     <p class="govuk-body govuk-!-margin-bottom-1">stride role 'maintain_agent_relationships'</p>
-     @a(key = "Digitally excluded authorisations", href = digitallyExcludedRelationshipsStrideLink)
+        <p class="govuk-body govuk-!-margin-bottom-1">stride role 'maintain_agent_relationships'</p>
+        @a(key = "Digitally excluded authorisations", href = digitallyExcludedRelationshipsStrideLink)
     </div>
     <div class="govuk-grid-column-one-third">
-     <p class="govuk-body govuk-!-margin-bottom-1">stride role 'maintain_agent_overseas'</p>
-     @a(key = "Review overseas applications", href = reviewOverseasApplicationsStrideLink)
+        <p class="govuk-body govuk-!-margin-bottom-1">stride role 'maintain_agent_overseas'</p>
+        @a(key = "Review overseas applications", href = reviewOverseasApplicationsStrideLink)
     </div>
     <div class="govuk-grid-column-one-third">
-     <p class="govuk-body govuk-!-margin-bottom-1">stride role 'maintain_agent_manually_assure'</p>
-     @a(key = "Agent manually assured list - AMLS", href = agentManuallyAssuredListStrideLink)
+        <p class="govuk-body govuk-!-margin-bottom-1">stride role 'maintain_agent_manually_assure'</p>
+        @a(key = "Agent manually assured list - AMLS", href = agentManuallyAssuredListStrideLink)
     </div>
     <div class="govuk-grid-column-full govuk-!-margin-top-5">
-     <p class="govuk-body govuk-!-margin-bottom-1">stride roles 'maintain_agent_manually_assure, maintain_agent_relationships'</p>
-     @a(key = "Alt itsa screen", href = altItsaStrideLink)
+        <p class="govuk-body govuk-!-margin-bottom-1">stride roles 'maintain_agent_manually_assure, maintain_agent_relationships'</p>
+        @a(key = "Alt itsa screen", href = altItsaStrideLink)
     </div>
 </div>
 
