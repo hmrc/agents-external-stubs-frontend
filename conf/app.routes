@@ -28,8 +28,8 @@ GET         /stride/sign-in                                                     
 GET         /agents-external-stubs/stride/sign-in                                  @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInStridePageInternal(successURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, origin: Option[String])
 
 # auth-login-stub support
-GET         /auth-login-stub/gg-sign-in                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl], origin: Option[String], accountType: Option[String])
-GET         /auth-login-stub/session/logout                                         @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl] ?= None)
+GET         /auth-login-stub/gg-sign-in                                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showSignInPage(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl], origin: Option[String], accountType: Option[String])
+GET         /auth-login-stub/session/logout                                        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.signOut(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl] ?= None)
 
 # government gateway registration frontend stubs
 GET         /government-gateway-registration-frontend                              @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.SignInController.showGovernmentGatewaySignInPage(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl] ?= None, origin: Option[String] ?= None, accountType: Option[String] ?= None)
@@ -37,22 +37,22 @@ GET         /agents-external-stubs/government-gateway-registration-frontend     
 
 # identity verification stubs
 
-GET        /mdtp/uplift                                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageProxy(confidenceLevel: Int, completionURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, failureURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, origin: Option[String])
-POST       /mdtp/uplift                                                             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftProxy(journeyId: String, confidenceLevel: Int, completionURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, failureURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, origin: Option[String])
-GET        /agents-external-stubs/mdtp/uplift                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageInternal(confidenceLevel: Int, completionURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, failureURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, origin: Option[String])
-POST       /agents-external-stubs/mdtp/uplift                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(journeyId: String, confidenceLevel: Int, completionURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, failureURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, origin: Option[String])
+GET        /mdtp/uplift                                                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageProxy(confidenceLevel: Int, completionURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, failureURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, origin: Option[String])
+POST       /mdtp/uplift                                                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftProxy(journeyId: String, confidenceLevel: Int, completionURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, failureURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, origin: Option[String])
+GET        /agents-external-stubs/mdtp/uplift                                      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.showUpliftPageInternal(confidenceLevel: Int, completionURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, failureURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, origin: Option[String])
+POST       /agents-external-stubs/mdtp/uplift                                      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.upliftInternal(journeyId: String, confidenceLevel: Int, completionURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, failureURL: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl, origin: Option[String])
 
-GET        /mdtp/journey/journeyId/:journeyId                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultProxy(journeyId: String)
-GET        /agents-external-stubs/mdtp/journey/journeyId/:journeyIdAndReason        @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultInternal(journeyIdAndReason: String)
+GET        /mdtp/journey/journeyId/:journeyId                                      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultProxy(journeyId: String)
+GET        /agents-external-stubs/mdtp/journey/journeyId/:journeyIdAndReason       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.IdentityVerificationController.getIvResultInternal(journeyIdAndReason: String)
 
 # personal details validation stubs
 
-GET        /start                     uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.start(completionUrl: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl)
+GET        /start                                                                  uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.start(completionUrl: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl)
 # this version for running in non-local envs (configure external-url to include prefix '/agents-external-stubs' in app config)
-GET        /agents-external-stubs/start                     uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.start(completionUrl: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl)
+GET        /agents-external-stubs/start                                            uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.start(completionUrl: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl)
 
-POST       /submit                    uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.submit(completionUrl: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl)
-POST       /agents-external-stubs/submit                    uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.submit(completionUrl: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl)
+POST       /submit                                                                 uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.submit(completionUrl: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl)
+POST       /agents-external-stubs/submit                                           uk.gov.hmrc.agentsexternalstubsfrontend.controllers.PersonalDetailsValidationController.submit(completionUrl: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl)
 
 # ui actions
 GET         /agents-external-stubs                                                 @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.start
@@ -68,10 +68,10 @@ GET         /agents-external-stubs/user/remove                                  
 GET         /agents-external-stubs/users                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showAllUsersPage
 POST        /agents-external-stubs/users                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.createNewUserFromShowAllUsersPage
 
-GET         /agents-external-stubs/group                                            @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.showGroupPage(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl] ?= None, groupId: Option[String] ?= None)
-GET         /agents-external-stubs/group/edit                                       @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.showEditGroupPage(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl] ?= None, groupId: Option[String] ?= None)
-POST        /agents-external-stubs/group/update                                     @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.updateGroup(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl] ?= None, groupId: Option[String] ?= None)
-GET         /agents-external-stubs/groups                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.showAllGroupsPage
+GET         /agents-external-stubs/group                                           @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.showGroupPage(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl] ?= None, groupId: Option[String] ?= None)
+GET         /agents-external-stubs/group/edit                                      @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.showEditGroupPage(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl] ?= None, groupId: Option[String] ?= None)
+POST        /agents-external-stubs/group/update                                    @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.updateGroup(continue: Option[uk.gov.hmrc.play.bootstrap.binders.RedirectUrl] ?= None, groupId: Option[String] ?= None)
+GET         /agents-external-stubs/groups                                          @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.GroupController.showAllGroupsPage
 
 #Granular permissions test URLs
 GET         /agents-external-stubs/test/gran-perms/generate-users-form             @uk.gov.hmrc.agentsexternalstubsfrontend.controllers.UserController.showGranPermsCreateUsers
