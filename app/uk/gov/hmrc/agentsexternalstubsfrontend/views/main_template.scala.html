@@ -48,7 +48,7 @@
     backLink = if(backLinkHref.isDefined) Some(BackLink(href = backLinkHref.get)) else None,
     isWelshTranslationAvailable = false,
     serviceURLs = ServiceURLs(
-        serviceUrl = None,
+        serviceUrl = Some(routes.SignInController.showQuickStart().url),
         signOutUrl = if(showSignOut) Some(routes.SignInController.signOutInternal().url) else None
     ),
     templateOverrides = TemplateOverrides(
